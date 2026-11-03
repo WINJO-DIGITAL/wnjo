@@ -30,7 +30,7 @@ Chromium against raengfitness.co.uk and records:
 `stage.html` is the motion design: the devices, camera moves, close-ups and type,
 as a pure function of time (`window.renderAt(seconds)`). `render.cjs` renders it
 frame by frame into H.264. The WNJO logo is in `assets/` (`wnjo-logo-source.png` is
-the original; the white and brown versions are cut-outs of it with transparency).
+the original; the brown (#715847, used in the credit) and white versions are cut-outs of it with transparency).
 
 ## Music
 
