@@ -51,7 +51,7 @@ describe("POST /api/enquiry", () => {
     const res = await post(contact);
     expect(res.status).toBe(200);
     const { reference } = await res.json();
-    expect(reference).toMatch(/^FYD-[0-9A-F]{6}$/);
+    expect(reference).toMatch(/^WNJO-[0-9A-F]{6}$/);
     const [, init] = fetchMock.mock.calls[0];
     const sent = JSON.parse(init.body);
     expect(sent.subject).toContain(`[${reference}]`);

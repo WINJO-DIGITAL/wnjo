@@ -122,8 +122,8 @@ const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]
  * Progress is kept for this browser tab only, so a refresh or a detour doesn't lose
  * it. Name and email are never stored; they stay in memory until the form is sent.
  */
-const DRAFT_KEY = "fydevs-enquiry-draft";
-const SENT_KEY = "fydevs-enquiry-sent";
+const DRAFT_KEY = "wnjo-enquiry-draft";
+const SENT_KEY = "wnjo-enquiry-sent";
 
 type Draft = Pick<Fields, "topic" | "site" | "budget" | "timeline" | "message">;
 

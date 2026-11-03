@@ -29,7 +29,7 @@ import { ArrowLeft, ArrowRight } from "../Icons";
 import { useEnquirySubmit } from "../useEnquirySubmit";
 import styles from "./Configurator.module.css";
 
-const STORAGE_KEY = "fydevs.configurator.v1";
+const STORAGE_KEY = "wnjo.configurator.v1";
 
 const STEPS = [
   { id: "type", label: "Project", title: "What would you like to build?" },

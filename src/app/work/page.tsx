@@ -11,7 +11,7 @@ import { projects } from "@/lib/projects";
 export const metadata = pageMetadata(
   "/work",
   "Our work",
-  "Websites and platforms designed and built by FY Devs: EV Exec, Boonma, FYStay and Alex K Bells.",
+  "Websites and platforms designed and built by WNJO: EV Exec, Boonma, FYStay and Alex K Bells.",
 );
 
 export default function WorkPage() {

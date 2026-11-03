@@ -9,7 +9,7 @@ import { Stopwatch } from "@/components/Icons";
 export const metadata = pageMetadata(
   "/about",
   "About",
-  "Why FY Devs exists: bespoke websites clients are proud of, honest pricing, and apps that solve real problems.",
+  "Why WNJO exists: bespoke websites clients are proud of, honest pricing, and apps that solve real problems.",
 );
 
 // Each principle as the thing we avoid, then what we do instead.

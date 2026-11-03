@@ -1,5 +1,5 @@
 /**
- * The single, authoritative source of FY Devs pricing rules (README §7, §8, §13).
+ * The single, authoritative source of WNJO pricing rules (README §7, §8, §13).
  *
  * Both the browser (live estimate) and the server (enquiry validation) import this
  * module, so a price is never calculated in two places. Browser-side results are
