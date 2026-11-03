@@ -1,0 +1,47 @@
+# RAENG Fitness: website showcase advert
+
+A 15-second, 16:9 (1920×1080, 60 fps) portfolio advert for the
+[RAENG Fitness website](https://raengfitness.co.uk), designed and developed by WINJO.
+The website is the product, so the advert sells the site's design and build, not the gym.
+
+- **Video:** `raeng-fitness-advert.mp4` (H.264 + AAC, web-optimised)
+- **Poster frame:** `poster.jpg`
+
+## Sequence
+
+| Time | Beat | What is on screen (all captured from the live site) |
+| --- | --- | --- |
+| 0–3 s | The reveal | Black. A desktop display emerges from darkness playing the real homepage hero video; slow push in. |
+| 3–7 s | Design details | Close-ups: the hero headline in Archivo at 3× (with the video behind it), the *Book a class* and *Explore coaching* buttons with the site's palette (`F5F2EB`, `171717`, `FFFFFF`), the class schedule cards with *Next up*, and the "1% better, every day." photography. |
+| 7–11 s | The experience | The real booking page (`/book/group-class`): the cursor picks Wednesday 4 November, then 6:30 pm, and *Your booking* updates. The window then narrows into a phone, which scrolls the real mobile homepage from the hero down to Memberships. |
+| 11–15 s | The signature | Pull back to the display and phone together, the RAENG lockup, then "Designed. Developed. Delivered." and WINJO. |
+
+## How it is made
+
+Nothing on a screen is mocked up or redrawn. `capture.cjs` drives a headless
+Chromium against raengfitness.co.uk and records:
+
+- the hero `<video>` stepped frame by frame inside the real page (desktop, plus a 3× close-up crop),
+- a full-page 2× capture of the desktop homepage,
+- the real booking flow (it stops after choosing a date and time; nothing is submitted),
+- a real eased scroll of the mobile homepage (393×852, 2×),
+- the brand lockup the site serves (`/brand/raeng-lockup-black.png`, shown inverted on black).
+
+`stage.html` is the motion design: the devices, camera moves, close-ups and type,
+as a pure function of time (`window.renderAt(seconds)`). `render.cjs` renders it
+frame by frame into H.264. `sound.py` synthesises the sound design (swell, air on
+the cuts, a quiet electronic pulse, UI ticks on the booking clicks, the closing impact
+and chord), so there is no third-party audio to license.
+
+## Rebuild
+
+Needs Node with Playwright and its Chromium, Python 3 with NumPy, and ffmpeg.
+
+```sh
+./build.sh                  # fresh captures, then render
+SKIP_CAPTURE=1 ./build.sh   # reuse build/capture
+node render.cjs --stills 3.5,8.4,12.6   # check single frames in build/stills
+```
+
+`build/` (captures and intermediate files) is not committed. Rebuild after the site
+changes so the advert keeps matching the live site.

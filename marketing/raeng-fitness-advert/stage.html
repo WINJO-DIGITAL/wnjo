@@ -1,0 +1,390 @@
+<!doctype html>
+<!--
+  RAENG Fitness website advert: the animated stage.
+  render.cjs loads this page, calls window.renderAt(seconds) for every frame
+  and screenshots it. Every screen image comes from build/capture (live captures
+  of raengfitness.co.uk made by capture.cjs).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RAENG Fitness advert stage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root { --ink: #171717; --cream: #f5f2eb; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+  body { font-family: Archivo, system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+  #stage { position: absolute; inset: 0; overflow: hidden; background: #000; perspective: 2600px; }
+  .abs { position: absolute; }
+  .center { left: 50%; top: 50%; }
+
+  /* Ambient light */
+  #spot { inset: 0; background: radial-gradient(ellipse 60% 55% at 50% 42%, rgba(245,242,235,.13), rgba(245,242,235,.03) 45%, transparent 70%); }
+  #floor { left: 50%; top: 0; width: 1500px; height: 180px; margin-left: -750px; border-radius: 50%;
+           background: radial-gradient(ellipse at center, rgba(245,242,235,.10), transparent 70%); filter: blur(10px); }
+
+  /* Desktop display */
+  #monitor { width: 1484px; height: 944px; transform-style: preserve-3d; will-change: transform; }
+  #monitor .frame { position: absolute; inset: 0; border-radius: 26px; background: #0a0a0b;
+    box-shadow: 0 0 0 3px #3b3b3e, 0 0 0 4px #1b1b1d, 0 40px 120px rgba(0,0,0,.8), 0 0 220px rgba(245,242,235,.07); }
+  #monitor .screen { position: absolute; left: 22px; top: 22px; width: 1440px; height: 900px; overflow: hidden; border-radius: 4px; background: var(--cream); }
+  #monitor .screen img { width: 1440px; height: 900px; display: block; }
+  #monitor .glare { position: absolute; inset: 0; border-radius: 26px; pointer-events: none; mix-blend-mode: screen;
+    background: linear-gradient(115deg, transparent 0%, transparent var(--g0), rgba(255,255,255,.16) var(--g1), transparent var(--g2), transparent 100%); }
+  #monitor .neck { position: absolute; left: 50%; top: 944px; width: 300px; height: 230px; margin-left: -150px;
+    background: linear-gradient(90deg, #1d1d1f, #4a4a4d 30%, #5a5a5e 50%, #3a3a3d 75%, #19191a);
+    clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%); }
+  #monitor .foot { position: absolute; left: 50%; top: 1170px; width: 520px; height: 20px; margin-left: -260px; border-radius: 4px 4px 10px 10px;
+    background: linear-gradient(180deg, #5c5c60, #26262a); box-shadow: 0 30px 60px rgba(0,0,0,.9); }
+
+  /* Macro shots */
+  .shot { inset: 0; overflow: hidden; will-change: transform, filter, opacity; transform-style: preserve-3d; }
+  .shot img { position: absolute; left: 0; top: 0; transform-origin: 0 0; display: block; }
+  .shot .shade { position: absolute; inset: 0; background: radial-gradient(ellipse 85% 85% at 50% 50%, transparent 55%, rgba(0,0,0,.55)); }
+
+  .caption { left: 96px; bottom: 84px; font: 500 15px/1 'JetBrains Mono', monospace; letter-spacing: .18em; text-transform: uppercase; white-space: nowrap; }
+  .caption.light { color: rgba(255,255,255,.78); }
+  .caption.dark { color: rgba(23,23,23,.7); }
+  #palette { left: 96px; bottom: 84px; display: flex; gap: 34px; align-items: center; }
+  #palette .sw { display: flex; align-items: center; gap: 14px; font: 500 14px/1 'JetBrains Mono', monospace; letter-spacing: .14em; color: rgba(255,255,255,.82); }
+  #palette .chip { width: 34px; height: 34px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,.35); }
+
+  /* Browser window that becomes a phone */
+  #device { transform-style: preserve-3d; will-change: transform; overflow: hidden; background: var(--cream); }
+  #device .desk { position: absolute; left: 0; top: 0; width: 1440px; height: 942px; }
+  #device .bar { position: absolute; left: 0; top: 0; width: 1440px; height: 42px; background: #e9e5dc; border-bottom: 1px solid #d6d1c6; }
+  #device .bar .lights { position: absolute; left: 18px; top: 15px; display: flex; gap: 8px; }
+  #device .bar .lights i { width: 12px; height: 12px; border-radius: 50%; background: #c8c3b8; display: block; }
+  #device .bar .url { position: absolute; left: 50%; top: 8px; width: 520px; margin-left: -260px; height: 26px; border-radius: 8px; background: #f5f2eb;
+    font: 500 13px/26px Archivo, sans-serif; color: #55524c; text-align: center; letter-spacing: .01em; }
+  #device .bar .url svg { vertical-align: -2px; margin-right: 6px; }
+  #device .page { position: absolute; left: 0; top: 42px; width: 1440px; height: 900px; }
+  #device .page img { position: absolute; inset: 0; width: 1440px; height: 900px; }
+  #device .mob { position: absolute; left: 0; top: 0; width: 393px; height: 852px; }
+  #device .mob img { width: 393px; height: 852px; display: block; }
+  #device .island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; }
+  #cursor { left: 0; top: 0; width: 30px; height: 30px; transform-origin: 3px 2px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.35)); }
+  #ripple { width: 80px; height: 80px; margin: -40px 0 0 -40px; border-radius: 50%; border: 2px solid rgba(23,23,23,.55); }
+
+  /* Signature */
+  #logo { width: 230px; filter: invert(1); }
+  #url { font: 500 15px/1 'JetBrains Mono', monospace; letter-spacing: .2em; color: rgba(255,255,255,.55); text-transform: uppercase; white-space: nowrap; }
+  #credit { left: 0; right: 0; top: 0; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  #credit .line { display: flex; gap: .32em; font: 600 76px/1.1 Archivo, sans-serif; letter-spacing: -.025em; }
+  #credit .line span { display: inline-block; will-change: transform, opacity, filter; }
+  #credit .rule { width: 64px; height: 1px; background: rgba(255,255,255,.35); margin: 54px 0 44px; }
+  #credit .winjo { font: 600 40px/1 Archivo, sans-serif; letter-spacing: .5em; margin-right: -.5em; }
+  #credit .by { font: 500 13px/1 'JetBrains Mono', monospace; letter-spacing: .3em; color: rgba(255,255,255,.5); margin-bottom: 22px; }
+
+  #vignette { inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 75% at 50% 50%, transparent 60%, rgba(0,0,0,.6)); }
+  #fade { inset: 0; background: #000; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="spot" class="abs"></div>
+  <div id="floor" class="abs"></div>
+
+  <div id="monitor" class="abs center">
+    <div class="frame"></div>
+    <div class="screen"><img id="monImg" alt=""></div>
+    <div class="glare"></div>
+    <div class="neck"></div>
+    <div class="foot"></div>
+  </div>
+
+  <!-- 3–7 s: details -->
+  <div id="shotA" class="shot abs"><img id="macroA" alt=""><div class="shade"></div>
+    <div class="caption light abs" style="left:auto;right:96px">Typography / Archivo</div></div>
+  <div id="shotB" class="shot abs"><img id="macroB" alt=""><div class="shade"></div>
+    <div id="palette" class="abs">
+      <div class="sw"><span class="chip" style="background:#f5f2eb"></span>F5F2EB</div>
+      <div class="sw"><span class="chip" style="background:#171717"></span>171717</div>
+      <div class="sw"><span class="chip" style="background:#ffffff"></span>FFFFFF</div>
+    </div></div>
+  <div id="shotC" class="shot abs"><img id="fullC" alt="" src="build/capture/desktop-full.png"><div class="shade" style="opacity:.5"></div>
+    <div class="caption dark abs">Layout / Class schedule</div></div>
+  <div id="shotD" class="shot abs"><img id="fullD" alt="" src="build/capture/desktop-full.png"><div class="shade"></div>
+    <div class="caption dark abs">Imagery / Composition</div></div>
+
+  <!-- 7–11 s: experience -->
+  <div id="device" class="abs center">
+    <div class="desk">
+      <div class="bar">
+        <div class="lights"><i></i><i></i><i></i></div>
+        <div class="url"><svg width="11" height="12" viewBox="0 0 11 12" fill="none"><rect x=".5" y="5" width="10" height="6.5" rx="1.5" fill="#6b675f"/><path d="M2.8 5V3.6a2.7 2.7 0 0 1 5.4 0V5" stroke="#6b675f" stroke-width="1.3"/></svg>raengfitness.co.uk/book/group-class</div>
+      </div>
+      <div class="page">
+        <img id="bk0" alt="" src="build/capture/book-0.png">
+        <img id="bk1" alt="" src="build/capture/book-1.png">
+        <img id="bk2" alt="" src="build/capture/book-2.png">
+        <div id="ripple" class="abs"></div>
+        <svg id="cursor" class="abs" viewBox="0 0 30 30"><path d="M4 2 L4 24 L9.5 18.8 L13.2 27 L17 25.3 L13.4 17.3 L21 17.3 Z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="mob"><img id="mobImg" alt=""><div class="island"></div></div>
+  </div>
+
+  <!-- 11–15 s: signature -->
+  <img id="logo" class="abs" alt="RAENG Fitness" src="build/capture/raeng-lockup-black.png">
+  <div id="url" class="abs">raengfitness.co.uk</div>
+  <div id="credit" class="abs">
+    <div class="line"><span>Designed.</span><span>Developed.</span><span>Delivered.</span></div>
+    <div class="rule"></div>
+    <div class="winjo">WINJO</div>
+  </div>
+
+  <div id="vignette" class="abs"></div>
+  <div id="fade" class="abs"></div>
+</div>
+
+<script>
+const W = 1920, H = 1080;
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, u) => a + (b - a) * u;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const easeInOut = (u) => (u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+const easeOut = (u) => 1 - Math.pow(1 - u, 3);
+const easeIn = (u) => u * u * u;
+const expoOut = (u) => (u === 1 ? 1 : 1 - Math.pow(2, -10 * u));
+const pad = (n) => String(n).padStart(4, '0');
+
+// Fade a layer in over [a, a+fi] and out over [b-fo, b]; returns 0..1.
+const life = (t, a, b, fi = .25, fo = .25) => Math.min(prog(t, a, a + fi), 1 - prog(t, b - fo, b));
+
+function setImg(img, src) {
+  if (img.getAttribute('src') !== src) img.setAttribute('src', src);
+}
+
+// Point a camera at a rectangle of a source image so it fills the frame (16:9).
+function frameRect(img, r, ox = 0, oy = 0) {
+  const s = W / r[2];
+  img.style.transform = `translate(${-r[0] * s + ox}px, ${-r[1] * s + oy}px) scale(${s})`;
+}
+const mixRect = (a, b, u) => a.map((v, i) => lerp(v, b[i], u));
+
+function show(el, o, blur = 0, extra = '') {
+  el.style.opacity = o;
+  el.style.display = o <= 0.001 ? 'none' : 'block';
+  el.style.filter = blur > .05 ? `blur(${blur}px)` : '';
+  if (extra) el.style.transform = extra;
+}
+
+window.renderAt = async function (t) {
+  const pending = [];
+  const want = (img, src) => { setImg(img, src); pending.push(img.decode().catch(() => {})); };
+
+  /* ---------- Ambient ---------- */
+  const spotOn = Math.max(prog(t, .2, 2.2) * (1 - prog(t, 2.7, 3.0)), prog(t, 11.0, 12.0) * (1 - prog(t, 12.85, 13.3)) * .9, .0);
+  $('spot').style.opacity = spotOn;
+
+  /* ---------- Monitor: 0–3 s reveal, 11–13 s signature ---------- */
+  const mon = $('monitor');
+  if (t < 3.05) {
+    const u = prog(t, 0, 2.55);
+    const push = easeIn(prog(t, 2.45, 3.05));
+    const s = lerp(.56, .66, easeInOut(u)) + push * 1.25;
+    const rx = lerp(9, 0, easeOut(u));
+    const y = lerp(40, 0, easeOut(u)) - push * 60;
+    const x = -push * 330;  // push towards the headline
+    mon.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${s}) rotateX(${rx}deg)`;
+    const bright = easeInOut(prog(t, .35, 2.0));
+    show(mon, 1, push * 14);
+    mon.style.filter = `brightness(${bright})` + (push > .02 ? ` blur(${push * 14}px)` : '');
+    mon.style.opacity = 1 - prog(t, 2.85, 3.05);
+    const g = lerp(-30, 130, easeInOut(prog(t, 1.1, 2.7)));
+    mon.style.setProperty('--g0', g - 14 + '%'); mon.style.setProperty('--g1', g + '%'); mon.style.setProperty('--g2', g + 14 + '%');
+    want($('monImg'), `build/capture/hero-desktop/${pad(Math.min(239, Math.floor(t * 30)))}.jpg`);
+    $('floor').style.opacity = bright * (1 - push);
+    $('floor').style.top = (540 + 470 * lerp(.56, .66, easeInOut(u)) + y + 220) + 'px';
+  } else if (t >= 10.9 && t < 13.35) {
+    const u = easeInOut(prog(t, 11.0, 12.2));
+    const lift = easeInOut(prog(t, 11.8, 12.6));
+    const out = easeIn(prog(t, 12.85, 13.3));
+    const s = lerp(1.05, .5, u) - out * .03;
+    const x = lerp(0, -100, u), y = lerp(-20, -40, u) - lift * 110;
+    mon.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${s})`;
+    mon.style.display = 'block';
+    mon.style.opacity = prog(t, 11.0, 11.55) * (1 - out);
+    mon.style.filter = out > .02 ? `blur(${out * 10}px)` : '';
+    mon.style.setProperty('--g0', '-40%'); mon.style.setProperty('--g1', '-30%'); mon.style.setProperty('--g2', '-20%');
+    want($('monImg'), `build/capture/hero-desktop/${pad(Math.min(239, 90 + Math.floor((t - 10.9) * 30)))}.jpg`);
+    $('floor').style.opacity = prog(t, 11.3, 12.0) * (1 - out);
+    $('floor').style.top = (540 + y + (472 + 246) * s - 60) + 'px';
+  } else {
+    mon.style.display = 'none';
+    $('floor').style.opacity = 0;
+  }
+
+  /* ---------- 3–7 s: macro details ---------- */
+  // A: the hero headline at 3x, live video behind it.
+  {
+    const o = life(t, 2.9, 4.2, .3, .25);
+    const el = $('shotA');
+    if (o > 0) {
+      const u = easeInOut(prog(t, 2.9, 4.2));
+      frameRect($('macroA'), mixRect([0, 30, 1900], [180, 290, 1320], u));
+      const blur = (1 - prog(t, 2.9, 3.25)) * 16 + prog(t, 3.95, 4.2) * 12;
+      show(el, o, blur, `rotateY(${lerp(-7, 5, u)}deg) scale(${lerp(1.04, 1, u)})`);
+      want($('macroA'), `build/capture/hero-macro/${pad(Math.floor(clamp(t - 2.9, 0, 2.4) * 30))}.jpg`);
+    } else show(el, 0);
+  }
+  // B: buttons + the site's palette.
+  {
+    const o = life(t, 4.0, 5.15, .22, .25);
+    const el = $('shotB');
+    if (o > 0) {
+      const u = easeInOut(prog(t, 4.0, 5.15));
+      frameRect($('macroB'), mixRect([40, 520, 1300], [170, 640, 1100], u));
+      const blur = (1 - prog(t, 4.0, 4.25)) * 12 + prog(t, 4.9, 5.15) * 12;
+      show(el, o, blur, `rotateX(${lerp(6, -3, u)}deg) translateY(${lerp(14, -10, u)}px)`);
+      want($('macroB'), `build/capture/hero-macro/${pad(Math.min(74, Math.floor((t - 2.9) * 30)))}.jpg`);
+      const p = $('palette');
+      p.style.opacity = prog(t, 4.25, 4.55);
+      p.style.transform = `translateY(${lerp(14, 0, easeOut(prog(t, 4.25, 4.6)))}px)`;
+    } else show(el, 0);
+  }
+  // C: class schedule from the full desktop page (2x capture, CSS px x2).
+  {
+    const o = life(t, 4.95, 6.15, .22, .25);
+    const el = $('shotC');
+    if (o > 0) {
+      const u = easeInOut(prog(t, 4.95, 6.15));
+      frameRect($('fullC'), mixRect([220, 2830, 2500], [1190, 3050, 1500], u));
+      const blur = (1 - prog(t, 4.95, 5.2)) * 12 + prog(t, 5.9, 6.15) * 12;
+      show(el, o, blur, `rotateY(${lerp(8, -4, u)}deg) rotateX(${lerp(-3, 2, u)}deg)`);
+    } else show(el, 0);
+  }
+  // D: photography: "1% better, every day." and the coach photo.
+  {
+    const o = life(t, 5.95, 7.15, .22, .3);
+    const el = $('shotD');
+    if (o > 0) {
+      const u = easeInOut(prog(t, 5.95, 7.15));
+      frameRect($('fullD'), mixRect([180, 7700, 2400], [1290, 7960, 1180], u));
+      const blur = (1 - prog(t, 5.95, 6.2)) * 12 + prog(t, 6.9, 7.15) * 14;
+      show(el, o, blur, `rotateY(${lerp(-6, 4, u)}deg)`);
+    } else show(el, 0);
+  }
+
+  /* ---------- 7–11 s: the experience (browser -> phone) ---------- */
+  {
+    const dev = $('device');
+    if (t >= 6.9 && t < 13.35) {
+      const enter = easeOut(prog(t, 6.9, 7.45));
+      const m = easeInOut(prog(t, 8.75, 9.6));             // desktop -> phone morph
+      const back = easeInOut(prog(t, 11.0, 12.2));          // pull back
+      const lift = easeInOut(prog(t, 11.8, 12.6));
+      const out = easeIn(prog(t, 12.85, 13.3));
+
+      const w = lerp(1440, 393, m), h = lerp(942, 852, m);
+      const r = lerp(14, 56, m), bw = lerp(0, 13, easeInOut(prog(t, 9.0, 9.6)));
+      dev.style.width = w + 'px'; dev.style.height = h + 'px';
+      dev.style.borderRadius = r + 'px';
+      dev.style.border = `${bw}px solid #050506`;
+      dev.style.boxShadow = `0 0 0 ${lerp(1, 2.5, m)}px ${m > .5 ? '#3a3a3d' : 'rgba(255,255,255,.18)'}, 0 50px 140px rgba(0,0,0,.85), 0 0 200px rgba(245,242,235,${lerp(.05, .08, m)})`;
+
+      // Camera: desktop drifts towards the calendar, then turns into the phone.
+      const dskS = lerp(1.12, 1.32, easeInOut(prog(t, 6.9, 8.75)));
+      const s0 = lerp(dskS, 1.08, m);
+      const s = lerp(s0, .55, back) * (1 - out * .03);
+      const x = lerp(lerp(lerp(40, -20, prog(t, 7, 8.7)), 0, m), 470, back);
+      const y = lerp(lerp(-55, -105, prog(t, 7, 8.7)), 0, m) + back * 120 - lift * 110;
+      const ry = lerp(lerp(lerp(16, 8, easeOut(prog(t, 6.9, 8.75))), -10, m), 0, easeInOut(prog(t, 9.6, 11.0)));
+      const rx = lerp(lerp(6, 3, prog(t, 6.9, 8.75)), 0, m);
+      const zIn = lerp(-500, 0, enter);
+      dev.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) translateZ(${zIn}px) scale(${s}) rotateY(${ry}deg) rotateX(${rx}deg)`;
+      dev.style.display = 'block';
+      dev.style.opacity = enter * (1 - out);
+      const blur = (1 - enter) * 10 + out * 10;
+      dev.style.filter = blur > .05 ? `blur(${blur}px)` : '';
+      dev.style.zIndex = 2;
+
+      // Desktop booking states and cursor.
+      const desk = dev.querySelector('.desk');
+      const dOp = 1 - prog(t, 8.95, 9.3);
+      desk.style.opacity = dOp;
+      desk.style.display = dOp > 0 ? 'block' : 'none';
+      desk.style.left = (w - 1440) / 2 + 'px';    // the page stays centred as the window narrows
+      $('bk1').style.opacity = prog(t, 7.72, 7.84);
+      $('bk2').style.opacity = prog(t, 8.38, 8.5);
+      const P0 = [1000, 820], P1 = [312, 669], P2 = [784, 557];
+      let cx, cy;
+      if (t < 7.72) { const u = easeInOut(prog(t, 7.15, 7.68)); cx = lerp(P0[0], P1[0], u); cy = lerp(P0[1], P1[1], u); }
+      else { const u = easeInOut(prog(t, 7.9, 8.35)); cx = lerp(P1[0], P2[0], u); cy = lerp(P1[1], P2[1], u); }
+      const press = Math.max(1 - Math.abs(t - 7.7) / .07, 1 - Math.abs(t - 8.36) / .07, 0);
+      const cur = $('cursor');
+      cur.style.transform = `translate(${cx - 3}px, ${cy - 2}px) scale(${1 - press * .15})`;
+      cur.style.opacity = prog(t, 7.1, 7.3) * (1 - prog(t, 8.6, 8.8));
+      const rp = $('ripple');
+      const rt = t < 8.1 ? prog(t, 7.7, 8.15) : prog(t, 8.36, 8.81);
+      const rpos = t < 8.1 ? P1 : P2;
+      rp.style.left = rpos[0] + 'px'; rp.style.top = rpos[1] + 'px';
+      rp.style.transform = `scale(${lerp(.3, 1.3, easeOut(rt))})`;
+      rp.style.opacity = rt > 0 && rt < 1 ? (1 - rt) * .9 : 0;
+
+      // Phone: live mobile scroll captured from the site.
+      const mob = dev.querySelector('.mob');
+      const mOp = prog(t, 9.0, 9.35);
+      mob.style.left = (w - 393) / 2 + 'px';
+      mob.style.opacity = mOp;
+      mob.style.display = mOp > 0 ? 'block' : 'none';
+      const k = Math.floor(clamp((t - 9.35) / 1.65, 0, 1) * 149);
+      want($('mobImg'), `build/capture/mobile-scroll/${pad(k)}.jpg`);
+    } else dev.style.display = 'none';
+  }
+
+  /* ---------- 11–15 s: signature ---------- */
+  {
+    const lo = $('logo'), url = $('url');
+    const inU = easeOut(prog(t, 11.85, 12.55));
+    const out = easeIn(prog(t, 12.85, 13.3));
+    const o = inU * (1 - out);
+    lo.style.opacity = o; url.style.opacity = o * prog(t, 12.05, 12.6);
+    lo.style.left = (960 - 115) + 'px';
+    lo.style.top = (lerp(822, 800, inU) - out * 6) + 'px';
+    url.style.left = '0'; url.style.right = '0'; url.style.textAlign = 'center';
+    url.style.top = (lerp(1004, 998, inU)) + 'px';
+    const b = (1 - inU) * 10 + out * 8;
+    lo.style.filter = 'invert(1)' + (b > .05 ? ` blur(${b}px)` : '');
+    lo.style.display = url.style.display = o > 0 ? 'block' : 'none';
+
+    const cr = $('credit');
+    const words = cr.querySelectorAll('.line span');
+    const starts = [13.2, 13.45, 13.7];
+    words.forEach((sp, i) => {
+      const u = easeOut(prog(t, starts[i], starts[i] + .5));
+      sp.style.opacity = u;
+      sp.style.transform = `translateY(${lerp(26, 0, u)}px)`;
+      sp.style.filter = u < .99 ? `blur(${(1 - u) * 10}px)` : '';
+    });
+    const ru = easeInOut(prog(t, 13.95, 14.4));
+    cr.querySelector('.rule').style.transform = `scaleX(${ru})`;
+    const wu = easeOut(prog(t, 14.0, 14.6));
+    const wj = cr.querySelector('.winjo');
+    wj.style.opacity = wu;
+    wj.style.letterSpacing = lerp(.9, .5, wu) + 'em';
+    wj.style.marginRight = -lerp(.9, .5, wu) + 'em';
+    wj.style.filter = wu < .99 ? `blur(${(1 - wu) * 8}px)` : '';
+    cr.style.display = t >= 13.1 ? 'flex' : 'none';
+    const drift = lerp(0, -6, prog(t, 13.2, 15));
+    cr.style.transform = `translateY(${drift}px) scale(${lerp(1.0, .985, prog(t, 13.2, 15))})`;
+  }
+
+  // Opening from black and a short close to black.
+  $('fade').style.opacity = Math.max(1 - prog(t, 0, .35), prog(t, 14.82, 15.0));
+
+  await Promise.all(pending);
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+};
+
+window.stageReady = Promise.all([
+  document.fonts.ready,
+  ...[...document.images].filter((i) => i.getAttribute('src')).map((i) => i.decode().catch(() => {})),
+]);
+</script>
+</body>
+</html>
