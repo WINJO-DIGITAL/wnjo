@@ -27,7 +27,7 @@ export const packagePlanCards: PlanCard[] = packageOrder.map((id) => ({
   from: true,
   includes: PACKAGES[id].includes,
   href: `/build?pages=${packagePages[id]}`,
-  cta: "Start a Project",
+  cta: "Get my price",
 }));
 
 /** App development, priced after scoping. */
@@ -42,6 +42,6 @@ export const appPlanCard: PlanCard = {
     "A working app delivered in agreed stages",
   ],
   href: "/contact?topic=bespoke",
-  cta: "Build My App",
+  cta: "Plan my app",
   variant: "inverse",
 };

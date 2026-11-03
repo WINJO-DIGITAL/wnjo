@@ -29,7 +29,7 @@ import { ArrowLeft, ArrowRight } from "../Icons";
 import { useEnquirySubmit } from "../useEnquirySubmit";
 import styles from "./Configurator.module.css";
 
-const STORAGE_KEY = "fydevs.configurator.v1";
+const STORAGE_KEY = "wnjo.configurator.v1";
 
 const STEPS = [
   { id: "type", label: "Project", title: "What would you like to build?" },
@@ -91,7 +91,7 @@ function store(saved: Saved | null) {
 }
 
 /** Choices carried over in the link, e.g. ?pages=6-12 from a pricing card or ?care=care from a plan. */
-export type ConfiguratorParams = { type?: string; pages?: string; care?: string };
+export type ConfiguratorParams = { type?: string; pages?: string; care?: string; business?: string };
 
 /** Initial answers: saved progress (in the browser only), then any choices carried over in the link. */
 function initialState(params: ConfiguratorParams, withSaved: boolean): Saved {
@@ -102,7 +102,10 @@ function initialState(params: ConfiguratorParams, withSaved: boolean): Saved {
     ...(params.pages && { pageBand: params.pages }),
     ...(params.care && { carePlan: params.care }),
   });
-  return { answers: merged ?? saved.answers, details: saved.details };
+  // A business carried in the link (e.g. from the homepage's example sites) fills an empty answer only.
+  const business = params.business?.trim().slice(0, 60);
+  const details = business && !saved.details.business ? { ...saved.details, business } : saved.details;
+  return { answers: merged ?? saved.answers, details };
 }
 
 const noopSubscribe = () => () => {};
@@ -434,7 +437,7 @@ function ConfiguratorInner({ params, inBrowser }: { params: ConfiguratorParams; 
                 </fieldset>
                 <p className="fine">
                   Domain names, business email, paid licences and third-party subscriptions are not included in any
-                  plan. <Link href="/websites#care">See what&apos;s covered</Link>.
+                  plan. <Link href="/pricing#care">See what&apos;s covered</Link>.
                 </p>
               </>
             )}

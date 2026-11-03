@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ArrowRight } from "./Icons";
+import { Stopwatch } from "./Icons";
 
 /** Pages that already are the next step, so the bar would only get in the way. */
 const HIDDEN_ON = ["/contact", "/build"];
@@ -11,7 +11,7 @@ const HIDDEN_ON = ["/contact", "/build"];
 /**
  * Phones and tablets: once the visitor has scrolled past the opening screen, a slim bar
  * slides up with the two next steps. It steps aside over sections that already offer them
- * (the hero zoom and showcase, call-to-action bands, the footer) and whenever another
+ * (the hero and its showcase, call-to-action bands, the footer) and whenever another
  * button reaches the strip along the bottom it would cover.
  */
 export function StickyCta() {
@@ -38,7 +38,7 @@ export function StickyCta() {
     };
     // Sections that already are the next step: anywhere on screen.
     const sections = new IntersectionObserver(track);
-    document.querySelectorAll(".zoom, .cta-band, .site-footer, [data-cta-hide]").forEach((el) => sections.observe(el));
+    document.querySelectorAll(".cta-band, .site-footer, [data-cta-hide]").forEach((el) => sections.observe(el));
     // Other buttons only matter in the strip the bar covers, along the bottom of the screen.
     const buttons = new IntersectionObserver(track, { rootMargin: "-82% 0px 0px 0px" });
     document.querySelectorAll("main .btn").forEach((el) => buttons.observe(el));
@@ -56,14 +56,14 @@ export function StickyCta() {
   if (HIDDEN_ON.includes(pathname)) return null;
 
   return (
-    <div className="sticky-cta" data-show={show} inert={!show}>
-      <Link href="/contact?topic=website" className="btn btn--primary">
-        Start a Project
-        <ArrowRight />
+    <aside className="sticky-cta" aria-label="Get started" data-show={show} inert={!show}>
+      <Link href="/build" className="btn btn--primary">
+        <Stopwatch />
+        Get my price
       </Link>
-      <Link href="/build" className="btn btn--secondary">
-        Instant estimate
+      <Link href="/contact?topic=website" className="btn btn--secondary">
+        Talk to us
       </Link>
-    </div>
+    </aside>
   );
 }

@@ -4,11 +4,11 @@
  * rather than invented. See README §15 "Open Decisions".
  */
 export const site = {
-  name: "FY Devs",
-  shortName: "FYDevs",
+  name: "WNJO",
+  shortName: "WNJO",
   tagline: "Bespoke websites, apps and booking software.",
   description:
-    "FY Devs designs and builds bespoke websites, apps and booking software for businesses that want considered design, clear pricing and technology that fits how they work.",
+    "WNJO designs and builds bespoke websites, apps and booking software for businesses that want considered design, clear pricing and technology that fits how they work.",
   locale: "en_GB",
   themeColor: "#F2ECE2",
 } as const;
@@ -41,12 +41,15 @@ export type NavItem = NavLink & {
   menu?: NavMenu;
   /** Other paths that belong to this section, for the current-section indicator. */
   also?: string[];
+  /** Kept off the desktop bar so it stays uncrowded; the phone menu and the footer still list it. */
+  mobileOnly?: boolean;
 };
 
 export const primaryNav: NavItem[] = [
   {
     href: "/work",
     label: "Work",
+    mobileOnly: true,
     menu: {
       primary: [
         { href: "/work", label: "All work" },
@@ -75,7 +78,7 @@ export const primaryNav: NavItem[] = [
     menu: {
       primary: [
         { href: "/websites", label: "Explore websites" },
-        { href: "/build", label: "Instant estimate" },
+        { href: "/build", label: "Get my price" },
         { href: "/pricing", label: "Packages & prices" },
         { href: "/pricing#care", label: "Hosting & care" },
       ],
@@ -91,8 +94,8 @@ export const primaryNav: NavItem[] = [
         {
           title: "Get started",
           links: [
-            { href: "/build", label: "Instant estimate" },
-            { href: "/contact?topic=website", label: "Start a Project" },
+            { href: "/build", label: "Get my price" },
+            { href: "/contact?topic=website", label: "Talk to us" },
           ],
         },
       ],
@@ -110,8 +113,8 @@ export const primaryNav: NavItem[] = [
         {
           title: "Learn more",
           links: [
-            { href: "/booking-software#fit", label: "Is it right for you?" },
-            { href: "/booking-software#demo", label: "What a demo covers" },
+            { href: "/booking-software#apps", label: "The apps" },
+            { href: "/booking-software#make-it-yours", label: "Make it yours" },
             { href: "/work#ev-exec", label: "Built for EV Exec" },
           ],
         },
@@ -124,7 +127,7 @@ export const primaryNav: NavItem[] = [
     menu: {
       primary: [
         { href: "/app-development", label: "App development" },
-        { href: "/contact?topic=bespoke", label: "Build My App" },
+        { href: "/contact?topic=bespoke", label: "Plan my app" },
       ],
       groups: [
         {
@@ -139,17 +142,17 @@ export const primaryNav: NavItem[] = [
     },
   },
   { href: "/pricing", label: "Pricing" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+  { href: "/about", label: "About", mobileOnly: true },
+  { href: "/contact", label: "Contact", mobileOnly: true },
 ];
 
 export const footerNav: { title: string; links: NavLink[] }[] = [
   {
     title: "Websites",
     links: [
-      { href: "/websites", label: "Web design" },
-      { href: "/pricing", label: "Packages & prices" },
-      { href: "/build", label: "Instant estimate" },
+      { href: "/websites", label: "Websites" },
+      { href: "/pricing", label: "Pricing" },
+      { href: "/build", label: "Get my price" },
       { href: "/pricing#care", label: "Hosting & care" },
     ],
   },
@@ -166,7 +169,7 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
     links: [
       { href: "/about", label: "About" },
       { href: "/faq", label: "FAQ" },
-      { href: "/contact", label: "Start a Project" },
+      { href: "/contact", label: "Contact" },
       { href: "/privacy", label: "Privacy" },
     ],
   },

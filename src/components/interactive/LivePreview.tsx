@@ -71,9 +71,9 @@ export function LivePreview({
       onEnded={onEnded}
       aria-label={`A walkthrough of the ${name} website`}
     >
-      {/* H.264 for Safari and most browsers; VP9 for browsers without it. */}
-      <source src={mp4} type="video/mp4" />
+      {/* VP9 first, about a third smaller; H.264 for the browsers that can't play it. */}
       <source src={webm} type="video/webm" />
+      <source src={mp4} type="video/mp4" />
     </video>
   );
 }

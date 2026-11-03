@@ -44,7 +44,13 @@ const STEPS: { title: string; short: string; fields: FieldKey[] }[] = [
 const REVIEW = STEPS.length - 1;
 const SITE_LIMIT = 200;
 
-const stroke = { fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round", strokeLinejoin: "round" } as const;
+const stroke = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.5,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
 
 /** What each option means, a line icon, and example goals visitors can tap to add. */
 const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]; askSite?: boolean }> = {
@@ -93,7 +99,9 @@ const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]
   },
   care: {
     note: "Look after a site you already have",
-    icon: <path d="M12 3.75 4.5 6.75v5.25c0 4.1 3.1 7.4 7.5 8.25 4.4-.85 7.5-4.15 7.5-8.25V6.75L12 3.75Z" {...stroke} />,
+    icon: (
+      <path d="M12 3.75 4.5 6.75v5.25c0 4.1 3.1 7.4 7.5 8.25 4.4-.85 7.5-4.15 7.5-8.25V6.75L12 3.75Z" {...stroke} />
+    ),
     examples: ["Keep it secure and up to date", "Small changes each month", "Move to better hosting"],
     askSite: true,
   },
@@ -114,8 +122,8 @@ const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]
  * Progress is kept for this browser tab only, so a refresh or a detour doesn't lose
  * it. Name and email are never stored; they stay in memory until the form is sent.
  */
-const DRAFT_KEY = "fydevs-enquiry-draft";
-const SENT_KEY = "fydevs-enquiry-sent";
+const DRAFT_KEY = "wnjo-enquiry-draft";
+const SENT_KEY = "wnjo-enquiry-sent";
 
 type Draft = Pick<Fields, "topic" | "site" | "budget" | "timeline" | "message">;
 
@@ -137,8 +145,16 @@ function writeSession(key: string, value: unknown) {
   }
 }
 
-function initialFields(topicParam: string | undefined, inBrowser: boolean): Fields {
+/** A brief handed over in the link (?brief=, e.g. from the booking app configurator): plain text, trimmed to size. */
+const cleanBrief = (brief: string | undefined) =>
+  brief
+    ?.replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "")
+    .trim()
+    .slice(0, LIMITS.message) || "";
+
+function initialFields(topicParam: string | undefined, briefParam: string | undefined, inBrowser: boolean): Fields {
   const draft = (inBrowser ? readSession<Partial<Draft>>(DRAFT_KEY) : null) ?? {};
+  const brief = cleanBrief(briefParam);
   return {
     name: "",
     email: "",
@@ -147,14 +163,17 @@ function initialFields(topicParam: string | undefined, inBrowser: boolean): Fiel
     site: typeof draft.site === "string" ? draft.site.slice(0, SITE_LIMIT) : "",
     budget: typeof draft.budget === "string" && draft.budget in BUDGETS ? (draft.budget as Budget) : "",
     timeline: typeof draft.timeline === "string" && draft.timeline in TIMELINES ? (draft.timeline as Timeline) : "",
-    message: typeof draft.message === "string" ? draft.message.slice(0, LIMITS.message) : "",
+    // Likewise a brief in the link: the app the visitor just designed.
+    message: brief || (typeof draft.message === "string" ? draft.message.slice(0, LIMITS.message) : ""),
     website: "",
   };
 }
 
 /** The message as sent: the current website (when asked for) ahead of the visitor's goals. */
 const composeMessage = (f: Fields) =>
-  f.topic && OPTIONS[f.topic].askSite && f.site.trim() ? `Current website: ${f.site.trim()}\n\n${f.message}` : f.message;
+  f.topic && OPTIONS[f.topic].askSite && f.site.trim()
+    ? `Current website: ${f.site.trim()}\n\n${f.message}`
+    : f.message;
 
 type Choice<K extends string> = { value: K; title: string; note: string; icon?: ReactNode };
 
@@ -253,16 +272,30 @@ const TIMELINE_CHOICES: Choice<Timeline>[] = (Object.keys(TIMELINES) as Timeline
 const noopSubscribe = () => () => {};
 
 /**
- * The server renders the form from the link (?topic=), so the page arrives at its
- * final size. Once hydrated it remounts with anything kept in this tab's session.
+ * The server renders the form from the link (?topic=, ?brief=), so the page arrives at
+ * its final size. Once hydrated it remounts with anything kept in this tab's session.
  */
-export function ContactForm({ topic }: { topic?: string }) {
-  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
-  return <EnquiryForm key={hydrated ? "browser" : "server"} topicParam={topic} inBrowser={hydrated} />;
+export function ContactForm({ topic, brief }: { topic?: string; brief?: string }) {
+  const hydrated = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+  return (
+    <EnquiryForm key={hydrated ? "browser" : "server"} topicParam={topic} briefParam={brief} inBrowser={hydrated} />
+  );
 }
 
-function EnquiryForm({ topicParam, inBrowser }: { topicParam?: string; inBrowser: boolean }) {
-  const [fields, setFields] = useState<Fields>(() => initialFields(topicParam, inBrowser));
+function EnquiryForm({
+  topicParam,
+  briefParam,
+  inBrowser,
+}: {
+  topicParam?: string;
+  briefParam?: string;
+  inBrowser: boolean;
+}) {
+  const [fields, setFields] = useState<Fields>(() => initialFields(topicParam, briefParam, inBrowser));
   const [step, setStep] = useState(0);
   const [furthest, setFurthest] = useState(0);
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -374,7 +407,13 @@ function EnquiryForm({ topicParam, inBrowser }: { topicParam?: string; inBrowser
       <div className="onboard-done" role="status">
         <p className="onboard-done__mark" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
-            <path d="m4.5 10.5 3.5 3.5 7.5-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="m4.5 10.5 3.5 3.5 7.5-8"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </p>
         <h2 ref={headingRef} tabIndex={-1} className="onboard-title">
@@ -514,9 +553,11 @@ function EnquiryForm({ topicParam, inBrowser }: { topicParam?: string; inBrowser
                     value={fields.message}
                     onChange={(e) => set("message", e.target.value)}
                     aria-invalid={allErrors.message ? true : undefined}
-                    aria-describedby={[option.examples.length ? "contact-examples" : "", describe("message") ?? ""]
-                      .filter(Boolean)
-                      .join(" ") || undefined}
+                    aria-describedby={
+                      [option.examples.length ? "contact-examples" : "", describe("message") ?? ""]
+                        .filter(Boolean)
+                        .join(" ") || undefined
+                    }
                   />
                   {option.examples.length > 0 && (
                     <div className="examples" id="contact-examples">

@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { CtaBand, PageHero } from "@/components/Blocks";
+import { PageHero } from "@/components/Blocks";
 import { Faq } from "@/components/Faq";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata(
   "/faq",
   "Questions",
-  "Answers on timings, revisions, payments, ownership, support after launch and building apps with FY Devs.",
+  "Answers on timings, revisions, payments, ownership, support after launch and building apps with WNJO.",
 );
 
 export default function FaqPage() {
@@ -26,25 +26,10 @@ export default function FaqPage() {
         }
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
-        <div className="container container--wide" style={{ maxWidth: "52rem" }}>
+        <div className="container container--wide" style={{ maxWidth: "64rem" }}>
           <Faq />
         </div>
       </section>
-      <CtaBand
-        title={
-          <>
-            Ready to <span className="serif-em">start?</span>
-          </>
-        }
-        body="Tell us what you need. Honest advice and a clear next step."
-      >
-        <Link href="/contact?topic=website" className="btn btn--primary">
-          Start a Project
-        </Link>
-        <Link href="/build" className="btn btn--secondary">
-          Instant estimate
-        </Link>
-      </CtaBand>
     </>
   );
 }

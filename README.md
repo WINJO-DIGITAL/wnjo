@@ -1,8 +1,8 @@
-# FY Devs — Core Project Brief
+# WNJO — Core Project Brief
 
 **Version:** 0.1  
 **Status:** Initial foundation  
-**Project:** FY Devs (F-Y-D-E-V-S)  
+**Project:** WNJO (W-N-J-O)  
 **Primary market assumption:** UK  
 **Currency assumption:** GBP (£), subject to confirmation
 
@@ -10,12 +10,12 @@
 
 ## 1. Project Overview
 
-FY Devs is a digital business with two primary revenue streams:
+WNJO is a digital business with two primary revenue streams:
 
 1. **Bespoke website design and development** for businesses seeking distinctive, premium-quality websites.
 2. **Booking software and SaaS products**, initially including a driver and operator application developed for an airport taxi business, with potential applications across taxi firms and other booking-based businesses.
 
-FY Devs is not intended to compete in the cheap, template-based website market. Its focus is on bespoke digital experiences, thoughtful design, useful functionality, and technology that solves real business problems.
+WNJO is not intended to compete in the cheap, template-based website market. Its focus is on bespoke digital experiences, thoughtful design, useful functionality, and technology that solves real business problems.
 
 The website should act as a premium showroom and sales platform. Visitors should be able to explore projects, understand services, configure their requirements, see estimated pricing, and purchase or enquire without unnecessary friction.
 
@@ -25,7 +25,7 @@ The website should act as a premium showroom and sales platform. Visitors should
 
 Bespoke digital experiences and practical software, built around the way your business works.
 
-FY Devs combines premium web design with custom development and booking software.
+WNJO combines premium web design with custom development and booking software.
 
 The brand should communicate quality, creativity, technical competence, and a genuine commitment to understanding each client's needs.
 
@@ -64,7 +64,7 @@ The website must distinguish between purchasing the existing SaaS product and co
 
 ## 4. Website Objectives
 
-1. Demonstrate the quality of FY Devs' work immediately.
+1. Demonstrate the quality of WNJO's work immediately.
 2. Showcase selected projects through strong visuals and concise case studies.
 3. Explain services quickly and clearly.
 4. Offer an interactive website configurator with instant indicative pricing.
@@ -78,7 +78,7 @@ The website must distinguish between purchasing the existing SaaS product and co
 ## 5. Proposed Website Structure
 
 ### Home
-Introduce FY Devs, communicate the value proposition, showcase selected work, and direct visitors towards website development or booking software.
+Introduce WNJO, communicate the value proposition, showcase selected work, and direct visitors towards website development or booking software.
 
 ### Websites
 Explain bespoke website services, the development process, package options, and pricing configurator.
@@ -95,7 +95,7 @@ Present the driver/operator and booking application, its intended audience, veri
 ### Bespoke Systems
 Explain custom booking platforms, integrations, and tailored software development.
 
-### About FY Devs
+### About WNJO
 Communicate the motivation behind the business and its commitment to creating websites clients are proud of.
 
 ### Contact / Project Summary
@@ -203,7 +203,7 @@ An estimate must not be presented as a guaranteed final quote unless the project
 
 ## 8. Interactive Website Configurator
 
-The configurator is a key part of the FY Devs customer experience.
+The configurator is a key part of the WNJO customer experience.
 
 Its purpose is to make purchasing straightforward and remove the uncertainty associated with requesting a traditional agency quote.
 
@@ -498,7 +498,7 @@ The following items remain unconfirmed and must not be treated as settled requir
 
 ## 16. Working Rules for Future Development
 
-Use this document as the initial source of truth for FY Devs.
+Use this document as the initial source of truth for WNJO.
 
 When making changes:
 
@@ -524,7 +524,7 @@ This section records the technical decisions made for the first build. Items in 
 
 - **Next.js 16 (App Router) + React 19 + TypeScript.** Pages are statically prerendered; the only server code is the enquiry API route.
 - **Plain CSS** with design tokens in `src/app/globals.css`, plus CSS modules for the configurator and quick estimate. No UI framework.
-- **Fonts:** Inter (interface and body) and Newsreader (editorial headings), self-hosted at build time with `next/font`.
+- **Fonts:** Inter (interface and body), Playfair Display (headings and italic accents) and Geist Mono (labels), self-hosted at build time with `next/font`. Jost and Archivo are loaded only where the booking demos show them.
 - **Tests:** Vitest. **Lint:** ESLint with `eslint-config-next`.
 
 ### Where things live
@@ -584,7 +584,8 @@ npm run build && npm start
 ### Before launch
 
 - Review the case-study wording in `src/lib/projects.ts` (challenge and solution are framed from each live site, not from client interviews) and the FAQ answers in `src/lib/faq.ts`, especially payments and ownership.
-- Add genuine client testimonials, with permission, if you have them. None are shown, so none are invented.
+- The example websites in the homepage's Websites tile (`public/styler/`) use free Unsplash photos (Unsplash License, no attribution required), cropped and converted to WebP. Every business shown there is an example.
+- Two testimonials are shown, on the homepage: the owners of EV Exec and Boonma, in words each approved as their own. Add more only when they are a real person's own words, given with permission; none are invented.
 
 - Confirm package, care-plan and estimator prices and VAT treatment.
 - Configure email delivery and send a test enquiry.

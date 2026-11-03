@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Inter, Newsreader, Playfair_Display } from "next/font/google";
+import { Geist_Mono, Inter, Playfair_Display } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Reveal } from "@/components/interactive/Reveal";
@@ -8,15 +8,7 @@ import { site, siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  variable: "--font-newsreader",
-  display: "swap",
-  style: ["normal", "italic"],
-  axes: ["opsz"],
-});
-
-/** Editorial display face for the homepage hero headline. */
+/** The one serif: headings, italic accents and statements. */
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
@@ -54,7 +46,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB" data-scroll-behavior="smooth" className={`${inter.variable} ${newsreader.variable} ${playfair.variable} ${mono.variable}`}>
+    <html lang="en-GB" data-scroll-behavior="smooth" className={`${inter.variable} ${playfair.variable} ${mono.variable}`}>
       <body>
         <a href="#main" className="skip-link">
           Skip to content

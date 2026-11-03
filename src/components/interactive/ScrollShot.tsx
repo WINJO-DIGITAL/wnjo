@@ -11,12 +11,15 @@ export function ScrollShot({
   host,
   sizes,
   className,
+  eager,
 }: {
   src: StaticImageData;
   alt: string;
   host?: string;
   sizes: string;
   className?: string;
+  /** The first thing on screen: fetched straight away, ahead of the rest. */
+  eager?: boolean;
 }) {
   // Longer pages scroll for longer, so the pace feels constant.
   const duration = Math.min(9, Math.max(3, (src.height / src.width) * 2.2));
@@ -31,7 +34,14 @@ export function ScrollShot({
         {host && <span className={styles.url}>{host}</span>}
       </div>
       <div className="scrollshot" style={{ "--scroll-dur": `${duration.toFixed(1)}s` } as React.CSSProperties}>
-        <Image src={src} alt={alt} sizes={sizes} placeholder="blur" />
+        <Image
+          src={src}
+          alt={alt}
+          sizes={sizes}
+          placeholder="blur"
+          loading={eager ? "eager" : undefined}
+          fetchPriority={eager ? "high" : undefined}
+        />
       </div>
     </figure>
   );

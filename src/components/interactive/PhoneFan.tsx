@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { ArrowLeft, ArrowRight } from "../Icons";
-import { APPS } from "./AppTour";
+import { APPS } from "@/lib/appScreens";
 
 // Operator screens first, then the driver's, as one loop.
 const SCREENS = (Object.keys(APPS) as (keyof typeof APPS)[]).flatMap((key) =>

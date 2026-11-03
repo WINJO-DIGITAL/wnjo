@@ -16,7 +16,12 @@ export default async function BuildPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const query = await searchParams;
-  const params: ConfiguratorParams = { type: first(query.type), pages: first(query.pages), care: first(query.care) };
+  const params: ConfiguratorParams = {
+    type: first(query.type),
+    pages: first(query.pages),
+    care: first(query.care),
+    business: first(query.business),
+  };
   return (
     <>
       <PageHero

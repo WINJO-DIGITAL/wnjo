@@ -4,28 +4,70 @@ import { PhoneFrame } from "@/components/Devices";
 import { pageMetadata } from "@/lib/metadata";
 import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
+import { Stopwatch } from "@/components/Icons";
 
 export const metadata = pageMetadata(
   "/about",
   "About",
-  "Why FY Devs exists: bespoke websites clients are proud of, honest pricing, and apps that solve real problems.",
+  "Why WNJO exists: bespoke websites clients are proud of, honest pricing, and apps that solve real problems.",
 );
 
+// Each principle as the thing we avoid, then what we do instead.
 const beliefs = [
-  ["Bespoke over generic", "Your business isn't a template, so your website shouldn't be one either."],
-  ["Clarity over friction", "Services, prices and next steps should be easy to understand before you pick up the phone."],
-  ["Outcomes over output", "Credibility, enquiries, bookings and smoother operations matter more than page counts."],
-  ["Premium, but approachable", "High standards without a complicated sales process or jargon."],
-  ["Purposeful technology", "We build features that solve real problems, and say so when something isn't needed."],
-  ["Practical delivery", "Start focused, launch well, and expand when there's a reason to."],
+  ["Bespoke over generic", "A theme with your logo on it", "Designed around your business"],
+  ["Clarity over friction", "\u201CCall us for a price\u201D", "Prices on the page"],
+  ["Outcomes over output", "Forty pages nobody reads", "More enquiries and bookings"],
+  ["Premium, but approachable", "Jargon and long sales calls", "Plain English, quick answers"],
+  ["Purposeful technology", "Features for the sake of it", "Only what solves a problem"],
+  ["Practical delivery", "Everything at once, and late", "Launch focused, grow later"],
 ];
 
 const standards = [
-  ["Accessible", "Semantic markup, keyboard support, visible focus and sufficient contrast, aiming for WCAG 2.2 AA."],
-  ["Fast", "Lean pages, optimised images and as little JavaScript as the job needs."],
-  ["Secure", "Input validated on the server, secrets kept out of the browser, and prices recalculated server-side."],
-  ["Maintainable", "Clear structure and shared design tokens, so the next change is as careful as the first."],
-];
+  ["Accessible", "Semantic markup, keyboard support, visible focus and sufficient contrast, aiming for WCAG 2.2 AA.", "a11y"],
+  ["Fast", "Lean pages, optimised images and as little JavaScript as the job needs.", "fast"],
+  ["Secure", "Input validated on the server, secrets kept out of the browser, and prices recalculated server-side.", "secure"],
+  ["Maintainable", "Clear structure and shared design tokens, so the next change is as careful as the first.", "tokens"],
+] as const;
+
+/** A small picture of each standard, drawn in code (decorative: the text says it all). */
+function StandardDemo({ kind }: { kind: (typeof standards)[number][2] }) {
+  if (kind === "a11y")
+    return (
+      <span className="std std--a11y">
+        <kbd>Tab</kbd>
+        <span className="std__arrow" />
+        <span className="std__btn">Get my price</span>
+      </span>
+    );
+  if (kind === "fast")
+    return (
+      <span className="std std--fast">
+        <span className="std__page">
+          <i style={{ width: "60%" }} />
+          <i style={{ width: "90%", height: "2.2em" }} />
+          <i style={{ width: "75%" }} />
+        </span>
+        <span className="std__tick">✓</span>
+      </span>
+    );
+  if (kind === "secure")
+    return (
+      <span className="std std--secure">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <rect x="5" y="10.5" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.6" />
+          <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" strokeWidth="1.6" />
+        </svg>
+        <span className="std__pill">Price checked on the server</span>
+      </span>
+    );
+  return (
+    <span className="std std--tokens">
+      {["#d45b32", "#56624a", "#2f5d62", "#f2ece2", "#3a2d22"].map((c) => (
+        <i key={c} style={{ background: c }} />
+      ))}
+    </span>
+  );
+}
 
 export default function AboutPage() {
   return (
@@ -66,15 +108,21 @@ export default function AboutPage() {
       <section className="section section--ruled">
         <div className="container container--wide">
           <SectionHead eyebrow="Principles" title={<>What <span className="serif-em">guides the work.</span></>} />
-          <ol role="list" className="ruled-list">
-            {beliefs.map(([title, body], i) => (
-              <li key={title}>
-                <span className="ruled-list__num">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className="h3">{title}</h3>
-                <p className="muted">{body}</p>
+          <ul role="list" className="beliefs">
+            {beliefs.map(([title, not, instead]) => (
+              <li key={title} className="belief" data-reveal>
+                <h3 className="belief__title">{title}</h3>
+                <p className="belief__not">
+                  <span className="visually-hidden">Not: </span>
+                  {not}
+                </p>
+                <p className="belief__yes">
+                  <span className="visually-hidden">Instead: </span>
+                  {instead}
+                </p>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 
@@ -84,8 +132,11 @@ export default function AboutPage() {
             <p>Every project, large or small, is built to the same baseline.</p>
           </SectionHead>
           <div className="grid-2" style={{ rowGap: "var(--space-7)" }}>
-            {standards.map(([title, body]) => (
+            {standards.map(([title, body, kind]) => (
               <div key={title} className="feature">
+                <div className="feature__demo" aria-hidden="true">
+                  <StandardDemo kind={kind} />
+                </div>
                 <h3 className="h3">{title}</h3>
                 <p className="muted">{body}</p>
               </div>
@@ -95,11 +146,12 @@ export default function AboutPage() {
       </section>
 
       <CtaBand title={<>Let&apos;s build something <span className="serif-em">you&apos;re proud of.</span></>}>
-        <Link href="/contact?topic=website" className="btn btn--primary">
-          Start a Project
+        <Link href="/build" className="btn btn--primary">
+          <Stopwatch />
+          Get my price
         </Link>
-        <Link href="/contact?topic=bespoke" className="btn btn--secondary">
-          Build My App
+        <Link href="/contact" className="btn btn--secondary">
+          Talk to us
         </Link>
       </CtaBand>
     </>

@@ -4,14 +4,14 @@ import { CtaBand, PageHero } from "@/components/Blocks";
 import { PhoneFrame } from "@/components/Devices";
 import { ScrollShot } from "@/components/interactive/ScrollShot";
 import { Tilt } from "@/components/interactive/Tilt";
-import { ArrowRight } from "@/components/Icons";
+import { ArrowRight, Stopwatch } from "@/components/Icons";
 import { pageMetadata } from "@/lib/metadata";
 import { projects } from "@/lib/projects";
 
 export const metadata = pageMetadata(
   "/work",
   "Our work",
-  "Websites and platforms designed and built by FY Devs: EV Exec, Boonma, FYStay and Alex K Bells.",
+  "Websites and platforms designed and built by WNJO: EV Exec, Boonma, FYStay and Alex K Bells.",
 );
 
 export default function WorkPage() {
@@ -20,7 +20,7 @@ export default function WorkPage() {
       <PageHero
         eyebrow="Our work"
         title={<>Case <span className="serif-em">studies.</span></>}
-        lede="Four live projects: three client websites and our own platform. For each one, the challenge, how we approached it and exactly what we built, with real desktop and mobile screenshots."
+        lede="Four live projects: three client websites and our own platform, shown as they are today on desktop and phone."
       />
 
       <section className="section--tight" style={{ paddingTop: 0 }}>
@@ -30,7 +30,7 @@ export default function WorkPage() {
               <article
                 key={p.slug}
                 id={p.slug}
-                className={`work-row${i % 2 === 1 ? " work-row--flip" : ""}`}
+                className="work-row"
                 data-reveal
                 aria-labelledby={`${p.slug}-title`}
               >
@@ -40,6 +40,7 @@ export default function WorkPage() {
                       src={p.page}
                       host={p.host}
                       alt={`The ${p.name} website, full page`}
+                      eager={i === 0}
                       sizes="(min-width: 80rem) 760px, (min-width: 64rem) 60vw, 100vw"
                     />
                     <PhoneFrame
@@ -51,29 +52,36 @@ export default function WorkPage() {
                   </div>
                 </Tilt>
                 <div className="work-row__text">
-                  <p className="work-row__meta">
-                    <span>{p.sector}</span>
-                    <span>{p.location}</span>
-                  </p>
-                  <h2 id={`${p.slug}-title`} className="h2 work-row__title">
-                    <Image src={p.logo} alt="" width={44} height={44} sizes="44px" className="work-row__logo" />
-                    {p.name}
-                  </h2>
-                  <div>
-                    <span className={`tag${p.kind === "product" ? " tag--accent" : ""}`}>
-                      {p.kind === "product" ? "Our own platform" : "Client website"}
-                    </span>
+                  <div className="work-row__intro">
+                    <p className="work-row__meta">
+                      <span>{p.sector}</span>
+                      <span>{p.location}</span>
+                    </p>
+                    <h2 id={`${p.slug}-title`} className="h2 work-row__title">
+                      <Image src={p.logo} alt="" width={44} height={44} sizes="44px" className="work-row__logo" />
+                      {p.name}
+                    </h2>
+                    <div>
+                      <span className={`tag${p.kind === "product" ? " tag--accent" : ""}`}>
+                        {p.kind === "product" ? "Our own platform" : "Client website"}
+                      </span>
+                    </div>
+                    <p className="muted">{p.summary}</p>
+                    <p>
+                      <a href={p.url} className="btn btn--secondary btn--sm" target="_blank" rel="noopener noreferrer">
+                        Visit the live site
+                        <ArrowRight />
+                        <span className="visually-hidden"> (opens in a new tab)</span>
+                      </a>
+                    </p>
+                    {p.slug === "ev-exec" && (
+                      <p className="small muted">
+                        We also developed the driver and operator apps behind EV Exec.{" "}
+                        <Link href="/booking-software">About the booking software</Link>.
+                      </p>
+                    )}
                   </div>
-                  <p className="muted">{p.summary}</p>
                   <dl className="case">
-                    <div>
-                      <dt>The challenge</dt>
-                      <dd>{p.challenge}</dd>
-                    </div>
-                    <div>
-                      <dt>Our solution</dt>
-                      <dd>{p.solution}</dd>
-                    </div>
                     <div>
                       <dt>What we built</dt>
                       <dd>
@@ -85,19 +93,6 @@ export default function WorkPage() {
                       </dd>
                     </div>
                   </dl>
-                  <p>
-                    <a href={p.url} className="btn btn--secondary btn--sm" target="_blank" rel="noopener noreferrer">
-                      Visit the live site
-                      <ArrowRight />
-                      <span className="visually-hidden"> (opens in a new tab)</span>
-                    </a>
-                  </p>
-                  {p.slug === "ev-exec" && (
-                    <p className="small muted">
-                      We also developed the driver and operator apps behind EV Exec.{" "}
-                      <Link href="/booking-software">About the booking software</Link>.
-                    </p>
-                  )}
                 </div>
               </article>
             ))}
@@ -109,11 +104,12 @@ export default function WorkPage() {
         title={<>Your business <span className="serif-em">could be next.</span></>}
         body="Tell us what you need. We reply with honest advice, a clear price and a plan."
       >
-        <Link href="/contact?topic=website" className="btn btn--primary">
-          Start a Project
+        <Link href="/build" className="btn btn--primary">
+          <Stopwatch />
+          Get my price
         </Link>
-        <Link href="/contact?topic=bespoke" className="btn btn--secondary">
-          Build My App
+        <Link href="/contact" className="btn btn--secondary">
+          Talk to us
         </Link>
       </CtaBand>
     </>

@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/metadata";
 export const metadata = pageMetadata(
   "/contact",
   "Start a project",
-  "Tell FY Devs about your website or app project: what you need, your budget, your goals and your timeline.",
+  "Tell WNJO about your website or app project: what you need, your budget, your goals and your timeline.",
 );
 
 export default async function ContactPage({
@@ -16,19 +16,26 @@ export default async function ContactPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { topic } = await searchParams;
+  const { topic, brief } = await searchParams;
   return (
     <>
       <PageHero
         eyebrow="Start a project"
-        title={<>Tell us <span className="serif-em">what you need.</span></>}
+        title={
+          <>
+            Tell us <span className="serif-em">what you need.</span>
+          </>
+        }
         lede="A few quick choices and a sentence about your goals. It takes about a minute."
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">
           <div className="contact-grid">
             <div className="card card--raised">
-              <ContactForm topic={Array.isArray(topic) ? topic[0] : topic} />
+              <ContactForm
+                topic={Array.isArray(topic) ? topic[0] : topic}
+                brief={Array.isArray(brief) ? brief[0] : brief}
+              />
             </div>
             <div className="stack" style={{ "--stack": "var(--space-7)" } as React.CSSProperties}>
               <div>
@@ -53,7 +60,7 @@ export default async function ContactPage({
                 </p>
                 <p className="mt-4">
                   <Link href="/build" className="arrow-link">
-                    Instant estimate <ArrowRight />
+                    Get my price <ArrowRight />
                   </Link>
                 </p>
               </div>

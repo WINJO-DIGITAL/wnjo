@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FY Devs design system
+   WNJO design system
    Tokens → base → layout → components. Component-specific styles that are
    only used by one interactive widget live in CSS modules next to it.
    ========================================================================== */
@@ -14,8 +14,8 @@
   --color-surface: #f7f3eb;
   --color-surface-raised: #fffdf9;
   --color-surface-sunken: #e9e0d2;
-  --color-ink: #1c1c1c;
-  --color-ink-2: #4a4540;
+  --color-ink: #3a2d22; /* the logo's espresso (11.3:1 on --color-bg) */
+  --color-ink-2: #574a3f;
   --color-ink-3: #665f57; /* ≥ 4.5:1 on --color-bg */
   --color-line: #e0d6c7;
   --color-line-strong: #cbbeab;
@@ -23,17 +23,17 @@
   --color-accent: #a84a26; /* terracotta: emphasis, markers, active states (4.9:1 on bg) */
   --color-accent-soft: #f3dfd3;
   --color-sage: #8e9a7e; /* decorative only; not for text */
-  --color-inverse-bg: #1c1c1c;
+  --color-inverse-bg: #2e241d; /* deep espresso, a shade below the logo's */
   --color-inverse-ink: #f2ece2;
   --color-inverse-ink-2: #bdb4a8;
-  --color-inverse-line: #3a3632;
+  --color-inverse-line: #4a3d33;
   --color-success: #56624a; /* deep sage */
   --color-error: #a3322a;
   --color-error-soft: #f7e4e1;
 
   /* Typography */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-serif: var(--font-newsreader), ui-serif, Georgia, "Times New Roman", serif;
+  --font-serif: var(--font-playfair), ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --text-xs: 0.8125rem; /* 13 */
@@ -71,7 +71,7 @@
   --width-measure: 34rem; /* comfortable line length for supporting copy */
   --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
   --svc-top: clamp(0.25rem, 0rem + 1vw, 1.25rem); /* space between the header and the service switcher */
-  --logo-h: 2.75rem; /* header logo height; the bar grows with it */
+  --logo-h: 2.25rem; /* header logo height; the bar grows with it */
   --header-h: max(4rem, calc(var(--logo-h) + 1.75rem));
 
   /* Shape & depth */
@@ -314,8 +314,7 @@ main {
   color: var(--color-ink-2);
 }
 
-.section-head .eyebrow::before,
-.eyebrow--num::before {
+.section-head .eyebrow::before {
   counter-increment: section;
   content: counter(section, decimal-leading-zero) " /";
   color: var(--color-ink-3);
@@ -426,8 +425,7 @@ main {
   color: var(--color-inverse-ink-2);
 }
 
-.inverse .section-head .eyebrow::before,
-.inverse .eyebrow--num::before {
+.inverse .section-head .eyebrow::before {
   color: var(--color-inverse-ink-2);
   opacity: 0.7;
 }
@@ -579,8 +577,6 @@ main {
   height: var(--header-h);
 }
 
-
-
 .brand {
   display: inline-flex;
   align-items: center;
@@ -701,8 +697,6 @@ main {
   transform: translateY(-4.25px) rotate(-45deg);
 }
 
-/* ---------- Menus (Apple-style) ---------- */
-
 /* Shared menu contents: large primary links, then small grouped links. */
 .menu__primary a {
   display: inline-block;
@@ -716,7 +710,7 @@ main {
 .menu__title {
   margin-bottom: var(--space-3);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-ink-3);
@@ -982,6 +976,19 @@ main {
   text-decoration-color: var(--color-accent);
 }
 
+/* Coming Back out of a sub-menu, only that option keeps the line. */
+.mm-pane--root[data-back] .mm-link[aria-current="page"]:not([data-current]) {
+  text-decoration: none;
+}
+
+/* In the drop-downs: the link last pressed, or the page you're on. */
+.menu a[href][aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.3em;
+  text-decoration-color: var(--color-accent);
+}
+
 .mm-cta {
   width: 100%;
   margin-top: var(--space-7);
@@ -1088,12 +1095,20 @@ main {
 
 .site-footer__grid {
   display: grid;
-  gap: var(--space-7);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-7) var(--space-5);
+}
+
+.site-footer__brand {
+  grid-column: 1 / -1;
 }
 
 @media (min-width: 48rem) {
   .site-footer__grid {
     grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+  }
+  .site-footer__brand {
+    grid-column: auto;
   }
 }
 
@@ -1118,10 +1133,13 @@ main {
 }
 
 .site-footer li + li {
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
 }
 
+/* At least 24px tall, so each link is an easy tap. */
 .site-footer a {
+  display: inline-block;
+  padding-block: 0.25rem;
   color: var(--color-ink-2);
   text-decoration: none;
 }
@@ -1171,19 +1189,6 @@ main {
   padding-block: clamp(3.5rem, 2rem + 6vw, 7.5rem) clamp(4rem, 2rem + 6vw, 7rem);
 }
 
-.hero__grid {
-  display: grid;
-  gap: var(--space-8);
-  align-items: center;
-}
-
-@media (min-width: 64rem) {
-  .hero__grid {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: var(--space-9);
-  }
-}
-
 .hero h1 {
   max-width: 14ch;
 }
@@ -1229,85 +1234,7 @@ main {
   box-shadow: var(--shadow-md);
 }
 
-.path-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-  min-height: 100%;
-  text-decoration: none;
-  transition:
-    border-color var(--duration) var(--ease),
-    background-color var(--duration) var(--ease);
-}
-
-.path-card:hover {
-  border-color: var(--color-line-strong);
-  background: var(--color-surface-raised);
-}
-
-.path-card__foot {
-  margin-top: auto;
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--color-line);
-}
-
-.path-card--dark {
-  background: var(--color-inverse-bg);
-  border-color: var(--color-inverse-bg);
-  color: var(--color-inverse-ink);
-}
-
-.path-card--dark:hover {
-  background: #2a2b2f;
-  border-color: #2a2b2f;
-}
-
-.path-card--dark .muted {
-  color: var(--color-inverse-ink-2);
-}
-
-.path-card--dark .path-card__foot {
-  border-color: var(--color-inverse-line);
-}
-
-.path-card--dark .arrow-link {
-  border-color: var(--color-inverse-line);
-}
-
 /* Numbered editorial list (principles, process) */
-.ruled-list {
-  border-top: 1px solid var(--color-line);
-}
-
-.ruled-list > li {
-  display: grid;
-  gap: var(--space-2) var(--space-6);
-  padding-block: var(--space-6);
-  border-bottom: 1px solid var(--color-line);
-}
-
-@media (min-width: 48rem) {
-  .ruled-list > li {
-    grid-template-columns: 4rem minmax(0, 5fr) minmax(0, 7fr);
-    align-items: baseline;
-  }
-}
-
-.ruled-list__num {
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  color: var(--color-ink-3);
-  font-variant-numeric: tabular-nums;
-}
-
-.inverse .ruled-list,
-.inverse .ruled-list > li {
-  border-color: var(--color-inverse-line);
-}
-
-.inverse .ruled-list__num {
-  color: var(--color-inverse-ink-2);
-}
 
 /* Feature columns */
 .feature {
@@ -1361,20 +1288,6 @@ main {
   gap: var(--space-5);
 }
 
-.package__price {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-}
-
-.package__price strong {
-  font-weight: 600;
-  font-size: var(--text-2xl);
-  font-weight: 400;
-  letter-spacing: var(--tracking-tight);
-  font-variant-numeric: tabular-nums;
-}
-
 .package .checks {
   padding-top: var(--space-5);
   border-top: 1px solid var(--color-line);
@@ -1384,10 +1297,6 @@ main {
   .package > .stack:first-child {
     min-height: 5.5rem;
   }
-}
-
-.package--featured {
-  border-color: var(--color-ink);
 }
 
 /* Notices */
@@ -1459,17 +1368,25 @@ main {
   font-weight: 450;
 }
 
-/* CTA band */
+/* CTA band: centred like the tiles above it, the buttons right under the words. */
 .cta-band {
   display: grid;
   gap: var(--space-6);
-  align-items: end;
+  justify-items: center;
+  text-align: center;
 }
 
-@media (min-width: 64rem) {
-  .cta-band {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
+.cta-band :is(.h1, .lede) {
+  margin-inline: auto;
+}
+
+/* Room under the brush stroke before the line that follows. */
+.cta-band .lede {
+  margin-top: var(--space-3);
+}
+
+.cta-band .btn-row {
+  justify-content: center;
 }
 
 /* ---------- Forms ---------- */
@@ -1532,7 +1449,7 @@ main {
 .select {
   appearance: none;
   padding-right: 2.75rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath stroke='%231c1c1c' stroke-width='1.5' d='m1 1.5 5 5 5-5'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath stroke='%233a2d22' stroke-width='1.5' d='m1 1.5 5 5 5-5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1.15rem center;
 }
@@ -1588,12 +1505,6 @@ main {
   color: #6f231d;
 }
 
-.form-status--success {
-  border-color: #c9ddd0;
-  background: #e8f1eb;
-  color: #1f4a33;
-}
-
 .form-status strong {
   display: block;
   margin-bottom: var(--space-1);
@@ -1608,9 +1519,6 @@ main {
 }
 .mt-6 {
   margin-top: var(--space-6);
-}
-.mt-7 {
-  margin-top: var(--space-7);
 }
 .mt-8 {
   margin-top: var(--space-8);
@@ -1628,7 +1536,7 @@ main {
 .hero-ed {
   --hx-cream: #f3ebdd;
   --hx-accent: #d45b32; /* large text and decoration only (3.3:1 on the cream) */
-  --hx-ink: #1c1c1c;
+  --hx-ink: var(--color-ink);
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -1650,7 +1558,7 @@ main {
 .hero-ed__title {
   font-family: var(--font-playfair), var(--font-serif);
   font-size: clamp(2.875rem, 1.6rem + 4.6vw, 5.75rem);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: -0.03em;
   color: var(--hx-ink);
@@ -1665,8 +1573,12 @@ main {
   color: var(--hx-accent);
 }
 
+/* Two long lines, "Websites and apps" over "that grow your business.", each kept whole.
+   The second is the longer, about 9.7 times the font size, so the sizes below are set
+   to keep it inside the screen. */
 .hero-ed__title {
   margin-bottom: var(--space-2);
+  white-space: nowrap;
 }
 
 .hero-ed .lede {
@@ -1685,50 +1597,6 @@ main {
   color: var(--hx-cream);
 }
 
-.hero-ed__links {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-4);
-}
-
-/* Circular arrow link. */
-.circle-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-4);
-  min-height: 2.75rem;
-  font-size: 1.0625rem;
-  font-weight: 500;
-  color: var(--color-ink);
-  text-decoration: none;
-}
-
-.circle-link__icon {
-  display: grid;
-  place-items: center;
-  width: 3rem;
-  height: 3rem;
-  border: 1.5px solid var(--hx-accent);
-  border-radius: 50%;
-  color: var(--color-accent);
-  transition:
-    background-color var(--duration) var(--ease),
-    color var(--duration) var(--ease),
-    transform var(--duration) var(--ease);
-}
-
-.circle-link:hover .circle-link__icon,
-.circle-link:focus-visible .circle-link__icon {
-  background: var(--hx-accent);
-  color: var(--hx-cream);
-  transform: translateX(3px);
-}
-
-.circle-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.3em;
-}
-
 /*
  * The desk photo sits behind the copy, starting just below the service switcher. Its top
  * is a plain sunlit wall, so the headline and buttons sit on the wall and the desk,
@@ -1739,26 +1607,6 @@ main {
   --hx-wall: #dfcfbc;
   --hx-wall-lit: #ede3d5; /* behind the headline: keeps the accent at 3.1:1 */
   --hx-photo-top: calc(var(--svc-top) + 2.75rem);
-}
-
-.hero-ed__visual {
-  position: absolute;
-  z-index: 0;
-  inset: var(--hx-photo-top) 0 0 0;
-  background: linear-gradient(to bottom, var(--hx-wall-lit) 30%, var(--hx-wall) 75%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 7rem, #000 94%, transparent);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 7rem, #000 94%, transparent);
-}
-
-/* Phones: the whole photo, anchored to the bottom; the copy sits on its wall. */
-.hero-ed__photo {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: auto;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 18%);
 }
 
 /*
@@ -1781,16 +1629,18 @@ main {
   .hero-ed .svc {
     margin-bottom: var(--space-3);
   }
+  /* The two-line headline leaves room: spread the copy down the wall above the desk. The
+     laptop's lid starts about a screen-width above the photo's foot, so the copy ends there. */
   .hero-ed__copy {
-    gap: clamp(0.5rem, 1.2svh, 0.875rem);
-    padding-bottom: calc(100vw * 0.64);
+    gap: clamp(0.75rem, 2.4svh, 1.5rem);
+    padding-bottom: calc(100vw * 0.96);
   }
   .hero-ed__title {
-    font-size: clamp(1.75rem, 3.95svh, 2.5rem);
+    font-size: min(9.2vw, 4.6svh);
     margin-bottom: 0;
   }
   .hero-ed .lede {
-    font-size: clamp(0.875rem, 1.85svh, 1rem);
+    font-size: clamp(0.9375rem, 2.05svh, 1.0625rem);
     line-height: 1.45;
   }
   .hero-ed .btn-row {
@@ -1802,33 +1652,10 @@ main {
     padding-inline: 1.1rem;
     font-size: 0.9375rem;
   }
-  .hero-ed__links {
-    gap: var(--space-2);
-  }
-  .hero-ed .circle-link {
-    font-size: 0.9375rem;
-  }
-  .hero-ed .circle-link__icon {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
-  /* Keeps the last lines of copy on the wall, clear of the laptop screen on the right. */
-  .hero-ed .hero-note {
-    max-width: 12.5rem;
-    font-size: 0.8125rem;
-  }
 }
-
 
 /* Tablets: a desk-height crop of the photo rather than the whole tall image. */
 @media (min-width: 40rem) and (max-width: 63.99rem) {
-  .hero-ed__photo {
-    height: 62vw;
-    object-fit: cover;
-    object-position: 60% 82%;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 25%);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 25%);
-  }
   .hero-ed__copy {
     padding-bottom: 54vw;
   }
@@ -1844,35 +1671,20 @@ main {
   .hero-ed__layout {
     width: 100%;
   }
+  /* The headline runs wider than the copy column, across the wall above the desk. */
   .hero-ed__copy {
     max-width: min(44%, 37rem);
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-4);
     padding-block: var(--svc-top) var(--space-7);
   }
   .hero-ed__title {
-    font-size: clamp(3.5rem, 0.6rem + 4.4vw, 6rem);
+    font-size: clamp(3.5rem, 6vw, 6.5rem);
   }
-  .hero-ed__visual {
-    background: linear-gradient(to right, var(--hx-wall-lit) 30%, var(--hx-wall) 70%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 7rem, #000 88%, transparent);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 7rem, #000 88%, transparent);
-  }
-  .hero-ed__photo {
-    top: 0;
-    left: auto;
-    right: 0;
-    width: min(74%, 64rem); /* no wider than the photo itself, so it stays sharp */
-    height: 100%;
-    object-fit: cover;
-    object-position: 62% 58%;
-    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 40%);
-    mask-image: linear-gradient(to right, transparent 0, #000 40%);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .hero-ed__photo {
-    animation: hero-photo-in 1200ms var(--ease) both;
+  /* The line in proportion to the large headline (the buttons grow with it, below). */
+  .hero-ed .lede {
+    max-width: 36rem;
+    font-size: clamp(1.1875rem, 0.8rem + 0.6vw, 1.4375rem);
   }
 }
 
@@ -1883,93 +1695,68 @@ main {
   }
 }
 
+/*
+ * The hero with our work as its picture: the message, then the project showcase (crisp
+ * laptop and phone, real sites playing). Phones stack them, the work starting right under
+ * the buttons; desktops set the message beside the work, both in the first screen.
+ */
+.hero-ed--work {
+  overflow: visible;
+  background: linear-gradient(to bottom, var(--hx-cream), var(--color-bg) 70%);
+}
+
+.hero-ed--work .hero-ed__copy {
+  padding-bottom: 0;
+}
+
+.hero-ed--work .showcase-section {
+  padding-top: var(--space-6);
+  padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+}
+
+@media (max-width: 39.99rem) {
+  .hero-ed--work {
+    min-height: 0;
+  }
+  .hero-ed--work .hero-ed__copy {
+    padding-bottom: 0;
+  }
+}
+
+@media (min-width: 64rem) {
+  .hero-ed--work {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    min-height: max(38rem, calc(100svh - var(--header-h)));
+    padding-inline: max(var(--gutter), calc((100% - var(--width-wide, 80rem)) / 2));
+  }
+  .hero-ed--work > .container {
+    max-width: none;
+    margin: 0;
+    padding-inline: 0;
+  }
+  .hero-ed--work .hero-ed__copy {
+    max-width: none;
+    padding-block: var(--space-6);
+  }
+  /* "that grow your business." is about 9.7 times the font size wide: kept inside its column. */
+  .hero-ed--work .hero-ed__title {
+    font-size: min(4vw, 3.6rem);
+  }
+  /* Beside the copy the bar is narrower: the tabs get their own row, so names show in full. */
+  .hero-ed--work .showcase__bar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hero-ed--work .showcase-section {
+    padding-block: var(--space-6);
+  }
+}
+
 /* The project showcase follows the hero as its own section. */
 .showcase-section {
   padding-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
 }
-
-/*
- * Laptop zoom (components/interactive/LaptopZoom). Scrolling through a runway keeps the
- * hero pinned while the camera moves into the laptop and its screen becomes the showcase.
- * Everything here waits for the script's .is-zoom class, so without JavaScript or with
- * reduced motion the hero and showcase simply stack, as before.
- */
-.zoom.is-zoom {
-  --zoom-run: 115lvh; /* how far you scroll while the zoom plays */
-  height: calc(100lvh - var(--header-h) + var(--zoom-run));
-}
-
-.zoom.is-zoom .zoom__stage {
-  position: sticky;
-  top: var(--header-h);
-  height: calc(100lvh - var(--header-h));
-  overflow: hidden;
-  background: var(--color-bg);
-}
-
-.zoom.is-zoom .hero-ed {
-  transform-origin: 0 0;
-}
-
-/* Desktop: the hero fills the pinned stage. Phones and tablets keep their own height. */
-@media (min-width: 64rem) {
-  .zoom.is-zoom .hero-ed {
-    height: 100%;
-    min-height: 0;
-  }
-}
-
-/*
- * The showcase, laid over the hero in perspective so that its laptop display sits exactly
- * on the laptop screen in the photo. At the end it is simply the showcase, in place.
- */
-.zoom.is-zoom .zoom__panel {
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  left: 0;
-  transform-origin: 0 0;
-}
-
-/* Everything but the display (bezel, keyboard, project tabs) arrives as the photo fades away. */
-/*
- * The next section rises into the empty stage below the landed showcase while the laptop
- * holds still, so there's no gap when the pin releases (the script measures the space).
- */
-.zoom.is-zoom {
-  margin-bottom: calc(var(--zoom-slack, 0px) * -1);
-}
-
-.zoom.is-zoom + * {
-  position: relative;
-  z-index: 1;
-}
-
-.zoom.is-zoom .showcase__bar {
-  opacity: var(--zoom-tabs, 1);
-}
-
-/* At the end of the zoom this column is exactly the visible stage; the showcase sits centred in it. */
-.zoom.is-zoom .zoom__column {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding-bottom: 1%;
-}
-
-.zoom.is-zoom .showcase-section {
-  width: 100%;
-  padding-top: 0;
-}
-
-/* Sized so the whole showcase, tabs included, fits the screen (the laptop is about 0.72 as tall as wide). */
-.zoom.is-zoom .showcase {
-  max-width: calc((var(--zoom-h) - 8rem) / 0.72);
-  margin-inline: auto;
-}
-
 
 /*
  * Featured project: the real site presented as an object on the page, in a quiet
@@ -1984,99 +1771,7 @@ main {
   overflow: hidden;
 }
 
-/* The website is the subject: full width on small screens, never covered by the phone. */
-.stage__browser {
-  width: 100%;
-}
-
-.stage .stage__browser {
-  border: 1px solid var(--color-line-strong);
-  border-radius: clamp(0.625rem, 0.4rem + 0.6vw, 0.875rem);
-  background: var(--color-surface-raised);
-  box-shadow:
-    0 1px 2px rgb(32 33 36 / 0.06),
-    0 10px 24px -14px rgb(32 33 36 / 0.22),
-    0 40px 80px -40px rgb(32 33 36 / 0.32);
-}
-
-.stage .stage__bar {
-  height: clamp(1.6rem, 1.3rem + 0.8vw, 2.25rem);
-  padding-inline: clamp(0.6rem, 0.4rem + 0.6vw, 1rem);
-  background: var(--color-bg);
-  border-bottom-color: var(--color-line-strong);
-}
-
-.stage .stage__dots i {
-  width: clamp(6px, 4px + 0.25vw, 9px);
-  height: clamp(6px, 4px + 0.25vw, 9px);
-  background: var(--color-line-strong);
-}
-
-.stage .stage__url {
-  max-width: 22rem;
-  border: 1px solid var(--color-line);
-  background: var(--color-surface-raised);
-  color: var(--color-ink-2);
-}
-
-.stage__phone {
-  display: none;
-  position: absolute;
-}
-
-
-@media (min-width: 48rem) {
-  .stage__browser {
-    width: 82%;
-  }
-  .stage__phone {
-    display: block;
-    width: 14%;
-    right: clamp(0.5rem, 0.1rem + 2vw, 3.5rem);
-    bottom: clamp(0.5rem, 0.1rem + 2vw, 3.5rem);
-  }
-}
-
-.stage-caption {
-  font-family: var(--font-mono);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--space-3) var(--space-6);
-  margin-top: var(--space-4);
-  font-size: 0.75rem;
-  color: var(--color-ink-2);
-}
-
-.stage-caption ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-4);
-}
-
-.stage-caption a {
-  text-decoration: none;
-  color: var(--color-ink);
-}
-
-.stage-caption a:hover {
-  text-decoration: underline;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .stage__browser,
-  .stage__phone {
-    animation: rise 900ms var(--ease) both;
-  }
-  .stage__phone--a {
-    animation-delay: 120ms;
-  }
-  .stage__phone--b {
-    animation-delay: 220ms;
-  }
-}
-
-/* Editorial project rows: large media, concise text, alternating sides. */
+/* Case studies: each project's live site full width, a short intro and what we built beneath. */
 .work-list {
   display: grid;
   gap: clamp(4rem, 2rem + 6vw, 8rem);
@@ -2085,20 +1780,6 @@ main {
 .work-row {
   display: grid;
   gap: var(--space-6);
-  align-items: center;
-}
-
-@media (min-width: 64rem) {
-  .work-row {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: var(--space-9);
-  }
-  .work-row--flip {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  }
-  .work-row--flip > .tilt {
-    order: 2;
-  }
 }
 
 .work-row__media {
@@ -2154,10 +1835,21 @@ main {
   color: var(--color-ink-3);
 }
 
-.work-row__text {
+.work-row__text,
+.work-row__intro {
   display: grid;
   gap: var(--space-4);
-  max-width: 30rem;
+  align-content: start;
+}
+
+@media (min-width: 64rem) {
+  .work-row__text {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: var(--space-9);
+  }
+  .work-row__text .case {
+    margin-top: 0;
+  }
 }
 
 .work-row__text .checks {
@@ -2173,7 +1865,7 @@ main {
   border: 1px solid var(--color-line-strong);
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--color-ink-2);
@@ -2183,191 +1875,14 @@ main {
 .tag--accent {
   border-color: transparent;
   background: var(--color-accent-soft);
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 85%, black); /* a shade darker: ≥ 4.5:1 on the tint */
   font-weight: 550;
-}
-
-/* Compact work grid (homepage): one wide feature plus smaller tiles. */
-.work-grid {
-  display: grid;
-  gap: var(--space-5);
-}
-
-@media (min-width: 48rem) {
-  .work-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .work-grid > :first-child {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (min-width: 64rem) {
-  .work-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .work-grid > :first-child {
-    grid-column: span 2;
-    grid-row: span 2;
-  }
-}
-
-.work-tile {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  text-decoration: none;
-}
-
-.work-tile__media {
-  position: relative;
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-sunken);
-  padding: clamp(0.875rem, 0.5rem + 1.5vw, 1.75rem);
-  overflow: hidden;
-  flex: 1;
-  display: grid;
-  align-items: start;
-}
-
-.work-tile__media figure {
-  transition: transform var(--duration-slow) var(--ease);
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .work-tile:hover .work-tile__media figure {
-    transform: translateY(-4px);
-  }
-}
-
-.work-tile__caption {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-4);
-}
-
-.work-tile__caption h3 {
-  font-size: var(--text-lg);
-  font-weight: 550;
-  letter-spacing: -0.01em;
-}
-
-.work-tile__caption p {
-  font-size: var(--text-sm);
-  color: var(--color-ink-3);
-  text-align: right;
-}
-
-/* Two-column service index with ruled rows. */
-.service-index {
-  display: grid;
-  gap: var(--space-8);
-}
-
-@media (min-width: 64rem) {
-  .service-index {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-9);
-  }
-}
-
-.service-index__col > header {
-  display: grid;
-  gap: var(--space-3);
-  padding-bottom: var(--space-5);
-}
-
-.service-index ul {
-  border-top: 1px solid var(--color-ink);
-}
-
-.service-index li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-1);
-  padding-block: var(--space-4);
-  border-bottom: 1px solid var(--color-line);
-}
-
-@media (min-width: 40rem) {
-  .service-index li {
-    grid-template-columns: 12rem minmax(0, 1fr);
-    gap: var(--space-5);
-  }
-}
-
-.service-index li strong {
-  font-weight: 550;
-}
-
-.service-index li span {
-  color: var(--color-ink-2);
-  font-size: var(--text-sm);
 }
 
 /* Dark product band. */
-.product-band {
-  overflow: hidden;
-}
 
-.product-band__grid {
-  display: grid;
-  gap: var(--space-8);
-  align-items: center;
-}
-
-@media (min-width: 64rem) {
-  .product-band__grid {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: var(--space-9);
-  }
-}
-
-.product-band .browser-on-dark,
 .inverse figure[class*="browser"] {
   border-color: var(--color-inverse-line);
-}
-
-.product-list {
-  display: grid;
-  gap: 0;
-  border-top: 1px solid var(--color-inverse-line);
-}
-
-.product-list > li {
-  display: grid;
-  gap: var(--space-2);
-  padding-block: var(--space-5);
-  border-bottom: 1px solid var(--color-inverse-line);
-}
-
-.product-list a {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-1) var(--space-4);
-  align-items: center;
-  text-decoration: none;
-}
-
-.product-list a strong {
-  font-weight: 550;
-}
-
-.product-list a span {
-  grid-column: 1;
-  font-size: var(--text-sm);
-  color: var(--color-inverse-ink-2);
-}
-
-.product-list a svg {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  transition: transform var(--duration) var(--ease);
-}
-
-.product-list a:hover svg {
-  transform: translateX(4px);
 }
 
 .inverse .arrow-link {
@@ -2401,60 +1916,6 @@ main {
   color: var(--color-inverse-ink-2);
 }
 
-/* Pricing on the homepage: packages beside the quick estimate. */
-.pricing-split {
-  display: grid;
-  gap: var(--space-7);
-  align-items: start;
-}
-
-@media (min-width: 64rem) {
-  .pricing-split {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: var(--space-8);
-  }
-}
-
-.price-rows {
-  border-top: 1px solid var(--color-ink);
-}
-
-.price-rows > li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-1) var(--space-5);
-  align-items: baseline;
-  padding-block: var(--space-5);
-  border-bottom: 1px solid var(--color-line);
-}
-
-.price-rows h3 {
-  font-size: var(--text-lg);
-  font-weight: 550;
-  letter-spacing: -0.01em;
-}
-
-.price-rows p {
-  grid-column: 1 / -1;
-  color: var(--color-ink-2);
-  font-size: var(--text-sm);
-}
-
-.price-rows .price {
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  font-size: var(--text-xl);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.price-rows .price small {
-  font-family: var(--font-sans);
-  font-size: var(--text-xs);
-  color: var(--color-ink-3);
-  margin-right: 0.35em;
-}
-
 /* Media + text split used on inner pages. */
 .split {
   display: grid;
@@ -2466,139 +1927,6 @@ main {
   .split {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: var(--space-9);
-  }
-  .split--media-wide {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  }
-}
-
-.media-panel {
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-sunken);
-  padding: clamp(1rem, 0.5rem + 3vw, 3rem);
-}
-
-.inverse .media-panel {
-  background: #2a2b2f;
-}
-
-.media-caption {
-  margin-top: var(--space-3);
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  color: var(--color-ink-3);
-}
-
-.inverse .media-caption {
-  color: var(--color-inverse-ink-2);
-}
-
-/* Editorial work index (homepage). */
-.work-index {
-  border-top: 1px solid var(--color-ink);
-}
-
-.work-index li {
-  border-bottom: 1px solid var(--color-line);
-}
-
-.work-index__row {
-  display: grid;
-  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
-  gap: var(--space-2) var(--space-4);
-  align-items: center;
-  padding-block: var(--space-4);
-  text-decoration: none;
-}
-
-.work-index__thumb {
-  grid-row: span 2;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--color-surface-sunken);
-}
-
-.work-index__thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
-  transition: transform var(--duration-slow) var(--ease);
-}
-
-.work-index__name {
-  font-weight: 600;
-  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.5rem);
-  letter-spacing: -0.035em;
-  line-height: 1.05;
-}
-
-.work-index__meta {
-  grid-column: 2;
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
-}
-
-.work-index__meta span {
-  color: var(--color-ink-3);
-}
-
-.work-index__meta span::before {
-  content: " · ";
-}
-
-.work-index__go {
-  grid-column: 3;
-  grid-row: 1 / span 2;
-  display: grid;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border: 1px solid var(--color-line-strong);
-  border-radius: 50%;
-  transition:
-    background-color var(--duration) var(--ease),
-    color var(--duration) var(--ease),
-    border-color var(--duration) var(--ease);
-}
-
-.work-index__row:hover .work-index__go,
-.work-index__row:focus-visible .work-index__go {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
-  color: var(--color-inverse-ink);
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .work-index__row:hover .work-index__thumb img {
-    transform: scale(1.06);
-  }
-}
-
-@media (min-width: 48rem) {
-  .work-index__row {
-    grid-template-columns: 5rem minmax(0, 1fr) minmax(0, 1fr) auto;
-    padding-block: var(--space-5);
-  }
-  .work-index__thumb {
-    grid-row: auto;
-    width: 5rem;
-    height: 4rem;
-  }
-  .work-index__meta {
-    grid-column: 3;
-  }
-  .work-index__go {
-    grid-column: 4;
-    grid-row: auto;
-  }
-  .work-index__meta span {
-    display: block;
-  }
-  .work-index__meta span::before {
-    content: none;
   }
 }
 
@@ -2672,8 +2000,7 @@ main {
 
 /* Media panels position their overlaid devices. */
 .stage,
-.work-row__media,
-.media-panel {
+.work-row__media {
   position: relative;
 }
 
@@ -2683,7 +2010,7 @@ main {
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-4);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
@@ -2779,7 +2106,6 @@ main {
   transform: translateY(28px);
 }
 
-
 /*
  * Showcase (homepage): our projects on a laptop, a dark bezel round a 16:10 display
  * with the keyboard deck below, so you see the site the way a customer would.
@@ -2795,21 +2121,6 @@ main {
   margin-inline: auto;
   container-type: inline-size;
 }
-
-/*
- * The laptop: the lid (bezel and display) stands upright and the base hinges back from its
- * bottom edge, seen from just above. The camera's distance scales with the laptop's width,
- * so it looks the same at every size.
- *
- * While the hero zoom turns it, the laptop is a true 3D object. At rest it is drawn flat,
- * with the base given the same perspective by its own transform: iPhone Safari doesn't
- * draw video inside a 3D scene, and the walkthrough clips play at rest.
- */
-.zoom[data-zoom="active"] .laptop__view {
-  perspective: 520cqw;
-  perspective-origin: 50% 35%;
-}
-
 /* Room for the base below the lid (it is drawn in 3D, outside the normal flow). */
 .laptop__view::after {
   content: "";
@@ -2819,10 +2130,6 @@ main {
 
 .laptop__body {
   position: relative;
-}
-
-.zoom[data-zoom="active"] .laptop__body {
-  transform-style: preserve-3d;
 }
 
 /* Phones: as big as the screen allows. */
@@ -2904,7 +2211,7 @@ main {
   box-shadow: 0 6px 18px -6px rgb(0 0 0 / 0.6);
   color: #fff;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -2926,10 +2233,6 @@ main {
   50% {
     opacity: 0.7;
   }
-}
-
-.zoom.is-zoom .laptop__hint {
-  opacity: var(--zoom-tabs, 1);
 }
 
 /* The walkthrough clip, filling the display (LivePreview). */
@@ -2999,12 +2302,6 @@ main {
   }
 }
 
-/* While the hero zoom carries the laptop in, the phone rises into place as it lands. */
-.zoom.is-zoom .phone {
-  opacity: var(--zoom-tabs, 1);
-  transform: translateY(calc((1 - var(--zoom-tabs, 1)) * 5cqw));
-}
-
 .laptop__base {
   position: absolute;
   top: 100%;
@@ -3018,10 +2315,6 @@ main {
    * laptop's height (32.35cqw above the hinge), so the projection is shifted to centre there.
    */
   transform: translateY(-32.35cqw) perspective(520cqw) translateY(32.35cqw) rotateX(82deg);
-}
-
-.zoom[data-zoom="active"] .laptop__base {
-  transform: rotateX(82deg);
 }
 
 .showcase__frames {
@@ -3154,8 +2447,13 @@ main {
   color: var(--color-ink-2);
 }
 
+/* What the project is, in proportion with the buttons beside it. */
 .showcase__caption {
   flex: 1 1 100%;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-ink);
 }
 
 @media (min-width: 40rem) {
@@ -3165,16 +2463,46 @@ main {
   }
 }
 
+/* The project's two links as pills, at their natural width. */
 .showcase__link {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
   color: var(--color-ink);
-  text-underline-offset: 0.25em;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 550;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color var(--duration) var(--ease);
+}
+
+.showcase__link:hover {
+  border-color: var(--color-ink);
+}
+
+.showcase__link--primary {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+
+@media (max-width: 39.99rem) {
+  .showcase__meta {
+    gap: var(--space-3);
+  }
 }
 
 .showcase__pause {
   display: grid;
+  flex: none;
   place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 1px solid var(--color-line-strong);
   border-radius: 50%;
   background: transparent;
@@ -3271,7 +2599,7 @@ main {
 .carousel__sector {
   grid-column: 1;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--color-ink-3);
@@ -3471,20 +2799,6 @@ ol.steps li::after {
   color: var(--color-ink-2);
 }
 
-/* Lift on hover for price rows. */
-.price-rows > li {
-  transition:
-    padding var(--duration) var(--ease),
-    background-color var(--duration) var(--ease);
-}
-
-@media (hover: hover) {
-  .price-rows > li:hover {
-    padding-inline: var(--space-4);
-    background: var(--color-surface);
-  }
-}
-
 /* On touch screens there is no hover, so the project in focus scrolls itself. */
 @keyframes page-scroll {
   0%,
@@ -3499,8 +2813,7 @@ ol.steps li::after {
 
 @media (hover: none) and (prefers-reduced-motion: no-preference) {
   .carousel__item.is-current .scrollshot img,
-  .work-row.is-in .scrollshot img,
-  .service-split [data-reveal].is-in .scrollshot img {
+  .work-row.is-in .scrollshot img {
     animation: page-scroll calc(var(--scroll-dur, 6s) * 1.6) ease-in-out 800ms infinite alternate;
   }
 }
@@ -3518,12 +2831,6 @@ ol.steps li::after {
   margin-bottom: var(--space-2);
   font-size: var(--text-sm);
   font-weight: 550;
-}
-
-.chips__options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
 }
 
 .chip {
@@ -3568,7 +2875,169 @@ ol.steps li::after {
   outline-offset: 2px;
 }
 
-/* Case study detail: challenge / solution / built. */
+/* About: each principle as the thing we avoid (struck through) and what we do instead. */
+.beliefs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-7);
+}
+
+.belief {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-5);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+
+.belief__title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+.belief__not,
+.belief__yes {
+  display: flex;
+  gap: 0.6em;
+  align-items: baseline;
+}
+
+.belief__not {
+  color: var(--color-ink-3);
+  text-decoration: line-through;
+  text-decoration-color: var(--home-orange);
+  text-decoration-thickness: 2px;
+}
+
+.belief__not::before,
+.belief__yes::before {
+  flex: none;
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.belief__not::before {
+  content: "\2715";
+  color: var(--home-orange);
+}
+
+.belief__yes {
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.625rem);
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.belief__yes::before {
+  content: "\2713";
+  font-size: 1rem;
+  color: var(--home-sage-deep);
+}
+
+/* About: a small drawn picture above each engineering standard (on the dark band). */
+.feature__demo {
+  display: flex;
+  align-items: center;
+  height: 4.5rem;
+  margin-bottom: var(--space-4);
+  padding-inline: var(--space-5);
+  border: 1px solid var(--color-inverse-line);
+  border-radius: var(--radius-md);
+  background: rgb(255 255 255 / 0.03);
+}
+
+.std {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 0.8125rem;
+  color: var(--color-inverse-ink);
+}
+
+.std kbd {
+  padding: 0.3em 0.7em;
+  border: 1px solid var(--color-inverse-line);
+  border-bottom-width: 3px;
+  border-radius: 0.4em;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.std__arrow {
+  width: 1.5rem;
+  height: 1px;
+  background: var(--color-inverse-ink-2);
+}
+
+.std__btn {
+  padding: 0.45em 1em;
+  border-radius: 2em;
+  background: var(--color-inverse-ink);
+  color: var(--color-ink);
+  font-weight: 600;
+  outline: 2px solid var(--home-orange);
+  outline-offset: 3px;
+}
+
+.std__page {
+  display: grid;
+  gap: 0.3em;
+  width: 7rem;
+  padding: 0.5em;
+  border-radius: 0.4em;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.std__page i {
+  display: block;
+  height: 0.5em;
+  border-radius: 0.2em;
+  background: rgb(255 255 255 / 0.3);
+}
+
+.std__tick {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--home-sage);
+  color: #fff;
+  font-weight: 700;
+}
+
+.std__pill {
+  padding: 0.35em 0.8em;
+  border: 1px solid var(--color-inverse-line);
+  border-radius: 2em;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-inverse-ink-2);
+}
+
+.std--tokens {
+  gap: 0.5rem;
+}
+
+.std--tokens i {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 50%;
+}
+
+/* Case study detail: what we built. */
 .case {
   display: grid;
   gap: var(--space-5);
@@ -3580,7 +3049,7 @@ ol.steps li::after {
 .case dt {
   margin-bottom: var(--space-1);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-ink-3);
@@ -3601,25 +3070,34 @@ ol.steps li::after {
   border-top: 0;
 }
 
-/* FAQ accordion. */
+/* FAQ: a card per question, its short answer large, the full answer a tap away. */
 .faq {
-  border-top: 1px solid var(--color-ink);
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 48rem) {
+  .faq {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
 }
 
 .faq__item {
-  border-bottom: 1px solid var(--color-line);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  transition: border-color var(--duration) var(--ease);
+}
+
+.faq__item[open] {
+  border-color: var(--color-line-strong);
 }
 
 .faq__item summary {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-5);
-  min-height: 3.5rem;
-  padding: var(--space-4) 0;
-  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
-  font-weight: 600;
-  letter-spacing: -0.015em;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-5) var(--space-4);
   cursor: pointer;
   list-style: none;
 }
@@ -3628,20 +3106,44 @@ ol.steps li::after {
   display: none;
 }
 
-.faq__item summary:hover span:first-child {
+.faq__q {
+  font-size: var(--text-sm);
+  font-weight: 500;
   color: var(--color-ink-2);
+}
+
+.faq__short {
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: clamp(1.625rem, 1.3rem + 1vw, 2.125rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--color-ink);
+}
+
+.faq__more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.faq__item summary:hover .faq__more {
+  color: var(--color-ink);
 }
 
 .faq__icon {
   position: relative;
   flex-shrink: 0;
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border: 1px solid var(--color-line-strong);
   border-radius: 50%;
   transition:
-    transform var(--duration) var(--ease),
-    background-color var(--duration) var(--ease);
+    background-color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
 }
 
 .faq__icon::before,
@@ -3650,7 +3152,7 @@ ol.steps li::after {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 10px;
+  width: 9px;
   height: 1.5px;
   background: var(--color-ink);
   transform: translate(-50%, -50%);
@@ -3676,8 +3178,7 @@ ol.steps li::after {
 }
 
 .faq__item p {
-  max-width: 44rem;
-  padding: 0 3rem var(--space-5) 0;
+  padding: 0 var(--space-5) var(--space-5);
   color: var(--color-ink-2);
 }
 
@@ -3685,6 +3186,34 @@ ol.steps li::after {
   .faq__item[open] p {
     animation: menu-item-in 320ms var(--ease) both;
   }
+}
+
+/* The last card: still a question? A person is one tap away. */
+.faq-ask {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding: clamp(1.75rem, 1rem + 3vw, 3rem);
+  border-radius: var(--radius-lg);
+  background: var(--color-inverse-bg);
+  color: var(--color-inverse-ink);
+}
+
+.faq-ask__title {
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: clamp(1.875rem, 1.4rem + 1.8vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.faq-ask__title .serif-em {
+  font-weight: 400;
+  color: var(--home-orange);
+}
+
+.faq-ask p {
+  color: var(--color-inverse-ink-2);
 }
 
 /* ==========================================================================
@@ -3698,110 +3227,6 @@ ol.steps li::after {
 
 .hero-note a {
   color: var(--color-ink);
-}
-
-/* Proof strip: checkable facts only. */
-.proof {
-  padding-top: var(--space-7);
-}
-
-.proof__list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid var(--color-line);
-}
-
-@media (min-width: 48rem) {
-  .proof__list {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-.proof__list li {
-  display: grid;
-  gap: var(--space-1);
-  padding: var(--space-5) var(--space-4) var(--space-5) 0;
-  border-bottom: 1px solid var(--color-line);
-}
-
-.proof__list strong {
-  font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.proof__note {
-  max-width: 44rem;
-  margin: var(--space-7) 0 0;
-  padding-left: var(--space-5);
-  border-left: 2px solid var(--home-orange, var(--color-accent));
-}
-
-.proof__note p {
-  font-family: var(--font-playfair), var(--font-serif);
-  font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.625rem);
-  line-height: 1.35;
-  color: var(--color-ink);
-}
-
-.proof__note em {
-  color: var(--color-accent);
-}
-
-.proof__more {
-  margin-top: var(--space-5);
-}
-
-.proof__list span {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--color-ink-3);
-}
-
-/* Service sections. */
-.service-split {
-  align-items: center;
-}
-
-.benefits {
-  display: grid;
-  gap: var(--space-4) var(--space-6);
-  padding-block: var(--space-2);
-}
-
-@media (min-width: 40rem) {
-  .benefits {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.benefits li {
-  display: grid;
-  gap: var(--space-1);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-line-strong);
-}
-
-.inverse .benefits li {
-  border-color: var(--color-inverse-line);
-}
-
-.benefits strong {
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.benefits span {
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
-}
-
-.inverse .benefits span {
-  color: var(--color-inverse-ink-2);
 }
 
 /* Pricing plans: a swipeable row of cards (see components/interactive/PlanSwiper). */
@@ -3821,9 +3246,10 @@ ol.steps li::after {
   }
 }
 
-@media (min-width: 80rem) {
+/* Laptops and up: every plan in one row, sharing the width, so none hangs off the edge. */
+@media (min-width: 64rem) {
   .carousel--plans .carousel__track {
-    grid-auto-columns: 25rem;
+    grid-auto-columns: minmax(0, 1fr);
   }
 }
 
@@ -3928,6 +3354,16 @@ ol.steps li::after {
   color: var(--color-ink);
 }
 
+.plan--inverse .btn--secondary {
+  border-color: var(--color-inverse-line);
+  color: var(--color-inverse-ink);
+}
+
+.plan--inverse .btn--secondary:hover {
+  border-color: var(--color-inverse-ink);
+  background: transparent;
+}
+
 /* The selected plan (Professional until the visitor picks another). */
 .plan.is-selected {
   border-color: var(--color-ink);
@@ -3972,7 +3408,7 @@ ol.steps li::after {
   background: var(--color-ink);
   color: var(--color-inverse-ink);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   opacity: 0;
@@ -4041,31 +3477,6 @@ ol.steps li::after {
   margin-top: var(--space-8);
   padding-top: var(--space-7);
   border-top: 1px solid var(--color-line);
-}
-
-.ongoing__intro {
-  display: grid;
-  gap: var(--space-3);
-  max-width: 40rem;
-}
-
-/* FAQ layout. */
-.faq-layout {
-  display: grid;
-  gap: var(--space-6);
-}
-
-@media (min-width: 64rem) {
-  .faq-layout {
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    gap: var(--space-8);
-    align-items: start;
-  }
-  .faq-layout .section-head {
-    position: sticky;
-    top: calc(var(--header-h) + var(--space-6));
-    margin-bottom: 0;
-  }
 }
 
 /* Contact page. */
@@ -4188,7 +3599,7 @@ ol.steps li::after {
   border: 1px solid currentColor;
   border-radius: 50%;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 400;
 }
 
@@ -4428,7 +3839,7 @@ ol.steps li::after {
 .examples__label {
   margin-right: var(--space-1);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: var(--color-ink-3);
 }
 
@@ -4586,7 +3997,6 @@ ol.steps li::after {
   background: var(--color-success);
   color: #fff;
 }
-
 
 /* ==========================================================================
    Page transitions from the header menu (app/template.tsx)
@@ -4759,7 +4169,7 @@ html:active-view-transition-type(nav-menu)::view-transition-new(root) {
 .svc__link:not([aria-current])::before {
   content: "";
   position: absolute;
-  top: 0;
+  bottom: 0.2rem;
   left: 0;
   width: 100%;
   height: 2px;
@@ -4794,10 +4204,10 @@ html:active-view-transition-type(nav-menu)::view-transition-new(root) {
   --svc-hint: #2f5d62;
 }
 
-/* The line above the current service; it glides to the next one when you switch. */
+/* The current service is underlined; the underline glides to the next one when you switch. */
 .svc__line {
   position: absolute;
-  top: 0;
+  bottom: 0.2rem;
   left: 0;
   width: 100%;
   height: 2px;
@@ -4834,8 +4244,47 @@ html:active-view-transition-type(nav-menu)::view-transition-new(root) {
 
 @media (max-width: 23.99rem) {
   .svc__link {
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
   }
+}
+
+/*
+ * Titles: a hand-drawn brush stroke under the italic words that carry each title's message.
+ * Drawn as a background on each line of the italic (so a wrapped phrase gets one per line and
+ * nothing reflows), in the page's accent: terracotta, sage on App development, teal on Booking
+ * software, and a lighter shade of each on dark bands.
+ */
+:root {
+  --brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M3 10 C 45 4, 110 2, 197 6' stroke='%23d45b32' stroke-opacity='0.6' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+:root:has(.svc[data-current="apps"]) {
+  --brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M3 10 C 45 4, 110 2, 197 6' stroke='%2356624a' stroke-opacity='0.6' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+:root:has(.svc[data-current="booking"]) {
+  --brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M3 10 C 45 4, 110 2, 197 6' stroke='%232f5d62' stroke-opacity='0.6' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+:root:has(.svc[data-current="apps"]) .inverse {
+  --brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M3 10 C 45 4, 110 2, 197 6' stroke='%23a9b596' stroke-opacity='0.6' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+:root:has(.svc[data-current="booking"]) .inverse {
+  --brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M3 10 C 45 4, 110 2, 197 6' stroke='%237fb3b8' stroke-opacity='0.6' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+main :is(h1, h2) .serif-em {
+  padding-bottom: 0.1em;
+  background: var(--brush) left bottom / 100% 0.22em no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Where the italic sits on its own line, the stroke runs under the words, not the column. */
+main :is(.hero-ed__title, .booking-hero .tile__title) .serif-em {
+  width: fit-content;
+  margin-bottom: -0.1em; /* its room for the stroke, given back so nothing below moves */
 }
 
 /* Each service page takes its own accent across the site's markers, links and states. */
@@ -4847,6 +4296,15 @@ html:active-view-transition-type(nav-menu)::view-transition-new(root) {
 :root:has(.svc[data-current="booking"]) {
   --color-accent: #2f5d62; /* deep teal (6.2:1 on the background) */
   --color-accent-soft: #d9e4e3;
+}
+
+/* The header takes the top of each service page's hero colour, so the two read as one band. */
+:root:has(.svc[data-current="apps"]) .site-header:not([data-open="true"]) {
+  background: rgb(232 234 222 / 0.86); /* #e8eade, sage */
+}
+
+:root:has(.svc[data-current="booking"]) .site-header:not([data-open="true"]) {
+  background: rgb(227 234 232 / 0.86); /* #e3eae8, pale blue-teal */
 }
 
 .page-hero:has(.svc[data-current="apps"]) {
@@ -4946,8 +4404,8 @@ html:active-view-transition-type(nav-menu)::view-transition-new(root) {
   --color-line: #e2d6c5;
   --color-line-strong: #cdbea9;
   --color-accent-soft: #f2dccd;
-  --color-inverse-bg: #181819;
-  --color-inverse-line: #34322f;
+  --color-inverse-bg: #2e241d;
+  --color-inverse-line: #4a3d33;
   --home-orange: #d45b32; /* large text and decoration only */
   --home-sage: #8e9a7e; /* decoration only */
   --home-sage-deep: #56624a; /* text-safe sage (5.6:1 on the wash) */
@@ -4956,7 +4414,7 @@ html:active-view-transition-type(nav-menu)::view-transition-new(root) {
 
 main :is(.h1, .h2) {
   font-family: var(--font-playfair), var(--font-serif);
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.04;
 }
@@ -4981,9 +4439,9 @@ main :is(.h1, .h2) .serif-em {
   color: var(--home-orange);
 }
 
-main :is(.steps h3, .ongoing .h3, .proof__list strong, .plan__name, .plan__price) {
+main :is(.steps h3, .ongoing .h3, .plan__name, .plan__price) {
   font-family: var(--font-playfair), var(--font-serif);
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.015em;
 }
 
@@ -4992,9 +4450,6 @@ main :is(.steps h3, .ongoing .h3) {
 }
 
 /* Sage: the quiet secondary, on the rules between benefits and through the process. */
-main .benefits li {
-  border-top-color: var(--home-sage);
-}
 
 main #process {
   background: var(--home-sage-wash);
@@ -5020,11 +4475,6 @@ main #process ol.steps li::after {
   }
 }
 
-/* The proof strip's figures sit on an orange rule, like the hero's switcher line. */
-main .proof__list {
-  border-top: 2px solid var(--home-orange);
-}
-
 /* ==========================================================================
    Sticky call to action (components/StickyCta): phones and tablets only
    ========================================================================== */
@@ -5038,7 +4488,7 @@ main .proof__list {
   gap: var(--space-2);
   width: min(calc(100% - 1.5rem), 26rem);
   padding: 0.4rem;
-  border: 1px solid rgb(28 28 28 / 0.08);
+  border: 1px solid rgb(58 45 34 / 0.08);
   border-radius: var(--radius-pill);
   background: rgb(250 246 239 / 0.92);
   -webkit-backdrop-filter: saturate(1.4) blur(14px);
@@ -5083,33 +4533,6 @@ main .proof__list {
   }
 }
 
-/* Pricing: a prompt to the instant estimate, the quickest way to a real number. */
-.estimate-prompt {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4) var(--space-5);
-  margin-top: var(--space-6);
-  padding: var(--space-5) var(--space-6);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-sunken);
-}
-
-.estimate-prompt p {
-  max-width: 34rem;
-  color: var(--color-ink-2);
-}
-
-.estimate-prompt strong {
-  display: block;
-  margin-bottom: var(--space-1);
-  font-family: var(--font-playfair), var(--font-serif);
-  font-size: 1.375rem;
-  font-weight: 500;
-  color: var(--color-ink);
-}
-
 /* Reply-time promise under the closing call to action. */
 .reply-note {
   font-family: var(--font-mono);
@@ -5122,77 +4545,6 @@ main .proof__list {
 /* ==========================================================================
    App tour (components/interactive/AppTour): the booking software's screens
    ========================================================================== */
-
-.app-tour__switch {
-  display: inline-flex;
-  gap: 0.25rem;
-  margin-bottom: var(--space-7);
-  padding: 0.3rem;
-  border: 1px solid var(--color-inverse-line);
-  border-radius: var(--radius-pill);
-}
-
-.app-tour__switch button {
-  min-height: 2.75rem;
-  padding: 0.5rem 1.2rem;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--color-inverse-ink-2);
-  font: inherit;
-  font-weight: 550;
-  cursor: pointer;
-  transition:
-    background-color var(--duration) var(--ease),
-    color var(--duration) var(--ease);
-}
-
-.app-tour__switch button[aria-pressed="true"] {
-  background: var(--color-inverse-ink);
-  color: var(--color-inverse-bg);
-}
-
-/* Phones swipe sideways; from tablets up the three screens sit side by side. */
-.app-tour__screens {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: min(72%, 17rem);
-  gap: var(--space-6);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  padding-bottom: var(--space-2);
-}
-
-.app-tour__screens::-webkit-scrollbar {
-  display: none;
-}
-
-@media (min-width: 48rem) {
-  .app-tour__screens {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    overflow: visible;
-  }
-}
-
-.app-tour__screens li {
-  scroll-snap-align: start;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .app-tour__screens li {
-    animation: tour-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
-    animation-delay: calc(var(--i) * 90ms);
-  }
-}
-
-@keyframes tour-in {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-}
 
 .app-phone {
   max-width: 17rem;
@@ -5212,34 +4564,1468 @@ main .proof__list {
   border-radius: 2rem;
 }
 
-.app-tour__screens h3 {
-  font-family: var(--font-playfair), var(--font-serif);
-  font-size: 1.375rem;
-  font-weight: 500;
+/* ==========================================================================
+   Booking replay (components/interactive/BookingDemo): EV Exec's booking flow on a
+   customer's phone, ending as a notification in the operator app beside it.
+   Everything inside a screen is sized in em, from a font size tied to the screen's
+   width, so the phones scale as one picture.
+   ========================================================================== */
+
+.bd {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-5);
 }
 
-.app-tour__screens p {
-  margin-top: var(--space-1);
-  color: var(--color-inverse-ink-2);
+.bd__phones {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  transition: opacity 500ms var(--ease);
+}
+
+.bd__phones[data-fading="true"] {
+  opacity: 0;
+}
+
+.bd__phone {
+  flex: none;
+  margin: 0;
+}
+
+.bd__phone--customer {
+  z-index: 1;
+  width: min(62%, 19rem);
+  max-width: none;
+}
+
+.bd__phone--ops {
+  width: min(44%, 14.5rem);
+  max-width: none;
+  margin-left: -6%;
+  margin-bottom: 2.5rem;
+  rotate: 3deg;
+}
+
+.bd__screen {
+  position: relative;
+  aspect-ratio: 390 / 844;
+  overflow: hidden;
+  border-radius: 2rem;
+  container-type: inline-size;
+  background: #020813;
+}
+
+.bd__phone--ops .bd__screen {
+  border-radius: 1.6rem;
+}
+
+.bd__phone--ops .bd__screen > img {
+  width: 100%;
+  height: auto;
+  border-radius: 0;
+}
+
+.bd__pause {
+  min-height: 2.75rem;
+  padding: 0.4rem 1.1rem;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* The customer's screen, in EV Exec's own look. */
+.bd-ui {
+  --gold: #d5a538;
+  --line: #2f3742;
+  --card: rgb(255 255 255 / 0.04);
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 85% 8%, rgb(213 165 56 / 0.1), transparent 32%),
+    radial-gradient(circle at 25% 20%, rgb(48 99 160 / 0.18), transparent 35%),
+    #020813;
+  color: #fff;
+  font-family: var(--font-jost), "Jost", Arial, sans-serif;
+  font-size: calc(100cqw / 24.4);
+  line-height: 1.35;
+  text-align: left;
+}
+
+.bd-status {
+  position: relative;
+  z-index: 2;
+  background: #020813;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 2.9em;
+  padding: 0 1.9em;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+.bd-status__icons {
+  width: 4em;
+  height: 0.75em;
+  border-radius: 0.2em;
+  background: linear-gradient(90deg, #fff 0 28%, transparent 28% 36%, #fff 36% 62%, transparent 62% 70%, #fff 70%);
+}
+
+.bd-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.5em 1.25em 0.8em;
+  background: #020813;
+  font-weight: 700;
+  font-size: 1.15em;
+  letter-spacing: 0.06em;
+}
+
+.bd-head img {
+  width: 2.2em;
+  height: 2.2em;
+  border-radius: 50%;
+}
+
+.bd-head small {
+  display: block;
+  color: var(--gold);
+  font-size: 0.42em;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.bd-body {
+  padding: 0.6em 1.25em 2em;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bd-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.bd-top h3 {
+  font-family: inherit;
+  font-size: 1.4em;
+  white-space: nowrap;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.bd-top h3 em {
+  color: var(--gold);
+  font-style: normal;
+  font-weight: 600;
+}
+
+.bd-steps {
+  display: flex;
+  gap: 0.9em;
+  font-size: 0.7em;
+  font-weight: 700;
+}
+
+.bd-steps li {
+  display: grid;
+  place-items: center;
+  width: 2em;
+  height: 1.6em;
+  border-radius: 0.3em;
+  background: #2a313c;
+  color: rgb(255 255 255 / 0.5);
+  transition: background-color 300ms, color 300ms;
+}
+
+.bd-steps li[data-state="on"],
+.bd-steps li[data-state="done"] {
+  background: var(--gold);
+  color: #06101c;
+}
+
+.bd-step {
+  animation: bd-in 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes bd-in {
+  from {
+    opacity: 0;
+    transform: translateX(1.5em);
+  }
+}
+
+.bd-label {
+  margin: 1.1em 0 0.5em;
+  color: rgb(255 255 255 / 0.4);
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.bd-step h4 {
+  font-family: inherit;
+  font-size: 1.45em;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.bd-sub {
+  margin: 0.25em 0 0.9em;
+  color: rgb(255 255 255 / 0.6);
+  font-size: 0.82em;
+}
+
+.bd-option,
+.bd-airport,
+.bd-card {
+  position: relative;
+  margin-bottom: 0.7em;
+  border: 1px solid var(--line);
+  border-radius: 0.5em;
+  background: var(--card);
+  transition:
+    border-color 300ms,
+    background-color 300ms;
+}
+
+.bd-option {
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  padding: 1em;
+}
+
+.bd-option b,
+.bd-airport b {
+  display: block;
+  font-weight: 600;
+}
+
+.bd-option small,
+.bd-airport small {
+  color: rgb(255 255 255 / 0.6);
+  font-size: 0.8em;
+}
+
+.bd-option > span:nth-child(2) {
+  flex: 1;
+}
+
+.bd-icon {
+  display: grid;
+  place-items: center;
+  width: 2.6em;
+  height: 2.6em;
+  border: 1px solid var(--line);
+  border-radius: 0.4em;
+  background: #0b1424;
+  color: var(--gold);
+  rotate: -45deg;
+}
+
+.bd-icon--land {
+  rotate: 45deg;
+}
+
+.bd-radio {
+  width: 1.3em;
+  height: 1.3em;
+  border: 2px solid rgb(255 255 255 / 0.35);
+  border-radius: 50%;
+  transition:
+    border-color 300ms,
+    box-shadow 300ms;
+}
+
+.bd-option.is-on,
+.bd-airport.is-on {
+  border-color: var(--gold);
+  background: rgb(213 165 56 / 0.08);
+}
+
+.bd-option.is-on .bd-radio {
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 0.25em #020813, inset 0 0 0 1em var(--gold);
+}
+
+.bd-toggle {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0.25em;
+  border: 1px solid var(--line);
+  border-radius: 0.5em;
+  font-size: 0.88em;
+  font-weight: 600;
+}
+
+.bd-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0.25em auto 0.25em 0.25em;
+  width: calc(50% - 0.25em);
+  border-radius: 0.3em;
+  background: var(--gold);
+  transition: translate 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bd-toggle[data-ret="true"]::before {
+  translate: 100% 0;
+}
+
+.bd-toggle span {
+  position: relative;
+  padding: 0.75em 0;
+  text-align: center;
+  transition: color 300ms;
+}
+
+.bd-toggle[data-ret="false"] span:first-child,
+.bd-toggle[data-ret="true"] span:last-child {
+  color: #06101c;
+}
+
+.bd-btn {
+  position: relative;
+  display: block;
+  margin-top: 1.1em;
+  padding: 1em;
+  border-radius: 0.4em;
+  background: #262d37;
+  color: rgb(255 255 255 / 0.6);
+  font-weight: 600;
+  text-align: center;
+  transition:
+    background-color 300ms,
+    color 300ms;
+}
+
+.bd-btn.is-on {
+  background: linear-gradient(180deg, #e2b752, #c99a2f);
+  color: #06101c;
+}
+
+.bd-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  margin-bottom: 0.4em;
+}
+
+.bd-titlebar .bd-label {
+  margin: 0 0 0.15em;
+}
+
+.bd-back {
+  display: grid;
+  place-items: center;
+  width: 2.6em;
+  height: 2.6em;
+  border: 1px solid var(--line);
+  border-radius: 0.4em;
+}
+
+.bd-airport {
+  padding: 0.85em 1em 0.85em 1.6em;
+}
+
+.bd-airport::before {
+  content: "";
+  position: absolute;
+  left: 0.8em;
+  top: 0.9em;
+  bottom: 0.9em;
+  width: 0.2em;
+  border-radius: 1em;
+  background: rgb(213 165 56 / 0.6);
+}
+
+.bd-card {
+  padding: 1em;
+}
+
+.bd-card__title {
+  display: block;
+  margin-bottom: 0.6em;
+  color: rgb(255 255 255 / 0.85);
+  font-size: 0.9em;
+  font-weight: 700;
+}
+
+.bd-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 0.6em;
+}
+
+.bd-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 2.9em;
+  margin-bottom: 0.55em;
+  padding: 0 0.9em;
+  border: 1px solid var(--line);
+  border-radius: 0.4em;
+  background: rgb(255 255 255 / 0.03);
+  font-size: 0.9em;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: border-color 250ms;
+}
+
+.bd-input:last-child {
+  margin-bottom: 0;
+}
+
+.bd-input.is-focus {
+  border-color: var(--gold);
+}
+
+.bd-ph {
+  color: rgb(255 255 255 / 0.35);
+}
+
+.bd-caret {
+  width: 1px;
+  height: 1.2em;
+  margin-left: 1px;
+  background: var(--gold);
+  animation: bd-blink 1s steps(1) infinite;
+}
+
+@keyframes bd-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.bd-terms {
+  display: flex;
+  gap: 0.8em;
+  align-items: center;
+  margin: 0.8em 0 0.2em;
+  color: rgb(255 255 255 / 0.75);
+  font-size: 0.82em;
+}
+
+.bd-terms em {
+  color: var(--gold);
+  font-style: normal;
+}
+
+.bd-check {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 0.25em;
+  background: #fff;
+  color: #06101c;
+  font-weight: 700;
+  transition: background-color 250ms;
+}
+
+.bd-check.is-on {
+  background: var(--gold);
+}
+
+.bd-spin {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  border: 2px solid rgb(6 16 28 / 0.25);
+  border-top-color: #06101c;
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: bd-spin 700ms linear infinite;
+}
+
+@keyframes bd-spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+.bd-done {
+  padding-top: 2.5em;
+  text-align: center;
+}
+
+.bd-done__tick {
+  display: inline-grid;
+  place-items: center;
+  width: 3.6em;
+  height: 3.6em;
+  margin-bottom: 1em;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #06101c;
+  font-size: 1.3em;
+  font-weight: 700;
+  animation: bd-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes bd-pop {
+  from {
+    scale: 0.3;
+    opacity: 0;
+  }
+}
+
+.bd-summary {
+  margin-top: 1.4em;
+  text-align: left;
+}
+
+.bd-summary .bd-label:first-child {
+  margin-top: 0;
+}
+
+.bd-summary b {
+  font-weight: 600;
+  font-size: 0.92em;
+}
+
+/* A tap: a thin ring that grows and fades where the finger lands. */
+.bd-tap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2.6em;
+  height: 2.6em;
+  margin: -1.3em 0 0 -1.3em;
+  border: 2px solid rgb(255 255 255 / 0.75);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 255 255 / 0.3) 0 18%, transparent 20%);
+  pointer-events: none;
+  animation: bd-tap 520ms ease-out both;
+}
+
+@keyframes bd-tap {
+  from {
+    scale: 0.4;
+    opacity: 1;
+  }
+  to {
+    scale: 1.6;
+    opacity: 0;
+  }
+}
+
+/* The operator app: a notification drops in from the top. */
+.bd-ping {
+  position: absolute;
+  top: 4%;
+  left: 4%;
+  right: 4%;
+  display: flex;
+  gap: 0.7em;
+  padding: 0.8em;
+  border-radius: 1.1em;
+  background: rgb(250 250 250 / 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.5);
+  color: #111;
+  font-family: var(--font-sans);
+  font-size: calc(100cqw / 18);
+  line-height: 1.3;
+  translate: 0 -140%;
+  transition: translate 650ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.bd-ping.is-in {
+  translate: 0 0;
+}
+
+.bd-ping img {
+  flex: none;
+  width: 2.3em;
+  height: 2.3em;
+  border-radius: 0.55em;
+}
+
+.bd-ping > span {
+  display: grid;
+  min-width: 0;
+}
+
+.bd-ping__app {
+  display: flex;
+  justify-content: space-between;
+  color: #666;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bd-ping b {
+  font-weight: 650;
+}
+
+.bd-ping > span > span:last-child {
+  font-size: 0.88em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-step,
+  .bd-done__tick {
+    animation: none;
+  }
+  .bd-body,
+  .bd-ping {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Make it yours (components/interactive/BookingStudio): a booking app restyled live,
+   like a car configurator. The phone's screen is sized in em, like the booking replay.
+   ========================================================================== */
+
+/* Phones: the choices first and the app right under them, so both stay on screen together.
+   Wider screens: the app on the left, choices and features on the right. */
+.studio {
+  display: grid;
+  grid-template-areas: "controls" "stage" "order" "features";
+  gap: var(--space-6);
+}
+
+@media (min-width: 56rem) {
+  .studio {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "stage controls" "stage order" "stage features";
+    align-items: center;
+    column-gap: var(--space-7);
+  }
+}
+
+.studio__stage {
+  grid-area: stage;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  margin: 0;
+}
+
+.studio__phone {
+  width: min(56%, 19rem);
+  max-width: none;
+  margin: 0;
+}
+
+@media (min-width: 56rem) {
+  .studio__phone {
+    width: min(72%, 19rem);
+  }
+}
+
+.studio__screen {
+  aspect-ratio: 390 / 844;
+  overflow: hidden;
+  border-radius: 2rem;
+  container-type: inline-size;
+}
+
+.studio__label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+.studio__controls {
+  grid-area: controls;
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 56rem) {
+  .studio__controls {
+    gap: var(--space-6);
+  }
+}
+
+.studio__group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.studio__group legend,
+.studio__legend {
+  margin-bottom: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+.studio__group legend span {
+  margin-left: 0.5em;
+  color: var(--color-ink);
+}
+
+.studio__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.studio__chips button {
+  min-height: 2.75rem;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: 550;
+  cursor: pointer;
+  transition:
+    background-color var(--duration) var(--ease),
+    color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+
+@media (max-width: 47.99rem) {
+  .studio__chips {
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+  }
+  .studio__chips button {
+    flex: none;
+    padding-inline: 0.8rem;
+    font-size: var(--text-xs);
+  }
+  /* Six businesses won't fit across a phone: the row swipes, running to the screen's edge. */
+  .studio__chips--swipe {
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .studio__chips--swipe::-webkit-scrollbar {
+    display: none;
+  }
+  .studio__chips--swipe button {
+    scroll-snap-align: start;
+  }
+}
+
+.studio__chips button[aria-pressed="true"] {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+
+/* Paint swatches, like choosing a car's colour. */
+.studio__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.studio__swatches button {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgb(255 255 255 / 0.45), transparent 45%),
+    var(--swatch);
+  box-shadow:
+    inset 0 -3px 6px rgb(0 0 0 / 0.25),
+    0 0 0 1px rgb(0 0 0 / 0.08);
+  cursor: pointer;
+  transition: box-shadow var(--duration) var(--ease), scale var(--duration) var(--ease);
+}
+
+.studio__swatches button[aria-pressed="true"] {
+  box-shadow:
+    inset 0 -3px 6px rgb(0 0 0 / 0.25),
+    0 0 0 3px var(--color-bg),
+    0 0 0 5px var(--color-ink);
+}
+
+.studio__swatches button:hover {
+  scale: 1.06;
+}
+
+.studio__more {
+  margin-top: var(--space-7);
+  text-align: center;
+}
+
+/* Name it: the business name appears in the app's header as it's typed. */
+.studio__legend {
+  display: block;
+}
+
+.studio__name {
+  width: 100%;
+  max-width: 22rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+}
+
+.studio__name:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.st-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The order: like the summary at the end of a car configurator. */
+.studio__order {
+  grid-area: order;
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.studio__order-title {
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  line-height: 1.15;
+}
+
+.studio__plans {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.studio__plan {
+  position: relative;
+  display: block;
+  padding: var(--space-4);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  cursor: pointer;
+  transition:
+    border-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+
+.studio__plan input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.studio__plan b {
+  display: block;
+  margin-bottom: 2px;
+  font-size: var(--text-base);
+  color: var(--color-ink);
+}
+
+.studio__plan:has(input:checked) {
+  border-color: var(--color-ink);
+  box-shadow: inset 0 0 0 1px var(--color-ink);
+}
+
+.studio__plan:has(input:focus-visible) {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.studio__order-btn {
+  justify-content: center;
+}
+
+.studio__order-note {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+.studio__features {
+  grid-area: features;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5) var(--space-4);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-line);
+}
+
+.studio__features li {
+  display: grid;
+  gap: 2px;
   font-size: var(--text-sm);
 }
 
-.app-tour__note {
-  margin-top: var(--space-6);
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
+.studio__features svg {
+  margin-bottom: var(--space-2);
+  color: var(--color-ink-2);
+}
+
+.studio__features span {
+  color: var(--color-ink-3);
+}
+
+/* The app on the phone: three looks, any accent. */
+.st-ui {
+  --bg: #0b1220;
+  --fg: #fff;
+  --muted: rgb(255 255 255 / 0.6);
+  --card: rgb(255 255 255 / 0.05);
+  --line: #2f3742;
+  --r: 0.55em;
+  --font: var(--font-jost), "Jost", Arial, sans-serif;
+  --head-weight: 600;
+  --head-case: none;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: calc(100cqw / 24.4);
+  line-height: 1.35;
+  text-align: left;
+  transition:
+    background-color 500ms var(--ease),
+    color 500ms var(--ease);
+}
+
+.st-ui[data-style="bold"] {
+  --bg: #f4f1ea;
+  --fg: #0b0b0b;
+  --muted: #555;
+  --card: #fff;
+  --line: #0b0b0b;
+  --r: 0;
+  --font: var(--font-archivo), "Archivo", Arial, sans-serif;
+  --head-weight: 800;
+  --head-case: uppercase;
+}
+
+.st-ui[data-style="soft"] {
+  --bg: #fff;
+  --fg: #1d1d1f;
+  --muted: #6e6e73;
+  --card: #f3f3f5;
+  --line: transparent;
+  --r: 1.1em;
+  --font: var(--font-sans);
+  --head-weight: 650;
+}
+
+.st-ui *,
+.st-ui *::before {
+  transition:
+    background-color 500ms var(--ease),
+    border-color 500ms var(--ease),
+    color 500ms var(--ease),
+    border-radius 500ms var(--ease);
+}
+
+.st-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 2.9em;
+  padding: 0 1.9em;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+.st-status__icons {
+  width: 4em;
+  height: 0.75em;
+  border-radius: 0.2em;
+  background: linear-gradient(
+    90deg,
+    currentColor 0 28%,
+    transparent 28% 36%,
+    currentColor 36% 62%,
+    transparent 62% 70%,
+    currentColor 70%
+  );
+}
+
+.st-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.4em 1.25em 1em;
+  border-bottom: 1px solid var(--line);
+  font-weight: var(--head-weight);
+  text-transform: var(--head-case);
+  letter-spacing: 0.02em;
+}
+
+.st-logo {
+  display: grid;
+  place-items: center;
+  width: 2.1em;
+  height: 2.1em;
+  border-radius: var(--r);
+  background: var(--a);
+  color: var(--on-a);
+  font-weight: 800;
+}
+
+.st-menu {
+  width: 1.3em;
+  height: 0.7em;
+  margin-left: auto;
+  border-block: 2px solid currentColor;
+}
+
+.st-body {
+  padding: 1.1em 1.25em;
+  animation: bd-in 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.st-kicker {
+  color: var(--muted);
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-inverse-ink-2);
+}
+
+.st-body h4 {
+  margin: 0.2em 0 0.8em;
+  font-family: inherit;
+  font-size: 1.55em;
+  font-weight: var(--head-weight);
+  line-height: 1.1;
+  text-transform: var(--head-case);
+}
+
+.st-option,
+.st-line,
+.st-seg,
+.st-days span,
+.st-slots span,
+.st-pay span {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+}
+
+.st-option {
+  display: grid;
+  margin-bottom: 0.6em;
+  padding: 0.85em 1em;
+}
+
+.st-option small,
+.st-line small {
+  color: var(--muted);
+  font-size: 0.82em;
+}
+
+.st-option.is-on,
+.st-line.is-on {
+  border-color: var(--a);
+  box-shadow: inset 0 0 0 1px var(--a);
+}
+
+.st-seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0.2em 0 0.7em;
+  padding: 0.25em;
+  font-size: 0.88em;
+  font-weight: 600;
+  text-align: center;
+}
+
+.st-seg--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.st-seg span {
+  padding: 0.6em 0;
+  border-radius: var(--r);
+}
+
+.st-seg .is-on,
+.st-days .is-on,
+.st-slots .is-on {
+  border-color: var(--a);
+  background: var(--a);
+  color: var(--on-a);
+}
+
+.st-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 0.6em;
+  padding: 0.85em 1em;
+}
+
+.st-days {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4em;
+  margin: 0.9em 0 0.6em;
+}
+
+.st-days span {
+  display: grid;
+  justify-items: center;
+  padding: 0.5em 0;
+  font-size: 0.75em;
+}
+
+.st-days b {
+  font-size: 1.35em;
+}
+
+.st-slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4em;
+}
+
+.st-slots span {
+  padding: 0.65em 0;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-align: center;
+}
+
+.st-slots .is-off {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.st-pay {
+  display: flex;
+  gap: 0.4em;
+  margin-top: 0.8em;
+}
+
+.st-pay span {
+  flex: 1;
+  padding: 0.5em 0;
+  font-size: 0.72em;
+  font-weight: 600;
+  text-align: center;
+}
+
+.st-kicker--gap {
+  margin: 0.9em 0 0.45em;
+}
+
+/* Garage: the car, found by its number plate (always the yellow rear plate). */
+.st-vehicle {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  margin-bottom: 0.7em;
+}
+
+.st-vehicle small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82em;
+}
+
+.st-plate {
+  flex: none;
+  padding: 0.45em 0.7em;
+  border: 2px solid #111;
+  border-radius: 0.3em;
+  background: #f7d117;
+  color: #111;
+  font-family: Arial, sans-serif;
+  font-size: 1.05em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+/* Tattoo studio: pick an artist, attach reference images. */
+.st-artists {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4em;
+}
+
+.st-artists span {
+  display: grid;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 0.55em 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.st-artists i {
+  display: grid;
+  place-items: center;
+  width: 2.2em;
+  height: 2.2em;
+  border-radius: 50%;
+  background: var(--fg);
+  color: var(--bg);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.st-artists .is-on {
+  border-color: var(--a);
+  box-shadow: inset 0 0 0 1px var(--a);
+}
+
+.st-artists .is-on i {
+  background: var(--a);
+  color: var(--on-a);
+}
+
+.st-upload {
+  margin-top: 0.7em;
+  padding: 0.9em;
+  border: 1.5px dashed var(--muted);
+  border-radius: var(--r);
+  color: var(--muted);
+  font-size: 0.85em;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* The app's tab bar along the bottom of the screen. */
+.st-tabs {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0.8em 1em 2em;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 0.7em;
+  font-weight: 600;
+  text-align: center;
+}
+
+.st-tabs span {
+  display: grid;
+  justify-items: center;
+  gap: 0.35em;
+}
+
+.st-tabs i {
+  width: 1.8em;
+  height: 1.8em;
+  border: 2px solid currentColor;
+  border-radius: calc(var(--r) * 0.6);
+}
+
+.st-tabs .is-on {
+  color: var(--fg);
+}
+
+.st-tabs .is-on i {
+  border-color: var(--a);
+  background: var(--a);
+}
+
+.st-btn {
+  display: block;
+  margin-top: 1em;
+  padding: 1em;
+  border-radius: var(--r);
+  background: var(--a);
+  color: var(--on-a);
+  font-weight: 700;
+  text-align: center;
+  text-transform: var(--head-case);
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-body {
+    animation: none;
+  }
+  .st-ui,
+  .st-ui *,
+  .st-ui *::before {
+    transition: none;
+  }
 }
 
 /* On dark bands the app and booking accents need to be lighter to stay readable (≥ 3:1). */
-:root:has(.svc[data-current="apps"]) .inverse :is(.h1, .h2) .serif-em {
+:root:has(.svc[data-current="apps"]) .inverse :is(.h1, .h2, .tile__title) .serif-em {
   color: #a9b596;
 }
 
-:root:has(.svc[data-current="booking"]) .inverse :is(.h1, .h2) .serif-em {
+:root:has(.svc[data-current="booking"]) .inverse :is(.h1, .h2, .tile__title) .serif-em {
   color: #7fb3b8;
+}
+
+/* Booking software's hero: laid out like the other service pages' heroes (switcher in
+   the same place, so it stays put when switching services, copy on the left). The copy
+   is compact so the booking replay is on screen as soon as the page opens: right under
+   it on phones, beside it on desktop. Doubled class to win over .tile, defined later. */
+.booking-hero.tile {
+  padding-block: var(--svc-top) clamp(3rem, 2rem + 4vw, 5rem);
+  background: linear-gradient(to bottom, #e3eae8, var(--color-bg) 40rem);
+  text-align: left;
+}
+
+/* Two whole lines, "Booked in a minute." over "In your app in a second."; the second is
+   the longer, about 9.6 times the font size, so the size keeps it inside the column. */
+.booking-hero .tile__title {
+  max-width: none;
+  margin-inline: 0;
+  font-size: min(9.1vw, 4rem);
+  white-space: nowrap;
+}
+
+.booking-hero .tile__title .serif-em {
+  display: block;
+}
+
+.booking-hero .tile__line {
+  margin: var(--space-3) 0 0;
+}
+
+.booking-hero__visual {
+  margin-top: var(--space-5);
+  text-align: center;
+}
+
+.booking-hero__ctas.tile__ctas {
+  justify-content: flex-start;
+  margin-top: var(--space-6);
+}
+
+/*
+ * The replay always fits on the first screen. The customer phone is as wide as the
+ * column allows, but never taller than the screen height left below the copy: its
+ * height is about 2.1 times its width, and --hero-top is roughly where it starts
+ * (header, switcher and copy above it). svh is the height with the browser's toolbars
+ * showing. The operator phone keeps its size relative to the customer's.
+ */
+.booking-hero {
+  --hero-top: 292px;
+}
+
+.booking-hero .bd__phone--customer {
+  width: min(62%, 19rem, calc((100svh - var(--hero-top)) / 2.08));
+}
+
+.booking-hero .bd__phone--ops {
+  width: calc(min(62%, 19rem, calc((100svh - var(--hero-top)) / 2.08)) * 0.71);
+}
+
+/* Short phones (an iPhone SE in Safari): the subline goes, so the phones can stay larger. */
+@media (max-width: 39.99rem) and (max-height: 600px) {
+  .booking-hero .tile__line {
+    display: none;
+  }
+  .booking-hero {
+    --hero-top: 262px;
+  }
+}
+
+@media (min-width: 40rem) {
+  .booking-hero {
+    --hero-top: 370px;
+  }
+}
+
+/* Desktop: copy and buttons on the left, the replay on the right. */
+@media (min-width: 64rem) {
+  .booking-hero__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    grid-template-rows: auto auto;
+    align-content: center;
+    column-gap: var(--space-7);
+  }
+  .booking-hero__copy {
+    align-self: end;
+  }
+  .booking-hero__visual {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-top: 0;
+  }
+  .booking-hero__ctas.tile__ctas {
+    align-self: start;
+  }
+  .booking-hero .tile__title {
+    font-size: clamp(2.5rem, 3.6vw, 4rem);
+  }
+  .booking-hero {
+    --hero-top: 172px;
+  }
+}
+
+.booking-hero__caption {
+  margin-top: var(--space-5);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+/* The configurator sits in a centred tile but reads left to right. */
+.booking-studio {
+  margin-top: clamp(3rem, 2rem + 4vw, 5rem);
+  padding-bottom: clamp(4.5rem, 3rem + 6vw, 8rem);
+  text-align: left;
 }
 
 /* ==========================================================================
@@ -5247,16 +6033,158 @@ main .proof__list {
    visual. (Layout borrowed from the best product sites; the look is ours.)
    ========================================================================== */
 
+/*
+ * The family line: a full screen of large type (FamilyLine). Pinned, the section is
+ * about one and a half screens tall and its stage sticks while the line types out with the scroll.
+ */
 .family-line {
-  padding-block: var(--space-6) 0;
-  text-align: center;
-  font-family: var(--font-playfair), var(--font-serif);
-  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
-  color: var(--color-ink-2);
+  background: var(--color-bg);
 }
 
-.family-line em {
+.family-line[data-pinned] {
+  height: 160svh;
+}
+
+.family-line__stage {
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+}
+
+.family-line[data-pinned] .family-line__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+}
+
+.family-line__text {
+  max-width: 22ch;
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: clamp(2.75rem, 1.2rem + 6.5vw, 7rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+.family-line__text em {
+  font-weight: 400;
   color: var(--color-accent);
+}
+
+/* Laid out from the start, shown as typed, so nothing moves. */
+.family-line__hidden {
+  visibility: hidden;
+}
+
+/* Takes no space (drawn over the gap), so the letters never move as it travels. Inline, not
+   inline-block: a block-level box mid-word is a place the line may break, and the text reflows. */
+.family-line__caret {
+  position: relative;
+  animation: family-caret 1s steps(1) infinite;
+}
+
+.family-line__caret::after {
+  content: "";
+  position: absolute;
+  bottom: 0.2em;
+  left: 0.02em;
+  width: 0.06em;
+  height: 0.85em;
+  background: var(--color-accent);
+}
+
+/* Once typing ends, the caret blinks a few more times and goes. */
+.family-line__caret:not([data-typing]) {
+  animation: family-caret 1s steps(1) 3 forwards;
+}
+
+@keyframes family-caret {
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .family-line__caret {
+    display: none;
+  }
+}
+
+/* The owners of EV Exec and Boonma, quoted under the family line: phones swipe from one to
+   the next (the second peeking in); wider screens show both side by side. */
+.owner-quotes {
+  position: relative; /* drawn over the family line's empty lower screen, below its text */
+  z-index: 1;
+  margin-top: -28svh;
+  padding-block: 0 clamp(4.5rem, 3rem + 6vw, 8rem);
+}
+
+.owner-quotes__row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 86%;
+  gap: var(--space-5);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+@media (max-width: 55.99rem) {
+  .owner-quotes__row {
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+  }
+}
+
+.owner-quotes__row::-webkit-scrollbar {
+  display: none;
+}
+
+.owner-quotes figure {
+  scroll-snap-align: start;
+}
+
+@media (min-width: 56rem) {
+  .owner-quotes__row {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2.5rem, 1rem + 4vw, 5rem);
+    overflow: visible;
+  }
+}
+
+.owner-quotes blockquote p {
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.25rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.22;
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
+}
+
+.owner-quotes figcaption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+.owner-quotes figcaption img {
+  border-radius: 0.5rem;
 }
 
 .tile {
@@ -5273,8 +6201,7 @@ main .proof__list {
   color: var(--color-ink-3);
 }
 
-.inverse .tile__name,
-.tile--dark .tile__name {
+.inverse .tile__name {
   color: var(--color-inverse-ink-2);
 }
 
@@ -5283,22 +6210,14 @@ main .proof__list {
   margin: var(--space-3) auto 0;
   font-family: var(--font-playfair), var(--font-serif);
   font-size: clamp(2.5rem, 1.5rem + 4.6vw, 5rem);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.02;
   letter-spacing: -0.03em;
-}
-
-.tile__title--sm {
-  font-size: clamp(2.125rem, 1.5rem + 2.6vw, 3.5rem);
 }
 
 .tile__title .serif-em {
   font-family: inherit;
   font-weight: 400;
-  color: var(--home-orange);
-}
-
-.tile--dark .tile__title .serif-em {
   color: var(--home-orange);
 }
 
@@ -5309,8 +6228,7 @@ main .proof__list {
   color: var(--color-ink-2);
 }
 
-.inverse .tile__line,
-.tile--dark .tile__line {
+.inverse .tile__line {
   color: var(--color-inverse-ink-2);
 }
 
@@ -5326,6 +6244,17 @@ main .proof__list {
   margin-top: clamp(3rem, 2rem + 4vw, 5rem);
 }
 
+/* A visual that isn't cut off by the tile's bottom edge needs room beneath it. */
+.tile__visual--pad {
+  padding-bottom: clamp(3rem, 2rem + 4vw, 5rem);
+}
+
+/* One quiet link in place of a row of buttons. */
+.tile__more {
+  margin-top: var(--space-5);
+  font-size: var(--text-sm);
+}
+
 /* Images settle into place as they arrive. */
 @media (prefers-reduced-motion: no-preference) {
   .tile [data-reveal] img {
@@ -5338,18 +6267,84 @@ main .proof__list {
   }
 }
 
-/* Websites: the site on a screen with its phone version in front. */
-.duo {
-  position: relative;
-  display: block;
-  max-width: 60rem;
-  margin-inline: auto;
-  padding-right: 9%;
-  padding-bottom: 6%;
+/* Websites: one site on a screen and a phone, redrawn for each business picked
+   (components/interactive/SiteStyler). Each business is a set of variables; everything
+   inside a screen is sized in em from that screen's width, so the picture scales as one. */
+.ss {
+  --bg: #2a1d17;
+  --ink: #f6ead8;
+  --muted: rgb(246 234 216 / 0.7);
+  --a: #e07a3f;
+  --on-a: #1a0f0a;
+  --card: rgb(255 255 255 / 0.06);
+  --h-font: var(--font-playfair), var(--font-serif);
+  --h-weight: 500;
+  --h-transform: none;
+  --h-spacing: -0.02em;
+  --r: 0.5em;
+  --photo: radial-gradient(circle at 68% 72%, #f2a65a 0 10%, transparent 34%), linear-gradient(160deg, #6a4430, #24180f 75%);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-5);
+  padding-bottom: clamp(3rem, 2rem + 4vw, 5rem);
 }
 
-.duo__screen {
-  display: block;
+.ss[data-site="barber"] {
+  --bg: #161618;
+  --ink: #efe9df;
+  --muted: rgb(239 233 223 / 0.68);
+  --a: #c9a56a;
+  --on-a: #161618;
+  --card: rgb(255 255 255 / 0.06);
+  --h-font: var(--font-serif);
+  --h-weight: 600;
+  --h-transform: uppercase;
+  --h-spacing: 0.02em;
+  --r: 0.2em;
+  --photo: linear-gradient(160deg, #3a3633, #161618 75%);
+}
+
+.ss[data-site="trades"] {
+  --bg: #fff;
+  --ink: #0f1b2d;
+  --muted: #4b5668;
+  --a: #f5c400;
+  --on-a: #0f1b2d;
+  --card: #eef1f5;
+  --h-font: var(--font-archivo), system-ui, sans-serif;
+  --h-weight: 800;
+  --h-transform: uppercase;
+  --h-spacing: -0.01em;
+  --r: 0.15em;
+  --photo: repeating-linear-gradient(-45deg, transparent 0 1.2em, rgb(245 196 0 / 0.85) 1.2em 1.8em), linear-gradient(#18273f, #0f1b2d);
+}
+
+.ss[data-site="clinic"] {
+  --bg: #eef3ef;
+  --ink: #1f3a33;
+  --muted: #557069;
+  --a: #2f6f62;
+  --on-a: #fff;
+  --card: #fff;
+  --h-font: var(--font-jost), system-ui, sans-serif;
+  --h-weight: 600;
+  --h-spacing: -0.01em;
+  --r: 0.8em;
+  --photo: radial-gradient(circle at 60% 40%, #f4f8f5 0 14%, transparent 40%), linear-gradient(170deg, #b9d3c7, #7fa596 85%);
+}
+
+.ss-duo {
+  position: relative;
+  width: 100%;
+  max-width: 60rem;
+  padding-right: 12%;
+  padding-bottom: 8%;
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+}
+
+.ss-screen {
   overflow: hidden;
   padding: clamp(0.35rem, 0.2rem + 0.6vw, 0.7rem);
   border-radius: clamp(0.8rem, 0.5rem + 1vw, 1.4rem);
@@ -5357,26 +6352,239 @@ main .proof__list {
   box-shadow: 0 40px 80px -40px rgb(32 33 36 / 0.45);
 }
 
-.duo__screen img {
-  display: block;
-  width: 100%;
-  height: auto;
+.ss-url {
+  margin: 0 auto clamp(0.3rem, 0.2rem + 0.4vw, 0.6rem);
+  width: fit-content;
+  max-width: 70%;
+  padding: 0.2em 1.4em;
+  border-radius: 1em;
+  background: rgb(255 255 255 / 0.1);
+  color: rgb(255 255 255 / 0.7);
+  font-size: clamp(0.5rem, 0.4rem + 0.35vw, 0.75rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ss-view {
+  overflow: hidden;
+  container-type: inline-size;
+  background: var(--bg);
+  color: var(--ink);
+  transition:
+    background-color 500ms var(--ease),
+    color 500ms var(--ease);
+}
+
+.ss-view--desktop {
+  aspect-ratio: 16 / 9;
   border-radius: clamp(0.45rem, 0.3rem + 0.5vw, 0.8rem);
 }
 
-.duo .duo__phone {
+.ss-view--mobile {
+  aspect-ratio: 9 / 19;
+  border-radius: clamp(0.8rem, 0.5rem + 1.3vw, 2rem);
+}
+
+.ss .ss-phone {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 24%;
+  width: 30%;
   max-width: none;
   margin: 0;
   padding: clamp(0.2rem, 0.1rem + 0.4vw, 0.45rem);
   border-radius: clamp(1rem, 0.6rem + 1.6vw, 2.4rem);
 }
 
-.duo .duo__phone img {
-  border-radius: clamp(0.8rem, 0.5rem + 1.3vw, 2rem);
+.ss-site {
+  display: grid;
+  align-content: start;
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+  text-align: left;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.ss-view--desktop .ss-site {
+  gap: 1.6em;
+  padding: 1.4em 2.6em;
+  font-size: calc(100cqw / 60);
+}
+
+.ss-view--mobile .ss-site {
+  gap: 0.9em;
+  padding: 2.6em 1.2em 1.2em;
+  font-size: calc(100cqw / 16);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ss-site {
+    animation: ss-in 600ms var(--ease) both;
+  }
+}
+
+@keyframes ss-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em);
+  }
+}
+
+.ss-nav {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+  color: var(--muted);
+}
+
+.ss-logo {
+  min-width: 0;
+  margin-right: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink);
+  font-family: var(--h-font);
+  font-size: 1.35em;
+  font-weight: var(--h-weight);
+  text-transform: var(--h-transform);
+  letter-spacing: var(--h-spacing);
+  white-space: nowrap;
+}
+
+.ss-menu {
+  width: 1.3em;
+  height: 0.6em;
+  border-block: 2px solid var(--ink);
+}
+
+.ss-title {
+  display: block;
+  font-family: var(--h-font);
+  font-size: 3.6em;
+  font-weight: var(--h-weight);
+  line-height: 1.02;
+  letter-spacing: var(--h-spacing);
+  text-transform: var(--h-transform);
+}
+
+.ss-view--mobile .ss-title {
+  font-size: 1.7em;
+}
+
+/* Bold capitals run wide: a size down, so the phone's headline still fits. */
+.ss[data-site="trades"] .ss-title {
+  font-size: 3em;
+}
+
+.ss[data-site="trades"] .ss-view--mobile .ss-title {
+  font-size: 1.35em;
+}
+
+.ss[data-site="trades"] .ss-view--mobile .ss-logo {
+  font-size: 1.1em;
+}
+
+.ss-line {
+  display: block;
+  margin-top: 0.6em;
+  color: var(--muted);
+  font-size: 1.15em;
+}
+
+.ss-view--mobile .ss-line {
+  margin-top: -0.3em;
+  font-size: 0.85em;
+}
+
+.ss-btn {
+  display: inline-block;
+  justify-self: start;
+  margin-top: 1.1em;
+  padding: 0.75em 1.4em;
+  border-radius: var(--r);
+  background: var(--a);
+  color: var(--on-a);
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background-color 500ms var(--ease);
+}
+
+.ss-view--mobile .ss-btn {
+  margin-top: 0;
+  font-size: 0.85em;
+}
+
+.ss-btn--sm {
+  margin-top: 0;
+  padding: 0.5em 1em;
+  font-size: 0.9em;
+}
+
+.ss-photo {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--r);
+  background: var(--photo); /* shows while the photo loads */
+}
+
+.ss-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 0; /* the frame rounds it, not the phone's own screenshot rule */
+  object-fit: cover;
+}
+
+.ss-hero {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: 2.4em;
+}
+
+.ss-hero .ss-photo {
+  aspect-ratio: 4 / 3;
+}
+
+.ss-view--mobile > .ss-site > .ss-photo {
+  aspect-ratio: 4 / 3;
+}
+
+.ss-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2em;
+}
+
+.ss-view--mobile .ss-cards {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6em;
+  font-size: 0.75em;
+}
+
+.ss-cards span {
+  display: grid;
+  gap: 0.6em;
+  padding: 0.6em;
+  border-radius: var(--r);
+  background: var(--card);
+  font-weight: 600;
+}
+
+.ss-cards .ss-photo {
+  aspect-ratio: 16 / 7;
+}
+
+.ss-pick {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ss-pick .studio__chips {
+  justify-content: center;
 }
 
 /* Booking software: the app screens as a fan, one in front and its neighbours tucked behind. */
@@ -5480,7 +6688,7 @@ main .proof__list {
 
 .fan__caption span {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -5507,121 +6715,6 @@ main .proof__list {
   .fan__phone {
     transition: none;
   }
-}
-
-/* Two smaller tiles side by side on wider screens. */
-.tiles-2 {
-  display: grid;
-  gap: var(--space-3);
-  padding: var(--space-3);
-}
-
-@media (min-width: 56rem) {
-  .tiles-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.tile--card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--space-7);
-  padding: clamp(3rem, 2rem + 3vw, 4.5rem) clamp(1.25rem, 0.5rem + 3vw, 3rem) 0;
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-sunken);
-}
-
-.tile--dark {
-  background: var(--color-inverse-bg);
-  color: var(--color-inverse-ink);
-}
-
-.tile__shot {
-  display: block;
-  overflow: hidden;
-  max-width: 34rem;
-  margin-inline: auto;
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-  box-shadow: 0 30px 60px -30px rgb(32 33 36 / 0.4);
-}
-
-.tile__shot img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.tile__figure {
-  padding-bottom: clamp(3rem, 2rem + 3vw, 4.5rem);
-  font-family: var(--font-playfair), var(--font-serif);
-  font-size: clamp(4.5rem, 3rem + 7vw, 8rem);
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-
-.tile__figure span {
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-inverse-ink-2);
-}
-
-/* The price promise. */
-.price-strip {
-  padding-block: clamp(4.5rem, 3rem + 6vw, 8rem);
-  text-align: center;
-}
-
-.price-strip__notice {
-  max-width: 40rem;
-  margin: var(--space-7) auto 0;
-  text-align: left;
-}
-
-/* Four steps in a row. */
-.four-steps {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-6) var(--space-5);
-  margin-top: var(--space-8);
-  text-align: left;
-}
-
-@media (min-width: 56rem) {
-  .four-steps {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-.four-steps li {
-  padding-top: var(--space-4);
-  border-top: 2px solid var(--home-orange);
-}
-
-.four-steps span {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--color-ink-3);
-}
-
-.four-steps h3 {
-  margin-top: var(--space-2);
-  font-family: var(--font-playfair), var(--font-serif);
-  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-  font-weight: 500;
-}
-
-.four-steps p {
-  margin-top: var(--space-1);
-  color: var(--color-ink-2);
-  font-size: var(--text-sm);
-}
-
-.four-steps__more {
-  padding-block: var(--space-8) clamp(4.5rem, 3rem + 6vw, 8rem);
 }
 
 /* Hero call to action: a weighted primary and a frosted second button that sits on the photo. */
@@ -5655,9 +6748,20 @@ main .proof__list {
   }
 }
 
+@media (min-width: 64rem) {
+  .hero-ed .btn-row {
+    gap: 0.75rem;
+  }
+  .hero-ed .btn {
+    min-height: 3.75rem;
+    padding-inline: 1.9rem;
+    font-size: 1.125rem;
+  }
+}
+
 .hero-ed .btn--primary {
   box-shadow:
-    0 10px 24px -12px rgb(28 28 28 / 0.55),
+    0 10px 24px -12px rgb(58 45 34 / 0.55),
     inset 0 1px 0 rgb(255 255 255 / 0.12);
 }
 
@@ -5670,11 +6774,11 @@ main .proof__list {
 }
 
 .hero-ed .btn--secondary {
-  border: 1px solid rgb(28 28 28 / 0.14);
+  border: 1px solid rgb(58 45 34 / 0.14);
   background: rgb(255 255 255 / 0.62);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 20px -14px rgb(28 28 28 / 0.35);
+  box-shadow: 0 8px 20px -14px rgb(58 45 34 / 0.35);
 }
 
 .hero-ed .btn--secondary:hover {
@@ -5686,80 +6790,942 @@ main .proof__list {
   max-width: none;
   margin-top: 0.15rem;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-ink-3);
 }
 
-/* Phones: the estimate is a slim link under Start a Project; from tablets up it is the second button. */
-.hero-estimate {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  justify-self: start;
-  width: max-content;
-  min-height: 2.75rem;
-  border-bottom: 1px solid rgb(28 28 28 / 0.3);
+/* ==========================================================================
+   App development page: the spreadsheet-to-app hero (SheetToApp), Build your app
+   (AppBuilder), the project clips (ClipShowcase) and the five stages (BuildStages).
+   Screens are sized in em from their own width, like the booking replay.
+   ========================================================================== */
+
+/* Phones: the spreadsheet-to-app first, then the buttons, so it's on the first screen. */
+.apps-hero__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.apps-hero__visual {
+  margin-top: var(--space-7);
+}
+
+@media (max-width: 39.99rem) {
+  .apps-hero__visual {
+    order: -1;
+    margin: var(--space-5) 0 var(--space-6);
+  }
+  /* The phone never runs below the first screen (about 2.1 times as tall as it is wide). */
+  .apps-hero__visual .sta__phone {
+    width: min(52%, 15.5rem, calc((100svh - 345px) / 2.1));
+  }
+}
+
+/* Desktop: copy and buttons on the left, the spreadsheet-to-app on the right (the switcher
+   keeps its place above both). */
+@media (min-width: 64rem) {
+  /* The copy sits together, centred beside the visual: rows 3 to 5, between two spacers. */
+  .page-hero:has(.apps-hero__body) .container {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto auto minmax(0, 1fr);
+    column-gap: var(--space-7);
+  }
+  .page-hero:has(.apps-hero__body) .container > .h1 {
+    grid-row: 3;
+  }
+  .page-hero:has(.apps-hero__body) .container > .lede {
+    grid-row: 4;
+  }
+  .page-hero:has(.apps-hero__body) .btn-row {
+    grid-row: 5;
+  }
+  .page-hero:has(.apps-hero__body) .container > * {
+    grid-column: 1;
+  }
+  .page-hero:has(.apps-hero__body) .container > .svc {
+    grid-column: 1 / -1;
+  }
+  .page-hero:has(.apps-hero__body) .container > .rise:has(.apps-hero__body),
+  .apps-hero__body {
+    display: contents;
+  }
+  .apps-hero__visual {
+    grid-column: 2;
+    grid-row: 2 / -1;
+    margin: 0;
+  }
+}
+
+/* The homepage's App development tile shows the finished app from that page's hero, whole. */
+.tile__sta {
+  margin-top: clamp(3rem, 2rem + 4vw, 5rem);
+  padding-bottom: clamp(4.5rem, 3rem + 6vw, 8rem);
+}
+
+.tile__sta .sta__phone {
+  width: min(52%, 13rem);
+}
+
+/* On the still phone, slightly bigger text and the tab bar at the foot fill its screen. */
+.tile__sta .sta__screen {
+  display: flex;
+  flex-direction: column;
+}
+
+.tile__sta .sta__screen > * {
+  font-size: calc(100cqw / 20);
+}
+
+.sta__tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-top: auto;
+  padding: 0.7em 0.6em 1.4em;
+  border-top: 1px solid #ececec;
+  color: #6b6b6b; /* 5.3:1 on white */
+  font-size: 0.8em;
+}
+
+.sta__tabs span {
+  display: grid;
+  justify-items: center;
+  gap: 0.3em;
+}
+
+.sta__tabs i {
+  width: 1.4em;
+  height: 1.4em;
+  border-radius: 0.45em;
+  background: currentColor;
+  opacity: 0.35;
+}
+
+.sta__tabs .is-on {
+  color: var(--a);
+  font-weight: 600;
+}
+
+.sta__tabs .is-on i {
+  opacity: 1;
+}
+
+/* Websites tile: the two prices side by side, a hairline between, then two quiet links. */
+.price-pair {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-6);
+}
+
+.price-pair > div {
+  padding-inline: clamp(1.25rem, 0.5rem + 3vw, 2.5rem);
+}
+
+.price-pair > div + div {
+  border-left: 1px solid var(--color-line-strong);
+}
+
+.price-pair dt {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  text-decoration: none;
-  color: var(--color-ink);
-  transition: border-color var(--duration) var(--ease);
-}
-
-.hero-estimate span {
   color: var(--color-ink-3);
 }
 
-.hero-estimate:hover {
-  border-bottom-color: var(--color-ink);
+.price-pair dd {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: clamp(2.25rem, 1.75rem + 2vw, 3.25rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
-/* Small phones: the laptop in the photo starts sooner, so the link drops its time. */
-@media (max-width: 24.4rem) {
-  .hero-estimate__time {
-    display: none;
+.price-pair dd span {
+  margin-left: 0.15em;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+/* Two quiet links side by side, under the prices (Websites tile). */
+
+.apps-tile__body {
+  margin-top: clamp(3rem, 2rem + 4vw, 5rem);
+  padding-bottom: clamp(4.5rem, 3rem + 6vw, 8rem);
+  text-align: left;
+}
+
+/* Spreadsheet to app: the jobs lift off the sheet and land as cards on the phone. */
+.sta {
+  --a: #56624a;
+  text-align: left; /* also inside centred tiles */
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+}
+
+.sta__stage {
+  display: grid;
+  place-items: start center;
+  width: min(100%, 44rem);
+}
+
+.sta__sheet,
+.sta__phone {
+  grid-area: 1 / 1;
+}
+
+.sta__sheet {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #d8d8d8;
+  border-radius: var(--radius-md);
+  background: #fff;
+  box-shadow: 0 24px 50px -30px rgb(0 0 0 / 0.35);
+  font-family: Arial, sans-serif;
+  font-size: clamp(0.625rem, 0.5rem + 0.5vw, 0.8125rem);
+  color: #222;
+  transition:
+    opacity 600ms var(--ease),
+    scale 600ms var(--ease);
+}
+
+.sta__sheet-bar {
+  padding: 0.5em 0.9em;
+  border-bottom: 1px solid #d8d8d8;
+  background: #f3f3f3;
+  font-family: var(--font-mono);
+  color: #666;
+}
+
+.sta__grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1.3fr 1fr 1.5fr 0.6fr;
+}
+
+.sta__grid > * {
+  overflow: hidden;
+  padding: 0.55em 0.6em;
+  border-right: 1px solid #e3e3e3;
+  border-bottom: 1px solid #e3e3e3;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition:
+    opacity 450ms var(--ease),
+    translate 450ms var(--ease);
+}
+
+.sta__grid > b {
+  background: #f6f6f6;
+  font-weight: 700;
+}
+
+.sta__grid .is-flag {
+  background: #fde7e7;
+  color: #b3261e;
+  font-weight: 700;
+}
+
+.sta__grid .is-empty {
+  background: #fff4c2;
+}
+
+.sta__phone {
+  z-index: 1;
+  width: min(52%, 15.5rem);
+  max-width: none;
+  margin: 0;
+  opacity: 0;
+  translate: 0 12%;
+  scale: 0.94;
+  transition:
+    opacity 600ms var(--ease),
+    translate 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    scale 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sta__screen {
+  aspect-ratio: 390 / 844;
+  overflow: hidden;
+  border-radius: 2rem;
+  background: #fff;
+  container-type: inline-size;
+}
+
+.sta__screen > * {
+  font-size: calc(100cqw / 22);
+}
+
+.sta__top {
+  padding: 1.1em 1.6em 0.4em;
+  font-weight: 600;
+}
+
+.sta__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6em 1.1em 0.8em;
+  font-size: calc(100cqw / 15) !important;
+}
+
+.sta__add {
+  display: grid;
+  place-items: center;
+  width: 1.4em;
+  height: 1.4em;
+  border-radius: 50%;
+  background: var(--a);
+  color: #fff;
+  font-size: 0.8em;
+}
+
+.sta__card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.8em;
+  margin: 0 1.1em 0.6em;
+  padding: 0.8em;
+  border-radius: 0.9em;
+  background: #f3f4f1;
+  opacity: 0;
+  translate: 0 1em;
+  transition:
+    opacity 450ms var(--ease),
+    translate 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sta__time {
+  font-weight: 700;
+}
+
+.sta__who {
+  display: grid;
+  min-width: 0;
+  font-size: 0.85em;
+  color: #555;
+}
+
+.sta__who b {
+  font-size: 1.1em;
+  color: #1d1d1f;
+}
+
+.sta__side {
+  display: grid;
+  justify-items: end;
+  gap: 0.25em;
+}
+
+.sta__side i {
+  padding: 0.15em 0.55em;
+  border-radius: 1em;
+  background: #e4ead9;
+  color: #3d4732;
+  font-size: 0.72em;
+  font-style: normal;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sta__side i[data-status="On the way"] {
+  background: #dde8f7;
+  color: #24456f;
+}
+
+.sta__side i[data-status="Quote sent"] {
+  background: #f7ecd4;
+  color: #6c4b12;
+}
+
+.sta__side i[data-status="Paid"] {
+  background: #e7e7e7;
+  color: #333;
+}
+/* Once faded, the old cells are hidden outright (so they don't linger as invisible text). */
+.sta[data-state="app"] .sta__grid > span {
+  opacity: 0;
+  translate: 0 -0.8em;
+  visibility: hidden;
+  transition:
+    opacity 450ms var(--ease) calc(var(--r) * 120ms),
+    translate 450ms var(--ease) calc(var(--r) * 120ms),
+    visibility 0s linear calc(450ms + var(--r) * 120ms);
+}
+
+.sta[data-state="app"] .sta__sheet {
+  opacity: 0;
+  scale: 0.94;
+  visibility: hidden;
+  transition:
+    opacity 600ms var(--ease) 500ms,
+    scale 600ms var(--ease) 500ms,
+    visibility 0s linear 1100ms;
+}
+
+.sta[data-state="app"] .sta__phone {
+  opacity: 1;
+  translate: 0 0;
+  scale: 1;
+  transition-delay: 350ms;
+}
+
+.sta[data-state="app"] .sta__card {
+  opacity: 1;
+  translate: 0 0;
+  transition-delay: calc(750ms + var(--r) * 140ms);
+}
+
+.sta__replay {
+  min-height: 2.75rem;
+  padding: 0.4rem 1.1rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.sta__replay:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Build your app: features on the left (above, on phones), the phone assembling on the right. */
+.ab {
+  display: grid;
+  gap: var(--space-6);
+  justify-items: center;
+}
+
+@media (min-width: 56rem) {
+  .ab {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
   }
 }
 
-@media (max-width: 39.99rem) {
-  .hero-ed .hero-estimate-btn,
-  .hero-ed .hero-note {
-    display: none;
+.ab__controls {
+  justify-self: stretch;
+}
+
+.ab .ab__chips {
+  flex-wrap: wrap;
+}
+
+.studio__legend span {
+  margin-left: 0.5em;
+  color: var(--color-ink);
+}
+
+.ab__phone {
+  width: min(62%, 18rem);
+  max-width: none;
+  margin: 0;
+}
+
+.ab__screen {
+  aspect-ratio: 390 / 844;
+  overflow: hidden;
+  border-radius: 2rem;
+  container-type: inline-size;
+}
+
+.ab-block,
+.ab-ping {
+  animation: bd-in 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ab-block {
+  margin-bottom: 0.8em;
+}
+
+.ab-ping {
+  margin: 0 1em 0.5em;
+  padding: 0.7em 0.9em;
+  border-radius: 1em;
+  background: #1d1d1f;
+  color: #fff;
+  font-size: 0.82em;
+}
+
+.ab-empty {
+  padding: 3em 0;
+  color: var(--muted);
+  text-align: center;
+}
+
+.ab-chart small {
+  display: block;
+}
+
+.ab-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.25em;
+  height: 2.6em;
+}
+
+.ab-bars i {
+  width: 0.55em;
+  border-radius: 0.2em;
+  background: var(--a);
+}
+
+.ab-team {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  font-size: 0.85em;
+  color: var(--muted);
+}
+
+.ab-team i {
+  display: grid;
+  place-items: center;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--fg);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.ab-team i + i {
+  margin-left: -0.7em;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+.ab-team span {
+  margin-left: 0.4em;
+}
+
+/* The project clips, in a browser window on the dark band. */
+.clips {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-5);
+}
+
+.clips__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.clips__tabs button {
+  min-height: 2.75rem;
+  padding: 0.5rem 1.2rem;
+  border: 1px solid var(--color-inverse-line);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-inverse-ink-2);
+  font: inherit;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.clips__tabs button[aria-pressed="true"] {
+  border-color: var(--color-inverse-ink);
+  background: var(--color-inverse-ink);
+  color: var(--color-inverse-bg);
+}
+
+.clips__frame {
+  width: min(100%, 60rem);
+}
+
+.clips__video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: #0c1220;
+}
+
+.clips__caption {
+  color: var(--color-inverse-ink-2);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.clips__caption .arrow-link {
+  color: var(--color-inverse-ink);
+}
+
+/* The five stages: one screen, from sticky notes to live. Phones swipe; wider screens show all five. */
+/* ol.bs: one step above the list reset, which would otherwise drop the side padding. */
+ol.bs {
+  --a: #56624a;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 70%;
+  gap: var(--space-4);
+  margin-inline: calc(-1 * var(--gutter));
+  padding: 0 var(--gutter) var(--space-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.bs::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 56rem) {
+  ol.bs {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
   }
 }
 
-@media (min-width: 40rem) {
-  .hero-estimate {
-    display: none;
+.bs__stage {
+  scroll-snap-align: start;
+}
+
+.bs__screen {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  container-type: inline-size;
+  color: #1d1d1f;
+}
+
+/* Sized from the screen's width (a container can't size its own text from itself). */
+.bs__inner {
+  padding: 1em;
+  font-size: calc(100cqw / 15);
+}
+
+.bs__stage[data-stage="discovery"] .bs__screen {
+  background: #f7f1e4;
+}
+
+.bs__stage[data-stage="scope"] .bs__screen {
+  background: #f1f1f1;
+}
+
+.bs__num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-3);
+}
+
+.bs__stage h3 {
+  margin-top: var(--space-1);
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
+  font-weight: 600;
+}
+
+.bs__stage p {
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+
+.bs-notes {
+  display: grid;
+  gap: 0.8em;
+  padding-top: 0.6em;
+}
+
+.bs-notes span {
+  padding: 0.7em 0.8em;
+  background: #ffe38a;
+  box-shadow: 0 6px 12px -8px rgb(0 0 0 / 0.4);
+  font-family: var(--font-playfair), var(--font-serif);
+  font-style: italic;
+  line-height: 1.2;
+}
+
+.bs-head {
+  margin-bottom: 0.6em;
+  font-weight: 700;
+}
+
+.bs-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.6em 0;
+  border-bottom: 1px solid #e8e8e8;
+  font-size: 0.85em;
+}
+
+.bs-who {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bs-time {
+  font-weight: 700;
+}
+
+.bs-chip {
+  padding: 0.15em 0.5em;
+  border-radius: 1em;
+  background: #e4ead9;
+  color: #3d4732;
+  font-size: 0.8em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bs-bar {
+  display: inline-block;
+  height: 0.75em;
+  border-radius: 0.3em;
+  background: #cfcfcf;
+}
+
+.bs__stage[data-stage="design"] .bs-bar {
+  background: #d9dfcf;
+}
+
+.bs__stage[data-stage="design"] .bs-bar--chip {
+  background: #b9c4a6;
+}
+
+.bs-btn,
+.bs-price {
+  display: block;
+  margin-top: 0.9em;
+  padding: 0.65em;
+  border-radius: 0.6em;
+  text-align: center;
+  font-weight: 700;
+}
+
+.bs-btn {
+  background: var(--a);
+  color: #fff;
+}
+
+.bs__stage[data-stage="design"] .bs-btn .bs-bar {
+  vertical-align: middle;
+  background: rgb(255 255 255 / 0.55);
+}
+
+.bs-price {
+  border: 2px dashed var(--a);
+  color: var(--a);
+  rotate: -2deg;
+}
+
+.bs-live {
+  margin-bottom: 0.7em;
+  padding: 0.5em 0.8em;
+  border-radius: 0.8em;
+  background: #1d1d1f;
+  color: #fff;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+/* The website version on the homepage: four steps, in the homepage's terracotta. */
+.bs--web {
+  --a: #b8481f;
+}
+
+@media (min-width: 56rem) {
+  .bs--web {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-/* A price in a tile's line links to the full pricing. */
-.tile__price {
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-color: rgb(28 28 28 / 0.3);
-  text-underline-offset: 0.2em;
+.bs--web .bs__stage[data-stage="enquire"] .bs__screen {
+  background: #f7f1e4;
 }
 
-.tile__price:hover {
-  text-decoration-color: currentColor;
+/* The scope is a sheet of paper: the quote. */
+.bs--web .bs__stage[data-stage="scope"] .bs__screen {
+  background: #fff;
 }
 
-/* The hero's estimate link answers a press the way the buttons do. */
-.hero-estimate > span[aria-hidden] {
-  transition: transform var(--duration) var(--ease);
+.ws-url {
+  display: flex;
+  align-items: center;
+  height: 1.7em;
+  margin-bottom: 0.7em;
+  padding-inline: 0.7em;
+  border-radius: 0.85em;
+  background: #f1efeb;
+  color: #6b6760;
+  font-size: 0.7em;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.hero-estimate:hover > span[aria-hidden],
-.hero-estimate:active > span[aria-hidden] {
-  transform: translateX(3px);
+.ws-url .bs-bar {
+  height: 0.8em;
 }
 
-.hero-estimate:active {
-  opacity: 0.75;
+.ws-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6em;
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: 0.9em;
+}
+
+.ws-menu {
+  width: 1.1em;
+  height: 0.55em;
+  border-block: 2px solid currentColor;
+}
+
+.ws-photo {
+  position: relative;
+  height: 4.6em;
+  margin-bottom: 0.7em;
+  border-radius: 0.5em;
+  background: #e2e2e2;
+}
+
+/* The same café as the Websites tile's example, with its photo, once it's built. */
+.bs__stage:is([data-stage="build"], [data-stage="launch"]) .ws-photo {
+  background: #2a1d17 url("/styler/cafe-hero.webp") center / cover no-repeat;
+}
+
+.ws-title {
+  display: block;
+  font-weight: 600;
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: 1.3em;
+  line-height: 1.1;
+}
+
+/* The scope: the quote itself, priced line by line. */
+.ws-quote__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5em;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid #1d1d1f;
+}
+
+.ws-quote__head b {
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: 1.2em;
+}
+
+.ws-quote__head span {
+  color: #6b6760;
+  font-size: 0.75em;
+}
+
+.ws-quote__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5em;
+  padding: 0.45em 0;
+  border-bottom: 1px solid #e8e8e8;
+  font-size: 0.8em;
+}
+
+.ws-quote__total {
+  border-bottom: 0;
+  font-weight: 700;
+}
+
+/* Your feedback, pinned to the page while it's being built. */
+.ws-note {
+  position: absolute;
+  right: -0.3em;
+  top: -0.5em;
+  padding: 0.35em 0.6em;
+  background: #ffe38a;
+  box-shadow: 0 6px 12px -8px rgb(0 0 0 / 0.4);
+  font-family: var(--font-playfair), var(--font-serif);
+  font-size: 0.75em;
+  font-style: italic;
+  rotate: 4deg;
+}
+
+.ws-btn {
+  display: inline-block;
+  margin-top: 0.7em;
+  padding: 0.5em 0.9em;
+  border-radius: 2em;
+  background: var(--a);
+  color: #fff;
+  font-size: 0.8em;
+  font-weight: 700;
+}
+
+/* For bookings, the ready-made product. */
+.apps-booking {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  color: var(--color-ink-2);
+  text-decoration: none;
+  transition: border-color var(--duration) var(--ease);
+}
+
+.apps-booking:hover {
+  border-color: var(--color-ink);
+}
+
+.apps-booking > span:nth-child(2) {
+  flex: 1;
+}
+
+.apps-booking b {
+  display: block;
+  color: var(--color-ink);
+}
+
+.apps-booking__phone {
+  flex: none;
+  width: 3.5rem;
+  margin: 0;
+  padding: 0.2rem;
+  border-radius: 0.8rem;
+}
+
+.apps-booking__phone img {
+  border-radius: 0.6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sta__sheet,
+  .sta__phone,
+  .sta__card,
+  .sta__grid > *,
+  .ab-block,
+  .ab-ping {
+    transition: none;
+    animation: none;
+  }
 }
