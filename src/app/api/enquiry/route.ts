@@ -14,7 +14,7 @@ type Json = Record<string, unknown>;
 const reply = (status: number, body: Json) => NextResponse.json(body, { status });
 
 /** A short reference quoted to the customer and in the email subject, so follow-up can be matched up. */
-const newReference = () => `FYD-${randomBytes(3).toString("hex").toUpperCase()}`;
+const newReference = () => `WNJO-${randomBytes(3).toString("hex").toUpperCase()}`;
 
 export async function POST(request: NextRequest) {
   const length = Number(request.headers.get("content-length") ?? 0);

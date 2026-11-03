@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FY Devs design system
+   WNJO design system
    Tokens → base → layout → components. Component-specific styles that are
    only used by one interactive widget live in CSS modules next to it.
    ========================================================================== */
@@ -71,7 +71,7 @@
   --width-measure: 34rem; /* comfortable line length for supporting copy */
   --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
   --svc-top: clamp(0.25rem, 0rem + 1vw, 1.25rem); /* space between the header and the service switcher */
-  --logo-h: 2.75rem; /* header logo height; the bar grows with it */
+  --logo-h: 2rem; /* header logo height; the bar grows with it */
   --header-h: max(4rem, calc(var(--logo-h) + 1.75rem));
 
   /* Shape & depth */
@@ -1114,7 +1114,7 @@ main {
 
 .site-footer__brand img {
   width: auto;
-  height: 1.75rem;
+  height: 1.5rem;
 }
 
 .site-footer__brand p {

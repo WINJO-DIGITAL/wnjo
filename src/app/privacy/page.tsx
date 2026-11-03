@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 export const metadata = pageMetadata(
   "/privacy",
   "Privacy notice",
-  "How FY Devs handles the personal information you share through this website.",
+  "How WNJO handles the personal information you share through this website.",
 );
 
 /*

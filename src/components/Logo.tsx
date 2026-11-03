@@ -1,7 +1,7 @@
 import Image from "next/image";
-import logo from "../../public/brand/fydevs-logo-462.png";
+import logo from "../../public/brand/wnjo-logo-462.png";
 
-/** The supplied FY Devs lockup (icon + wordmark), used unmodified. */
+/** The supplied WNJO wordmark, used unmodified. */
 export function Logo({ preload = false }: { preload?: boolean }) {
-  return <Image src={logo} alt="FY Devs" preload={preload} sizes="(min-width: 64rem) 260px, 200px" />;
+  return <Image src={logo} alt="WNJO" preload={preload} sizes="140px" />;
 }

@@ -4,11 +4,11 @@
  * rather than invented. See README §15 "Open Decisions".
  */
 export const site = {
-  name: "FY Devs",
-  shortName: "FYDevs",
+  name: "WNJO",
+  shortName: "WNJO",
   tagline: "Bespoke websites, apps and booking software.",
   description:
-    "FY Devs designs and builds bespoke websites, apps and booking software for businesses that want considered design, clear pricing and technology that fits how they work.",
+    "WNJO designs and builds bespoke websites, apps and booking software for businesses that want considered design, clear pricing and technology that fits how they work.",
   locale: "en_GB",
   themeColor: "#F2ECE2",
 } as const;

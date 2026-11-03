@@ -1,8 +1,8 @@
-# FY Devs — Core Project Brief
+# WNJO — Core Project Brief
 
 **Version:** 0.1  
 **Status:** Initial foundation  
-**Project:** FY Devs (F-Y-D-E-V-S)  
+**Project:** WNJO (W-N-J-O)  
 **Primary market assumption:** UK  
 **Currency assumption:** GBP (£), subject to confirmation
 
@@ -10,12 +10,12 @@
 
 ## 1. Project Overview
 
-FY Devs is a digital business with two primary revenue streams:
+WNJO is a digital business with two primary revenue streams:
 
 1. **Bespoke website design and development** for businesses seeking distinctive, premium-quality websites.
 2. **Booking software and SaaS products**, initially including a driver and operator application developed for an airport taxi business, with potential applications across taxi firms and other booking-based businesses.
 
-FY Devs is not intended to compete in the cheap, template-based website market. Its focus is on bespoke digital experiences, thoughtful design, useful functionality, and technology that solves real business problems.
+WNJO is not intended to compete in the cheap, template-based website market. Its focus is on bespoke digital experiences, thoughtful design, useful functionality, and technology that solves real business problems.
 
 The website should act as a premium showroom and sales platform. Visitors should be able to explore projects, understand services, configure their requirements, see estimated pricing, and purchase or enquire without unnecessary friction.
 
@@ -25,7 +25,7 @@ The website should act as a premium showroom and sales platform. Visitors should
 
 Bespoke digital experiences and practical software, built around the way your business works.
 
-FY Devs combines premium web design with custom development and booking software.
+WNJO combines premium web design with custom development and booking software.
 
 The brand should communicate quality, creativity, technical competence, and a genuine commitment to understanding each client's needs.
 
@@ -64,7 +64,7 @@ The website must distinguish between purchasing the existing SaaS product and co
 
 ## 4. Website Objectives
 
-1. Demonstrate the quality of FY Devs' work immediately.
+1. Demonstrate the quality of WNJO's work immediately.
 2. Showcase selected projects through strong visuals and concise case studies.
 3. Explain services quickly and clearly.
 4. Offer an interactive website configurator with instant indicative pricing.
@@ -78,7 +78,7 @@ The website must distinguish between purchasing the existing SaaS product and co
 ## 5. Proposed Website Structure
 
 ### Home
-Introduce FY Devs, communicate the value proposition, showcase selected work, and direct visitors towards website development or booking software.
+Introduce WNJO, communicate the value proposition, showcase selected work, and direct visitors towards website development or booking software.
 
 ### Websites
 Explain bespoke website services, the development process, package options, and pricing configurator.
@@ -95,7 +95,7 @@ Present the driver/operator and booking application, its intended audience, veri
 ### Bespoke Systems
 Explain custom booking platforms, integrations, and tailored software development.
 
-### About FY Devs
+### About WNJO
 Communicate the motivation behind the business and its commitment to creating websites clients are proud of.
 
 ### Contact / Project Summary
@@ -203,7 +203,7 @@ An estimate must not be presented as a guaranteed final quote unless the project
 
 ## 8. Interactive Website Configurator
 
-The configurator is a key part of the FY Devs customer experience.
+The configurator is a key part of the WNJO customer experience.
 
 Its purpose is to make purchasing straightforward and remove the uncertainty associated with requesting a traditional agency quote.
 
@@ -498,7 +498,7 @@ The following items remain unconfirmed and must not be treated as settled requir
 
 ## 16. Working Rules for Future Development
 
-Use this document as the initial source of truth for FY Devs.
+Use this document as the initial source of truth for WNJO.
 
 When making changes:
 

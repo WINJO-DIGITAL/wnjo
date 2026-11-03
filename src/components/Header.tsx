@@ -353,7 +353,7 @@ export function Header() {
           <Link
             href="/"
             className="brand"
-            aria-label="FY Devs home"
+            aria-label="WNJO home"
             onMouseEnter={() => hoverItem(null)}
             onClick={closeIfSamePage}
             transitionTypes={NAV}

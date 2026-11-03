@@ -8,7 +8,7 @@ import { appPlanCard, carePlanCards, packagePlanCards } from "@/lib/plans";
 export const metadata = pageMetadata(
   "/pricing",
   "Pricing",
-  "Starting prices for FY Devs websites and app development, and optional hosting and care plans.",
+  "Starting prices for WNJO websites and app development, and optional hosting and care plans.",
 );
 
 // Always flagged up front, whichever plan is chosen.

@@ -8,7 +8,7 @@ export function Footer() {
       <div className="container container--wide">
         <div className="site-footer__grid">
           <div className="site-footer__brand">
-            <Link href="/" className="brand" aria-label="FY Devs home">
+            <Link href="/" className="brand" aria-label="WNJO home">
               <Logo />
             </Link>
             <p>{site.tagline}</p>
