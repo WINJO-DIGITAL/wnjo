@@ -551,7 +551,7 @@ main {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgb(242 236 226 / 0.86);
+  background: rgb(242 236 226 / 0.97);
   backdrop-filter: saturate(1.4) blur(14px);
   -webkit-backdrop-filter: saturate(1.4) blur(14px);
   border-bottom: 1px solid transparent;
@@ -1742,7 +1742,7 @@ main {
   }
   /* "that grow your business." is about 9.7 times the font size wide: kept inside its column. */
   .hero-ed--work .hero-ed__title {
-    font-size: min(4vw, 3.6rem);
+    font-size: min(4.2vw, 3.6rem);
   }
   /* Beside the copy the bar is narrower: the tabs get their own row, so names show in full. */
   .hero-ed--work .showcase__bar {
@@ -1750,6 +1750,102 @@ main {
   }
   .hero-ed--work .showcase-section {
     padding-block: var(--space-6);
+  }
+}
+
+/*
+ * Hero copy: a three-line headline, one dominant button with a quieter "See our work"
+ * beside it, a longer reassurance line, and the service switcher as small pills.
+ */
+.hero-ed--work .hero-ed__tail {
+  display: block;
+}
+
+.hero-ed--work .hero-ed__copy {
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+.hero-ed--work .btn--primary {
+  min-height: 3.25rem;
+  padding-inline: 1.6rem;
+  font-size: 1.0625rem;
+  font-weight: 650;
+}
+
+.hero-ed--work .btn--secondary {
+  min-height: 2.75rem;
+  border-color: var(--color-line-strong);
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.hero-ed--work .btn--secondary:hover {
+  border-color: var(--color-ink);
+  background: rgb(255 255 255 / 0.5);
+}
+
+.hero-ed--work .hero-ed__copy .hero-note {
+  margin-top: 0;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  text-transform: none;
+  text-wrap: balance;
+  background: none;
+}
+
+.hero-ed--work .hero-ed__services {
+  margin-top: var(--space-1);
+}
+
+.hero-ed--work .svc {
+  margin: 0;
+}
+
+.hero-ed--work .svc .svc__list {
+  gap: var(--space-2);
+}
+
+.hero-ed--work .svc .svc__item::after,
+.hero-ed--work .svc .svc__link::before,
+.hero-ed--work .svc .svc__line {
+  display: none;
+}
+
+.hero-ed--work .svc .svc__link {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  font-size: 0.6875rem;
+}
+
+.hero-ed--work .svc .svc__link[aria-current="page"] {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+
+@media (max-width: 39.99rem) {
+  .hero-ed--work .hero-ed__copy {
+    gap: var(--space-3);
+    padding-top: var(--space-2);
+  }
+  .hero-ed--work .btn-row {
+    gap: var(--space-2);
+  }
+  /* The dominant button takes the full width; "See our work" sits quietly under it. */
+  .hero-ed--work .btn--primary {
+    flex: 1 1 100%;
+    min-height: 3.5rem;
+    font-size: 1.125rem;
+  }
+  .hero-ed--work .showcase-section {
+    padding-top: var(--space-4);
   }
 }
 
