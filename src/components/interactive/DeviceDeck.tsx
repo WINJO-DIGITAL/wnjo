@@ -50,6 +50,8 @@ export function DeviceDeck({ items }: { items: Item[] }) {
   const [inView, setInView] = useState(true);
   // Once the visitor swipes, taps, uses the arrows, keys or pills, auto-advance stays off.
   const [stopped, setStopped] = useState(false);
+  // The visitor's own pause, from the bar above the stage.
+  const [paused, setPaused] = useState(false);
   const reduced = useSyncExternalStore(
     subscribeReduced,
     () => window.matchMedia(reducedQuery).matches,
@@ -162,7 +164,16 @@ export function DeviceDeck({ items }: { items: Item[] }) {
   );
 
   // Auto-advance: runs only while nothing holds it (see the header comment).
-  const autoOn = !reduced && !stopped && !hovered && !focused && !dragging && inView;
+  const playing = !paused && !stopped;
+  const autoOn = !reduced && playing && !hovered && !focused && !dragging && inView;
+  const togglePlay = () => {
+    if (playing) {
+      setPaused(true);
+    } else {
+      setPaused(false);
+      setStopped(false);
+    }
+  };
   useEffect(() => {
     if (!autoOn) return;
     const t = window.setTimeout(() => goTo((index + 1) % items.length, true), AUTO_MS);
@@ -254,6 +265,56 @@ export function DeviceDeck({ items }: { items: Item[] }) {
           if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false);
         }}
       >
+        <div className="deck__bar">
+          <span aria-hidden="true" />
+          <div className="deck__switch" role="group" aria-label="Choose a device">
+            <i aria-hidden="true" />
+            <button
+              type="button"
+              aria-pressed={mode === "phone"}
+              onClick={() => setMode("phone")}
+              onPointerDown={() => setTabletReady(true)}
+            >
+              <svg width="12" height="14" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <rect x="2.5" y="1" width="9" height="14" rx="2.2" />
+                <path d="M6 12.5h2" strokeLinecap="round" />
+              </svg>
+              Phone
+            </button>
+            <button
+              type="button"
+              aria-pressed={mode === "tablet"}
+              onClick={() => setMode("tablet")}
+              onPointerDown={() => setTabletReady(true)}
+              onFocus={() => setTabletReady(true)}
+            >
+              <svg width="14" height="16" viewBox="0 0 16 18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <rect x="1.5" y="1" width="13" height="16" rx="2.4" />
+                <path d="M6.5 14.5h3" strokeLinecap="round" />
+              </svg>
+              Tablet
+            </button>
+          </div>
+          {!reduced && (
+            <button
+              type="button"
+              className="deck__pause"
+              onClick={togglePlay}
+              aria-label={playing ? "Pause examples" : "Play examples"}
+            >
+              {playing ? (
+                <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true">
+                  <path d="M1 1h3.2v12H1zM7.8 1H11v12H7.8z" fill="currentColor" />
+                </svg>
+              ) : (
+                <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true">
+                  <path d="M1 1.2 11 7 1 12.8z" fill="currentColor" />
+                </svg>
+              )}
+            </button>
+          )}
+        </div>
+
         <div
           ref={stageRef}
           className="deck__stage"
@@ -304,12 +365,12 @@ export function DeviceDeck({ items }: { items: Item[] }) {
               </div>
             </div>
           ))}
-          <button type="button" className="deck__arrow deck__arrow--prev" aria-label="Previous project" onClick={() => step(-1)}>
+          <button type="button" className="deck__arrow deck__arrow--prev" aria-label="Previous example" onClick={() => step(-1)}>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M10 3 5 8l5 5" />
             </svg>
           </button>
-          <button type="button" className="deck__arrow deck__arrow--next" aria-label="Next project" onClick={() => step(1)}>
+          <button type="button" className="deck__arrow deck__arrow--next" aria-label="Next example" onClick={() => step(1)}>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="m6 3 5 5-5 5" />
             </svg>
@@ -319,34 +380,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
           </span>
         </div>
 
-        <div className="deck__switch" role="group" aria-label="Choose a device">
-          <i aria-hidden="true" />
-          <button
-            type="button"
-            aria-pressed={mode === "phone"}
-            onClick={() => setMode("phone")}
-            onPointerDown={() => setTabletReady(true)}
-          >
-            <svg width="12" height="14" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-              <rect x="2.5" y="1" width="9" height="14" rx="2.2" />
-              <path d="M6 12.5h2" strokeLinecap="round" />
-            </svg>
-            Phone
-          </button>
-          <button
-            type="button"
-            aria-pressed={mode === "tablet"}
-            onClick={() => setMode("tablet")}
-            onPointerDown={() => setTabletReady(true)}
-            onFocus={() => setTabletReady(true)}
-          >
-            <svg width="14" height="16" viewBox="0 0 16 18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-              <rect x="1.5" y="1" width="13" height="16" rx="2.4" />
-              <path d="M6.5 14.5h3" strokeLinecap="round" />
-            </svg>
-            Tablet
-          </button>
-        </div>
       </div>
 
       <div className="deck__cta">

@@ -7977,7 +7977,7 @@ ol.bs {
 .deck__panel {
   position: relative;
   width: calc(100% - 20px);
-  padding-bottom: 8px;
+  padding-top: 8px;
   border-radius: 30px;
   background: var(--bg, #2a2019);
   transition: background-color 0.6s;
@@ -7998,7 +7998,7 @@ ol.bs {
   height: clamp(200px, calc(100svh - var(--deck-fixed)), 410px);
   /* Clipped sideways only, so the glow and floor run on into the panel without a seam. */
   overflow-x: clip;
-  border-radius: 30px 30px 0 0;
+  border-radius: 0 0 30px 30px;
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
@@ -8155,7 +8155,44 @@ ol.bs {
   right: 0;
 }
 
-/* The device switch: inside the panel, secondary to the price button in size and contrast. */
+/* The top bar of the panel: the device switch, centred, with the pause control at its right. */
+.deck__bar {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  height: 44px;
+  padding-inline: 10px;
+}
+.deck__pause {
+  position: relative;
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #f6f0e6;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.deck__pause::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: rgb(246 240 230 / 0.12);
+  transition: background-color 0.3s;
+}
+.deck__pause:hover::before {
+  background: rgb(246 240 230 / 0.24);
+}
+.deck__pause svg {
+  position: relative;
+}
+
+/* The device switch: secondary to the price button in size and contrast. */
 .deck__switch {
   position: relative;
   display: grid;
@@ -8253,16 +8290,16 @@ ol.bs {
   font-weight: 700;
   color: #f0b48f;
 }
-/* The microcopy: 16px, and its colour is 5.3:1 on the cream (WCAG AA is 4.5:1). Two lines are reserved. */
+/* The microcopy: one line at 375px, 16px, in the sans caps (the mono caps need 365px+ at 16px,
+   more than the 335px there is). Its colour is 5.3:1 on the cream (WCAG AA is 4.5:1). */
 .deck__cta p {
   margin: 0;
-  min-height: 40px;
-  font: 400 16px/20px var(--font-mono);
-  letter-spacing: 0.04em;
+  font: 500 16px/20px var(--font-sans);
+  letter-spacing: -0.02em;
   text-transform: uppercase;
   color: #6b5f55;
   text-align: center;
-  text-wrap: balance;
+  white-space: nowrap;
 }
 
 /* Owner quotes share one grid cell: the space is reserved and they crossfade. */
@@ -8309,10 +8346,15 @@ ol.bs {
   border-radius: 7px;
 }
 
-.deck :is(.deck__pill, .deck__btn, .deck__switch button, .deck__arrow):focus-visible,
+.deck :is(.deck__pill, .deck__btn, .deck__switch button, .deck__arrow, .deck__pause):focus-visible,
 .deck__stage:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
+}
+/* On the dark panel the rings are cream, so they show (terracotta is too dark there). */
+.deck .deck__panel :is(.deck__switch button, .deck__arrow, .deck__pause):focus-visible,
+.deck .deck__panel .deck__stage:focus-visible {
+  outline-color: #f6f0e6;
 }
 
 @media (prefers-reduced-motion: reduce) {
