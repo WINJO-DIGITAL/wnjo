@@ -8321,50 +8321,6 @@ ol.bs {
   color: #f0b48f;
 }
 
-/* Owner quotes share one grid cell: the space is reserved and they crossfade. */
-.deck__quotes {
-  display: grid;
-  width: 100%;
-  padding: 18px 28px 0;
-  min-height: 108px;
-}
-.deck__quote {
-  grid-area: 1 / 1;
-  margin: 0;
-  text-align: center;
-  opacity: 0;
-  transition: opacity 0.5s;
-  pointer-events: none;
-}
-.deck__quote[data-on="true"] {
-  opacity: 1;
-}
-.deck__quote blockquote p {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
-  margin: 0;
-  font: italic 400 15px/1.35 var(--font-serif);
-  letter-spacing: -0.01em;
-  color: var(--deck-ink);
-}
-.deck__quote figcaption {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 10px;
-  font: 400 11px/1 var(--font-mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-ink-3);
-}
-.deck__quote figcaption img {
-  border-radius: 7px;
-}
-
 .deck :is(.deck__pill, .deck__btn, .deck__switch button, .deck__arrow):focus-visible,
 .deck__stage:focus-visible {
   outline: 2px solid var(--color-accent);

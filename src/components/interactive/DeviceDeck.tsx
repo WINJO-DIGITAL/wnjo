@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Stopwatch } from "@/components/Icons";
-import { OWNER_QUOTES, type Project } from "@/lib/projects";
+import type { Project } from "@/lib/projects";
 
 type Item = Pick<Project, "slug" | "name" | "mobile" | "tablet" | "logo">;
 type Mode = "phone" | "tablet";
@@ -33,7 +33,7 @@ const subscribeReduced = (onChange: () => void) => {
 
 /**
  * The phone hero's showcase: a swipeable coverflow of our work in a panel, with the Phone/Tablet
- * switch inside that panel, a rail of project pills, the price button and the owner's quote.
+ * switch inside that panel, a rail of project pills and the price button.
  * It moves on by itself every few seconds, pausing on hover, focus and while the panel is
  * off screen, and stopping for good once the visitor takes over. Reduced motion turns it off.
  * Only transform and opacity animate; dragging writes CSS variables and reads no layout.
@@ -374,26 +374,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
             </span>
           </span>
         </Link>
-      </div>
-
-      {/* Every owner's words share one grid cell, so the space is reserved and they crossfade. */}
-      <div className="deck__quotes">
-        {OWNER_QUOTES.map(({ project, quote }) => (
-          <figure
-            key={project.slug}
-            className="deck__quote"
-            data-on={project.slug === current.slug}
-            aria-hidden={project.slug !== current.slug}
-          >
-            <blockquote>
-              <p>{`“${quote}”`}</p>
-            </blockquote>
-            <figcaption>
-              <Image src={project.logo} alt="" width={28} height={28} sizes="28px" />
-              Owner, {project.name}
-            </figcaption>
-          </figure>
-        ))}
       </div>
     </div>
   );
