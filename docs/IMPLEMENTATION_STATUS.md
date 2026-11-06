@@ -20,3 +20,29 @@ Live tracker for the platform brief. Each step is only marked done once it has b
 - Platform-level roles (`user_roles`) are separate from agency roles (`tenant_members`), so an agency member can't alter platform permissions.
 - No automatic profile creation on sign-up yet. The app will create profile rows when they're first needed.
 - No staff-granting function yet. Staff will be added through a server action with an audit entry, in Step 2.
+
+## Step 2: Agency business system — in progress
+
+Built in sub-steps, each tested before the next.
+
+### 2a. Pricing catalogue — done, tested
+- Tables: `pricing_packages`, `pricing_features`, `pricing_rates`, `pricing_care_plans`, `pricing_settings`. All amounts are integer pence.
+- Seeded with WNJO's current provisional prices. Owners and admins edit them through row-level-security policies; staff can read them.
+- Migrations: `20261106220000` to `20261106220300`.
+
+### 2b. Quotes and immutable snapshots — done, tested
+- Tables: `quotes`, `quote_versions` (the frozen answers, catalogue and result), `quote_version_items`, `quote_acceptances`.
+- Versions, items and acceptances can't be changed or deleted, even by the database owner (a trigger enforces this).
+- A quote is visible to agency staff and to the client organisation it was issued to.
+- Tests: `supabase/tests/quotes.sql`, 11 checks, all passing.
+
+### 2c. Server quote engine — done, tested
+- `src/lib/quote-engine.ts` prices an enquiry from a catalogue passed in as data. It doesn't read the database itself.
+- Parity test (`src/lib/quote-engine.test.ts`): the engine matches the current calculator exactly on more than 10,000 combinations of answers, including package, total, range, care price, scope flags and line items.
+- The browser configurator still uses the old `estimate()` in `src/lib/pricing.ts`. Switching it to the server engine is part of 2d, so the two can't disagree for long.
+
+### Still to build in Step 2
+- 2d: quote screens for customers and staff, including acceptance with recorded evidence.
+- Orders, contracts and project creation after acceptance.
+- Stripe deposits and payment schedules (blocked on Stripe test-mode keys).
+- Staff admin screens for prices and team membership.
