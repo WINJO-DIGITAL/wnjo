@@ -11,7 +11,7 @@ type Item = Pick<
 >;
 
 /** The phone hero shows these three clients; the laptop showcase keeps the full set. */
-const PHONE_CLIENTS = ["ev-exec", "boonma", "fystay"];
+const PHONE_CLIENTS = ["ev-exec", "boonma", "raeng-fitness"];
 
 const phoneQuery = "(max-width: 39.99rem)";
 const subscribe = (onChange: () => void) => {

@@ -7922,6 +7922,8 @@ ol.bs {
   width: 100%;
   height: 58px;
   padding: 6px 40px 6px 20px;
+  /* A snapped pill rests 20px in from the edge, the same gutter as the price button. */
+  scroll-padding-inline: 20px;
   overflow-x: auto;
   scroll-snap-type: x proximity;
   scrollbar-width: none;

@@ -10,7 +10,7 @@ import { HeroShowcase } from "@/components/interactive/HeroShowcase";
 import { WebStages } from "@/components/WebStages";
 import { WebsitesTile } from "@/components/WebsitesTile";
 import { jost } from "@/lib/fonts";
-import { OWNER_QUOTES, projectBySlug, projects } from "@/lib/projects";
+import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 
 // Title, description and share image come from the root layout; only the canonical URL is added here.
@@ -47,7 +47,7 @@ export default function HomePage() {
           </div>
         </div>
         <div aria-label="Recent work" className="container container--wide showcase-section">
-          <HeroShowcase items={projects} />
+          <HeroShowcase items={heroProjects} />
         </div>
       </section>
 

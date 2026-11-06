@@ -15,6 +15,11 @@ import fystayDesktop from "../../public/work/fystay-desktop.webp";
 import fystayMobile from "../../public/work/fystay-mobile.webp";
 import fystayPage from "../../public/work/fystay-page.webp";
 import fystayTablet from "../../public/work/fystay-tablet.webp";
+import raengDesktop from "../../public/work/raeng-desktop.webp";
+import raengMobile from "../../public/work/raeng-mobile.webp";
+import raengTablet from "../../public/work/raeng-tablet.webp";
+import raengPage from "../../public/work/raeng-page.webp";
+import raengLogo from "../../public/work/logos/raeng-fitness.png";
 import alexLogo from "../../public/work/logos/alex-k-bells.png";
 import boonmaLogo from "../../public/work/logos/boonma.png";
 import evexecLogo from "../../public/work/logos/ev-exec.png";
@@ -203,4 +208,48 @@ export const OWNER_QUOTES = [
     quote:
       "Clients find a treatment, see the price and book a time, all from their phone. It feels like our studio.",
   },
+];
+
+/**
+ * RAENG Fitness, shown in the homepage hero in place of FYStay. Kept out of `projects`, so the
+ * work pages list stays as it is. Descriptions state only what the live site shows.
+ */
+export const raengFitness: Project = {
+  slug: "raeng-fitness",
+  name: "RAENG Fitness",
+  kind: "client",
+  sector: "Kettlebell training",
+  location: "Cumbernauld",
+  summary: "Kettlebell classes, one-to-one and small group coaching, and memberships from a studio in Cumbernauld.",
+  challenge:
+    "A kettlebell studio needed one place to show its classes and coaching, and to let people book a class or buy a membership online.",
+  solution:
+    "A bold, dark website led by training photography, with the class timetable, prices and membership plans shown up front and booking built in.",
+  built: [
+    "Class timetable with booking",
+    "Group, one-to-one and small group coaching, each with its price",
+    "Four membership plans and pay-as-you-go pricing",
+    "A free first class for new customers",
+  ],
+  url: "https://raengfitness.co.uk",
+  host: "raengfitness.co.uk",
+  desktop: raengDesktop,
+  mobile: raengMobile,
+  tablet: raengTablet,
+  logo: raengLogo,
+  page: raengPage,
+  walkthrough: {
+    mp4: "/work/raeng-walkthrough.mp4",
+    webm: "/work/raeng-walkthrough.webm",
+    poster: "/work/raeng-walkthrough.webp",
+  },
+  identity: "Heavy uppercase sans on black training photography, with cream for the light areas.",
+};
+
+/** The four work pieces the homepage hero shows, in order: RAENG takes FYStay's place. */
+export const heroProjects: Project[] = [
+  projectBySlug("ev-exec")!,
+  projectBySlug("boonma")!,
+  raengFitness,
+  projectBySlug("alex-k-bells")!,
 ];
