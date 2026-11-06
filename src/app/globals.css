@@ -8185,35 +8185,6 @@ ol.bs {
   height: 44px;
   padding-inline: 10px;
 }
-.deck__pause {
-  position: relative;
-  display: grid;
-  place-items: center;
-  justify-self: end;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: #f6f0e6;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.deck__pause::before {
-  content: "";
-  position: absolute;
-  inset: 6px;
-  border-radius: 50%;
-  background: rgb(246 240 230 / 0.12);
-  transition: background-color 0.3s;
-}
-.deck__pause:hover::before {
-  background: rgb(246 240 230 / 0.24);
-}
-.deck__pause svg {
-  position: relative;
-}
-
 /* The device switch: secondary to the price button in size and contrast. */
 .deck__switch {
   position: relative;
@@ -8371,13 +8342,13 @@ ol.bs {
   border-radius: 7px;
 }
 
-.deck :is(.deck__pill, .deck__btn, .deck__switch button, .deck__arrow, .deck__pause):focus-visible,
+.deck :is(.deck__pill, .deck__btn, .deck__switch button, .deck__arrow):focus-visible,
 .deck__stage:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 /* On the dark panel the rings are cream, so they show (terracotta is too dark there). */
-.deck .deck__panel :is(.deck__switch button, .deck__arrow, .deck__pause):focus-visible,
+.deck .deck__panel :is(.deck__switch button, .deck__arrow):focus-visible,
 .deck .deck__panel .deck__stage:focus-visible {
   outline-color: #f6f0e6;
 }

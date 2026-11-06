@@ -50,8 +50,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
   const [inView, setInView] = useState(true);
   // Once the visitor swipes, taps, uses the arrows, keys or pills, auto-advance stays off.
   const [stopped, setStopped] = useState(false);
-  // The visitor's own pause, from the bar above the stage.
-  const [paused, setPaused] = useState(false);
   const reduced = useSyncExternalStore(
     subscribeReduced,
     () => window.matchMedia(reducedQuery).matches,
@@ -164,16 +162,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
   );
 
   // Auto-advance: runs only while nothing holds it (see the header comment).
-  const playing = !paused && !stopped;
-  const autoOn = !reduced && playing && !hovered && !focused && !dragging && inView;
-  const togglePlay = () => {
-    if (playing) {
-      setPaused(true);
-    } else {
-      setPaused(false);
-      setStopped(false);
-    }
-  };
+  const autoOn = !reduced && !stopped && !hovered && !focused && !dragging && inView;
   useEffect(() => {
     if (!autoOn) return;
     const t = window.setTimeout(() => goTo((index + 1) % items.length, true), AUTO_MS);
@@ -295,24 +284,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
               Tablet
             </button>
           </div>
-          {!reduced && (
-            <button
-              type="button"
-              className="deck__pause"
-              onClick={togglePlay}
-              aria-label={playing ? "Pause examples" : "Play examples"}
-            >
-              {playing ? (
-                <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true">
-                  <path d="M1 1h3.2v12H1zM7.8 1H11v12H7.8z" fill="currentColor" />
-                </svg>
-              ) : (
-                <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true">
-                  <path d="M1 1.2 11 7 1 12.8z" fill="currentColor" />
-                </svg>
-              )}
-            </button>
-          )}
         </div>
 
         <div
