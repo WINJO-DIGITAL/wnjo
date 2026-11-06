@@ -35,6 +35,14 @@ export default function PrivacyPage() {
               marketing.
             </p>
 
+            <h2>Customer accounts</h2>
+            <p>
+              If you have ordered a website from us, you can sign in with your email address to follow its progress. We
+              email you a one-time sign-in link; we don&apos;t store a password. Your order details (business name,
+              project type, progress stage and the updates we post) are stored with Supabase, our database provider, in
+              its Frankfurt (EU) region. You can only see your own orders.
+            </p>
+
             <h2>How it&apos;s delivered</h2>
             <p>
               Submissions are sent from our website to our business inbox using a transactional email provider, which
@@ -45,7 +53,9 @@ export default function PrivacyPage() {
             <p>
               This website doesn&apos;t set cookies and doesn&apos;t use analytics or advertising trackers. The website
               configurator saves your answers in your own browser&apos;s local storage so you don&apos;t lose progress;
-              this stays on your device and is removed when you send your brief or clear your browser data.
+              this stays on your device and is removed when you send your brief or clear your browser data. If you sign
+              in to follow your order, your sign-in session is also kept in your browser&apos;s local storage until you
+              sign out or clear your browser data.
             </p>
 
             <h2>How long we keep it</h2>
