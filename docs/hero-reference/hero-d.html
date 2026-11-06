@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WNJO hero, D · Swipe + device switch</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#ddd5c8;font-family:Inter,sans-serif;color:#2e241d}
+#app{--ease:cubic-bezier(.2,.8,.2,1);position:relative;width:390px;height:844px;margin:0 auto;overflow:hidden;background:#f2ece2}
+button{font-family:inherit;cursor:pointer}
+.top{position:absolute;left:0;right:0;top:0;height:64px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;z-index:9}
+.top img{height:32px;width:auto}
+.menu{width:44px;height:44px;border:0;background:none;display:grid;place-items:center;color:#2e241d;padding:0}
+h1{position:absolute;left:20px;right:20px;top:82px;margin:0;font-family:'Playfair Display',serif;font-weight:600;font-size:35px;line-height:1.02;letter-spacing:-.03em;white-space:nowrap}
+h1 em{display:block;position:relative;width:fit-content;font-weight:400;color:#a84a26;letter-spacing:-.025em;margin-top:1px}
+h1 em svg{position:absolute;left:0;bottom:-5px;width:100%;height:9px}
+
+/* premium pills: swipeable rail, the next pill peeks in from the edge */
+.rail{position:absolute;left:0;right:0;top:182px;height:60px;display:flex;gap:8px;padding:6px 40px 10px 20px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent);z-index:8}
+.rail::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;align-items:center;gap:10px;height:46px;padding:0 18px 0 7px;border-radius:23px;border:1px solid rgba(46,36,29,.12);background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.55));box-shadow:inset 0 1px 0 #fff,0 10px 20px -14px rgba(46,36,29,.45);color:#2e241d;font-size:14px;font-weight:600;letter-spacing:-.01em;scroll-snap-align:start;transition:background .4s var(--ease),color .4s var(--ease),box-shadow .4s var(--ease),transform .4s var(--ease)}
+.chip img{width:32px;height:32px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.chip[aria-pressed=true]{background:linear-gradient(180deg,#3d3027,#2a2019);color:#f6f0e6;border-color:#2e241d;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 12px 22px -10px rgba(46,36,29,.75),0 0 0 3px rgba(168,74,38,.22)}
+
+/* the stage */
+.stage{position:absolute;left:10px;right:10px;top:246px;height:410px;border-radius:30px;overflow:hidden;background:#1b2233;transition:background-color .6s;touch-action:pan-y;user-select:none;-webkit-user-select:none;z-index:5;outline-offset:3px}
+.glow{position:absolute;left:50%;top:46%;width:380px;height:380px;margin:-190px 0 0 -190px;border-radius:50%;transition:background .6s}
+.stage::after{content:"";position:absolute;inset:0;border-radius:30px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);pointer-events:none}
+.floor{position:absolute;left:50%;bottom:14px;width:240px;height:22px;margin-left:-120px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent);filter:blur(4px);transition:width .6s var(--ease),margin .6s var(--ease)}
+.mode-tablet .floor{width:300px;margin-left:-150px}
+
+.card{position:absolute;left:50%;top:50%;width:176px;transform:translate(calc(-50% + var(--x,0px)),-50%) scale(var(--s,1));opacity:var(--o,1);z-index:var(--z,1);transition:transform .65s var(--ease),opacity .5s,width .65s var(--ease)}
+.dragging .card{transition:none}
+.mode-tablet .card{width:300px}
+.frame{position:relative;border-radius:32px;padding:5px;background:linear-gradient(160deg,#2c2c2e,#111112 60%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 36px 50px -18px rgba(0,0,0,.85);transition:border-radius .65s var(--ease),padding .65s var(--ease)}
+.mode-tablet .frame{border-radius:30px;padding:12px;background:linear-gradient(160deg,#d9d6d1,#b9b5af 55%,#a8a49e);box-shadow:inset 0 0 0 1px rgba(255,255,255,.5),inset 0 0 0 2px rgba(0,0,0,.12),0 36px 50px -18px rgba(0,0,0,.85)}
+.mode-tablet .frame::before{content:"";position:absolute;left:50%;top:5px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#2a2a2c;opacity:0;transition:opacity .5s}
+.mode-tablet .frame::before{opacity:1}
+.screen{position:relative;overflow:hidden;height:359px;border-radius:27px;background:#0b0b0c;transition:height .65s var(--ease),border-radius .65s var(--ease)}
+.mode-tablet .screen{height:368px;border-radius:16px;background:#0b0b0c}
+.screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;transition:opacity .55s}
+.screen .tb{opacity:0}
+.mode-tablet .screen .tb{opacity:1}
+.mode-tablet .screen .ph{opacity:0}
+
+/* the device switch */
+.seg{position:absolute;left:50%;top:668px;width:220px;height:46px;margin-left:-110px;padding:4px;border-radius:23px;background:rgba(46,36,29,.09);box-shadow:inset 0 1px 2px rgba(46,36,29,.12);display:grid;grid-template-columns:1fr 1fr;z-index:8}
+.seg i{position:absolute;left:4px;top:4px;width:106px;height:38px;border-radius:19px;background:linear-gradient(180deg,#3d3027,#2a2019);box-shadow:0 6px 14px -6px rgba(46,36,29,.7);transition:transform .5s var(--ease)}
+.mode-tablet .seg i{transform:translateX(106px)}
+.seg button{position:relative;z-index:1;border:0;background:none;display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:600;color:#5b4f45;transition:color .4s}
+.seg button[aria-pressed=true]{color:#f6f0e6}
+.seg::before{content:"";position:absolute;inset:-5px;border-radius:28px;border:2px solid rgba(168,74,38,.45);opacity:0;animation:ring 2.2s var(--ease) 1.6s 2}
+@keyframes ring{0%{opacity:.9;transform:scale(.96)}100%{opacity:0;transform:scale(1.12)}}
+
+/* the one big button */
+.cta{position:absolute;left:20px;right:20px;bottom:26px;display:grid;gap:11px;justify-items:center;z-index:8}
+.cta a{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:58px;border-radius:29px;background:linear-gradient(180deg,#3a2e25,#2a2019);color:#f6f0e6;font-size:17px;font-weight:600;text-decoration:none;box-shadow:0 14px 28px -12px rgba(46,36,29,.7),inset 0 1px 0 rgba(255,255,255,.1)}
+.cta a b{font-weight:600;color:#f0b48f}
+.cta p{margin:0;font:400 11px 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#6b5f55}
+@media (prefers-reduced-motion:reduce){.seg::before{animation:none}.card,.frame,.screen,.bar{transition:none}}
+</style>
+</head>
+<body>
+<div id="app" class="mode-phone">
+  <div class="top">
+    <img src="img/wnjo-logo-462.png" alt="WNJO">
+    <button class="menu" aria-label="Open menu"><svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true"><path d="M0 1h26M0 11h26" stroke="currentColor" stroke-width="2"/></svg></button>
+  </div>
+  <h1>Websites and apps
+    <em>that grow your business.<svg viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10 C 45 4, 110 2, 197 6" stroke="#d45b32" stroke-opacity=".65" stroke-width="5" fill="none" stroke-linecap="round"/></svg></em>
+  </h1>
+
+  <div class="rail" id="rail" role="group" aria-label="Choose a project"></div>
+
+  <div class="stage" id="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Recent work">
+    <div class="glow" id="glow"></div><div class="floor"></div>
+  </div>
+
+  <div class="seg" role="group" aria-label="Choose a device">
+    <i></i>
+    <button type="button" id="bPhone" aria-pressed="true"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2.5" y="1" width="9" height="14" rx="2.2"/><path d="M6 12.5h2" stroke-linecap="round"/></svg>Phone</button>
+    <button type="button" id="bDesk" aria-pressed="false"><svg width="16" height="18" viewBox="0 0 16 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1.5" y="1" width="13" height="16" rx="2.4"/><path d="M6.5 14.5h3" stroke-linecap="round"/></svg>Tablet</button>
+  </div>
+
+  <div class="cta">
+    <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span id="ctaText">Price a site like <b>EV Exec</b></span></a>
+    <p>Free · No obligation · About 2 minutes</p>
+  </div>
+</div>
+
+<script>
+const P=[
+ {n:'EV Exec',h:'evexec.co.uk',m:'img/evexec-mobile.webp',d:'img/evexec-ipad.jpg',l:'img/ev-exec.png',bg:'#1b2233',g:'#c9a24b'},
+ {n:'Boonma',h:'boonma.vercel.app',m:'img/boonma-mobile.webp',d:'img/boonma-ipad.jpg',l:'img/boonma.png',bg:'#4a3a4f',g:'#b78fb8'},
+ {n:'FYStay',h:'fystay.co.uk',m:'img/fystay-mobile.webp',d:'img/fystay-ipad.jpg',l:'img/fystay.png',bg:'#8f3d22',g:'#e08a5f'},
+ {n:'Alex K Bells',h:'alexkbells.vercel.app',m:'img/alex-mobile.webp',d:'img/alex-ipad.jpg',l:'img/alex-k-bells.png',bg:'#34353a',g:'#8d93a3'}
+];
+const app=document.getElementById('app'),stage=document.getElementById('stage'),rail=document.getElementById('rail'),glow=document.getElementById('glow');
+let i=0,drag=0,mode='phone';
+const chips=P.map((p,k)=>{const b=document.createElement('button');b.type='button';b.className='chip';b.innerHTML='<img src="'+p.l+'" alt=""><span>'+p.n+'</span>';b.onclick=()=>go(k);rail.appendChild(b);return b});
+const cards=P.map((p,k)=>{const c=document.createElement('div');c.className='card';
+ c.innerHTML='<div class="frame"><div class="screen"><img class="ph" src="'+p.m+'" alt="The '+p.n+' website on a phone"><img class="tb" src="'+p.d+'" alt="The '+p.n+' website on a tablet"></div></div>';
+ c.addEventListener('click',()=>{if(moved<6&&k!==i)go(k)});stage.appendChild(c);return c});
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function render(){
+  const sp=mode==='phone'?150:262;
+  cards.forEach((c,k)=>{const o=k-i+drag/sp,a=Math.abs(o);
+    c.style.setProperty('--x',(o*sp)+'px');
+    c.style.setProperty('--s',(1-Math.min(a,1)*.17).toFixed(3));
+    c.style.setProperty('--o',a>1.6?0:(1-Math.min(a,1)*.42).toFixed(2));
+    c.style.setProperty('--z',String(10-Math.round(a*2)));
+    c.setAttribute('aria-hidden',k===i?'false':'true');});
+  chips.forEach((b,k)=>b.setAttribute('aria-pressed',k===i));
+  stage.style.backgroundColor=P[i].bg;
+  glow.style.background='radial-gradient(circle,'+P[i].g+'66,'+P[i].g+'00 66%)';
+  document.getElementById('ctaText').innerHTML='Price a site like <b>'+P[i].n+'</b>';
+}
+function go(k){i=Math.max(0,Math.min(P.length-1,k));drag=0;render();
+  const c=chips[i];rail.scrollTo({left:c.offsetLeft-20,behavior:reduce?'auto':'smooth'});}
+function setMode(m){mode=m;app.className='mode-'+m;document.getElementById('bPhone').setAttribute('aria-pressed',m==='phone');document.getElementById('bDesk').setAttribute('aria-pressed',m==="tablet");render();}
+document.getElementById('bPhone').onclick=()=>setMode('phone');
+document.getElementById('bDesk').onclick=()=>setMode("tablet");
+let sx=null,moved=0;
+stage.addEventListener('pointerdown',e=>{sx=e.clientX;moved=0;stage.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',e=>{if(sx===null)return;const dx=e.clientX-sx;moved=Math.max(moved,Math.abs(dx));if(moved>6){app.classList.add('dragging');
+  const edge=(i===0&&dx>0)||(i===P.length-1&&dx<0);drag=edge?dx*.3:dx;render();}});
+const end=e=>{if(sx===null)return;const dx=e.clientX-sx;sx=null;app.classList.remove('dragging');
+  if(Math.abs(dx)>45)go(i+(dx<0?1:-1));else{drag=0;render();}};
+stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);
+stage.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(i+1);if(e.key==='ArrowLeft')go(i-1);});
+render();
+// a gentle nudge on arrival, so the swipe is discovered
+if(!reduce)setTimeout(()=>{app.classList.add('dragging');let t=0;const step=()=>{t+=1;drag=-Math.sin(Math.min(t/22,1)*Math.PI)*30;render();if(t<22)requestAnimationFrame(step);else{drag=0;app.classList.remove('dragging');render();}};requestAnimationFrame(step);},900);
+</script>
+</body>
+</html>
