@@ -97,3 +97,21 @@ Built in sub-steps, each tested before the next.
 ### Still to build in Phase 3
 - Staff: project and message management screens, with internal notes.
 - Upload and download screens (signed URLs, need the server key), the notification list and email sender, invoices and payments (Stripe), staff screens for approvals, revisions, files and notifications.
+
+## Phase 4: AI orchestration — core built and tested; live provider blocked
+
+### 4a. Core engine — built and tested (no credentials needed)
+- Database (migration `20261106270000`): `ai_agents`, `ai_permissions`, `ai_tasks`, `ai_runs`, `ai_tool_calls`, `ai_budget_settings`. Staff can read them; nobody can write them from the browser, so agents can't grant themselves permissions or change their own task status. Clients see nothing. Tested in `supabase/tests/ai_access.sql` (6 checks).
+- Code in `src/lib/ai/`:
+  - `provider.ts`: the model-provider interface. Grok (xAI) will be one implementation of it.
+  - `tools.ts`: the tool registry. Tools are registered by name, and each one declares whether it is high-risk.
+  - `policy.ts`: permission and budget decisions. Denies by default; high-risk tools need an owner approval; disabled or paused agents do nothing.
+  - `runner.ts`: runs one task with bounded attempts, bounded model calls per attempt, a spend limit, and no retry for authentication or invalid-response errors. A runaway tool loop fails the task at once rather than retrying.
+- Tests: `src/lib/ai/engine.test.ts`, 15 checks, all passing. They use a scripted provider and an in-memory store.
+
+### Not yet built in Phase 4
+- The xAI (Grok) provider. This needs the xAI API key. Without it, I can only write it against a fake HTTP response.
+- A database-backed `RunStore`, so runs and tool calls are written to the tables above. This needs the server key.
+- Budget enforcement across tasks, agents and projects (the `ai_budget_settings` rows are read by nothing yet), and the approval queue screens.
+- Event triggers (the event-driven queue), the five agents' instructions, and the morning briefing.
+- Known limitation: transient provider errors are retried immediately, with no backoff delay.
