@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { QuotesPanel } from "./QuotesPanel";
+import { ProjectsPanel } from "./ProjectsPanel";
 
 export const STAGES = [
   { id: "brief_received", label: "Brief received" },
@@ -126,6 +127,7 @@ export function AccountView() {
         </p>
       )}
 
+      {client && <ProjectsPanel client={client} userId={session.user.id} />}
       {client && <QuotesPanel client={client} />}
 
       {orders?.map((order) => (

@@ -54,3 +54,20 @@ Built in sub-steps, each tested before the next.
 - Stripe deposits and payment schedules (blocked on Stripe test-mode keys).
 - Staff screens for editing prices and team members.
 - Switching the configurator to the server engine (needs the service key).
+
+## Phase 3: Project and client portals — in progress
+
+### 3a. Projects and messages — database built and tested; client screens built
+- Applied: `projects`, `conversations`, `messages` (migration `20261106240000`). Messages are append-only for everyone. Internal notes (`is_internal`) are invisible to clients, enforced by row-level security. Clients can post only customer-visible messages, as themselves, into their own organisation's projects. System messages can only be written by the server.
+- Tests: `supabase/tests/messages.sql`, 15 checks, all passing.
+- Client screen: "Your projects" on `/account` shows each project's customer status, target date and message thread, with a form to send a message. Built, type-checked, built for production. Not yet tested signed in.
+
+### BLOCKED: pending migration (not applied)
+- `supabase/pending/20261106240100_step3a_split_internal_project_fields.sql` moves the internal project fields (`status`, `priority`) into a staff-only `project_internal` table, and restricts client access to customer-safe columns of `projects`.
+- It was not applied: the Supabase apply tool timed out while the server was asking a question that no one answered. The database was checked afterwards and is unchanged (`projects.status` still exists, `project_internal` does not exist).
+- **Exact next action:** answer or clear the pending Supabase question in the dashboard, then apply `supabase/pending/20261106240100_step3a_split_internal_project_fields.sql` (move it to `supabase/migrations/` once applied), then rerun `supabase/tests/messages.sql` and add a check that clients cannot read `status` or `priority`.
+- **Current exposure:** until it is applied, a signed-in client could read `status` and `priority` on their own project through the API. No projects exist in the database yet, so no data is exposed today. This must be fixed before any project is created.
+
+### Still to build in Phase 3
+- Staff: project and message management screens, with internal notes.
+- Approvals and revision requests, files (private storage with signed URLs), notifications, invoices and payment history (Stripe-dependent).

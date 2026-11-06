@@ -8523,3 +8523,30 @@ ol.bs {
 .admin-table td {
   overflow-wrap: anywhere;
 }
+
+/* Project conversations (client account) */
+.acct-thread {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+}
+.acct-messages {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.acct-msg {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-line);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+}
+.acct-msg--client {
+  border-color: var(--color-line-strong);
+  background: var(--color-surface-raised);
+}
+.acct-msg p {
+  margin: 0.25rem 0 0;
+}
