@@ -35,7 +35,10 @@ export async function runTask(input: {
   store: RunStore;
   system: string;
   approvedTools?: string[];
+  /** Wait before retrying a transient error. Defaults to exponential backoff; tests pass 0. */
+  retryDelayMs?: (attempt: number) => number;
 }): Promise<RunOutcome> {
+  const retryDelay = input.retryDelayMs ?? ((attempt: number) => Math.min(30_000, 1000 * 2 ** (attempt - 1)));
   const task = await input.store.loadTask(input.taskId);
   const agent = await input.store.loadAgent(task.tenantId, task.agentKey);
   if (!agent || !agent.enabled || agent.paused) {
@@ -124,9 +127,14 @@ export async function runTask(input: {
         await input.store.setTaskStatus(task.id, "failed", { spentPence: spent, attempts });
         return { status: "failed", reason: providerError.kind === "authentication" ? "The model provider rejected the credentials." : "The model returned an unusable response." };
       }
-      // Transient errors (and unexpected ones) are retried, up to the attempt limit.
+      // Transient errors (and unexpected ones) are retried after a delay, up to the attempt limit.
+      if (attempts < task.maxAttempts) await sleep(retryDelay(attempts));
     }
   }
   await input.store.setTaskStatus(task.id, "failed", { spentPence: spent, attempts });
   return { status: "failed", reason: "The task did not complete within its retry limit." };
+}
+
+function sleep(ms: number): Promise<void> {
+  return ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve();
 }

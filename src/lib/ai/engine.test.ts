@@ -5,6 +5,7 @@ import { budgetRemaining, canSpend, decideToolUse } from "@/lib/ai/policy";
 import { MAX_MODEL_CALLS_PER_ATTEMPT, runTask, type RunStore } from "@/lib/ai/runner";
 
 const usage = { inputTokens: 10, outputTokens: 5, costPence: 1 };
+const NO_DELAY = () => 0;
 
 /** A provider that plays back a script of responses or errors, and counts calls. */
 function scripted(steps: Array<ProviderResponse | Error>): AiProvider & { calls: number } {
@@ -121,7 +122,7 @@ describe("tool registry and policy", () => {
 describe("agent task runner", () => {
   it("completes a task with a final answer", async () => {
     const { store, log } = memoryStore({ permissions: {} });
-    const outcome = await runTask({ taskId: "t1", provider: scripted([{ kind: "final", text: "Done", usage }]), tools: registry(), store, system: "sys" });
+    const outcome = await runTask({ taskId: "t1", provider: scripted([{ kind: "final", text: "Done", usage }]), tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
     expect(outcome).toEqual({ status: "succeeded", text: "Done" });
     expect(log.statuses.at(-1)).toBe("succeeded");
   });
@@ -129,7 +130,7 @@ describe("agent task runner", () => {
   it("runs a permitted tool and records the call", async () => {
     const { store, log } = memoryStore({ permissions: { read_project: true } });
     const provider = scripted([{ kind: "tool_call", tool: "read_project", args: {}, usage }, { kind: "final", text: "Looks good", usage }]);
-    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys" });
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
     expect(outcome.status).toBe("succeeded");
     expect(log.calls).toEqual([{ tool: "read_project", allowed: true, denialReason: undefined }]);
   });
@@ -137,7 +138,7 @@ describe("agent task runner", () => {
   it("refuses a tool the agent is not permitted to use, and records the refusal", async () => {
     const { store, log } = memoryStore({ permissions: {} });
     const provider = scripted([{ kind: "tool_call", tool: "read_project", args: {}, usage }]);
-    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys" });
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
     expect(outcome.status).toBe("failed");
     expect(log.calls[0]).toMatchObject({ tool: "read_project", allowed: false });
   });
@@ -149,14 +150,14 @@ describe("agent task runner", () => {
     const provider = scripted([{ kind: "tool_call", tool: "change_quote_price", args: {}, usage }, { kind: "final", text: "ok", usage }]);
 
     const blocked = memoryStore({ permissions: { change_quote_price: true } });
-    const first = await runTask({ taskId: "t1", provider, tools: r, store: blocked.store, system: "sys" });
+    const first = await runTask({ taskId: "t1", provider, tools: r, store: blocked.store, system: "sys", retryDelayMs: NO_DELAY });
     expect(first).toMatchObject({ status: "awaiting_approval", tool: "change_quote_price" });
     expect(ran).toBe(false);
     expect(blocked.task.status).toBe("awaiting_approval");
 
     const approved = memoryStore({ permissions: { change_quote_price: true } });
     const provider2 = scripted([{ kind: "tool_call", tool: "change_quote_price", args: {}, usage }, { kind: "final", text: "ok", usage }]);
-    const second = await runTask({ taskId: "t1", provider: provider2, tools: r, store: approved.store, system: "sys", approvedTools: ["change_quote_price"] });
+    const second = await runTask({ taskId: "t1", provider: provider2, tools: r, store: approved.store, system: "sys", approvedTools: ["change_quote_price"], retryDelayMs: NO_DELAY });
     expect(second.status).toBe("succeeded");
     expect(ran).toBe(true);
   });
@@ -164,7 +165,7 @@ describe("agent task runner", () => {
   it("does nothing for a paused agent, and never calls the model", async () => {
     const { store } = memoryStore({ agent: { enabled: true, paused: true }, permissions: { read_project: true } });
     const provider = scripted([{ kind: "final", text: "x", usage }]);
-    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys" });
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
     expect(outcome.status).toBe("suspended");
     expect(provider.calls).toBe(0);
   });
@@ -172,7 +173,7 @@ describe("agent task runner", () => {
   it("suspends a task at its budget, and records the stopped run", async () => {
     const { store, log } = memoryStore({ budgetPence: 2, permissions: { read_project: true } });
     const provider = forever({ kind: "tool_call", tool: "read_project", args: {}, usage: { inputTokens: 1, outputTokens: 1, costPence: 1 } });
-    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys" });
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
     expect(outcome.status).toBe("suspended");
     expect(log.statuses.at(-1)).toBe("suspended");
     expect(provider.calls).toBeLessThanOrEqual(3);
@@ -181,7 +182,7 @@ describe("agent task runner", () => {
   it("retries transient provider errors, then succeeds", async () => {
     const { store, task } = memoryStore({ maxAttempts: 3 });
     const provider = scripted([new ProviderError("timeout", "transient"), { kind: "final", text: "Recovered", usage }]);
-    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys" });
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
     expect(outcome).toEqual({ status: "succeeded", text: "Recovered" });
     expect(task.attempts).toBe(2);
   });
@@ -189,7 +190,7 @@ describe("agent task runner", () => {
   it("does not retry an authentication failure", async () => {
     const { store, task } = memoryStore({ maxAttempts: 3 });
     const provider = scripted([new ProviderError("401", "authentication")]);
-    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys" });
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
     expect(outcome.status).toBe("failed");
     expect(provider.calls).toBe(1);
     expect(task.attempts).toBe(1);
@@ -198,7 +199,7 @@ describe("agent task runner", () => {
   it("stops after the retry limit when errors keep happening", async () => {
     const { store, task } = memoryStore({ maxAttempts: 3 });
     const provider = scripted([new ProviderError("down", "transient")]);
-    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys" });
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
     expect(outcome.status).toBe("failed");
     expect(provider.calls).toBe(3);
     expect(task.attempts).toBe(3);
@@ -207,10 +208,20 @@ describe("agent task runner", () => {
   it("bounds an endless tool loop and does not retry it", async () => {
     const { store, task } = memoryStore({ maxAttempts: 3, budgetPence: 1_000_000, permissions: { read_project: true } });
     const provider = forever({ kind: "tool_call", tool: "read_project", args: {}, usage: { inputTokens: 0, outputTokens: 0, costPence: 0 } });
-    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys" });
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
     expect(outcome).toMatchObject({ status: "failed", reason: expect.stringContaining("too many steps") });
     expect(provider.calls).toBe(MAX_MODEL_CALLS_PER_ATTEMPT);
     expect(task.attempts).toBe(1);
     expect(task.status).toBe("failed");
+  });
+});
+
+describe("retry delay", () => {
+  it("waits between transient retries, and does not wait after the last attempt", async () => {
+    const { store } = memoryStore({ maxAttempts: 3 });
+    const delays: number[] = [];
+    const provider = scripted([new ProviderError("down", "transient")]);
+    await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: (attempt) => { delays.push(attempt); return 0; } });
+    expect(delays).toEqual([1, 2]);
   });
 });

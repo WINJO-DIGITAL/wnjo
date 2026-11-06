@@ -109,9 +109,16 @@ Built in sub-steps, each tested before the next.
   - `runner.ts`: runs one task with bounded attempts, bounded model calls per attempt, a spend limit, and no retry for authentication or invalid-response errors. A runaway tool loop fails the task at once rather than retrying.
 - Tests: `src/lib/ai/engine.test.ts`, 15 checks, all passing. They use a scripted provider and an in-memory store.
 
+### 4b. Provider, budgets and storage — built, tested against fakes
+- `src/lib/ai/xai.ts`: the Grok provider, using the chat-completions format with function tools. The model name and prices must be configured (`XAI_API_KEY`, `XAI_MODEL`, `XAI_INPUT_PENCE_PER_MILLION_TOKENS`, `XAI_OUTPUT_PENCE_PER_MILLION_TOKENS`); nothing is assumed. Errors are classified as authentication, transient or invalid. **Not verified against the live xAI API**: the request shape follows the common chat-completions format and needs a live check once the key is available.
+- `src/lib/ai/budget.ts`: the budget gate. Checks task, agent, project and global limits together, stops at the first limit that would be exceeded, and warns at each warning threshold. 4 tests.
+- `src/lib/ai/store.ts`: the database-backed run store, using the server's secret key. Tested against a fake client only; not yet run against the live database.
+- The runner now waits between transient retries (exponential, up to 30 seconds). Tests use no delay.
+- Tests: 34 AI tests in total, all passing.
+
 ### Not yet built in Phase 4
-- The xAI (Grok) provider. This needs the xAI API key. Without it, I can only write it against a fake HTTP response.
-- A database-backed `RunStore`, so runs and tool calls are written to the tables above. This needs the server key.
-- Budget enforcement across tasks, agents and projects (the `ai_budget_settings` rows are read by nothing yet), and the approval queue screens.
+- Wiring the budget gate into the runner, and reading `ai_budget_settings` (currently read by nothing).
+- Running the real store and the live provider end to end. This needs the server key and the xAI key.
+- The approval queue screens.
 - Event triggers (the event-driven queue), the five agents' instructions, and the morning briefing.
-- Known limitation: transient provider errors are retried immediately, with no backoff delay.
+- Known limitation: if the store itself fails while a task is running, the task is left in `running` and nothing sweeps it yet. A recovery job is still to be built.
