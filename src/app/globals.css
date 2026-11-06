@@ -6286,8 +6286,8 @@ main #process ol.steps li::after {
 @media (min-width: 56rem) {
   .owner-quotes__row {
     grid-auto-flow: row;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(2.5rem, 1rem + 4vw, 5rem);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.5rem, 0.5rem + 2.5vw, 3rem);
     overflow: visible;
   }
 }

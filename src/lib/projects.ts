@@ -193,24 +193,6 @@ export const projects: Project[] = [
 export const projectBySlug = (slug: string) => projects.find((p) => p.slug === slug);
 
 /**
- * Each owner's own words, approved by them; keep them true to how the business runs today.
- * One source for the homepage's quotes section and the phone hero. FYStay (ours) and
- * Alex K Bells have no quote.
- */
-export const OWNER_QUOTES = [
-  {
-    project: projectBySlug("ev-exec")!,
-    quote:
-      "Customers book their airport transfer on their phone in a minute, and I get the job straight away. It runs the business while I\u2019m driving.",
-  },
-  {
-    project: projectBySlug("boonma")!,
-    quote:
-      "Clients find a treatment, see the price and book a time, all from their phone. It feels like our studio.",
-  },
-];
-
-/**
  * RAENG Fitness, shown in the homepage hero in place of FYStay. Kept out of `projects`, so the
  * work pages list stays as it is. Descriptions state only what the live site shows.
  */
@@ -252,4 +234,27 @@ export const heroProjects: Project[] = [
   projectBySlug("boonma")!,
   raengFitness,
   projectBySlug("alex-k-bells")!,
+];
+
+/**
+ * Each owner's own words, approved by them; keep them true to how the business runs today.
+ * One source for the homepage's quotes section and the phone hero. FYStay (ours) and
+ * Alex K Bells have no quote.
+ */
+export const OWNER_QUOTES = [
+  {
+    project: projectBySlug("ev-exec")!,
+    quote:
+      "Customers book their airport transfer on their phone in a minute, and I get the job straight away. It runs the business while I\u2019m driving.",
+  },
+  {
+    project: projectBySlug("boonma")!,
+    quote:
+      "Clients find a treatment, see the price and book a time, all from their phone. It feels like our studio.",
+  },
+  {
+    project: raengFitness,
+    quote:
+      "From the first look, the website feels professional and looks class. It gives the business a great online presence, gets people talking and makes it easy to start attracting new clients.",
+  },
 ];
