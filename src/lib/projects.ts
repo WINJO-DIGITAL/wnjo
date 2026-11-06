@@ -121,6 +121,37 @@ export const projects: Project[] = [
     identity: "Warm editorial serif, soft ivory and a deep plum accent.",
   },
   {
+    slug: "raeng-fitness",
+    name: "RAENG Fitness",
+    kind: "client",
+    sector: "Kettlebell training",
+    location: "Cumbernauld",
+    summary: "Kettlebell classes, one-to-one and small group coaching, and memberships from a studio in Cumbernauld.",
+    challenge:
+      "A kettlebell studio needed one place to show its classes and coaching, and to let people book a class or buy a membership online.",
+    solution:
+      "A bold, dark website led by training photography, with the class timetable, prices and membership plans shown up front and booking built in.",
+    built: [
+      "Class timetable with booking",
+      "Group, one-to-one and small group coaching, each with its price",
+      "Four membership plans and pay-as-you-go pricing",
+      "A free first class for new customers",
+    ],
+    url: "https://raengfitness.co.uk",
+    host: "raengfitness.co.uk",
+    desktop: raengDesktop,
+    mobile: raengMobile,
+    tablet: raengTablet,
+    logo: raengLogo,
+    page: raengPage,
+    walkthrough: {
+      mp4: "/work/raeng-walkthrough.mp4",
+      webm: "/work/raeng-walkthrough.webm",
+      poster: "/work/raeng-walkthrough.webp",
+    },
+    identity: "Heavy uppercase sans on black training photography, with cream for the light areas.",
+  },
+  {
     slug: "fystay",
     name: "FYStay",
     kind: "product",
@@ -151,37 +182,6 @@ export const projects: Project[] = [
       poster: "/work/fystay-walkthrough.webp",
     },
     identity: "Seaside warmth: terracotta, sand and an app-like mobile tab bar.",
-  },
-  {
-    slug: "raeng-fitness",
-    name: "RAENG Fitness",
-    kind: "client",
-    sector: "Kettlebell training",
-    location: "Cumbernauld",
-    summary: "Kettlebell classes, one-to-one and small group coaching, and memberships from a studio in Cumbernauld.",
-    challenge:
-      "A kettlebell studio needed one place to show its classes and coaching, and to let people book a class or buy a membership online.",
-    solution:
-      "A bold, dark website led by training photography, with the class timetable, prices and membership plans shown up front and booking built in.",
-    built: [
-      "Class timetable with booking",
-      "Group, one-to-one and small group coaching, each with its price",
-      "Four membership plans and pay-as-you-go pricing",
-      "A free first class for new customers",
-    ],
-    url: "https://raengfitness.co.uk",
-    host: "raengfitness.co.uk",
-    desktop: raengDesktop,
-    mobile: raengMobile,
-    tablet: raengTablet,
-    logo: raengLogo,
-    page: raengPage,
-    walkthrough: {
-      mp4: "/work/raeng-walkthrough.mp4",
-      webm: "/work/raeng-walkthrough.webm",
-      poster: "/work/raeng-walkthrough.webp",
-    },
-    identity: "Heavy uppercase sans on black training photography, with cream for the light areas.",
   },
 ];
 
