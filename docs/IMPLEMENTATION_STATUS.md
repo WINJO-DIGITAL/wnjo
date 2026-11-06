@@ -85,11 +85,9 @@ Built in sub-steps, each tested before the next.
 - Applied in migrations `20261106260200` and `20261106260300`: TRUNCATE, REFERENCES and TRIGGER removed from browser roles; anonymous visitors have no table access; quote status can only change through the tested functions; staff can change only an order's stage; projects can't be inserted from the browser.
 - Verified by a privilege audit of every public table, and the approvals suite was rerun (16 checks passing).
 
-### BLOCKED: pending migration (not applied)
-- `supabase/pending/20261106240100_step3a_split_internal_project_fields.sql` moves the internal project fields (`status`, `priority`) into a staff-only `project_internal` table, and restricts client access to customer-safe columns of `projects`.
-- It was not applied: the Supabase apply tool timed out while the server was asking a question that no one answered. The database was checked afterwards and is unchanged (`projects.status` still exists, `project_internal` does not exist).
-- **Exact next action:** answer or clear the pending Supabase question in the dashboard, then apply `supabase/pending/20261106240100_step3a_split_internal_project_fields.sql` (move it to `supabase/migrations/` once applied), then rerun `supabase/tests/messages.sql` and add a check that clients cannot read `status` or `priority`.
-- **Current exposure:** until it is applied, a signed-in client could read `status` and `priority` on their own project through the API. No projects exist in the database yet, so no data is exposed today. This must be fixed before any project is created.
+### RESOLVED: internal project fields hidden from clients
+- Applied `20261106260400`: the API can no longer read a project's internal `status` and `priority`. Clients read only the customer-safe columns. Tested in `supabase/tests/project_columns.sql` (3 checks, passing).
+- Still optional: dropping those two columns from `projects` (they are now unused, since internal fields belong in `project_internal`). Dropping columns is destructive, so it needs your explicit confirmation before it runs.
 
 ### Still to build in Phase 3
 - Staff: project and message management screens, with internal notes.
