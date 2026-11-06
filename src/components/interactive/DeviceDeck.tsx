@@ -371,7 +371,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
           <span className="deck__btn-text">
             <span className="deck__btn-main">Get my price</span>
             <span className="deck__btn-sub">
-              Like {current.name}? Free, in 2 minutes.
+              Like {current.name}? In 2 minutes.
             </span>
           </span>
         </Link>
