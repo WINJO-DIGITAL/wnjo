@@ -26,6 +26,6 @@ Replace the phone showcase on the homepage (src/components/interactive/ShowcaseS
 Accessible: real buttons, aria-pressed on pills and the switch, carousel role and label, aria-hidden on off-screen cards, 44px minimum touch targets, visible focus. No new dependencies unless truly needed.
 
 ## Verify before you say it's done
-Run typecheck, lint, tests and a production build. Then use the preinstalled Playwright to screenshot at 390x844 (phone mode, tablet mode, after a swipe) and at 1280x800 to confirm desktop is unchanged. Send me the screenshots.
+Run typecheck, lint, tests and a production build. Then use the preinstalled Playwright to screenshot at 390x844 and at 390x664 (phone mode, tablet mode, after a swipe, and with the owner quote showing) and at 1280x800 to confirm desktop is unchanged. At 390x664 the primary button must be fully visible without scrolling. Check keyboard use, reduced motion, and that nothing shifts when the label or quote changes. Send me the screenshots.
 
-Commit and push to a branch. Do not push to main unless I ask. In your summary, list what you changed and anything that deviates from the prototype.
+Commit and push to a branch. Do not push to main unless I ask. In your summary, list what you changed and anything that deviates from the prototype, whether the From-price is switched off (and why), and your own rating out of 100 for sellability with what would raise it.
