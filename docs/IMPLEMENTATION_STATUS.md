@@ -69,6 +69,22 @@ Built in sub-steps, each tested before the next.
 - Client screen: approvals appear under each project on `/account`, with approve and request-changes controls. Built and type-checked; not yet tested signed in.
 - Not yet built: staff screens to create approvals and handle revision requests.
 
+### 3c. Project files — database built and tested
+- Applied: `project_files` metadata and a private `project-files` bucket (migration `20261106260000`).
+- Tests: `supabase/tests/files.sql`, 9 checks, all passing.
+- Not built: upload and download screens. Both need server-issued signed URLs, which need the server key.
+
+### 3d. Notifications — database built and tested
+- Applied: `notification_preferences`, `notifications` (one per recipient, unique dedupe key, so replays never duplicate), and triggers for staff messages, approval requests and new quotes (migration `20261106260100`).
+- Clients see only their own notifications, can mark them read, and can't change their content.
+- Tests: `supabase/tests/notifications.sql`, 11 checks, all passing.
+- Not built: the in-app notification list and the email sending. Email uses the `email_wanted` flag and `sent_at` column; the server sender is still to be written.
+
+### SECURITY FIX (applied): default privileges tightened
+- Finding: Supabase grants new public tables to the browser roles by default, including TRUNCATE (which bypasses row-level security) and direct writes. This had been left open on the tables created since Step 1.
+- Applied in migrations `20261106260200` and `20261106260300`: TRUNCATE, REFERENCES and TRIGGER removed from browser roles; anonymous visitors have no table access; quote status can only change through the tested functions; staff can change only an order's stage; projects can't be inserted from the browser.
+- Verified by a privilege audit of every public table, and the approvals suite was rerun (16 checks passing).
+
 ### BLOCKED: pending migration (not applied)
 - `supabase/pending/20261106240100_step3a_split_internal_project_fields.sql` moves the internal project fields (`status`, `priority`) into a staff-only `project_internal` table, and restricts client access to customer-safe columns of `projects`.
 - It was not applied: the Supabase apply tool timed out while the server was asking a question that no one answered. The database was checked afterwards and is unchanged (`projects.status` still exists, `project_internal` does not exist).
@@ -77,4 +93,4 @@ Built in sub-steps, each tested before the next.
 
 ### Still to build in Phase 3
 - Staff: project and message management screens, with internal notes.
-- Files (private storage with signed URLs), notifications, invoices and payment history (Stripe-dependent). Staff screens for approvals and revisions.
+- Upload and download screens (signed URLs, need the server key), the notification list and email sender, invoices and payments (Stripe), staff screens for approvals, revisions, files and notifications.
