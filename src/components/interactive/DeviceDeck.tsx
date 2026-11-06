@@ -22,6 +22,8 @@ const FALLBACK = { bg: "#2a2019", glow: "#a84a26" };
 const BASE_H = 410;
 /** Centre-to-centre spacing of the cards at that size. */
 const SPACING: Record<Mode, number> = { phone: 150, tablet: 262 };
+/** How long each project stays up before the carousel moves on by itself. */
+const AUTO_MS = 6000;
 
 const reducedQuery = "(prefers-reduced-motion: reduce)";
 const subscribeReduced = (onChange: () => void) => {
@@ -31,8 +33,10 @@ const subscribeReduced = (onChange: () => void) => {
 };
 
 /**
- * The phone hero's stage: a swipeable coverflow of our work with the active device centred,
- * a rail of project pills, a Phone/Tablet switch, the price button and the owner's quote.
+ * The phone hero's showcase: a swipeable coverflow of our work in a panel, with the Phone/Tablet
+ * switch inside that panel, a rail of project pills, the price button and the owner's quote.
+ * It moves on by itself every few seconds, pausing on hover, focus and while the panel is
+ * off screen, and stopping for good once the visitor takes over. Reduced motion turns it off.
  * Only transform and opacity animate; dragging writes CSS variables and reads no layout.
  */
 export function DeviceDeck({ items }: { items: Item[] }) {
@@ -40,22 +44,31 @@ export function DeviceDeck({ items }: { items: Item[] }) {
   const [mode, setMode] = useState<Mode>("phone");
   // Tablet screenshots are fetched once the visitor reaches for the switch (or the page is idle).
   const [tabletReady, setTabletReady] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [inView, setInView] = useState(true);
+  // Once the visitor swipes, taps, uses the arrows, keys or pills, auto-advance stays off.
+  const [stopped, setStopped] = useState(false);
   const reduced = useSyncExternalStore(
     subscribeReduced,
     () => window.matchMedia(reducedQuery).matches,
     () => false,
   );
 
+  const panelRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const pillRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  // Pixels per nominal pixel (stage height / 410), cached by a ResizeObserver.
+  // Pixels per nominal pixel (stage height / 410), kept by a ResizeObserver.
   const unit = useRef(1);
   const gesture = useRef<{ x: number; moved: number; captured: boolean } | null>(null);
-  const lastMoved = useRef(0);
+  // Set just after a drag, so the click that ends it doesn't also count as a tap.
+  const justDragged = useRef(false);
   const nudge = useRef(0);
   const nudgeTimer = useRef(0);
+  const placeRef = useRef<(drag: number) => void>(() => {});
 
   const last = items.length - 1;
 
@@ -76,8 +89,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
     [index, mode],
   );
 
-  // The nudge's timer and frames call the latest `place`, never a stale one.
-  const placeRef = useRef(place);
+  // The nudge's frames call the latest `place`, never a stale one.
   useLayoutEffect(() => {
     placeRef.current = place;
     place(0);
@@ -88,9 +100,18 @@ export function DeviceDeck({ items }: { items: Item[] }) {
     if (!el) return;
     const ro = new ResizeObserver(([entry]) => {
       unit.current = entry.contentRect.height / BASE_H || 1;
+      el.style.setProperty("--u", `${unit.current}px`);
     });
     ro.observe(el);
     return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.5 });
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   useEffect(() => {
@@ -122,17 +143,31 @@ export function DeviceDeck({ items }: { items: Item[] }) {
     return stopNudge;
   }, [reduced, stopNudge]);
 
-  const go = useCallback(
-    (k: number) => {
-      const next = Math.max(0, Math.min(last, k));
+  const goTo = useCallback(
+    (k: number, auto = false) => {
       stopNudge();
-      setIndex(next);
+      if (!auto) setStopped(true);
+      setIndex(k);
       const rail = railRef.current;
-      const pill = pillRefs.current[next];
+      const pill = pillRefs.current[k];
       if (rail && pill) rail.scrollTo({ left: pill.offsetLeft - 20, behavior: reduced ? "auto" : "smooth" });
     },
-    [reduced, stopNudge, last],
+    [reduced, stopNudge],
   );
+
+  /** Arrows and keys wrap round the ends. */
+  const step = useCallback(
+    (d: number) => goTo((index + d + items.length) % items.length),
+    [goTo, index, items.length],
+  );
+
+  // Auto-advance: runs only while nothing holds it (see the header comment).
+  const autoOn = !reduced && !stopped && !hovered && !focused && !dragging && inView;
+  useEffect(() => {
+    if (!autoOn) return;
+    const t = window.setTimeout(() => goTo((index + 1) % items.length, true), AUTO_MS);
+    return () => window.clearTimeout(t);
+  }, [autoOn, index, items.length, goTo]);
 
   const onPointerDown = (e: React.PointerEvent) => {
     stopNudge();
@@ -149,6 +184,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       e.currentTarget.setPointerCapture(e.pointerId);
       g.captured = true;
       stageRef.current?.classList.add("is-dragging");
+      setDragging(true);
     }
     const edge = (index === 0 && dx > 0) || (index === last && dx < 0);
     place((edge ? dx * 0.3 : dx) / unit.current);
@@ -158,19 +194,29 @@ export function DeviceDeck({ items }: { items: Item[] }) {
     if (!g) return;
     gesture.current = null;
     stageRef.current?.classList.remove("is-dragging");
+    setDragging(false);
     const dx = e.clientX - g.x;
-    if (g.moved > 6) lastMoved.current = Date.now();
-    if (Math.abs(dx) > 45) go(index + (dx < 0 ? 1 : -1));
+    if (g.moved > 6) {
+      justDragged.current = true;
+      window.setTimeout(() => (justDragged.current = false), 300);
+      setStopped(true);
+    }
+    const target = index + (dx < 0 ? 1 : -1);
+    if (Math.abs(dx) > 45 && target >= 0 && target <= last) goTo(target);
     else place(0);
   };
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowRight") {
       e.preventDefault();
-      go(index + 1);
+      step(1);
     } else if (e.key === "ArrowLeft") {
       e.preventDefault();
-      go(index - 1);
+      step(-1);
     }
+  };
+  /** A tap on a neighbour brings it forward (not after a drag). */
+  const tap = (k: number) => {
+    if (k !== index && !justDragged.current) goTo(k);
   };
 
   const current = items[index];
@@ -189,107 +235,118 @@ export function DeviceDeck({ items }: { items: Item[] }) {
             type="button"
             className="deck__pill"
             aria-pressed={k === index}
-            onClick={() => go(k)}
+            onClick={() => goTo(k)}
           >
-            <Image src={p.logo} alt="" width={32} height={32} sizes="32px" />
+            <Image src={p.logo} alt="" width={36} height={36} sizes="36px" />
             <span>{p.name}</span>
           </button>
         ))}
       </div>
 
       <div
-        ref={stageRef}
-        className="deck__stage"
-        tabIndex={0}
-        role="group"
-        aria-roledescription="carousel"
-        aria-label="Recent work"
+        ref={panelRef}
+        className="deck__panel"
         style={{ "--bg": theme.bg, "--glow": `${theme.glow}66`, "--glow-0": `${theme.glow}00` } as React.CSSProperties}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerEnd}
-        onPointerCancel={onPointerEnd}
-        onKeyDown={onKeyDown}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setFocused(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false);
+        }}
       >
-        <div className="deck__glow" aria-hidden="true" />
-        <div className="deck__floor" aria-hidden="true" />
-        {items.map((p, k) => (
-          <div
-            key={p.slug}
-            ref={(el) => {
-              cardRefs.current[k] = el;
-            }}
-            className="deck__card"
-            aria-hidden={k !== index}
-          >
+        <div
+          ref={stageRef}
+          className="deck__stage"
+          tabIndex={0}
+          role="group"
+          aria-roledescription="carousel"
+          aria-label="Recent work"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerEnd}
+          onPointerCancel={onPointerEnd}
+          onKeyDown={onKeyDown}
+        >
+          <div className="deck__glow" aria-hidden="true" />
+          <div className="deck__floor" aria-hidden="true" />
+          {items.map((p, k) => (
             <div
-              className="deck__dev deck__dev--phone"
-              onClick={() => {
-                if (k !== index && Date.now() - lastMoved.current > 300) go(k);
+              key={p.slug}
+              ref={(el) => {
+                cardRefs.current[k] = el;
               }}
+              className="deck__card"
+              aria-hidden={k !== index}
             >
-              <div className="deck__screen">
-                <Image
-                  src={p.mobile}
-                  alt={k === index ? `The ${p.name} website on a phone` : ""}
-                  fill
-                  sizes="176px"
-                  preload={k === 0}
-                  fetchPriority={k === 0 ? "high" : undefined}
-                />
-              </div>
-            </div>
-            <div
-              className="deck__dev deck__dev--tablet"
-              onClick={() => {
-                if (k !== index && Date.now() - lastMoved.current > 300) go(k);
-              }}
-            >
-              <div className="deck__screen">
-                {showTablet && (
+              <div className="deck__dev deck__dev--phone" onClick={() => tap(k)}>
+                <div className="deck__screen">
                   <Image
-                    src={p.tablet}
-                    alt={k === index ? `The ${p.name} website on a tablet` : ""}
+                    src={p.mobile}
+                    alt={k === index ? `The ${p.name} website on a phone` : ""}
                     fill
-                    sizes="276px"
+                    sizes="176px"
+                    preload={k === 0}
+                    fetchPriority={k === 0 ? "high" : undefined}
                   />
-                )}
+                </div>
+              </div>
+              <div className="deck__dev deck__dev--tablet" onClick={() => tap(k)}>
+                <div className="deck__screen">
+                  {showTablet && (
+                    <Image
+                      src={p.tablet}
+                      alt={k === index ? `The ${p.name} website on a tablet` : ""}
+                      fill
+                      sizes="300px"
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-        <span className="visually-hidden" aria-live="polite">
-          {`${current.name}, ${index + 1} of ${items.length}`}
-        </span>
-      </div>
+          ))}
+          <button type="button" className="deck__arrow deck__arrow--prev" aria-label="Previous project" onClick={() => step(-1)}>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M10 3 5 8l5 5" />
+            </svg>
+          </button>
+          <button type="button" className="deck__arrow deck__arrow--next" aria-label="Next project" onClick={() => step(1)}>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m6 3 5 5-5 5" />
+            </svg>
+          </button>
+          <span className="visually-hidden" aria-live="polite">
+            {`${current.name}, ${index + 1} of ${items.length}`}
+          </span>
+        </div>
 
-      <div className="deck__switch" role="group" aria-label="Choose a device">
-        <i aria-hidden="true" />
-        <button
-          type="button"
-          aria-pressed={mode === "phone"}
-          onClick={() => setMode("phone")}
-          onPointerDown={() => setTabletReady(true)}
-        >
-          <svg width="12" height="14" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-            <rect x="2.5" y="1" width="9" height="14" rx="2.2" />
-            <path d="M6 12.5h2" strokeLinecap="round" />
-          </svg>
-          Phone
-        </button>
-        <button
-          type="button"
-          aria-pressed={mode === "tablet"}
-          onClick={() => setMode("tablet")}
-          onPointerDown={() => setTabletReady(true)}
-          onFocus={() => setTabletReady(true)}
-        >
-          <svg width="14" height="16" viewBox="0 0 16 18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-            <rect x="1.5" y="1" width="13" height="16" rx="2.4" />
-            <path d="M6.5 14.5h3" strokeLinecap="round" />
-          </svg>
-          Tablet
-        </button>
+        <div className="deck__switch" role="group" aria-label="Choose a device">
+          <i aria-hidden="true" />
+          <button
+            type="button"
+            aria-pressed={mode === "phone"}
+            onClick={() => setMode("phone")}
+            onPointerDown={() => setTabletReady(true)}
+          >
+            <svg width="12" height="14" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <rect x="2.5" y="1" width="9" height="14" rx="2.2" />
+              <path d="M6 12.5h2" strokeLinecap="round" />
+            </svg>
+            Phone
+          </button>
+          <button
+            type="button"
+            aria-pressed={mode === "tablet"}
+            onClick={() => setMode("tablet")}
+            onPointerDown={() => setTabletReady(true)}
+            onFocus={() => setTabletReady(true)}
+          >
+            <svg width="14" height="16" viewBox="0 0 16 18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <rect x="1.5" y="1" width="13" height="16" rx="2.4" />
+              <path d="M6.5 14.5h3" strokeLinecap="round" />
+            </svg>
+            Tablet
+          </button>
+        </div>
       </div>
 
       <div className="deck__cta">

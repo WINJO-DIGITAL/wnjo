@@ -32,16 +32,13 @@ export default function HomePage() {
               Websites and apps <span className="serif-em">that grow your business.</span>
             </h1>
             <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
-              Bespoke, mobile-first, priced in the open.
+              Bespoke websites, apps and booking software for cafés, salons and trades. Priced upfront.
             </p>
             {/* The lowest-risk step first (a price in two minutes), a person second. */}
             <div className="btn-row rise" style={{ "--i": 3 } as React.CSSProperties}>
               <Link href="/build" className="btn btn--primary">
                 <Stopwatch />
                 Get my price
-              </Link>
-              <Link href="/contact?topic=website" className="btn btn--secondary">
-                Talk to us
               </Link>
             </div>
             <p className="hero-note rise" style={{ "--i": 4 } as React.CSSProperties}>

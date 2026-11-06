@@ -10,6 +10,9 @@ type Item = Pick<
   "slug" | "name" | "sector" | "host" | "url" | "desktop" | "mobile" | "tablet" | "walkthrough" | "logo"
 >;
 
+/** The phone hero shows these three clients; the laptop showcase keeps the full set. */
+const PHONE_CLIENTS = ["ev-exec", "boonma", "fystay"];
+
 const phoneQuery = "(max-width: 39.99rem)";
 const subscribe = (onChange: () => void) => {
   const mq = window.matchMedia(phoneQuery);
@@ -28,7 +31,7 @@ export function HeroShowcase({ items }: { items: Item[] }) {
     () => (window.matchMedia(phoneQuery).matches ? "phone" : "laptop"),
     () => null,
   );
-  if (size === "phone") return <DeviceDeck items={items} />;
+  if (size === "phone") return <DeviceDeck items={items.filter((p) => PHONE_CLIENTS.includes(p.slug))} />;
   if (size === "laptop") return <ShowcaseStage items={items} />;
   return <div className="hero-reserve" aria-hidden="true" />;
 }

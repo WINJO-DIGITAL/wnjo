@@ -6921,10 +6921,10 @@ main #process ol.steps li::after {
   max-width: none;
   margin-top: 0.15rem;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 1rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-ink-3);
+  color: var(--color-ink-2);
 }
 
 /* ==========================================================================
@@ -7861,24 +7861,24 @@ ol.bs {
   }
 }
 
+
 /* ==========================================================================
    Phone hero: the device deck (components/interactive/DeviceDeck). Below 40rem only.
-   Sizes are laid out for a 410px-tall stage and scale with --u (stage height / 410), so the
-   stage can shrink to fit the screen. Only transform and opacity animate.
+   The stage is laid out for 410px tall and scales with --u (stage height / 410, set by
+   the component), so it can shrink to fit the screen. Only transform and opacity animate.
    ========================================================================== */
 
 /* Held while the right showcase mounts, so nothing shifts. */
 .hero-reserve {
   min-height: 30rem;
 }
+
 @media (max-width: 39.99rem) {
   .hero-reserve {
     min-height: 34rem;
   }
-}
 
-@media (max-width: 39.99rem) {
-  /* Headline and the compact services row only: the lede, buttons and note give way to the deck's own. */
+  /* The copy: headline, then the one-line subheading. The deck carries the rest. */
   .hero-ed--work .hero-ed__copy {
     gap: 0;
   }
@@ -7886,42 +7886,42 @@ ol.bs {
     font-size: min(9.2vw, 4.6svh);
     line-height: 1.02;
   }
-  .hero-ed--work .svc {
-    margin-bottom: 0;
+  .hero-ed--work .lede {
+    display: block;
+    max-width: 25rem;
+    margin-top: 0.6rem;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: var(--color-ink-2);
   }
-  .hero-ed--work .svc__link {
-    padding: 0.55rem 0 0.4rem;
-  }
-  .hero-ed--work .lede,
   .hero-ed--work .btn-row,
   .hero-ed--work .hero-note {
     display: none;
   }
   .hero-ed--work .showcase-section {
-    padding: var(--space-2) 0 var(--space-5);
-  }
-}
-
-@media (max-width: 39.99rem) and (max-height: 40rem) {
-  .hero-ed--work .svc__link {
-    padding: 0.35rem 0 0.25rem;
+    padding: var(--space-4) 0 var(--space-5);
   }
 }
 
 .deck {
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --deck-ink: #3a2d22;
+  --u: 0.68px;
+  /* Everything above and below the stage (header, copy, rail, price button), so the button
+     stays in view: the stage takes what is left. */
+  --deck-fixed: 436px;
   display: grid;
   justify-items: center;
 }
 
 /* Pills: a sideways rail, the next one peeking in at the edge. */
 .deck__rail {
+  position: relative;
   display: flex;
   gap: 8px;
   width: 100%;
-  height: 56px;
-  padding: 5px 40px 5px 20px;
+  height: 58px;
+  padding: 6px 40px 6px 20px;
   overflow-x: auto;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
@@ -7945,7 +7945,7 @@ ol.bs {
     inset 0 1px 0 #fff,
     0 10px 20px -14px rgb(58 45 34 / 0.45);
   color: var(--deck-ink);
-  font: 600 14px/1 var(--font-sans);
+  font: 600 15px/1 var(--font-sans);
   letter-spacing: -0.01em;
   scroll-snap-align: start;
   cursor: pointer;
@@ -7956,9 +7956,9 @@ ol.bs {
     box-shadow 0.4s var(--ease);
 }
 .deck__pill img {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
 }
 .deck__pill[aria-pressed="true"] {
@@ -7971,30 +7971,38 @@ ol.bs {
     0 0 0 3px rgb(168 74 38 / 0.22);
 }
 
-/* The stage: shrinks first when the screen is short (button stays whole, see --deck-fixed). */
-.deck__stage {
-  --u: calc(100cqh / 410);
-  --deck-fixed: 384px;
-  container-type: size;
+/* The panel is the showcase container: the stage on top, the device switch along its foot. */
+.deck__panel {
   position: relative;
   width: calc(100% - 20px);
-  height: clamp(224px, calc(100svh - var(--deck-fixed)), 410px);
+  padding-bottom: 8px;
   border-radius: 30px;
-  overflow: hidden;
   background: var(--bg, #2a2019);
   transition: background-color 0.6s;
-  touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
-  outline-offset: 3px;
 }
-.deck__stage::after {
+.deck__panel::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 30px;
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
   pointer-events: none;
+}
+
+/* The stage: shrinks first when the screen is short; the button and its line are never cut. */
+.deck__stage {
+  position: relative;
+  width: 100%;
+  height: clamp(200px, calc(100svh - var(--deck-fixed)), 410px);
+  /* Clipped sideways only, so the glow and floor run on into the panel without a seam. */
+  overflow-x: clip;
+  border-radius: 30px 30px 0 0;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.deck__stage:focus-visible {
+  outline-offset: -3px;
 }
 .deck__glow {
   position: absolute;
@@ -8104,20 +8112,57 @@ ol.bs {
   pointer-events: auto;
   transform: translate(-50%, -50%) scale(1);
 }
-.deck[data-mode="tablet"] .deck__dev--phone {
-  transform: translate(-50%, -50%) scale(1.6);
+
+/* Prev / next: round, on the stage's edges, 44px targets. */
+.deck__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: #f6f0e6;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.deck__arrow::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: rgb(246 240 230 / 0.14);
+  border: 1px solid rgb(246 240 230 / 0.22);
+  transition: background-color 0.3s;
+}
+.deck__arrow:hover::before {
+  background: rgb(246 240 230 / 0.26);
+}
+.deck__arrow svg {
+  position: relative;
+}
+.deck__arrow--prev {
+  left: 0;
+}
+.deck__arrow--next {
+  right: 0;
 }
 
-/* The device switch: secondary to the price button in size and contrast. */
+/* The device switch: inside the panel, secondary to the price button in size and contrast. */
 .deck__switch {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: 184px;
   height: 44px;
-  margin-top: 8px;
+  margin: 0 auto;
   border-radius: 22px;
-  background: rgb(58 45 34 / 0.07);
+  background: rgb(255 255 255 / 0.1);
 }
 .deck__switch i {
   position: absolute;
@@ -8126,10 +8171,8 @@ ol.bs {
   width: calc(50% - 3px);
   height: 38px;
   border-radius: 19px;
-  background: #fff;
-  box-shadow:
-    0 1px 3px rgb(58 45 34 / 0.2),
-    inset 0 0 0 1px rgb(58 45 34 / 0.08);
+  background: #f6f0e6;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.3);
   transition: transform 0.5s var(--ease);
 }
 .deck__switch:has(button:last-of-type[aria-pressed="true"]) i {
@@ -8147,7 +8190,7 @@ ol.bs {
   background: none;
   border-radius: 22px;
   font: 600 13px/1 var(--font-sans);
-  color: #6b5f55;
+  color: rgb(246 240 230 / 0.72);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.4s;
@@ -8161,7 +8204,7 @@ ol.bs {
   position: absolute;
   inset: -4px;
   border-radius: 26px;
-  border: 2px solid rgb(168 74 38 / 0.45);
+  border: 2px solid rgb(246 240 230 / 0.45);
   opacity: 0;
   pointer-events: none;
   animation: deck-ring 2.2s var(--ease) 1.6s 1;
@@ -8183,7 +8226,7 @@ ol.bs {
   justify-items: center;
   gap: 8px;
   width: 100%;
-  padding: 12px 20px 0;
+  padding: 14px 20px 0;
 }
 .deck__btn {
   display: flex;
@@ -8191,12 +8234,12 @@ ol.bs {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  height: 56px;
+  height: 60px;
   padding-inline: 12px;
-  border-radius: 28px;
+  border-radius: 30px;
   background: linear-gradient(180deg, #3a2e25, #2a2019);
   color: #f6f0e6;
-  font: 600 min(17px, 4.7vw) / 1 var(--font-sans);
+  font: 700 min(18px, 4.8vw) / 1 var(--font-sans);
   white-space: nowrap;
   text-decoration: none;
   box-shadow:
@@ -8205,17 +8248,19 @@ ol.bs {
   -webkit-tap-highlight-color: transparent;
 }
 .deck__btn b {
-  font-weight: 600;
+  font-weight: 700;
   color: #f0b48f;
 }
+/* The microcopy: 16px, and its colour is 5.3:1 on the cream (WCAG AA is 4.5:1). Two lines are reserved. */
 .deck__cta p {
   margin: 0;
-  height: 14px;
-  font: 400 11px/14px var(--font-mono);
-  letter-spacing: 0.06em;
+  min-height: 40px;
+  font: 400 16px/20px var(--font-mono);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #6b5f55;
-  white-space: nowrap;
+  text-align: center;
+  text-wrap: balance;
 }
 
 /* Owner quotes share one grid cell: the space is reserved and they crossfade. */
@@ -8262,22 +8307,16 @@ ol.bs {
   border-radius: 7px;
 }
 
-.deck :is(.deck__pill, .deck__btn, .deck__switch button):focus-visible,
+.deck :is(.deck__pill, .deck__btn, .deck__switch button, .deck__arrow):focus-visible,
 .deck__stage:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .deck__switch::before {
-    animation: none;
-  }
-  .deck__card,
-  .deck__dev,
-  .deck__floor,
-  .deck__switch i,
-  .deck__quote,
-  .deck__stage {
-    transition: none;
+  .deck *,
+  .deck *::before {
+    transition: none !important;
+    animation: none !important;
   }
 }
