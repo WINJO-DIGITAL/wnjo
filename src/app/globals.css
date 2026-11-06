@@ -8289,9 +8289,9 @@ ol.bs {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  min-height: 60px;
-  padding: 10px 12px;
-  border-radius: 30px;
+  min-height: 74px;
+  padding: 14px 16px;
+  border-radius: 37px;
   background: linear-gradient(180deg, #3a2e25, #2a2019);
   color: #f6f0e6;
   font: 700 min(18px, 4.8vw) / 1 var(--font-sans);
@@ -8311,11 +8311,11 @@ ol.bs {
   text-align: left;
 }
 .deck__btn-main {
-  font: 700 min(18px, 4.8vw) / 1 var(--font-sans);
+  font: 700 min(22px, 5.8vw) / 1 var(--font-sans);
   text-transform: uppercase;
 }
 .deck__btn-sub {
-  font: 600 min(12.5px, 3.4vw) / 1 var(--font-sans);
+  font: 600 min(15px, 4vw) / 1 var(--font-sans);
   text-transform: none;
   letter-spacing: 0;
   color: #f0b48f;
