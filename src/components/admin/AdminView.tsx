@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { ProjectsAdmin } from "./ProjectsAdmin";
 
 type Membership = { tenant_id: string; role: "owner" | "admin" | "staff" };
 type Enquiry = { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string };
@@ -12,7 +13,7 @@ type OrderRow = { id: string; business_name: string; project_type: string; stage
 const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-type Tab = "enquiries" | "quotes" | "orders";
+type Tab = "enquiries" | "quotes" | "orders" | "projects";
 
 /**
  * The agency's read-only control area for this step. Every query is limited by row-level security, so
@@ -21,7 +22,7 @@ type Tab = "enquiries" | "quotes" | "orders";
 export function AdminView() {
   const client = supabase();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
-  const [role, setRole] = useState<Membership["role"] | null | "loading">("loading");
+  const [membership, setMembership] = useState<Membership | null | "loading">("loading");
   const [tab, setTab] = useState<Tab>("enquiries");
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export function AdminView() {
       .then(({ data }) => {
         if (cancelled) return;
         const first = (data as Membership[] | null)?.[0];
-        setRole(first ? first.role : null);
+        setMembership(first ?? null);
       });
     return () => {
       cancelled = true;
@@ -51,8 +52,8 @@ export function AdminView() {
   if (!client) return <p className="lede">The admin area isn&apos;t switched on yet.</p>;
   if (session === undefined) return <p className="lede">Checking your access…</p>;
   if (!session) return <SignIn client={client} />;
-  if (role === "loading") return <p className="lede">Checking your access…</p>;
-  if (!role) {
+  if (membership === "loading") return <p className="lede">Checking your access…</p>;
+  if (!membership) {
     return (
       <div>
         <p className="lede">You don&apos;t have access to the agency admin.</p>
@@ -66,13 +67,13 @@ export function AdminView() {
   return (
     <div className="admin">
       <div className="acct-bar">
-        <p className="acct-meta">Signed in as {session.user.email} · {role}</p>
+        <p className="acct-meta">Signed in as {session.user.email} · {membership.role}</p>
         <button type="button" className="btn btn--secondary" onClick={() => client.auth.signOut()}>
           Sign out
         </button>
       </div>
       <nav className="admin-tabs" aria-label="Admin sections">
-        {(["enquiries", "quotes", "orders"] as Tab[]).map((t) => (
+        {(["enquiries", "quotes", "orders", "projects"] as Tab[]).map((t) => (
           <button
             key={t}
             type="button"
@@ -87,6 +88,7 @@ export function AdminView() {
       {tab === "enquiries" && <EnquiriesTable client={client} />}
       {tab === "quotes" && <QuotesTable client={client} />}
       {tab === "orders" && <OrdersTable client={client} />}
+      {tab === "projects" && <ProjectsAdmin client={client} tenantId={membership.tenant_id} userId={session.user.id} />}
     </div>
   );
 }

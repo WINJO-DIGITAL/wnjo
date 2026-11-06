@@ -89,6 +89,11 @@ Built in sub-steps, each tested before the next.
 - Applied `20261106260400`: the API can no longer read a project's internal `status` and `priority`. Clients read only the customer-safe columns. Tested in `supabase/tests/project_columns.sql` (3 checks, passing).
 - Still optional: dropping those two columns from `projects` (they are now unused, since internal fields belong in `project_internal`). Dropping columns is destructive, so it needs your explicit confirmation before it runs.
 
+### 3e. Staff project management — built; database rules tested
+- `/admin` → Projects: list projects, set the client-visible status and target date, start conversations, reply (customer-visible or internal note), request approvals, update revision-request status, and see file records.
+- Database rules: `supabase/tests/staff_projects.sql`, 4 checks passing. Staff can't move a project to another client, and can't create projects from the browser.
+- Limitations: staff can't see or edit the internal project status or priority (not readable through the API yet); file upload and download wait for the server key; the screens haven't been exercised signed in, since that needs a staff sign-in link.
+
 ### Still to build in Phase 3
 - Staff: project and message management screens, with internal notes.
 - Upload and download screens (signed URLs, need the server key), the notification list and email sender, invoices and payments (Stripe), staff screens for approvals, revisions, files and notifications.
