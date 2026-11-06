@@ -328,6 +328,8 @@ export function DeviceDeck({ items }: { items: Item[] }) {
           onPointerCancel={onPointerEnd}
           onKeyDown={onKeyDown}
         >
+          {/* The scene fades out at both edges, so the neighbours read as a scroll, not a crop. */}
+          <div className="deck__scene">
           <div className="deck__glow" aria-hidden="true" />
           <div className="deck__floor" aria-hidden="true" />
           {items.map((p, k) => (
@@ -365,6 +367,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
               </div>
             </div>
           ))}
+          </div>
           <button type="button" className="deck__arrow deck__arrow--prev" aria-label="Previous example" onClick={() => step(-1)}>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M10 3 5 8l5 5" />

@@ -8006,6 +8006,12 @@ ol.bs {
 .deck__stage:focus-visible {
   outline-offset: -3px;
 }
+.deck__scene {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent);
+}
 .deck__glow {
   position: absolute;
   left: 50%;
