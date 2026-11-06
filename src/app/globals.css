@@ -4452,23 +4452,6 @@ main :is(.hero-ed__title, .booking-hero .tile__title) .serif-em {
   --color-accent-soft: #d9e4e3;
 }
 
-/* The header takes the top of each service page's hero colour, so the two read as one band. */
-:root:has(.svc[data-current="apps"]) .site-header:not([data-open="true"]) {
-  background: rgb(232 234 222 / 0.86); /* #e8eade, sage */
-}
-
-:root:has(.svc[data-current="booking"]) .site-header:not([data-open="true"]) {
-  background: rgb(227 234 232 / 0.86); /* #e3eae8, pale blue-teal */
-}
-
-.page-hero:has(.svc[data-current="apps"]) {
-  background: linear-gradient(to bottom, #e8eade, var(--color-bg));
-}
-
-.page-hero:has(.svc[data-current="booking"]) {
-  background: linear-gradient(to bottom, #e3eae8, var(--color-bg));
-}
-
 /* Switching services: the labels stay put; the line slides and changes colour. */
 ::view-transition-group(svc-labels) {
   z-index: 1; /* above the sliding page, which would otherwise paint its hero over them */
@@ -6072,7 +6055,7 @@ main #process ol.steps li::after {
    it on phones, beside it on desktop. Doubled class to win over .tile, defined later. */
 .booking-hero.tile {
   padding-block: var(--svc-top) clamp(3rem, 2rem + 4vw, 5rem);
-  background: linear-gradient(to bottom, #e3eae8, var(--color-bg) 40rem);
+  background: transparent; /* the site's background, like every other page */
   text-align: left;
 }
 
