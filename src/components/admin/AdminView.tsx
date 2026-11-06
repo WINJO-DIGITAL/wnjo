@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { ProjectsAdmin } from "./ProjectsAdmin";
+import { AiStatus } from "./AiStatus";
 
 type Membership = { tenant_id: string; role: "owner" | "admin" | "staff" };
 type Enquiry = { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string };
@@ -13,7 +14,7 @@ type OrderRow = { id: string; business_name: string; project_type: string; stage
 const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-type Tab = "enquiries" | "quotes" | "orders" | "projects";
+type Tab = "enquiries" | "quotes" | "orders" | "projects" | "ai";
 
 /**
  * The agency's read-only control area for this step. Every query is limited by row-level security, so
@@ -73,7 +74,7 @@ export function AdminView() {
         </button>
       </div>
       <nav className="admin-tabs" aria-label="Admin sections">
-        {(["enquiries", "quotes", "orders", "projects"] as Tab[]).map((t) => (
+        {(["enquiries", "quotes", "orders", "projects", "ai"] as Tab[]).map((t) => (
           <button
             key={t}
             type="button"
@@ -81,13 +82,14 @@ export function AdminView() {
             aria-current={tab === t ? "page" : undefined}
             onClick={() => setTab(t)}
           >
-            {t[0].toUpperCase() + t.slice(1)}
+            {t === "ai" ? "AI" : t[0].toUpperCase() + t.slice(1)}
           </button>
         ))}
       </nav>
       {tab === "enquiries" && <EnquiriesTable client={client} />}
       {tab === "quotes" && <QuotesTable client={client} />}
       {tab === "orders" && <OrdersTable client={client} />}
+      {tab === "ai" && <AiStatus client={client} />}
       {tab === "projects" && <ProjectsAdmin client={client} tenantId={membership.tenant_id} userId={session.user.id} />}
     </div>
   );

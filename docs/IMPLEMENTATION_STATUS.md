@@ -122,3 +122,8 @@ Built in sub-steps, each tested before the next.
 - The approval queue screens.
 - Event triggers (the event-driven queue), the five agents' instructions, and the morning briefing.
 - Known limitation: if the store itself fails while a task is running, the task is left in `running` and nothing sweeps it yet. A recovery job is still to be built.
+
+### 4c. Agent set-up and staff AI view — built
+- Migration `20261106270100`: the five agents for WNJO, all switched off, and a global AI budget of £0. Verified in the database: 5 agents, 0 enabled.
+- `/admin` → AI: a read-only view of the agents and their switches, recent tasks, and the budget. No controls yet; switching agents on and changing budgets come with the approval screens.
+- Not yet wired: the budget gate is not connected to the runner, and nothing reads the budget to block spending. This is safe while every agent is switched off and the budget is £0, but must be wired before anything is switched on.
