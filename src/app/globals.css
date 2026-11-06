@@ -8144,21 +8144,22 @@ ol.bs {
   position: absolute;
   inset: 4px;
   border-radius: 50%;
-  background: rgb(246 240 230 / 0.14);
-  border: 1px solid rgb(246 240 230 / 0.22);
+  background: rgb(246 240 230 / 0.2);
+  border: 1px solid rgb(246 240 230 / 0.32);
   transition: background-color 0.3s;
 }
 .deck__arrow:hover::before {
-  background: rgb(246 240 230 / 0.26);
+  background: rgb(246 240 230 / 0.32);
 }
 .deck__arrow svg {
   position: relative;
 }
+/* Inset from the stage's edges, so each arrow sits clear of the edge it belongs to. */
 .deck__arrow--prev {
-  left: 0;
+  left: 12px;
 }
 .deck__arrow--next {
-  right: 0;
+  right: 12px;
 }
 
 /* The top bar of the panel: the device switch, centred, with the pause control at its right. */
