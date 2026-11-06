@@ -126,7 +126,7 @@ export const primaryNav: NavItem[] = [
     label: "App development",
     menu: {
       primary: [
-        { href: "/app-development", label: "App development" },
+        { href: "/app-development", label: "Explore app development" },
         { href: "/contact?topic=bespoke", label: "Plan my app" },
       ],
       groups: [

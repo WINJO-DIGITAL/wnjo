@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CtaBand } from "@/components/Blocks";
-import { ServiceSwitcher } from "@/components/ServiceSwitcher";
 import { ArrowRight, Stopwatch } from "@/components/Icons";
 import { BookingDemo } from "@/components/interactive/BookingDemo";
 import { FamilyLine } from "@/components/interactive/FamilyLine";
@@ -29,7 +28,6 @@ export default function HomePage() {
       <section className="hero-ed hero-ed--work" data-nav="/work" aria-labelledby="hero-title" data-cta-hide>
         <div className="container container--wide hero-ed__layout">
           <div className="hero-ed__copy">
-            <ServiceSwitcher current="web" />
             <h1 id="hero-title" className="hero-ed__title rise" style={{ "--i": 1 } as React.CSSProperties}>
               Websites and apps <span className="serif-em">that grow your business.</span>
             </h1>
