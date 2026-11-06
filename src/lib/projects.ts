@@ -2,15 +2,19 @@ import type { StaticImageData } from "next/image";
 import alexDesktop from "../../public/work/alex-desktop.webp";
 import alexMobile from "../../public/work/alex-mobile.webp";
 import alexPage from "../../public/work/alex-page.webp";
+import alexTablet from "../../public/work/alex-tablet.webp";
 import boonmaDesktop from "../../public/work/boonma-desktop.webp";
 import boonmaMobile from "../../public/work/boonma-mobile.webp";
 import boonmaPage from "../../public/work/boonma-page.webp";
+import boonmaTablet from "../../public/work/boonma-tablet.webp";
 import evexecDesktop from "../../public/work/evexec-desktop.webp";
 import evexecMobile from "../../public/work/evexec-mobile.webp";
 import evexecPage from "../../public/work/evexec-page.webp";
+import evexecTablet from "../../public/work/evexec-tablet.webp";
 import fystayDesktop from "../../public/work/fystay-desktop.webp";
 import fystayMobile from "../../public/work/fystay-mobile.webp";
 import fystayPage from "../../public/work/fystay-page.webp";
+import fystayTablet from "../../public/work/fystay-tablet.webp";
 import alexLogo from "../../public/work/logos/alex-k-bells.png";
 import boonmaLogo from "../../public/work/logos/boonma.png";
 import evexecLogo from "../../public/work/logos/ev-exec.png";
@@ -40,6 +44,8 @@ export type Project = {
   host: string;
   desktop: StaticImageData;
   mobile: StaticImageData;
+  /** Portrait tablet capture (3:4), used by the phone-sized hero's Tablet view. */
+  tablet: StaticImageData;
   /** The business's own logo, as a square tile (used with the owner's permission). */
   logo: StaticImageData;
   /** Full-page capture, used for hover-to-scroll previews. */
@@ -73,6 +79,7 @@ export const projects: Project[] = [
     host: "evexec.co.uk",
     desktop: evexecDesktop,
     mobile: evexecMobile,
+    tablet: evexecTablet,
     logo: evexecLogo,
     page: evexecPage,
     walkthrough: {
@@ -103,6 +110,7 @@ export const projects: Project[] = [
     host: "boonma.vercel.app",
     desktop: boonmaDesktop,
     mobile: boonmaMobile,
+    tablet: boonmaTablet,
     logo: boonmaLogo,
     page: boonmaPage,
     walkthrough: {
@@ -134,6 +142,7 @@ export const projects: Project[] = [
     host: "fystay.co.uk",
     desktop: fystayDesktop,
     mobile: fystayMobile,
+    tablet: fystayTablet,
     logo: fystayLogo,
     page: fystayPage,
     walkthrough: {
@@ -164,6 +173,7 @@ export const projects: Project[] = [
     host: "alexkbells.vercel.app",
     desktop: alexDesktop,
     mobile: alexMobile,
+    tablet: alexTablet,
     logo: alexLogo,
     page: alexPage,
     walkthrough: {
@@ -176,3 +186,21 @@ export const projects: Project[] = [
 ];
 
 export const projectBySlug = (slug: string) => projects.find((p) => p.slug === slug);
+
+/**
+ * Each owner's own words, approved by them; keep them true to how the business runs today.
+ * One source for the homepage's quotes section and the phone hero. FYStay (ours) and
+ * Alex K Bells have no quote.
+ */
+export const OWNER_QUOTES = [
+  {
+    project: projectBySlug("ev-exec")!,
+    quote:
+      "Customers book their airport transfer on their phone in a minute, and I get the job straight away. It runs the business while I\u2019m driving.",
+  },
+  {
+    project: projectBySlug("boonma")!,
+    quote:
+      "Clients find a treatment, see the price and book a time, all from their phone. It feels like our studio.",
+  },
+];

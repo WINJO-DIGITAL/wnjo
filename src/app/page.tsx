@@ -7,31 +7,17 @@ import { ArrowRight, Stopwatch } from "@/components/Icons";
 import { BookingDemo } from "@/components/interactive/BookingDemo";
 import { FamilyLine } from "@/components/interactive/FamilyLine";
 import { SheetToApp } from "@/components/interactive/SheetToApp";
-import { ShowcaseStage } from "@/components/interactive/ShowcaseStage";
+import { HeroShowcase } from "@/components/interactive/HeroShowcase";
 import { WebStages } from "@/components/WebStages";
 import { WebsitesTile } from "@/components/WebsitesTile";
 import { jost } from "@/lib/fonts";
-import { projectBySlug, projects } from "@/lib/projects";
+import { OWNER_QUOTES, projectBySlug, projects } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 
 // Title, description and share image come from the root layout; only the canonical URL is added here.
 export const metadata: Metadata = siteUrl() ? { alternates: { canonical: "/" } } : {};
 
 const evexec = projectBySlug("ev-exec")!;
-
-// Each owner's own words, approved by them; keep them true to how the business runs today.
-const OWNER_QUOTES = [
-  {
-    project: evexec,
-    quote:
-      "Customers book their airport transfer on their phone in a minute, and I get the job straight away. It runs the business while I\u2019m driving.",
-  },
-  {
-    project: projectBySlug("boonma")!,
-    quote:
-      "Clients find a treatment, see the price and book a time, all from their phone. It feels like our studio.",
-  },
-];
 
 export default function HomePage() {
   return (
@@ -66,7 +52,7 @@ export default function HomePage() {
           </div>
         </div>
         <div aria-label="Recent work" className="container container--wide showcase-section">
-          <ShowcaseStage items={projects} />
+          <HeroShowcase items={projects} />
         </div>
       </section>
 
