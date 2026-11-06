@@ -87,7 +87,7 @@ Built in sub-steps, each tested before the next.
 
 ### RESOLVED: internal project fields hidden from clients
 - Applied `20261106260400`: the API can no longer read a project's internal `status` and `priority`. Clients read only the customer-safe columns. Tested in `supabase/tests/project_columns.sql` (3 checks, passing).
-- Still optional: dropping those two columns from `projects` (they are now unused, since internal fields belong in `project_internal`). Dropping columns is destructive, so it needs your explicit confirmation before it runs.
+- Decision (owner): leave the unused `status` and `priority` columns on `projects` for now. They are hidden from clients. Revisit once the internal `project_internal` table is built; dropping the columns is destructive and needs explicit confirmation at that point.
 
 ### 3e. Staff project management — built; database rules tested
 - `/admin` → Projects: list projects, set the client-visible status and target date, start conversations, reply (customer-visible or internal note), request approvals, update revision-request status, and see file records.
