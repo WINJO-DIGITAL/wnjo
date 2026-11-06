@@ -228,12 +228,11 @@ export const raengFitness: Project = {
   identity: "Heavy uppercase sans on black training photography, with cream for the light areas.",
 };
 
-/** The four work pieces the homepage hero shows, in order: RAENG takes FYStay's place. */
+/** The work pieces the homepage hero shows, in order: RAENG takes FYStay's place. */
 export const heroProjects: Project[] = [
   projectBySlug("ev-exec")!,
   projectBySlug("boonma")!,
   raengFitness,
-  projectBySlug("alex-k-bells")!,
 ];
 
 /**
