@@ -38,7 +38,7 @@ export default function HomePage() {
             <div className="btn-row rise" style={{ "--i": 3 } as React.CSSProperties}>
               <Link href="/build" className="btn btn--primary">
                 <Stopwatch />
-                Get my price
+                Get my website price
               </Link>
             </div>
             <p className="hero-note rise" style={{ "--i": 4 } as React.CSSProperties}>
