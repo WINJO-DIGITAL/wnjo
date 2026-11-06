@@ -8298,19 +8298,18 @@ ol.bs {
   height: 60px;
   padding-inline: 12px;
   border-radius: 30px;
-  background: linear-gradient(180deg, #3a2e25, #2a2019);
-  color: #f6f0e6;
+  /* Terracotta, lighter at the top; white text stays 4.5:1+ (WCAG AA) on both stops. */
+  background: linear-gradient(180deg, #c05a33, #a84a26);
+  color: #fff;
   font: 700 min(18px, 4.8vw) / 1 var(--font-sans);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
   white-space: nowrap;
   text-decoration: none;
   box-shadow:
-    0 14px 28px -12px rgb(46 36 29 / 0.7),
-    inset 0 1px 0 rgb(255 255 255 / 0.1);
+    0 14px 28px -12px rgb(168 74 38 / 0.6),
+    inset 0 1px 0 rgb(255 255 255 / 0.15);
   -webkit-tap-highlight-color: transparent;
-}
-.deck__btn b {
-  font-weight: 700;
-  color: #f0b48f;
 }
 /* The microcopy: one line at 375px, 16px, in the sans caps (the mono caps need 365px+ at 16px,
    more than the 335px there is). Its colour is 5.3:1 on the cream (WCAG AA is 4.5:1). */

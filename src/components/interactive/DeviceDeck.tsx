@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Stopwatch } from "@/components/Icons";
+import { ArrowRight, Stopwatch } from "@/components/Icons";
 import { OWNER_QUOTES, type Project } from "@/lib/projects";
 
 type Item = Pick<Project, "slug" | "name" | "mobile" | "tablet" | "logo">;
@@ -397,9 +397,8 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       <div className="deck__cta">
         <Link href="/build" className="deck__btn">
           <Stopwatch size={20} />
-          <span>
-            Price a site like <b>{current.name}</b>
-          </span>
+          <span>Get my website price</span>
+          <ArrowRight size={18} />
         </Link>
         <p>Free · No obligation · About 2 minutes</p>
       </div>
