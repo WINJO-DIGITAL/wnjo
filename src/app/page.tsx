@@ -43,32 +43,29 @@ export default function HomePage() {
       <section className="hero-ed hero-ed--work" data-nav="/work" aria-labelledby="hero-title" data-cta-hide>
         <div className="container container--wide hero-ed__layout">
           <div className="hero-ed__copy">
+            <ServiceSwitcher current="web" />
             <h1 id="hero-title" className="hero-ed__title rise" style={{ "--i": 1 } as React.CSSProperties}>
-              Websites that <span className="serif-em">book your customers</span>
-              <span className="hero-ed__tail">for you.</span>
+              Websites and apps <span className="serif-em">that grow your business.</span>
             </h1>
             <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
-              Bespoke, mobile-first, and priced in the open. See your exact price in 2 minutes.
+              Bespoke, mobile-first, priced in the open.
             </p>
-            {/* The lowest-risk step first (a price in two minutes), our work second. */}
+            {/* The lowest-risk step first (a price in two minutes), a person second. */}
             <div className="btn-row rise" style={{ "--i": 3 } as React.CSSProperties}>
               <Link href="/build" className="btn btn--primary">
                 <Stopwatch />
                 Get my price
               </Link>
-              <a href="#showcase" className="btn btn--secondary">
-                See our work
-              </a>
+              <Link href="/contact?topic=website" className="btn btn--secondary">
+                Talk to us
+              </Link>
             </div>
             <p className="hero-note rise" style={{ "--i": 4 } as React.CSSProperties}>
-              {"Free · No obligation · Real prices, no \u2018contact us for a quote\u2019"}
+              Free · no obligation · about 2 minutes
             </p>
-            <div className="hero-ed__services rise" style={{ "--i": 5 } as React.CSSProperties}>
-              <ServiceSwitcher current="web" />
-            </div>
           </div>
         </div>
-        <div id="showcase" aria-label="Recent work" className="container container--wide showcase-section">
+        <div aria-label="Recent work" className="container container--wide showcase-section">
           <ShowcaseStage items={projects} />
         </div>
       </section>
