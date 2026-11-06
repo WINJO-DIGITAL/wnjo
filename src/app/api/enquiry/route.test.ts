@@ -2,6 +2,13 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_ANSWERS } from "@/lib/pricing";
 import { POST } from "./route";
+import { saveEnquiry } from "@/lib/enquiry-store";
+
+// Storage is switched on per test with STORE_ON, so the other tests keep their behaviour.
+vi.mock("@/lib/enquiry-store", () => ({
+  enquiryStoreConfigured: () => process.env.STORE_ON === "1",
+  saveEnquiry: vi.fn(async () => true),
+}));
 
 let ipCounter = 0;
 const post = (body: unknown) =>
@@ -108,5 +115,48 @@ describe("POST /api/enquiry", () => {
   it("strips line breaks from the subject", async () => {
     await post({ ...contact, name: "Ada\nBcc: x@y.z" });
     expect(JSON.parse(fetchMock.mock.calls[0][1].body).subject).not.toMatch(/\n/);
+  });
+});
+
+describe("POST /api/enquiry with storage", () => {
+  const fetchMock = vi.fn();
+  const saveMock = vi.mocked(saveEnquiry);
+
+  beforeEach(() => {
+    vi.stubGlobal("fetch", fetchMock);
+    fetchMock.mockReset().mockResolvedValue(new Response("{}", { status: 200 }));
+    saveMock.mockReset().mockResolvedValue(true);
+    vi.stubEnv("STORE_ON", "1");
+    vi.stubEnv("RESEND_API_KEY", "test-key");
+    vi.stubEnv("ENQUIRY_TO_EMAIL", "inbox@example.com");
+    vi.stubEnv("ENQUIRY_FROM_EMAIL", "site@example.com");
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it("saves an enquiry even when email isn't configured", async () => {
+    vi.stubEnv("RESEND_API_KEY", "");
+    const res = await post(contact);
+    expect(res.status).toBe(200);
+    const { reference } = await res.json();
+    expect(saveMock).toHaveBeenCalledTimes(1);
+    expect(saveMock.mock.calls[0][0]).toMatchObject({ reference, kind: "contact", email: "ada@example.com" });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("still succeeds when saving fails but email goes out", async () => {
+    saveMock.mockResolvedValue(false);
+    const res = await post(contact);
+    expect(res.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports failure when neither saving nor email works", async () => {
+    saveMock.mockResolvedValue(false);
+    fetchMock.mockResolvedValue(new Response("{}", { status: 500 }));
+    const res = await post(contact);
+    expect(res.status).toBe(502);
   });
 });

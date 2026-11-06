@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { BUDGETS, LIMITS, MIN_FILL_MS, TIMELINES, TOPICS, clean, validateEnquiry } from "@/lib/enquiry";
 import { mailConfig, sendEnquiryEmail } from "@/lib/mailer";
+import { enquiryStoreConfigured, saveEnquiry } from "@/lib/enquiry-store";
 import { formatBrief } from "@/lib/brief";
 import { PROJECT_TYPES, parseAnswers } from "@/lib/pricing";
 import { rateLimited } from "@/lib/rate-limit";
@@ -70,7 +71,8 @@ export async function POST(request: NextRequest) {
   if (fields.message) lines.push(kind === "brief" ? "ADDITIONAL NOTES" : "GOALS", fields.message);
 
   const config = mailConfig();
-  if (!config) {
+  const storeOn = enquiryStoreConfigured();
+  if (!config && !storeOn) {
     return reply(503, {
       error: "Online enquiries aren't connected yet, so this message has not been sent.",
       code: "not_configured",
@@ -83,13 +85,29 @@ export async function POST(request: NextRequest) {
     return reply(429, { error: "Too many submissions from this connection. Please try again in a few minutes." });
   }
 
+  // Keep the enquiry first, so it survives even if the email step fails. Then email it if that's set up.
   const reference = newReference();
-  const sent = await sendEnquiryEmail(config, {
-    subject: `${subject.replace(/\s+/g, " ").slice(0, 180)} [${reference}]`,
-    text: [`Reference: ${reference}`, ...lines].join("\n"),
-    replyTo: fields.email,
-  });
-  if (!sent) {
+  const emailSubject = `${subject.replace(/\s+/g, " ").slice(0, 180)} [${reference}]`;
+  const text = [`Reference: ${reference}`, ...lines].join("\n");
+  const saved = storeOn
+    ? await saveEnquiry({
+        reference,
+        kind,
+        name: fields.name,
+        email: fields.email,
+        company: fields.company || undefined,
+        topic: TOPICS[fields.topic],
+        budget: fields.budget ? BUDGETS[fields.budget] : undefined,
+        timeline: fields.timeline ? TIMELINES[fields.timeline] : undefined,
+        subject: emailSubject,
+        body: text,
+      })
+    : false;
+  const sent = config
+    ? await sendEnquiryEmail(config, { subject: emailSubject, text, replyTo: fields.email })
+    : false;
+
+  if (!saved && !sent) {
     return reply(502, { error: "We couldn't send your message just now. Please try again shortly." });
   }
   return reply(200, { ok: true, reference });

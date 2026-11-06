@@ -45,8 +45,9 @@ export default function PrivacyPage() {
 
             <h2>How it&apos;s delivered</h2>
             <p>
-              Submissions are sent from our website to our business inbox using a transactional email provider, which
-              processes the message on our behalf in order to deliver it.
+              Each submission is saved to a database held by Supabase, our database provider, in its Frankfurt (EU)
+              region, so that it isn&apos;t lost. We also send it to our business inbox using a transactional email
+              provider, which processes the message on our behalf in order to deliver it.
             </p>
 
             <h2>Cookies and storage</h2>
