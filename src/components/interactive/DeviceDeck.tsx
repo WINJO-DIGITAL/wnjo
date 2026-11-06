@@ -368,19 +368,28 @@ export function DeviceDeck({ items }: { items: Item[] }) {
             </div>
           ))}
           </div>
-          <button type="button" className="deck__arrow deck__arrow--prev" aria-label="Previous example" onClick={() => step(-1)}>
+          <span className="visually-hidden" aria-live="polite">
+            {`${current.name}, ${index + 1} of ${items.length}`}
+          </span>
+        </div>
+
+        {/* Prev / next sit in their own row under the stage, so they never cover a mockup. */}
+        <div className="deck__nav">
+          <button type="button" className="deck__arrow" aria-label="Previous example" onClick={() => step(-1)}>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M10 3 5 8l5 5" />
             </svg>
           </button>
-          <button type="button" className="deck__arrow deck__arrow--next" aria-label="Next example" onClick={() => step(1)}>
+          <div className="deck__dots" aria-hidden="true">
+            {items.map((p, k) => (
+              <span key={p.slug} className={k === index ? "is-on" : undefined} />
+            ))}
+          </div>
+          <button type="button" className="deck__arrow" aria-label="Next example" onClick={() => step(1)}>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="m6 3 5 5-5 5" />
             </svg>
           </button>
-          <span className="visually-hidden" aria-live="polite">
-            {`${current.name}, ${index + 1} of ${items.length}`}
-          </span>
         </div>
 
       </div>

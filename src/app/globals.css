@@ -7909,7 +7909,7 @@ ol.bs {
   --u: 0.68px;
   /* Everything above and below the stage (header, copy, rail, price button), so the button
      stays in view: the stage takes what is left. */
-  --deck-fixed: 436px;
+  --deck-fixed: 480px;
   display: grid;
   justify-items: center;
 }
@@ -7995,7 +7995,7 @@ ol.bs {
 .deck__stage {
   position: relative;
   width: 100%;
-  height: clamp(200px, calc(100svh - var(--deck-fixed)), 410px);
+  height: clamp(180px, calc(100svh - var(--deck-fixed)), 410px);
   /* Clipped sideways only, so the glow and floor run on into the panel without a seam. */
   overflow-x: clip;
   border-radius: 0 0 30px 30px;
@@ -8123,14 +8123,11 @@ ol.bs {
 
 /* Prev / next: round, on the stage's edges, 44px targets. */
 .deck__arrow {
-  position: absolute;
-  top: 50%;
-  z-index: 20;
+  position: relative;
   display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
-  margin-top: -22px;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -8154,12 +8151,30 @@ ol.bs {
 .deck__arrow svg {
   position: relative;
 }
-/* Inset from the stage's edges, so each arrow sits clear of the edge it belongs to. */
-.deck__arrow--prev {
-  left: 12px;
+/* The control row under the stage: prev, the position dots, next. */
+.deck__nav {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  height: 44px;
+  padding-inline: 10px;
 }
-.deck__arrow--next {
-  right: 12px;
+.deck__dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.deck__dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgb(246 240 230 / 0.35);
+  transition: width 0.4s var(--ease), background-color 0.4s;
+}
+.deck__dots span.is-on {
+  width: 18px;
+  background: rgb(246 240 230 / 0.9);
 }
 
 /* The top bar of the panel: the device switch, centred, with the pause control at its right. */
@@ -8236,7 +8251,7 @@ ol.bs {
   background: none;
   border-radius: 22px;
   font: 600 13px/1 var(--font-sans);
-  color: rgb(246 240 230 / 0.72);
+  color: rgb(246 240 230 / 0.8);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.4s;
