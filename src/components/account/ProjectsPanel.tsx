@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { ApprovalsPanel } from "./ApprovalsPanel";
 
 type Project = { id: string; tenant_id: string; name: string; customer_status: string; target_date: string | null };
 type Conversation = { id: string; tenant_id: string; project_id: string; subject: string };
@@ -47,6 +48,7 @@ export function ProjectsPanel({ client, userId }: { client: SupabaseClient; user
           <p className="eyebrow">{project.customer_status}</p>
           <h3 id={`project-${project.id}`} className="h2">{project.name}</h3>
           {project.target_date && <p className="acct-meta">Target: {day.format(new Date(project.target_date))}</p>}
+          <ApprovalsPanel client={client} projectId={project.id} />
           {conversations
             .filter((c) => c.project_id === project.id)
             .map((conversation) => (

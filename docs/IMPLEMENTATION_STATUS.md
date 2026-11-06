@@ -62,6 +62,13 @@ Built in sub-steps, each tested before the next.
 - Tests: `supabase/tests/messages.sql`, 15 checks, all passing.
 - Client screen: "Your projects" on `/account` shows each project's customer status, target date and message thread, with a form to send a message. Built, type-checked, built for production. Not yet tested signed in.
 
+### 3b. Approvals and revision requests — database built and tested; client screens built
+- Applied: `approval_requests`, `approval_responses`, `revision_requests`, and `decide_approval` (migrations `20261106250000` and `20261106250100`, the latter fixing a variable-name clash).
+- Staff create approval requests. Clients approve, or request changes with a written reason, once per request. Each decision records the signed-in email and writes an audit entry. Clients can ask for revisions on their own project, but cannot change their status.
+- Tests: `supabase/tests/approvals.sql`, 16 checks, all passing.
+- Client screen: approvals appear under each project on `/account`, with approve and request-changes controls. Built and type-checked; not yet tested signed in.
+- Not yet built: staff screens to create approvals and handle revision requests.
+
 ### BLOCKED: pending migration (not applied)
 - `supabase/pending/20261106240100_step3a_split_internal_project_fields.sql` moves the internal project fields (`status`, `priority`) into a staff-only `project_internal` table, and restricts client access to customer-safe columns of `projects`.
 - It was not applied: the Supabase apply tool timed out while the server was asking a question that no one answered. The database was checked afterwards and is unchanged (`projects.status` still exists, `project_internal` does not exist).
@@ -70,4 +77,4 @@ Built in sub-steps, each tested before the next.
 
 ### Still to build in Phase 3
 - Staff: project and message management screens, with internal notes.
-- Approvals and revision requests, files (private storage with signed URLs), notifications, invoices and payment history (Stripe-dependent).
+- Files (private storage with signed URLs), notifications, invoices and payment history (Stripe-dependent). Staff screens for approvals and revisions.
