@@ -397,9 +397,13 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       <div className="deck__cta">
         <Link href="/build" className="deck__btn">
           <Stopwatch size={20} />
-          <span>Get my website price</span>
+          <span className="deck__btn-text">
+            <span className="deck__btn-main">Get my price</span>
+            <span className="deck__btn-sub">
+              for a site like {current.name} · free · 2 mins
+            </span>
+          </span>
         </Link>
-        <p>Free · No obligation · About 2 minutes</p>
       </div>
 
       {/* Every owner's words share one grid cell, so the space is reserved and they crossfade. */}
