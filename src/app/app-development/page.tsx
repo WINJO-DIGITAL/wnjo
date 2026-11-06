@@ -43,7 +43,6 @@ export default function AppDevelopmentPage() {
   return (
     <>
       <PageHero
-        service="apps"
         eyebrow="App development"
         title={
           <>

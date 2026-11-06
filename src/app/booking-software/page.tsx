@@ -2,7 +2,6 @@ import type { Viewport } from "next";
 import Link from "next/link";
 import { CtaBand } from "@/components/Blocks";
 import { ArrowRight } from "@/components/Icons";
-import { ServiceSwitcher } from "@/components/ServiceSwitcher";
 import { BookingDemo } from "@/components/interactive/BookingDemo";
 import { BookingStudio } from "@/components/interactive/BookingStudio";
 import { PhoneFan } from "@/components/interactive/PhoneFan";
@@ -35,7 +34,6 @@ export default function BookingSoftwarePage() {
       */}
       <section className={`tile booking-hero ${jost.variable}`} aria-labelledby="hero-title">
         <div className="container container--wide">
-          <ServiceSwitcher current="booking" />
           <div className="booking-hero__layout">
             <div className="booking-hero__copy">
               <h1 id="hero-title" className="tile__title rise" style={{ "--i": 1 } as React.CSSProperties}>
