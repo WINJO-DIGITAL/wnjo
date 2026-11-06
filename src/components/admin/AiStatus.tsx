@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { nextBriefingAt, type Briefing } from "@/lib/briefing";
 
 /**
  * Read-only view of the AI workforce: agents and their switches, recent tasks, and budgets. There are no
@@ -11,6 +12,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 type Agent = { agent_key: string; name: string; enabled: boolean; paused: boolean };
 type Task = { id: string; agent_key: string; title: string; status: string; spent_pence: number; created_at: string };
 type Budget = { scope: string; scope_id: string | null; monthly_limit_pence: number; warn_at_pence: number };
+type ReportRow = { report_date: string; body: Briefing; generated_at: string };
 
 const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 const pounds = (pence: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(pence / 100);
@@ -20,6 +22,17 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const [budgets, setBudgets] = useState<Budget[] | null>(null);
   const [error, setError] = useState(false);
+  const [briefing, setBriefing] = useState<ReportRow | null | "loading">("loading");
+
+  useEffect(() => {
+    client
+      .from("ai_reports")
+      .select("report_date, body, generated_at")
+      .eq("kind", "morning_briefing")
+      .order("report_date", { ascending: false })
+      .limit(1)
+      .then(({ data }) => setBriefing(((data as ReportRow[]) ?? [])[0] ?? null));
+  }, [client]);
 
   useEffect(() => {
     Promise.all([
@@ -41,6 +54,25 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
   return (
     <div className="admin-stack">
       <p className="acct-meta">Read-only. Agents are switched off, and the global budget is {global ? pounds(global.monthly_limit_pence) : "not set"} a month.</p>
+
+      <h3 className="acct-label">Morning briefing</h3>
+      {briefing === "loading" && <p className="acct-meta">Loading the briefing…</p>}
+      {briefing === null && (
+        <p className="acct-meta">No briefing yet. The next one is due at 07:30 London time, {when.format(nextBriefingAt(new Date()))}.</p>
+      )}
+      {briefing && briefing !== "loading" && (
+        <div className="admin-stack">
+          <p className="acct-meta">For {briefing.report_date}. Facts first, then suggestions.</p>
+          <ul className="admin-list" aria-label="Facts">
+            {briefing.body.facts.map((f, i) => <li key={`f${i}`} className="admin-row-static">{f.text}</li>)}
+          </ul>
+          <h4 className="acct-label">Suggested priorities</h4>
+          <ul className="admin-list" aria-label="Recommendations">
+            {briefing.body.recommendations.length === 0 && <li className="acct-meta">Nothing needs action today.</li>}
+            {briefing.body.recommendations.map((r, i) => <li key={`r${i}`} className="admin-row-static">{r.text}</li>)}
+          </ul>
+        </div>
+      )}
 
       <h3 className="acct-label">Agents</h3>
       <ul className="admin-list">

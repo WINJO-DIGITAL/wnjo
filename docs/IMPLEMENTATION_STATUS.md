@@ -127,3 +127,9 @@ Built in sub-steps, each tested before the next.
 - Migration `20261106270100`: the five agents for WNJO, all switched off, and a global AI budget of £0. Verified in the database: 5 agents, 0 enabled.
 - `/admin` → AI: a read-only view of the agents and their switches, recent tasks, and the budget. No controls yet; switching agents on and changing budgets come with the approval screens.
 - Not yet wired: the budget gate is not connected to the runner, and nothing reads the budget to block spending. This is safe while every agent is switched off and the budget is £0, but must be wired before anything is switched on.
+
+### 4d. Morning briefing (deterministic part) — built, tested
+- `src/lib/briefing.ts`: 07:30 Europe/London scheduling that handles the clock changes (6 tests), and a briefing builder that keeps facts and suggested priorities in separate lists, linked to projects (tested).
+- Migration `20261106280000`: `ai_reports` table, staff read-only. The AI tab shows the latest briefing, or when the next one is due.
+- Not yet built: the server job that gathers the facts from the database and writes the report each morning. It needs the server key, and the scheduling mechanism still needs choosing.
+- Not AI-written yet: the wording is fixed and comes from the facts. Grok can add prose later, once enabled.
