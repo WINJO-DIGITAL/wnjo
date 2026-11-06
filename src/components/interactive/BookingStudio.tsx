@@ -7,7 +7,7 @@ import { ArrowRight } from "../Icons";
 /*
  * "Make it yours": a booking app the visitor restyles live, like a car configurator.
  * Pick a business, a colour and a look, and the phone redraws itself. The looks borrow
- * from booking flows we've built: EV Exec's dark, rounded one and Alex K Bells' bold,
+ * from booking flows we've built: EV Exec's dark, rounded one and a bold,
  * square one. Every name, price and time shown is an example.
  */
 

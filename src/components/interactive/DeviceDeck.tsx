@@ -14,7 +14,6 @@ const THEME: Record<string, { bg: string; glow: string }> = {
   "ev-exec": { bg: "#1b2233", glow: "#c9a24b" },
   boonma: { bg: "#4a3a4f", glow: "#b78fb8" },
   "raeng-fitness": { bg: "#262624", glow: "#d8d2c4" },
-  "alex-k-bells": { bg: "#34353a", glow: "#8d93a3" },
 };
 const FALLBACK = { bg: "#2a2019", glow: "#a84a26" };
 

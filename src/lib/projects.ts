@@ -1,8 +1,4 @@
 import type { StaticImageData } from "next/image";
-import alexDesktop from "../../public/work/alex-desktop.webp";
-import alexMobile from "../../public/work/alex-mobile.webp";
-import alexPage from "../../public/work/alex-page.webp";
-import alexTablet from "../../public/work/alex-tablet.webp";
 import boonmaDesktop from "../../public/work/boonma-desktop.webp";
 import boonmaMobile from "../../public/work/boonma-mobile.webp";
 import boonmaPage from "../../public/work/boonma-page.webp";
@@ -20,7 +16,6 @@ import raengMobile from "../../public/work/raeng-mobile.webp";
 import raengTablet from "../../public/work/raeng-tablet.webp";
 import raengPage from "../../public/work/raeng-page.webp";
 import raengLogo from "../../public/work/logos/raeng-fitness.png";
-import alexLogo from "../../public/work/logos/alex-k-bells.png";
 import boonmaLogo from "../../public/work/logos/boonma.png";
 import evexecLogo from "../../public/work/logos/ev-exec.png";
 import fystayLogo from "../../public/work/logos/fystay.png";
@@ -158,87 +153,51 @@ export const projects: Project[] = [
     identity: "Seaside warmth: terracotta, sand and an app-like mobile tab bar.",
   },
   {
-    slug: "alex-k-bells",
-    name: "Alex K Bells",
+    slug: "raeng-fitness",
+    name: "RAENG Fitness",
     kind: "client",
-    sector: "Kettlebell coaching",
+    sector: "Kettlebell training",
     location: "Cumbernauld",
-    summary: "A kettlebell coach offering group classes, one-to-one sessions and online coaching.",
+    summary: "Kettlebell classes, one-to-one and small group coaching, and memberships from a studio in Cumbernauld.",
     challenge:
-      "A kettlebell coach offering group classes, one-to-one sessions and online coaching needed one place that explains each option and its price, and makes booking straightforward.",
+      "A kettlebell studio needed one place to show its classes and coaching, and to let people book a class or buy a membership online.",
     solution:
-      "A bold, monochrome site led by training film, with clear pricing for three ways to train and a simple three-step booking explanation.",
+      "A bold, dark website led by training photography, with the class timetable, prices and membership plans shown up front and booking built in.",
     built: [
-      "Three ways to train, each with clear pricing",
-      "Full-bleed training video hero",
-      "A simple three-step booking explanation",
-      "Class times and location details",
+      "Class timetable with booking",
+      "Group, one-to-one and small group coaching, each with its price",
+      "Four membership plans and pay-as-you-go pricing",
+      "A free first class for new customers",
     ],
-    url: "https://alexkbells.vercel.app",
-    host: "alexkbells.vercel.app",
-    desktop: alexDesktop,
-    mobile: alexMobile,
-    tablet: alexTablet,
-    logo: alexLogo,
-    page: alexPage,
+    url: "https://raengfitness.co.uk",
+    host: "raengfitness.co.uk",
+    desktop: raengDesktop,
+    mobile: raengMobile,
+    tablet: raengTablet,
+    logo: raengLogo,
+    page: raengPage,
     walkthrough: {
-      mp4: "/work/alex-walkthrough.mp4",
-      webm: "/work/alex-walkthrough.webm",
-      poster: "/work/alex-walkthrough.webp",
+      mp4: "/work/raeng-walkthrough.mp4",
+      webm: "/work/raeng-walkthrough.webm",
+      poster: "/work/raeng-walkthrough.webp",
     },
-    identity: "Heavy uppercase type and monochrome film, built for energy.",
+    identity: "Heavy uppercase sans on black training photography, with cream for the light areas.",
   },
 ];
 
 export const projectBySlug = (slug: string) => projects.find((p) => p.slug === slug);
 
-/**
- * RAENG Fitness, shown in the homepage hero in place of FYStay. Kept out of `projects`, so the
- * work pages list stays as it is. Descriptions state only what the live site shows.
- */
-export const raengFitness: Project = {
-  slug: "raeng-fitness",
-  name: "RAENG Fitness",
-  kind: "client",
-  sector: "Kettlebell training",
-  location: "Cumbernauld",
-  summary: "Kettlebell classes, one-to-one and small group coaching, and memberships from a studio in Cumbernauld.",
-  challenge:
-    "A kettlebell studio needed one place to show its classes and coaching, and to let people book a class or buy a membership online.",
-  solution:
-    "A bold, dark website led by training photography, with the class timetable, prices and membership plans shown up front and booking built in.",
-  built: [
-    "Class timetable with booking",
-    "Group, one-to-one and small group coaching, each with its price",
-    "Four membership plans and pay-as-you-go pricing",
-    "A free first class for new customers",
-  ],
-  url: "https://raengfitness.co.uk",
-  host: "raengfitness.co.uk",
-  desktop: raengDesktop,
-  mobile: raengMobile,
-  tablet: raengTablet,
-  logo: raengLogo,
-  page: raengPage,
-  walkthrough: {
-    mp4: "/work/raeng-walkthrough.mp4",
-    webm: "/work/raeng-walkthrough.webm",
-    poster: "/work/raeng-walkthrough.webp",
-  },
-  identity: "Heavy uppercase sans on black training photography, with cream for the light areas.",
-};
-
-/** The work pieces the homepage hero shows, in order: RAENG takes FYStay's place. */
+/** The work pieces the homepage hero shows, in order. */
 export const heroProjects: Project[] = [
   projectBySlug("ev-exec")!,
   projectBySlug("boonma")!,
-  raengFitness,
+  projectBySlug("raeng-fitness")!,
 ];
 
 /**
  * Each owner's own words, approved by them; keep them true to how the business runs today.
  * One source for the homepage's quotes section and the phone hero. FYStay (ours) and
- * Alex K Bells have no quote.
+ * RAENG Fitness have no quote.
  */
 export const OWNER_QUOTES = [
   {
@@ -252,7 +211,7 @@ export const OWNER_QUOTES = [
       "Clients find a treatment, see the price and book a time, all from their phone. It feels like our studio.",
   },
   {
-    project: raengFitness,
+    project: projectBySlug("raeng-fitness")!,
     quote:
       "From the first look, the website feels professional and looks class. It gives the business a great online presence, gets people talking and makes it easy to start attracting new clients.",
   },

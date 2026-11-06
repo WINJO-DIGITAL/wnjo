@@ -537,7 +537,7 @@ This section records the technical decisions made for the first build. Items in 
 | FAQ answers (only state what the site already commits to) | `src/lib/faq.ts` |
 | Enquiry API: validation, spam checks, server-side estimate, email | `src/app/api/enquiry/route.ts` |
 | Website configurator | `src/components/configurator/` |
-| Case studies: challenge, solution and what was built (EV Exec, Boonma, FYStay, Alex K Bells) | `src/lib/projects.ts` |
+| Case studies: challenge, solution and what was built (EV Exec, Boonma, FYStay, RAENG Fitness) | `src/lib/projects.ts` |
 | Browser and phone frames for real screenshots | `src/components/Devices.tsx` |
 | Project screenshots (captured from the live sites) | `public/work/` |
 | Navigation and confirmed site facts | `src/lib/site.ts` |

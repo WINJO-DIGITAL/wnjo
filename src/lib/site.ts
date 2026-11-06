@@ -56,7 +56,7 @@ export const primaryNav: NavItem[] = [
         { href: "/work#ev-exec", label: "EV Exec" },
         { href: "/work#boonma", label: "Boonma" },
         { href: "/work#fystay", label: "FYStay" },
-        { href: "/work#alex-k-bells", label: "Alex K Bells" },
+        { href: "/work#raeng-fitness", label: "RAENG Fitness" },
       ],
       groups: [
         {
@@ -65,7 +65,7 @@ export const primaryNav: NavItem[] = [
             { href: "https://www.evexec.co.uk", label: "evexec.co.uk", external: true },
             { href: "https://boonma.vercel.app", label: "boonma.vercel.app", external: true },
             { href: "https://www.fystay.co.uk", label: "fystay.co.uk", external: true },
-            { href: "https://alexkbells.vercel.app", label: "alexkbells.vercel.app", external: true },
+            { href: "https://raengfitness.co.uk", label: "raengfitness.co.uk", external: true },
           ],
         },
       ],
