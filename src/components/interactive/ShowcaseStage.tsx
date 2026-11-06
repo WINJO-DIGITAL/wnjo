@@ -51,6 +51,18 @@ function LaptopBase() {
   );
 }
 
+function PlayPauseIcon({ playing }: { playing: boolean }) {
+  return playing ? (
+    <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden="true">
+      <path d="M0 0h3v12H0zM7 0h3v12H7z" fill="currentColor" />
+    </svg>
+  ) : (
+    <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden="true">
+      <path d="M0 0l10 6-10 6z" fill="currentColor" />
+    </svg>
+  );
+}
+
 const reducedQuery = "(prefers-reduced-motion: reduce)";
 const subscribeReduced = (onChange: () => void) => {
   const mq = window.matchMedia(reducedQuery);
@@ -233,6 +245,25 @@ export function ShowcaseStage({ items }: { items: Item[] }) {
             ))}
           </div>
         </figure>
+        {/* Phones: the project's name and links sit in the stage, beside the phone. */}
+        <div className="showcase__now">
+          <p className="showcase__now-sector" aria-live="polite">
+            {current.sector}
+          </p>
+          <div className="showcase__now-actions">
+            <Link href={`/work#${current.slug}`} className="showcase__now-link">
+              View project
+            </Link>
+            <button
+              type="button"
+              className="showcase__now-pause"
+              onClick={toggle}
+              aria-label={userPaused ? "Play the walkthroughs" : "Pause the walkthroughs"}
+            >
+              <PlayPauseIcon playing={!userPaused} />
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="showcase__bar">
@@ -276,15 +307,7 @@ export function ShowcaseStage({ items }: { items: Item[] }) {
             onClick={toggle}
             aria-label={userPaused ? "Play the walkthroughs" : "Pause the walkthroughs"}
           >
-            {userPaused ? (
-              <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden="true">
-                <path d="M0 0l10 6-10 6z" fill="currentColor" />
-              </svg>
-            ) : (
-              <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden="true">
-                <path d="M0 0h3v12H0zM7 0h3v12H7z" fill="currentColor" />
-              </svg>
-            )}
+            <PlayPauseIcon playing={!userPaused} />
           </button>
         </div>
       </div>

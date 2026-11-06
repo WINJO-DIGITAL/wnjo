@@ -2514,6 +2514,137 @@ main {
   border-color: var(--color-ink);
 }
 
+/* In-stage project info: phones only (see the phone stage below). */
+.showcase__now {
+  display: none;
+}
+
+/*
+ * Phones: the work as a full-bleed stage. No laptop chrome: the site fills the width at
+ * full size, the same site on a phone hangs below its corner, and the project's name,
+ * link and pause sit in the space beside the phone, so the work is the picture and the
+ * tabs underneath are all that's left to tap.
+ */
+@media (max-width: 39.99rem) {
+  .hero-ed--work .showcase-section {
+    padding-inline: 0;
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-6);
+  }
+  .hero-ed--work .showcase__bar {
+    padding-inline: var(--gutter);
+    margin-top: var(--space-5);
+  }
+  /* The stage's own controls replace the row of links under the tabs. */
+  .hero-ed--work .showcase__meta {
+    display: none;
+  }
+
+  .showcase__stage.laptop {
+    max-width: none;
+    margin-inline: 0;
+    background:
+      radial-gradient(90% 70% at 85% 100%, rgb(168 74 38 / 0.22), transparent 70%),
+      linear-gradient(to bottom, #1d1611, var(--color-inverse-bg));
+  }
+  .laptop__screen {
+    margin-inline: 0;
+    padding: 0;
+  }
+  .laptop__screen::before,
+  .laptop__base {
+    display: none;
+  }
+  .laptop__display,
+  .laptop__hit {
+    border-radius: 0;
+  }
+  /* Where the phone and the project's details hang below the screen. */
+  .laptop__view::after {
+    aspect-ratio: auto;
+    height: 33cqw;
+  }
+
+  .phone {
+    right: 5cqw;
+    bottom: 4cqw;
+    width: 28cqw;
+    padding: 1cqw;
+    border-radius: 4.2cqw;
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.12),
+      0 4cqw 8cqw -2cqw rgb(0 0 0 / 0.7);
+  }
+  .phone__screen {
+    border-radius: 3.3cqw;
+  }
+  .phone::after {
+    top: 2.2cqw;
+    width: 6cqw;
+    height: 1.7cqw;
+  }
+
+  /* The play invitation sits on the left, clear of the phone. */
+  .laptop__hint {
+    left: 4cqw;
+    bottom: 5cqw;
+    transform: none;
+  }
+
+  .showcase__now {
+    position: absolute;
+    z-index: 4;
+    left: var(--gutter);
+    right: calc(28cqw + 9cqw);
+    bottom: 4cqw;
+    display: grid;
+    gap: var(--space-3);
+    align-content: end;
+  }
+  .showcase__now-sector {
+    color: var(--color-inverse-ink);
+    font-size: var(--text-base);
+    font-weight: 500;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+  .showcase__now-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .showcase__now-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-inverse-ink);
+    color: var(--color-inverse-bg);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .showcase__now-pause {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--color-inverse-line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-inverse-ink);
+    cursor: pointer;
+  }
+  .showcase__now-link:focus-visible,
+  .showcase__now-pause:focus-visible {
+    outline: 2px solid var(--color-inverse-ink);
+    outline-offset: 2px;
+  }
+}
+
 /* Carousel: a full-bleed, swipeable row of projects. */
 .carousel .carousel__track {
   --edge: max(var(--gutter), calc((100% - var(--width-wide)) / 2));
