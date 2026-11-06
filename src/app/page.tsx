@@ -36,14 +36,14 @@ export default function HomePage() {
             </p>
             {/* The lowest-risk step first (a price in two minutes), a person second. */}
             <div className="btn-row rise" style={{ "--i": 3 } as React.CSSProperties}>
-              <Link href="/build" className="btn btn--primary">
+              <Link href="/build" className="btn btn--primary hero-btn">
                 <Stopwatch />
-                Get my website price
+                <span className="hero-btn__text">
+                  <span className="hero-btn__main">Get my price</span>
+                  <span className="hero-btn__sub">No obligation · In 2 minutes</span>
+                </span>
               </Link>
             </div>
-            <p className="hero-note rise" style={{ "--i": 4 } as React.CSSProperties}>
-              Free · no obligation · about 2 minutes
-            </p>
           </div>
         </div>
         <div aria-label="Recent work" className="container container--wide showcase-section">
