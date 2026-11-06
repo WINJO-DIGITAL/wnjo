@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { QuotesPanel } from "./QuotesPanel";
 
 export const STAGES = [
   { id: "brief_received", label: "Brief received" },
@@ -124,6 +125,8 @@ export function AccountView() {
           No orders are linked to this email yet. If you&apos;ve just ordered, we&apos;ll link it shortly.
         </p>
       )}
+
+      {client && <QuotesPanel client={client} />}
 
       {orders?.map((order) => (
         <article key={order.id} className="acct-order" aria-labelledby={`order-${order.id}`}>
