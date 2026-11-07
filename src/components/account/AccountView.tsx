@@ -1,20 +1,68 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { QuotesPanel } from "./QuotesPanel";
 import { ProjectsPanel } from "./ProjectsPanel";
 
 export const STAGES = [
-  { id: "brief_received", label: "Brief received" },
-  { id: "designing", label: "Designing" },
-  { id: "building", label: "Building" },
-  { id: "reviewing", label: "Reviewing with you" },
-  { id: "live", label: "Live" },
+  { id: "brief_received", label: "Brief received", short: "Brief" },
+  { id: "designing", label: "Designing", short: "Design" },
+  { id: "building", label: "Building", short: "Build" },
+  { id: "reviewing", label: "Reviewing with you", short: "Review" },
+  { id: "live", label: "Live", short: "Live" },
 ] as const;
 
 type Stage = (typeof STAGES)[number]["id"];
+
+/** One plain sentence on what happens at each stage. Kept short: the rail does the explaining. */
+const STAGE_NOTES: Record<Stage, string> = {
+  brief_received: "We have your brief and are reading it through.",
+  designing: "Layouts are being drawn. You'll see them here before anything is built.",
+  building: "Your site is being built, page by page.",
+  reviewing: "Ready for you to look at. Tell us what you think, or approve it.",
+  live: "It's live. Thanks for choosing WNJO.",
+};
+
+/** The order's progress as a rail: done stages tick, the current one pulses, the line fills to it. */
+function OrderTracker({ stage }: { stage: Stage }) {
+  const current = Math.max(0, STAGES.findIndex((s) => s.id === stage));
+  const fill = `${(current / (STAGES.length - 1)) * 100}%`;
+  return (
+    <div className="track">
+      <div className="track__now">
+        <span className="track__count">{String(current + 1).padStart(2, "0")} / {String(STAGES.length).padStart(2, "0")}</span>
+        <p className="track__title">{STAGES[current].label}</p>
+      </div>
+      <ol
+        className="track__rail"
+        aria-label={`Progress: step ${current + 1} of ${STAGES.length}, ${STAGES[current].label}`}
+        style={{ "--fill": fill } as CSSProperties}
+      >
+        <li className="track__line" aria-hidden="true"><span className="track__fill" /></li>
+        {STAGES.map((s, i) => {
+          const state = i < current ? "done" : i === current ? "current" : "todo";
+          return (
+            <li key={s.id} className={`track__step track__step--${state}`} aria-current={state === "current" ? "step" : undefined}>
+              <span className="track__node" aria-hidden="true">
+                {state === "done" ? (
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M2.5 7.5 5.5 10.5 11.5 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  i + 1
+                )}
+              </span>
+              <span className="track__label">{s.short}</span>
+            </li>
+          );
+        })}
+      </ol>
+      <p className="track__note">{STAGE_NOTES[stage]}</p>
+    </div>
+  );
+}
 
 type Update = { id: string; message: string; created_at: string };
 type Order = {
@@ -139,20 +187,7 @@ export function AccountView() {
           <h2 id={`order-${order.id}`} className="h2">
             {order.business_name}
           </h2>
-          <ol className="acct-steps" aria-label="Progress">
-            {STAGES.map((stage, i) => {
-              const current = STAGES.findIndex((s) => s.id === order.stage);
-              const state = i < current ? "done" : i === current ? "current" : "todo";
-              return (
-                <li key={stage.id} className={`acct-step acct-step--${state}`} aria-current={state === "current" ? "step" : undefined}>
-                  <span className="acct-step__num" aria-hidden="true">
-                    {i + 1}
-                  </span>
-                  <span>{stage.label}</span>
-                </li>
-              );
-            })}
-          </ol>
+          <OrderTracker stage={order.stage} />
           <p className="acct-meta">Updated {dateFormat.format(new Date(order.stage_updated_at))}</p>
           {order.order_updates.length > 0 && (
             <ul className="acct-updates">
