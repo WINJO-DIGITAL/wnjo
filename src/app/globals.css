@@ -6170,96 +6170,11 @@ main #process ol.steps li::after {
    visual. (Layout borrowed from the best product sites; the look is ours.)
    ========================================================================== */
 
-/*
- * The family line: a full screen of large type (FamilyLine). Pinned, the section is
- * about one and a half screens tall and its stage sticks while the line types out with the scroll.
- */
-.family-line {
-  background: var(--color-bg);
-}
-
-.family-line[data-pinned] {
-  height: 160svh;
-}
-
-.family-line__stage {
-  display: grid;
-  place-items: center;
-  min-height: 100svh;
-}
-
-.family-line[data-pinned] .family-line__stage {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-}
-
-.family-line__text {
-  max-width: 22ch;
-  font-family: var(--font-playfair), var(--font-serif);
-  font-size: clamp(2.75rem, 1.2rem + 6.5vw, 7rem);
-  font-weight: 600;
-  line-height: 1.04;
-  letter-spacing: -0.03em;
-  text-align: center;
-  color: var(--color-ink);
-  text-wrap: balance;
-}
-
-.family-line__text em {
-  font-weight: 400;
-  color: var(--color-accent);
-}
-
-/* Laid out from the start, shown as typed, so nothing moves. */
-.family-line__hidden {
-  visibility: hidden;
-}
-
-/* Takes no space (drawn over the gap), so the letters never move as it travels. Inline, not
-   inline-block: a block-level box mid-word is a place the line may break, and the text reflows. */
-.family-line__caret {
-  position: relative;
-  animation: family-caret 1s steps(1) infinite;
-}
-
-.family-line__caret::after {
-  content: "";
-  position: absolute;
-  bottom: 0.2em;
-  left: 0.02em;
-  width: 0.06em;
-  height: 0.85em;
-  background: var(--color-accent);
-}
-
-/* Once typing ends, the caret blinks a few more times and goes. */
-.family-line__caret:not([data-typing]) {
-  animation: family-caret 1s steps(1) 3 forwards;
-}
-
-@keyframes family-caret {
-  50% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .family-line__caret {
-    display: none;
-  }
-}
-
-/* The owners of EV Exec and Boonma, quoted under the family line: phones swipe from one to
+/* The owners of EV Exec and Boonma, quoted after the hero: phones swipe from one to
    the next (the second peeking in); wider screens show both side by side. */
 .owner-quotes {
-  position: relative; /* drawn over the family line's empty lower screen, below its text */
-  z-index: 1;
-  margin-top: -28svh;
-  padding-block: 0 clamp(4.5rem, 3rem + 6vw, 8rem);
+  position: relative;
+  padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem) clamp(4.5rem, 3rem + 6vw, 8rem);
 }
 
 .owner-quotes__row {

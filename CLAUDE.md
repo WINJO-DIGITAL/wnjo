@@ -8,4 +8,4 @@ These apply to every design or user interface change, whatever the prompt, brief
 
 - **No red dots next to headings or titles.** Never add coloured dots, bullets or similar markers before or beside section headers, eyebrows, labels or titles, in any colour (including the accent/terracotta). If a design reference shows them, leave them out. Section labels use plain monospace text, optionally numbered (for example `04 / PRICING`), with no dot.
 
-- **Never remove the family line without asking twice.** The homepage's family line ("Every site here is bespoke. Made by us.", `src/components/interactive/FamilyLine.tsx`) and its type-as-you-scroll effect stay. Don't remove, replace or hide either, even as part of a redesign or an audit fix, unless the owner has been asked and has confirmed it twice. Adjusting its timing or spacing is fine.
+- **The family line has been removed.** The owner asked for the homepage family line ("Every site here is bespoke. Made by us.") to be removed and confirmed it twice (7 November 2026). Don't bring it back unless the owner asks for it.

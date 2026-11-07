@@ -4,7 +4,6 @@ import Link from "next/link";
 import { CtaBand } from "@/components/Blocks";
 import { ArrowRight } from "@/components/Icons";
 import { BookingDemo } from "@/components/interactive/BookingDemo";
-import { FamilyLine } from "@/components/interactive/FamilyLine";
 import { SheetToApp } from "@/components/interactive/SheetToApp";
 import { HeroShowcase } from "@/components/interactive/HeroShowcase";
 import { WebStages } from "@/components/WebStages";
@@ -45,8 +44,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* One true line, full screen after the showcase, typed out as it arrives. */}
-      <FamilyLine />
 
       {/* The owners of EV Exec and Boonma, in their own words (approved by them), right after the line that says they're ours. Phones swipe between them. */}
       <section className="owner-quotes" aria-label="From the owners">
