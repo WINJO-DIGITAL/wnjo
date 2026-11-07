@@ -209,23 +209,26 @@ export const heroProjects: Project[] = [
 
 /**
  * Each owner's own words, approved by them; keep them true to how the business runs today.
- * One source for the homepage's quotes section and the phone hero. FYStay (ours) and
- * RAENG Fitness have no quote.
+ * One source for the homepage's quotes section and the phone hero. FYStay (ours) has no quote.
+ * `pull` is one sentence lifted word for word from the quote, shown large; never reword it (a test checks).
  */
 export const OWNER_QUOTES = [
   {
     project: projectBySlug("ev-exec")!,
     quote:
       "Customers book their airport transfer on their phone in a minute, and I get the job straight away. It runs the business while I\u2019m driving.",
+    pull: "It runs the business while I\u2019m driving.",
   },
   {
     project: projectBySlug("boonma")!,
     quote:
       "Clients find a treatment, see the price and book a time, all from their phone. It feels like our studio.",
+    pull: "It feels like our studio.",
   },
   {
     project: projectBySlug("raeng-fitness")!,
     quote:
       "From the first look, the website feels professional and looks class. It gives the business a great online presence, gets people talking and makes it easy to start attracting new clients.",
+    pull: "From the first look, the website feels professional and looks class.",
   },
 ];

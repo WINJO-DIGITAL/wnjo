@@ -217,24 +217,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
 
   return (
     <div className="deck" data-mode={mode}>
-      <div ref={railRef} className="deck__rail" role="group" aria-label="Choose a project">
-        {items.map((p, k) => (
-          <button
-            key={p.slug}
-            ref={(el) => {
-              pillRefs.current[k] = el;
-            }}
-            type="button"
-            className="deck__pill"
-            aria-pressed={k === index}
-            onClick={() => goTo(k)}
-          >
-            <Image src={p.logo} alt="" width={36} height={36} sizes="36px" />
-            <span>{p.name}</span>
-          </button>
-        ))}
-      </div>
-
       <div
         ref={panelRef}
         className="deck__panel"
@@ -292,6 +274,25 @@ export function DeviceDeck({ items }: { items: Item[] }) {
           </span>
         </div>
 
+      </div>
+
+      {/* The project pills sit under the device, so the headline and the phone lead. */}
+      <div ref={railRef} className="deck__rail" role="group" aria-label="Choose a project">
+        {items.map((p, k) => (
+          <button
+            key={p.slug}
+            ref={(el) => {
+              pillRefs.current[k] = el;
+            }}
+            type="button"
+            className="deck__pill"
+            aria-pressed={k === index}
+            onClick={() => goTo(k)}
+          >
+            <Image src={p.logo} alt="" width={36} height={36} sizes="36px" />
+            <span>{p.name}</span>
+          </button>
+        ))}
       </div>
 
       <div className="deck__cta">

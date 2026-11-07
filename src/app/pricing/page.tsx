@@ -148,6 +148,7 @@ export default function PricingPage() {
       </PlanFlow>
 
       <CtaBand
+        tone="light"
         title={
           <>
             What would <span className="serif-em">yours cost?</span>

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { CtaBand } from "@/components/Blocks";
 import { ArrowRight } from "@/components/Icons";
@@ -10,6 +9,7 @@ import { WebStages } from "@/components/WebStages";
 import { WebsitesTile } from "@/components/WebsitesTile";
 import { jost } from "@/lib/fonts";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
+import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
 
@@ -48,28 +48,18 @@ export default function HomePage() {
       {/* The owners of EV Exec and Boonma, in their own words (approved by them), right after the line that says they're ours. Phones swipe between them. */}
       <section className="owner-quotes" aria-label="From the owners">
         <div className="container container--wide">
-          <div className="owner-quotes__row" tabIndex={0}>
-            {OWNER_QUOTES.map(({ project, quote }) => (
-              <figure key={project.slug}>
-                <blockquote>
-                  <p>{`\u201C${quote}\u201D`}</p>
-                </blockquote>
-                <figcaption>
-                  <Image src={project.logo} alt="" width={36} height={36} />
-                  <span>
-                    Owner, {project.name}
-                    <span className="owner-quotes__meta">
-                      {project.location} ·{" "}
-                      <a href={project.url} target="_blank" rel="noopener noreferrer">
-                        Visit {project.host}
-                        <span className="visually-hidden"> (opens in a new tab)</span>
-                      </a>
-                    </span>
-                  </span>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+          <OwnerQuotes
+            items={OWNER_QUOTES.map(({ project, quote, pull }) => ({
+              slug: project.slug,
+              name: project.name,
+              logo: project.logo,
+              location: project.location,
+              url: project.url,
+              host: project.host,
+              quote,
+              pull,
+            }))}
+          />
         </div>
       </section>
 

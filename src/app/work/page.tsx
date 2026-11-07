@@ -106,6 +106,16 @@ export default function WorkPage() {
       </section>
 
       <CtaBand
+        tone="light"
+        visual={
+          <ul role="list" className="cta-logos" aria-label="Businesses we've built for">
+            {projects.map((p) => (
+              <li key={p.slug}>
+                <Image src={p.logo} alt={p.name} width={52} height={52} sizes="52px" />
+              </li>
+            ))}
+          </ul>
+        }
         title={<>Your business <span className="serif-em">could be next.</span></>}
         body="Tell us what you need. We reply with honest advice, a clear price and a plan."
       >

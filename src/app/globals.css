@@ -1423,6 +1423,33 @@ main {
 }
 
 /* CTA band: centred like the tiles above it, the buttons right under the words. */
+/* Light closing band: the page colour under a hairline, for variety between pages. */
+.cta-band--light .lede {
+  color: var(--color-ink-2);
+}
+
+.cta-band__visual {
+  display: flex;
+  justify-content: center;
+}
+
+/* The businesses we've built for, as a quiet row of their own logos. */
+.cta-logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cta-logos img {
+  display: block;
+  border-radius: 0.8rem;
+  box-shadow: 0 6px 18px -10px rgb(46 36 29 / 0.45);
+}
+
 .cta-band {
   display: grid;
   gap: var(--space-6);
@@ -6238,64 +6265,56 @@ main #process ol.steps li::after {
    visual. (Layout borrowed from the best product sites; the look is ours.)
    ========================================================================== */
 
-/* The owners of EV Exec and Boonma, quoted after the hero: phones swipe from one to
-   the next (the second peeking in); wider screens show both side by side. */
+/* The owners, quoted after the hero, one at a time: the businesses' logos to choose from, then that owner's
+   strongest sentence large and their full words beneath. */
 .owner-quotes {
   position: relative;
   padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem) 0;
 }
 
-.owner-quotes__row {
+.oq {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 86%;
-  gap: var(--space-5);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--gutter);
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
+  gap: var(--space-6);
+  max-width: 52rem;
 }
 
-@media (max-width: 55.99rem) {
-  .owner-quotes__row {
-    margin-inline: calc(-1 * var(--gutter));
-    padding-inline: var(--gutter);
-  }
+.oq__item {
+  margin: 0;
+  animation: oq-in 350ms var(--ease);
 }
 
-.owner-quotes__row::-webkit-scrollbar {
+.oq__item[data-active="false"] {
   display: none;
 }
 
-.owner-quotes figure {
-  scroll-snap-align: start;
-}
-
-@media (min-width: 56rem) {
-  .owner-quotes__row {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(1.5rem, 0.5rem + 2.5vw, 3rem);
-    overflow: visible;
+@keyframes oq-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
 }
 
-.owner-quotes blockquote p {
+.oq__pull {
   font-family: var(--font-playfair), var(--font-serif);
-  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.25rem);
+  font-size: clamp(2rem, 1.3rem + 2.6vw, 3.5rem);
   font-style: italic;
   font-weight: 400;
-  line-height: 1.22;
-  letter-spacing: -0.015em;
-  text-wrap: pretty;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: var(--color-ink);
 }
 
-.owner-quotes figcaption {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-5);
+.oq__full {
+  margin-top: var(--space-4);
+  max-width: 40rem;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  line-height: 1.6;
+  color: var(--color-ink-2);
+}
+
+.oq__by {
+  margin-top: var(--space-4);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.06em;
@@ -6303,8 +6322,80 @@ main #process ol.steps li::after {
   color: var(--color-ink-3);
 }
 
-.owner-quotes figcaption img {
-  border-radius: 0.5rem;
+.oq__by a {
+  color: inherit;
+}
+
+/* The switch: plain logo-and-name tabs on a hairline, like the work page filter; the chosen one in ink,
+   underlined in the accent. */
+.oq__switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem clamp(1rem, 0.5rem + 2vw, 2rem);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.oq__switch button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0 0.7rem;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--color-ink-3);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease);
+}
+
+.oq__switch button img {
+  border-radius: 0.4rem;
+  opacity: 0.7;
+  transition: opacity var(--duration-fast) var(--ease);
+}
+
+.oq__switch button::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-fast) var(--ease);
+}
+
+.oq__switch button:hover,
+.oq__switch button[aria-pressed="true"] {
+  color: var(--color-ink);
+}
+
+.oq__switch button[aria-pressed="true"] img,
+.oq__switch button:hover img {
+  opacity: 1;
+}
+
+.oq__switch button[aria-pressed="true"]::before {
+  transform: scaleX(1);
+}
+
+.oq__switch button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oq__item {
+    animation: none;
+  }
+  .oq__switch button::before {
+    transition: none;
+  }
 }
 
 .tile {
@@ -8007,6 +8098,10 @@ ol.bs {
 .deck__rail::-webkit-scrollbar {
   display: none;
 }
+/* Under the device: a little air between the screen and the pills. */
+.deck__panel + .deck__rail {
+  margin-top: 10px;
+}
 .deck__pill {
   flex: none;
   display: flex;
@@ -9631,8 +9726,6 @@ body:has(.dash-header) .site-footer {
 @media (min-width: 64rem) { .bd__steps { grid-template-columns: repeat(3, 1fr); } }
 
 /* Owner quotes: where the business is, and its live site. */
-.owner-quotes__meta { display: block; margin-top: 0.15rem; font-size: 0.8125rem; color: var(--color-ink-3); }
-.owner-quotes__meta a { color: inherit; }
 
 /* Trust row: three published commitments, quietly listed under the prices. */
 .trust-row { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.25rem; font-size: var(--text-sm); color: var(--color-ink-2); }
@@ -9668,3 +9761,37 @@ body:has(.dash-header) .site-footer {
 }
 .bd__steps li button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 .bd__steps li button[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 0.25em; }
+
+/* Printing (or saving as PDF) the price form's confirmation: only the quote summary, in plain ink on white. */
+.print-only {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  [data-print-root],
+  [data-print-root] * {
+    visibility: visible;
+  }
+  [data-print-root] {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    box-shadow: none;
+    border: 0;
+    background: #fff;
+    color: #000;
+  }
+  [data-print-root] .btn-row {
+    display: none;
+  }
+  .print-only {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}

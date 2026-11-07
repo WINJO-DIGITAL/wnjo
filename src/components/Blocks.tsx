@@ -89,18 +89,27 @@ export function PricingNotice({ compact = false }: { compact?: boolean }) {
   );
 }
 
+/**
+ * The closing call to action. Dark by default; "light" sits on the page colour under a hairline, so pages don't all
+ * end on the same dark block. An optional visual (logos, a figure) sits above the title.
+ */
 export function CtaBand({
   title,
   body,
   children,
+  tone = "dark",
+  visual,
 }: {
   title: ReactNode;
   body?: ReactNode;
   children: ReactNode;
+  tone?: "dark" | "light";
+  visual?: ReactNode;
 }) {
   return (
-    <section className="section inverse">
+    <section className={tone === "dark" ? "section inverse" : "section section--ruled cta-band--light"}>
       <div className="container container--wide cta-band" data-reveal>
+        {visual && <div className="cta-band__visual">{visual}</div>}
         <div className="stack">
           <h2 className="h1" style={{ maxWidth: "18ch" }}>
             {title}

@@ -210,7 +210,8 @@ function ConfiguratorInner({ params, inBrowser }: { params: ConfiguratorParams; 
   if (state.status === "success") {
     return (
       <div className={styles.done}>
-        <div className="card card--raised stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
+        <div className="card card--raised stack" data-print-root style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
+          <p className="print-only">WNJO · www.wnjoweb.co.uk</p>
           <p className="eyebrow">Brief received</p>
           <h2 className="h2" tabIndex={-1} ref={(el) => el?.focus()}>
             {state.quoteReference
@@ -236,6 +237,9 @@ function ConfiguratorInner({ params, inBrowser }: { params: ConfiguratorParams; 
                 Sign in to see your quote
               </Link>
             )}
+            <button type="button" className="btn btn--secondary" onClick={() => window.print()}>
+              Save or print
+            </button>
             <Link href="/" className="btn btn--secondary">
               Back to home
             </Link>

@@ -145,7 +145,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <CtaBand title={<>Let&apos;s build something <span className="serif-em">you&apos;re proud of.</span></>}>
+      <CtaBand tone="light" title={<>Let&apos;s build something <span className="serif-em">you&apos;re proud of.</span></>}>
         <Link href="/build" className="btn btn--primary">
           <Stopwatch />
           Get my price
