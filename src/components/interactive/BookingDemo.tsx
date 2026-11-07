@@ -346,6 +346,13 @@ export function BookingDemo() {
         </div>
       </div>
 
+      <ol className="bd__steps">
+        <li><span>01</span> The customer picks a journey and a time on their phone.</li>
+        <li><span>02</span> They send the request in under a minute.</li>
+        <li><span>03</span> It lands in your app straight away, with every detail.</li>
+      </ol>
+      <p className="bd__note">A replay of EV Exec&apos;s real booking flow. Customer details are examples.</p>
+
       {!reduced && (
         <button type="button" className="bd__pause js-only" onClick={() => setPaused((p) => !p)} aria-pressed={paused}>
           {paused ? "Play animation" : "Pause animation"}
