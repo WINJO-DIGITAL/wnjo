@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Reveal } from "@/components/interactive/Reveal";
 import { StickyCta } from "@/components/StickyCta";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { site, siteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </a>
         <Header />
         <main id="main" tabIndex={-1}>
+          <Breadcrumbs />
           {children}
         </main>
         <Footer />
