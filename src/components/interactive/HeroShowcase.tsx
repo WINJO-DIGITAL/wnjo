@@ -22,8 +22,10 @@ const subscribe = (onChange: () => void) => {
 
 /**
  * The homepage's work showcase: the swipeable device deck on phones (below 40rem), the laptop from
- * 40rem up. Only one is mounted, so each screen downloads only its own images. The server can't
- * know the screen, so it renders a sized placeholder and the right one mounts on hydration.
+ * 40rem up. The server can't know the screen, so it renders the phone deck (most visitors, and the
+ * main price button), which phones show at once, even without JavaScript. Wider screens hide it and
+ * hold the space until the laptop showcase mounts. Phones keep the same markup after loading, so
+ * the deck isn't rebuilt.
  */
 export function HeroShowcase({ items }: { items: Item[] }) {
   const size = useSyncExternalStore(
@@ -31,7 +33,13 @@ export function HeroShowcase({ items }: { items: Item[] }) {
     () => (window.matchMedia(phoneQuery).matches ? "phone" : "laptop"),
     () => null,
   );
-  if (size === "phone") return <DeviceDeck items={items.filter((p) => PHONE_CLIENTS.includes(p.slug))} />;
   if (size === "laptop") return <ShowcaseStage items={items} />;
-  return <div className="hero-reserve" aria-hidden="true" />;
+  return (
+    <>
+      <div className="hero-ssr-phone">
+        <DeviceDeck items={items.filter((p) => PHONE_CLIENTS.includes(p.slug))} />
+      </div>
+      <div className="hero-reserve hero-ssr-wide" aria-hidden="true" />
+    </>
+  );
 }

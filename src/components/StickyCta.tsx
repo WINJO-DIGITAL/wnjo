@@ -22,8 +22,8 @@ export function StickyCta() {
   useEffect(() => {
     if (HIDDEN_ON.includes(pathname)) return;
     if (pathname === "/") {
-      // Homepage: the bar takes over from the top "Get my price" button. It shows once that button scrolls away, and
-      // steps aside only over the footer.
+      // Homepage: the bar takes over once the hero (which ends with the top "Get my price" button) has scrolled away,
+      // on every screen size, and steps aside only over the footer.
       let topVisible = true;
       let footerVisible = false;
       const apply = () => setShow(!topVisible && !footerVisible);
@@ -35,10 +35,10 @@ export function StickyCta() {
         footerVisible = entry.isIntersecting;
         apply();
       });
-      // The top button is rendered by the page's own components, so it may arrive after this bar; wait for it.
+      // The hero is part of the page; if it isn't there yet when this bar mounts, wait for it.
       let watched: Element | null = null;
       const attach = () => {
-        const top = document.querySelector(".deck__btn");
+        const top = document.querySelector(".hero-ed");
         const footer = document.querySelector(".site-footer");
         if (top && top !== watched) {
           watched = top;
