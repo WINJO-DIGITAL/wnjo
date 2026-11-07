@@ -3530,6 +3530,46 @@ ol.steps li::after {
   box-shadow: 0 0 0 1px var(--color-accent);
 }
 
+/* The pricing flow's bar: the running total, the deposit and Continue, held to the bottom of the screen. */
+.plan-bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 40;
+  background: var(--color-inverse-bg);
+  color: var(--color-inverse-ink);
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--color-inverse-ink) 18%, transparent);
+}
+
+.plan-bar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.plan-bar__summary {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.plan-bar__deposit {
+  display: block;
+  opacity: 0.8;
+  font-size: 0.85em;
+}
+
+.plan-bar .btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .plan__select {
   position: absolute;
   inset: 0;

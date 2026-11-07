@@ -1,5 +1,11 @@
 import type { PlanCard } from "@/components/interactive/PlanSwiper";
-import { CARE_PLANS, PACKAGES, formatGBP, type CarePlan, type PackageId } from "./pricing";
+import {
+  CARE_PLANS,
+  PACKAGES,
+  formatGBP,
+  type CarePlan,
+  type PackageId,
+} from "./pricing";
 
 const careOrder: CarePlan[] = ["hosting", "care", "carePlus"];
 
@@ -16,11 +22,17 @@ export const carePlanCards: PlanCard[] = careOrder.map((id) => ({
 }));
 
 const packageOrder: PackageId[] = ["essential", "professional", "premium"];
-const packagePages: Record<PackageId, string> = { essential: "1-5", professional: "6-12", premium: "13-25" };
+/** The page size each package covers, as the price form reads it. */
+export const packagePages: Record<PackageId, string> = {
+  essential: "1-5",
+  professional: "6-12",
+  premium: "13-25",
+};
 
 /** Website packages as selectable cards with their full inclusions; each opens the configurator. */
 export const packagePlanCards: PlanCard[] = packageOrder.map((id) => ({
   id,
+  selectable: true,
   name: PACKAGES[id].name,
   summary: PACKAGES[id].summary,
   price: formatGBP(PACKAGES[id].from),
@@ -30,9 +42,10 @@ export const packagePlanCards: PlanCard[] = packageOrder.map((id) => ({
   cta: "Get my price",
 }));
 
-/** App development, priced after scoping. */
+/** App development, priced after scoping. It is not a website package, so it can't be picked in the flow. */
 export const appPlanCard: PlanCard = {
   id: "apps",
+  selectable: false,
   name: "App development",
   summary: "Web and mobile apps, customer portals and internal tools.",
   price: "Custom quote",
