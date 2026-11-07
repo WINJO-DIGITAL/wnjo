@@ -19,6 +19,7 @@ export function WebsitesTile({
   ctas?: boolean;
 }) {
   const titleId = `${id ?? "websites"}-title`;
+  const handoverDays = PACKAGES.essential.includes.find((l) => /handover/.test(l))?.match(/(\d+) days/)?.[1] ?? "30";
   return (
     <section
       id={id}
@@ -46,6 +47,12 @@ export function WebsitesTile({
             </dd>
           </div>
         </dl>
+        {/* Reasons to trust the price, each one a published commitment rather than a claim. */}
+        <ul className="trust-row" role="list">
+          <li>Your price in writing before you commit</li>
+          <li>50% to start, 50% once you&apos;re happy</li>
+          <li>{handoverDays} days of support after launch</li>
+        </ul>
         {ctas ? (
           <div className="tile__ctas">
             <Link href="/pricing" className="btn btn--secondary">

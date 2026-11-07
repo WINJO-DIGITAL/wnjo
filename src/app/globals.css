@@ -9530,3 +9530,8 @@ body:has(.dash-header) .site-footer {
 /* Owner quotes: where the business is, and its live site. */
 .owner-quotes__meta { display: block; margin-top: 0.15rem; font-size: 0.8125rem; color: var(--color-ink-3); }
 .owner-quotes__meta a { color: inherit; }
+
+/* Trust row: three published commitments, quietly listed under the prices. */
+.trust-row { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.25rem; font-size: var(--text-sm); color: var(--color-ink-2); }
+.trust-row li { display: inline-flex; align-items: center; gap: 0.4rem; }
+.trust-row li::before { content: ""; width: 0.9rem; height: 0.9rem; flex: none; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5 6.5 12 13 4.5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5 6.5 12 13 4.5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; }
