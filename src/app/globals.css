@@ -7138,7 +7138,7 @@ main #process ol.steps li::after {
   border-bottom: 1px solid #d8d8d8;
   background: #f3f3f3;
   font-family: var(--font-mono);
-  color: #666;
+  color: #474747; /* ≥ 4.5:1 on the bar, even while the sheet fades */
 }
 
 .sta__grid {
