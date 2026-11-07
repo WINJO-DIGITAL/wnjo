@@ -225,3 +225,37 @@ describe("retry delay", () => {
     expect(delays).toEqual([1, 2]);
   });
 });
+
+describe("budget gate in the runner", () => {
+  it("stops a task before a call that would exceed the agency-wide budget", async () => {
+    const { store, task } = memoryStore({ permissions: { read_project: true }, budgetPence: 1_000_000 });
+    const provider = forever({ kind: "tool_call", tool: "read_project", args: {}, usage: { inputTokens: 1, outputTokens: 1, costPence: 5 } });
+    const outcome = await runTask({
+      taskId: "t1",
+      provider,
+      tools: registry(),
+      store,
+      system: "sys",
+      retryDelayMs: NO_DELAY,
+      loadBudgets: async () => [{ scope: "global", limitPence: 12, warnAtPence: 12, spentPence: 0 }],
+    });
+    expect(outcome).toMatchObject({ status: "suspended", reason: expect.stringContaining("global") });
+    expect(provider.calls).toBeLessThanOrEqual(3);
+    expect(task.status).toBe("suspended");
+  });
+
+  it("lets a task run while every limit has room", async () => {
+    const { store } = memoryStore({});
+    const provider = scripted([{ kind: "final", text: "Done", usage }]);
+    const outcome = await runTask({
+      taskId: "t1",
+      provider,
+      tools: registry(),
+      store,
+      system: "sys",
+      retryDelayMs: NO_DELAY,
+      loadBudgets: async () => [{ scope: "global", limitPence: 10_000, warnAtPence: 9_000, spentPence: 0 }],
+    });
+    expect(outcome).toEqual({ status: "succeeded", text: "Done" });
+  });
+});

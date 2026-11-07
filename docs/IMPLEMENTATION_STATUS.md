@@ -137,3 +137,7 @@ Built in sub-steps, each tested before the next.
 ### 4e. Event routing — built, tested
 - `src/lib/ai/events.ts`: maps 11 business events (deposit paid, QA failed, client message, deadline approaching, and others) to the agent tasks they create. Each task has a stable key, so a repeated event never creates duplicate work. An agent's own events never re-trigger that agent, which prevents loops. 6 tests, all passing.
 - Not yet built: the queue that delivers events and runs the tasks. It needs the server key, and the scheduling choice from the briefing job applies here too.
+
+### 4f. Budget gate wired into the runner — built, tested
+- The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
+- Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.

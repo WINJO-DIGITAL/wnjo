@@ -1,6 +1,7 @@
 import { ProviderError, type AiProvider, type ProviderMessage } from "@/lib/ai/provider";
 import type { ToolRegistry, ToolContext } from "@/lib/ai/tools";
 import { decideToolUse } from "@/lib/ai/policy";
+import { checkBudgets, type BudgetLimit } from "@/lib/ai/budget";
 
 /**
  * Runs one agent task. It is bounded in every direction: attempts, model calls per attempt, spend per task,
@@ -37,6 +38,8 @@ export async function runTask(input: {
   approvedTools?: string[];
   /** Wait before retrying a transient error. Defaults to exponential backoff; tests pass 0. */
   retryDelayMs?: (attempt: number) => number;
+  /** Current spend limits (task, agent, project, global). Checked before every model call. */
+  loadBudgets?: () => Promise<BudgetLimit[]>;
 }): Promise<RunOutcome> {
   const retryDelay = input.retryDelayMs ?? ((attempt: number) => Math.min(30_000, 1000 * 2 ** (attempt - 1)));
   const task = await input.store.loadTask(input.taskId);
@@ -49,6 +52,7 @@ export async function runTask(input: {
   const approved = new Set(input.approvedTools ?? []);
   let spent = task.spentPence;
   let attempts = task.attempts;
+  let lastCallCost = 0;
 
   while (attempts < task.maxAttempts) {
     attempts += 1;
@@ -67,6 +71,19 @@ export async function runTask(input: {
           await input.store.setTaskStatus(task.id, "suspended", { spentPence: spent, attempts });
           return { status: "suspended", reason: "This task has reached its budget." };
         }
+        // Every model call is checked against the agent, project and global limits as well. The estimate
+        // uses the most expensive call seen so far, so a call that could exceed a limit is never started.
+        if (input.loadBudgets) {
+          // Stored totals only change when a run finishes, so add what this task has spent since it started.
+          const runSpend = spent - task.spentPence;
+          const limits = (await input.loadBudgets()).map((limit) => ({ ...limit, spentPence: limit.spentPence + runSpend }));
+          const verdict = checkBudgets(limits, lastCallCost);
+          if (verdict.outcome === "stop") {
+            await input.store.finishRun(runId, { status: "stopped", inputTokens, outputTokens, costPence, error: verdict.reason });
+            await input.store.setTaskStatus(task.id, "suspended", { spentPence: spent, attempts });
+            return { status: "suspended", reason: verdict.reason };
+          }
+        }
         const response = await input.provider.complete({
           system: input.system,
           messages,
@@ -76,6 +93,7 @@ export async function runTask(input: {
         outputTokens += response.usage.outputTokens;
         costPence += response.usage.costPence;
         spent += response.usage.costPence;
+        lastCallCost = Math.max(lastCallCost, response.usage.costPence);
 
         if (response.kind === "final") {
           await input.store.finishRun(runId, { status: "succeeded", inputTokens, outputTokens, costPence });
