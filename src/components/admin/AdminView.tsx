@@ -311,41 +311,101 @@ function QuoteFromBrief({ client, enquiryId }: { client: SupabaseClient; enquiry
   );
 }
 
+type PaymentState = { acceptanceId: string; depositPaid: boolean; balance: "none" | "requested" | "paid" };
+
 function QuotesTable({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<QuoteRow[] | null>(null);
+  const [payments, setPayments] = useState<Record<string, PaymentState>>({});
   const [error, setError] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [refresh, setRefresh] = useState(0);
+
   useEffect(() => {
-    client
-      .from("quotes")
-      .select("id, reference, status, created_at, expires_at, quote_versions(version, range_low_pence, range_high_pence)")
-      .order("created_at", { ascending: false })
-      .limit(100)
-      .then(({ data, error: err }) => {
-        setError(Boolean(err));
-        setRows(err ? null : ((data as unknown as QuoteRow[]) ?? []));
-      });
-  }, [client]);
+    Promise.all([
+      client
+        .from("quotes")
+        .select("id, reference, status, created_at, expires_at, quote_versions(version, range_low_pence, range_high_pence)")
+        .order("created_at", { ascending: false })
+        .limit(100),
+      client.from("quote_acceptances").select("id, quote_id"),
+      client.from("deposits").select("quote_acceptance_id, kind, status"),
+    ]).then(([q, a, d]) => {
+      setError(Boolean(q.error));
+      setRows(q.error ? null : ((q.data as unknown as QuoteRow[]) ?? []));
+      const deposits = (d.data as unknown as Array<{ quote_acceptance_id: string; kind: string; status: string }>) ?? [];
+      const map: Record<string, PaymentState> = {};
+      for (const acc of ((a.data as unknown as Array<{ id: string; quote_id: string }>) ?? [])) {
+        const mine = deposits.filter((x) => x.quote_acceptance_id === acc.id);
+        const balance = mine.find((x) => x.kind === "balance");
+        map[acc.quote_id] = {
+          acceptanceId: acc.id,
+          depositPaid: mine.some((x) => x.kind === "deposit" && x.status === "paid"),
+          balance: !balance ? "none" : balance.status === "paid" ? "paid" : "requested",
+        };
+      }
+      setPayments(map);
+    });
+  }, [client, refresh]);
+
+  /** Staff request the balance once the deposit is in. The server records it and tells the client. */
+  const requestBalance = async (quoteId: string, acceptanceId: string) => {
+    setBusy(quoteId);
+    setNote(null);
+    const { data } = await client.auth.getSession();
+    const token = data.session?.access_token;
+    const res = token
+      ? await fetch("/api/admin/balance", {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+          body: JSON.stringify({ acceptanceId }),
+        })
+      : null;
+    setBusy(null);
+    const body = res ? ((await res.json().catch(() => null)) as { amountPence?: number; error?: string } | null) : null;
+    if (res?.ok && body?.amountPence) {
+      setNote(`Balance requested: ${money.format(body.amountPence / 100)}. The client has been told.`);
+      setRefresh((r) => r + 1);
+    } else {
+      setNote(body?.error === "deposit_not_paid" ? "The deposit hasn't been paid yet." : "The balance couldn't be requested. Please try again.");
+    }
+  };
+
   if (error) return <p role="alert">Quotes couldn&apos;t be loaded.</p>;
   if (rows === null) return <p className="lede">Loading…</p>;
   if (rows.length === 0) return <Empty text="No quotes yet." />;
   return (
-    <table className="admin-table">
-      <thead><tr><th scope="col">Issued</th><th scope="col">Reference</th><th scope="col">Status</th><th scope="col">Range</th><th scope="col">Expires</th></tr></thead>
-      <tbody>
-        {rows.map((r) => {
-          const latest = r.quote_versions[r.quote_versions.length - 1];
-          return (
-            <tr key={r.id}>
-              <td>{when.format(new Date(r.created_at))}</td>
-              <td>{r.reference}</td>
-              <td>{r.status}</td>
-              <td>{latest ? `${money.format(latest.range_low_pence / 100)} to ${money.format(latest.range_high_pence / 100)}` : "-"}</td>
-              <td>{r.expires_at ? when.format(new Date(r.expires_at)) : "-"}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+    <>
+      {note && <p role="status" className="acct-meta">{note}</p>}
+      <table className="admin-table">
+        <thead><tr><th scope="col">Issued</th><th scope="col">Reference</th><th scope="col">Status</th><th scope="col">Range</th><th scope="col">Expires</th><th scope="col">Payment</th></tr></thead>
+        <tbody>
+          {rows.map((r) => {
+            const latest = r.quote_versions[r.quote_versions.length - 1];
+            const pay = payments[r.id];
+            return (
+              <tr key={r.id}>
+                <td>{when.format(new Date(r.created_at))}</td>
+                <td>{r.reference}</td>
+                <td>{r.status}</td>
+                <td>{latest ? `${money.format(latest.range_low_pence / 100)} to ${money.format(latest.range_high_pence / 100)}` : "-"}</td>
+                <td>{r.expires_at ? when.format(new Date(r.expires_at)) : "-"}</td>
+                <td>
+                  {!pay ? <span className="acct-meta">Not accepted</span>
+                    : pay.balance === "paid" ? <span className="acct-meta">Settled</span>
+                    : pay.balance === "requested" ? <span className="acct-meta">Balance requested</span>
+                    : pay.depositPaid ? (
+                      <button type="button" className="btn btn--secondary" disabled={busy === r.id} onClick={() => requestBalance(r.id, pay.acceptanceId)}>
+                        Request balance
+                      </button>
+                    ) : <span className="acct-meta">Awaiting deposit</span>}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 }
 
