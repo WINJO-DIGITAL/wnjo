@@ -151,3 +151,9 @@ Built in sub-steps, each tested before the next.
 - `main` fast-forwarded to `845ac72` (the working branch merged, 22 commits) and pushed. Vercel production built from `main` and is READY.
 - Checked live on `www.wnjoweb.co.uk`: `/account` and `/admin` serve (both `noindex`), and the homepage serves. `wnjoweb.co.uk` now returns a 308 redirect to `www`, so the earlier 404 on the bare domain is resolved.
 - Still open: the database test suites in `supabase/tests/` have not been re-run since the latest migrations; the Resend and IONOS keys need rotating; Stripe, xAI and the GitHub App are not connected.
+
+### 3g. Staff-side client linking — built, tested
+- Migration `20261107010000`: `client_invites` table (staff read and create for their own agency only, and only for that agency's orders and organisations; no browser edits). `orders.customer_id` may now be empty until a customer claims the order.
+- `claim_client_invites()` (signed-in customers only): claims invites matching the verified sign-in email, attaches the order, and adds the customer to the organisations of that order's projects. An order that already belongs to someone else is never taken over.
+- `/admin` → Orders: invite a customer by email to an order, and see whether it is waiting or linked. `/account` claims pending invites when a customer signs in.
+- Tests: `supabase/tests/client_invites.sql`, 16 checks, all passing against the live database.

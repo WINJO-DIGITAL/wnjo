@@ -49,10 +49,13 @@ export function AccountView() {
   useEffect(() => {
     if (!client || !session) return;
     let cancelled = false;
+    // Attach any orders staff have invited this email to. A failure here must not block the page.
     client
-      .from("orders")
-      .select("id, business_name, project_type, stage, stage_updated_at, created_at, order_updates(id, message, created_at)")
-      .order("created_at", { ascending: false })
+      .rpc("claim_client_invites")
+      .then(() => client
+        .from("orders")
+        .select("id, business_name, project_type, stage, stage_updated_at, created_at, order_updates(id, message, created_at)")
+        .order("created_at", { ascending: false }))
       .then(({ data, error }) => {
         if (cancelled) return;
         setLoadError(Boolean(error));

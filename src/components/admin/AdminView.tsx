@@ -105,7 +105,12 @@ export function AdminView() {
       </nav>
       {tab === "enquiries" && <EnquiriesTable client={client} />}
       {tab === "quotes" && <QuotesTable client={client} />}
-      {tab === "orders" && <OrdersTable client={client} />}
+      {tab === "orders" && (
+        <>
+          <OrdersTable client={client} />
+          <InvitesPanel client={client} tenantId={membership.tenant_id} />
+        </>
+      )}
       {tab === "approvals" && <ApprovalsTable client={client} />}
       {tab === "ai" && <AiStatus client={client} />}
       {tab === "projects" && <ProjectsAdmin client={client} tenantId={membership.tenant_id} userId={session.user.id} />}
@@ -255,6 +260,95 @@ function ApprovalsTable({ client }: { client: SupabaseClient }) {
         })}
       </tbody>
     </table>
+  );
+}
+
+type InviteRow = { id: string; email: string; order_id: string | null; created_at: string; claimed_at: string | null };
+type OrderOption = { id: string; business_name: string };
+
+/**
+ * Staff invite a customer to an order. The customer claims it by signing in with that email, so staff
+ * never see anyone's account. Invites can only be created for this agency's own orders.
+ */
+function InvitesPanel({ client, tenantId }: { client: SupabaseClient; tenantId: string }) {
+  const [invites, setInvites] = useState<InviteRow[] | null>(null);
+  const [orders, setOrders] = useState<OrderOption[]>([]);
+  const [email, setEmail] = useState("");
+  const [orderId, setOrderId] = useState("");
+  const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const fetchAll = () =>
+    Promise.all([
+      client.from("client_invites").select("id, email, order_id, created_at, claimed_at").order("created_at", { ascending: false }).limit(50),
+      client.from("orders").select("id, business_name").order("created_at", { ascending: false }).limit(100),
+    ]).then(([inv, ord]) => {
+      setInvites(inv.error ? null : ((inv.data as InviteRow[]) ?? []));
+      setOrders(ord.error ? [] : ((ord.data as OrderOption[]) ?? []));
+    });
+
+  useEffect(() => {
+    fetchAll();
+    // Reloads only when the client changes; fetchAll reads the client it was given.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client]);
+
+  const create = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setBusy(true);
+    setMessage(null);
+    const { error } = await client.from("client_invites").insert({
+      tenant_id: tenantId,
+      email: email.trim().toLowerCase(),
+      order_id: orderId,
+    });
+    setBusy(false);
+    if (error) {
+      setMessage({ kind: "error", text: "The invite couldn't be created. Check the email address and the order." });
+      return;
+    }
+    setMessage({ kind: "ok", text: "Invite created. The customer links the order by signing in with that email." });
+    setEmail("");
+    setOrderId("");
+    fetchAll();
+  };
+
+  const orderName = (id: string | null) => orders.find((o) => o.id === id)?.business_name ?? "-";
+
+  return (
+    <section className="admin-invites" aria-labelledby="invites-heading">
+      <h2 id="invites-heading" className="h3">Invite a customer to an order</h2>
+      <form onSubmit={create} className="acct-form">
+        <label htmlFor="invite-email" className="acct-label">Customer email</label>
+        <input id="invite-email" type="email" required className="acct-input" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <label htmlFor="invite-order" className="acct-label">Order</label>
+        <select id="invite-order" required className="acct-input" value={orderId} onChange={(e) => setOrderId(e.target.value)}>
+          <option value="">Choose an order</option>
+          {orders.map((o) => (
+            <option key={o.id} value={o.id}>{o.business_name}</option>
+          ))}
+        </select>
+        <button type="submit" className="btn btn--primary" disabled={busy || !orderId}>Create invite</button>
+        {message && <p role={message.kind === "error" ? "alert" : "status"}>{message.text}</p>}
+      </form>
+      {invites === null && <p className="lede">Invites couldn&apos;t be loaded.</p>}
+      {invites && invites.length === 0 && <Empty text="No invites yet." />}
+      {invites && invites.length > 0 && (
+        <table className="admin-table">
+          <thead><tr><th scope="col">Sent</th><th scope="col">Email</th><th scope="col">Order</th><th scope="col">Status</th></tr></thead>
+          <tbody>
+            {invites.map((r) => (
+              <tr key={r.id}>
+                <td>{when.format(new Date(r.created_at))}</td>
+                <td>{r.email}</td>
+                <td>{orderName(r.order_id)}</td>
+                <td>{r.claimed_at ? `Linked ${when.format(new Date(r.claimed_at))}` : "Waiting for sign-in"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
   );
 }
 
