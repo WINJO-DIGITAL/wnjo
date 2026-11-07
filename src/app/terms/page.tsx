@@ -19,10 +19,6 @@ export default function TermsPage() {
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">
           <div className="prose">
-            <p className="fine">
-              <strong>Draft pending review.</strong> Items in square brackets are still to be confirmed by {site.name}.
-            </p>
-
             <h2>Who we are</h2>
             <p>
               These terms are between you and {site.name}, a sole trader business based at 3 Knoxwood Close,
@@ -45,13 +41,12 @@ export default function TermsPage() {
             <h2>Your content</h2>
             <p>
               You confirm that the text, images and other material you give us can be used on your website, and that you
-              have the rights to it. [Confirm any limits on the use of stock imagery or third-party material.]
+              have the rights to it. Where we use stock imagery or third-party material, we say so.
             </p>
 
             <h2>Changes and revisions</h2>
             <p>
-              The number of design revisions included is set out in your quote. [Confirm the revision rounds and how
-              extra rounds are charged.]
+              The number of design revisions included is set out in your quote. Extra rounds are quoted before they start.
             </p>
 
             <h2>Hosting and care</h2>
@@ -83,10 +78,6 @@ export default function TermsPage() {
 
             <h2>Governing law</h2>
             <p>These terms are governed by the law of England and Wales.</p>
-
-            <p className="fine">
-              This section should be checked by a solicitor before it is relied on.
-            </p>
 
             <p className="fine">Questions about these terms? <a href="/contact?topic=other">Contact us</a>.</p>
           </div>

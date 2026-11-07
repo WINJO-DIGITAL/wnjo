@@ -19,10 +19,6 @@ export default function CookiesPage() {
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">
           <div className="prose">
-            <p className="fine">
-              <strong>Draft pending review.</strong> This page describes what the site stores as it is built today.
-            </p>
-
             <h2>What we don&apos;t use</h2>
             <p>
               This website doesn&apos;t use analytics, advertising or social-media tracking. There is no cookie banner
