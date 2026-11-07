@@ -195,6 +195,14 @@ Built in sub-steps, each tested before the next.
 - Progress notices now follow those choices: a switched-off on-site notice is not queued at all, and a switched-off email leaves it on the site only. Migration `20261107120000`, checked live (default emails; email off stays on site; on-site off queues nothing).
 - Quote notices follow the same switches (migration `20261107130000`, checked live: default emails, email off stays on the site, site off queues nothing).
 
+### 4k. Long-running agent work — built, tested
+- A task's conversation and model-call count are saved after each step (migration `20261107140000`). A run that reaches its time limit before the next model call saves the conversation, returns the task to the queue without counting the attempt, and resumes from that conversation on the next run.
+- A total cap of 40 model calls per task, across every pause, stops a task that keeps pausing.
+- The worker (`GET /api/cron/tasks`, bearer `CRON_SECRET`) runs queued tasks for up to 40 seconds per invocation. If work is left, it calls itself again, up to 20 times in a chain. Events, the Stripe webhook and the staff send route also start the worker when a task pauses; the daily cron picks up anything left over.
+- An errored task stays queued for the daily cron and does not start a loop.
+- Tests: 4 new runner tests (pause, resume, total cap, saved steps), 171 across the suite.
+- Not yet run against live model calls. No agent is enabled and no Grok key is set, so nothing has paused in production yet.
+
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.

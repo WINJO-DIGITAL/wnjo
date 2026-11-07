@@ -12,24 +12,29 @@ export type AgentRecord = { enabled: boolean; paused: boolean };
 
 /** Everything the runner reads or writes goes through this port, so it can be tested without a database. */
 export interface RunStore {
-  loadTask(taskId: string): Promise<{ id: string; tenantId: string; agentKey: string; projectId: string | null; title: string; status: string; attempts: number; maxAttempts: number; budgetPence: number; spentPence: number; approvedTools?: string[] }>;
+  loadTask(taskId: string): Promise<{ id: string; tenantId: string; agentKey: string; projectId: string | null; title: string; status: string; attempts: number; maxAttempts: number; budgetPence: number; spentPence: number; approvedTools?: string[]; transcript?: ProviderMessage[]; modelCalls?: number }>;
   loadAgent(tenantId: string, agentKey: string): Promise<AgentRecord | null>;
   loadPermissions(tenantId: string, agentKey: string): Promise<Record<string, boolean>>;
   setTaskStatus(taskId: string, status: string, patch?: { attempts?: number; spentPence?: number }): Promise<void>;
   startRun(input: { taskId: string; tenantId: string; attempt: number; provider: string; model: string }): Promise<string>;
   finishRun(runId: string, input: { status: "succeeded" | "failed" | "stopped"; inputTokens: number; outputTokens: number; costPence: number; error?: string }): Promise<void>;
   recordToolCall(input: { runId: string; tenantId: string; tool: string; allowed: boolean; denialReason?: string; args: Record<string, unknown>; resultSummary?: string }): Promise<void>;
+  /** Saves the conversation so a paused or interrupted run can resume. Optional for simple stores. */
+  saveTranscript?(taskId: string, messages: ProviderMessage[], modelCalls: number): Promise<void>;
   /** Records that a high-risk tool needs an owner's decision. Optional so simple stores can skip it. */
   requestApproval?(input: { taskId: string; tenantId: string; tool: string; args: Record<string, unknown>; reason: string }): Promise<void>;
 }
 
 export type RunOutcome =
   | { status: "succeeded"; text: string }
+  | { status: "paused"; reason: string }
   | { status: "awaiting_approval"; tool: string; reason: string }
   | { status: "suspended"; reason: string }
   | { status: "failed"; reason: string };
 
 export const MAX_MODEL_CALLS_PER_ATTEMPT = 8;
+/** Across every pause and resume of one task. Stops a task that keeps pausing from running forever. */
+export const MAX_MODEL_CALLS_PER_TASK = 40;
 
 export async function runTask(input: {
   taskId: string;
@@ -42,7 +47,11 @@ export async function runTask(input: {
   retryDelayMs?: (attempt: number) => number;
   /** Current spend limits (task, agent, project, global). Checked before every model call. */
   loadBudgets?: () => Promise<BudgetLimit[]>;
+  /** Epoch ms after which no new model call is started; the run saves its conversation and pauses instead. */
+  deadline?: number;
+  now?: () => number;
 }): Promise<RunOutcome> {
+  const clock = input.now ?? Date.now;
   const retryDelay = input.retryDelayMs ?? ((attempt: number) => Math.min(30_000, 1000 * 2 ** (attempt - 1)));
   const task = await input.store.loadTask(input.taskId);
   const agent = await input.store.loadAgent(task.tenantId, task.agentKey);
@@ -56,19 +65,35 @@ export async function runTask(input: {
   let spent = task.spentPence;
   let attempts = task.attempts;
   let lastCallCost = 0;
+  let modelCalls = task.modelCalls ?? 0;
+  // A task that paused earlier resumes from its saved conversation; a new task starts from its title.
+  const saved = task.transcript && task.transcript.length > 0 ? task.transcript : null;
 
   while (attempts < task.maxAttempts) {
     attempts += 1;
     await input.store.setTaskStatus(task.id, "running", { attempts, spentPence: spent });
     const runId = await input.store.startRun({ taskId: task.id, tenantId: task.tenantId, attempt: attempts, provider: input.provider.name, model: input.provider.model });
     const ctx: ToolContext = { tenantId: task.tenantId, projectId: task.projectId, taskId: task.id };
-    const messages: ProviderMessage[] = [{ role: "user", content: task.title }];
+    const messages: ProviderMessage[] = saved ? [...saved] : [{ role: "user", content: task.title }];
     let inputTokens = 0;
     let outputTokens = 0;
     let costPence = 0;
 
     try {
       for (let call = 0; call < MAX_MODEL_CALLS_PER_ATTEMPT; call++) {
+        if (modelCalls >= MAX_MODEL_CALLS_PER_TASK) {
+          await input.store.finishRun(runId, { status: "failed", inputTokens, outputTokens, costPence, error: "Too many model calls across pauses" });
+          await input.store.setTaskStatus(task.id, "failed", { spentPence: spent, attempts });
+          return { status: "failed", reason: "The task took too many steps without a result." };
+        }
+        // Pause rather than start a call that could run past the deadline. The conversation is kept, and the
+        // attempt is not counted, so a long task can continue on a later invocation.
+        if (input.deadline !== undefined && clock() >= input.deadline) {
+          await input.store.finishRun(runId, { status: "stopped", inputTokens, outputTokens, costPence, error: "Paused to continue in the next run" });
+          await input.store.saveTranscript?.(task.id, messages, modelCalls);
+          await input.store.setTaskStatus(task.id, "queued", { spentPence: spent, attempts: attempts - 1 });
+          return { status: "paused", reason: "Paused to continue in the next run." };
+        }
         if (spent >= task.budgetPence) {
           await input.store.finishRun(runId, { status: "stopped", inputTokens, outputTokens, costPence, error: "Task budget reached" });
           await input.store.setTaskStatus(task.id, "suspended", { spentPence: spent, attempts });
@@ -96,6 +121,7 @@ export async function runTask(input: {
         outputTokens += response.usage.outputTokens;
         costPence += response.usage.costPence;
         spent += response.usage.costPence;
+        modelCalls += 1;
         lastCallCost = Math.max(lastCallCost, response.usage.costPence);
 
         if (response.kind === "final") {
@@ -136,6 +162,7 @@ export async function runTask(input: {
         const result = await tool.run(response.args, ctx);
         await input.store.recordToolCall({ runId, tenantId: task.tenantId, tool: tool.name, allowed: true, args: response.args, resultSummary: result.slice(0, 1000) });
         messages.push({ role: "tool", toolName: tool.name, content: result });
+        await input.store.saveTranscript?.(task.id, messages, modelCalls);
       }
       // A runaway tool loop is not retried: fresh attempts would only spend more budget on the same loop.
       await input.store.finishRun(runId, { status: "failed", inputTokens, outputTokens, costPence, error: "Too many steps without a result" });

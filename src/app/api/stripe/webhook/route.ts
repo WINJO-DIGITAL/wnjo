@@ -2,7 +2,7 @@ import { after, NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
 import { verifyStripeSignature } from "@/lib/stripe";
 import { recordEvent } from "@/lib/ai/event-store";
-import { processDueEvents } from "@/lib/ai/sweep";
+import { kickWorker, processDueEvents } from "@/lib/ai/sweep";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -69,7 +69,8 @@ export async function POST(request: NextRequest) {
   // wait for it. A failure here does not undo the payment; the event stays recorded and the daily sweep retries it.
   after(async () => {
     try {
-      await processDueEvents(db);
+      const result = await processDueEvents(db);
+      if (result.paused > 0) await kickWorker(1);
     } catch {
       console.error("Event processing after deposit payment failed");
     }

@@ -27,13 +27,13 @@ const SYSTEM_PROMPT =
  */
 export function buildAgentRuntime(db: SupabaseClient, provider: AiProvider | null = providerFromEnv()): {
   tools: ToolRegistry;
-  runQueuedTask: (taskId: string) => Promise<RunOutcome>;
+  runQueuedTask: (taskId: string, options?: { deadline?: number }) => Promise<RunOutcome>;
 } {
   const tools = buildReadToolRegistry(db);
   const store = new SupabaseRunStore(db);
   return {
     tools,
-    runQueuedTask: async (taskId: string) => {
+    runQueuedTask: async (taskId: string, options?: { deadline?: number }) => {
       const task = await store.loadTask(taskId);
       if (!provider) {
         await store.setTaskStatus(task.id, "suspended");
@@ -46,6 +46,7 @@ export function buildAgentRuntime(db: SupabaseClient, provider: AiProvider | nul
         store,
         system: SYSTEM_PROMPT,
         loadBudgets: () => loadBudgetLimits(db, task),
+        deadline: options?.deadline,
       });
     },
   };

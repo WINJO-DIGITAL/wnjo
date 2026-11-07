@@ -1,7 +1,7 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
 import { sendDueNotifications } from "@/lib/notify/send-due";
-import { processDueEvents } from "@/lib/ai/sweep";
+import { kickWorker, processDueEvents } from "@/lib/ai/sweep";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
   try {
     // Business events first (a new message or project may need agent work), then the customer emails.
     const events = await processDueEvents(db);
+    if (events.paused > 0) after(() => kickWorker(1));
     const mail = await sendDueNotifications(db);
     if (!mail) return NextResponse.json({ error: "mail_not_configured", events }, { status: 503 });
     return NextResponse.json({ events, mail });

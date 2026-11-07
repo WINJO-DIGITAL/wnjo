@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ProviderError, type AiProvider, type ProviderResponse } from "@/lib/ai/provider";
+import { ProviderError, type AiProvider, type ProviderMessage, type ProviderResponse } from "@/lib/ai/provider";
 import { ToolRegistry, type ToolDefinition } from "@/lib/ai/tools";
 import { budgetRemaining, canSpend, decideToolUse } from "@/lib/ai/policy";
 import { MAX_MODEL_CALLS_PER_ATTEMPT, runTask, type RunStore } from "@/lib/ai/runner";
@@ -30,16 +30,17 @@ function forever(response: ProviderResponse): AiProvider & { calls: number } {
   return scripted([response]);
 }
 
-type Row = { id: string; tenantId: string; agentKey: string; projectId: string | null; title: string; status: string; attempts: number; maxAttempts: number; budgetPence: number; spentPence: number; approvedTools: string[] };
+type Row = { id: string; tenantId: string; agentKey: string; projectId: string | null; title: string; status: string; attempts: number; maxAttempts: number; budgetPence: number; spentPence: number; approvedTools: string[]; transcript: ProviderMessage[]; modelCalls: number };
 
 /** An in-memory store that records everything the engine writes. */
-function memoryStore(opts: { agent?: { enabled: boolean; paused: boolean } | null; permissions?: Record<string, boolean>; budgetPence?: number; maxAttempts?: number; approvedTools?: string[] }) {
-  const task: Row = { id: "t1", tenantId: "tenant", agentKey: "developer", projectId: "p1", title: "Fix the homepage", status: "queued", attempts: 0, maxAttempts: opts.maxAttempts ?? 3, budgetPence: opts.budgetPence ?? 500, spentPence: 0, approvedTools: opts.approvedTools ?? [] };
+function memoryStore(opts: { agent?: { enabled: boolean; paused: boolean } | null; permissions?: Record<string, boolean>; budgetPence?: number; maxAttempts?: number; approvedTools?: string[]; transcript?: ProviderMessage[]; modelCalls?: number }) {
+  const task: Row = { id: "t1", tenantId: "tenant", agentKey: "developer", projectId: "p1", title: "Fix the homepage", status: "queued", attempts: 0, maxAttempts: opts.maxAttempts ?? 3, budgetPence: opts.budgetPence ?? 500, spentPence: 0, approvedTools: opts.approvedTools ?? [], transcript: opts.transcript ?? [], modelCalls: opts.modelCalls ?? 0 };
   const log = {
     statuses: [] as string[],
     runs: [] as Array<{ status: string; error?: string; costPence: number }>,
     calls: [] as Array<{ tool: string; allowed: boolean; denialReason?: string }>,
     approvals: [] as Array<{ tool: string; args: Record<string, unknown>; reason: string }>,
+    saves: [] as number[],
     runCount: 0,
   };
   const store: RunStore = {
@@ -67,6 +68,11 @@ function memoryStore(opts: { agent?: { enabled: boolean; paused: boolean } | nul
     },
     async recordToolCall(input) {
       log.calls.push({ tool: input.tool, allowed: input.allowed, denialReason: input.denialReason });
+    },
+    async saveTranscript(_id, messages, modelCalls) {
+      task.transcript = messages.map((m) => ({ ...m }));
+      task.modelCalls = modelCalls;
+      log.saves.push(modelCalls);
     },
     async requestApproval(input) {
       log.approvals.push({ tool: input.tool, args: input.args, reason: input.reason });
@@ -262,6 +268,61 @@ describe("retry delay", () => {
     const provider = scripted([new ProviderError("down", "transient")]);
     await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: (attempt) => { delays.push(attempt); return 0; } });
     expect(delays).toEqual([1, 2]);
+  });
+});
+
+describe("pausing and resuming long tasks", () => {
+  it("pauses before a call that would run past the deadline, keeps the conversation, and does not count the attempt", async () => {
+    const { store, task, log } = memoryStore({ permissions: { read_project: true } });
+    const provider = scripted([{ kind: "final", text: "never", usage }]);
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY, deadline: 1000, now: () => 2000 });
+    expect(outcome.status).toBe("paused");
+    expect(provider.calls).toBe(0);
+    expect(task.status).toBe("queued");
+    expect(task.attempts).toBe(0);
+    expect(task.transcript).toEqual([{ role: "user", content: "Fix the homepage" }]);
+    expect(log.statuses.at(-1)).toBe("queued");
+  });
+
+  it("resumes from the saved conversation and completes, carrying the calls already made", async () => {
+    const seen: number[] = [];
+    const provider: AiProvider & { calls: number } = {
+      name: "fake",
+      model: "fake-model",
+      calls: 0,
+      async complete(input) {
+        provider.calls++;
+        seen.push(input.messages.length);
+        return { kind: "final", text: "Done after resume", usage };
+      },
+    };
+    const { store, task } = memoryStore({
+      permissions: { read_project: true },
+      transcript: [
+        { role: "user", content: "Fix the homepage" },
+        { role: "tool", content: "Project: Homepage" },
+      ],
+      modelCalls: 3,
+    });
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY, deadline: 5000, now: () => 1000 });
+    expect(outcome).toEqual({ status: "succeeded", text: "Done after resume" });
+    expect(seen).toEqual([2]);
+    expect(task.modelCalls).toBe(3);
+  });
+
+  it("fails a task that has used its total model calls, however many pauses it took", async () => {
+    const { store } = memoryStore({ permissions: { read_project: true }, modelCalls: 40 });
+    const provider = scripted([{ kind: "final", text: "never", usage }]);
+    const outcome = await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
+    expect(outcome.status).toBe("failed");
+    expect(provider.calls).toBe(0);
+  });
+
+  it("saves the conversation after each tool step, so an interrupted run can be picked up", async () => {
+    const { store, log } = memoryStore({ permissions: { read_project: true } });
+    const provider = scripted([{ kind: "tool_call", tool: "read_project", args: {}, usage }, { kind: "final", text: "ok", usage }]);
+    await runTask({ taskId: "t1", provider, tools: registry(), store, system: "sys", retryDelayMs: NO_DELAY });
+    expect(log.saves).toEqual([1]);
   });
 });
 

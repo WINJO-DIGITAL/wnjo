@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { RunStore } from "@/lib/ai/runner";
+import type { ProviderMessage } from "@/lib/ai/provider";
 
 /**
  * Writes agent work to the database. Uses the server's secret key, because browser roles can't write these
@@ -12,7 +13,7 @@ export class SupabaseRunStore implements RunStore {
   async loadTask(taskId: string) {
     const { data, error } = await this.db
       .from("ai_tasks")
-      .select("id, tenant_id, agent_key, project_id, title, status, attempts, max_attempts, budget_pence, spent_pence, approved_tools")
+      .select("id, tenant_id, agent_key, project_id, title, status, attempts, max_attempts, budget_pence, spent_pence, approved_tools, transcript, model_calls")
       .eq("id", taskId)
       .single();
     if (error || !data) throw new Error(`Could not load task: ${error?.message ?? "not found"}`);
@@ -29,6 +30,8 @@ export class SupabaseRunStore implements RunStore {
       budgetPence: Number(row.budget_pence),
       spentPence: Number(row.spent_pence),
       approvedTools: Array.isArray(row.approved_tools) ? (row.approved_tools as string[]) : [],
+      transcript: Array.isArray(row.transcript) ? (row.transcript as ProviderMessage[]) : [],
+      modelCalls: Number(row.model_calls ?? 0),
     };
   }
 
@@ -88,6 +91,14 @@ export class SupabaseRunStore implements RunStore {
       })
       .eq("id", runId);
     if (error) throw new Error(`Could not finish run: ${error.message}`);
+  }
+
+  async saveTranscript(taskId: string, messages: ProviderMessage[], modelCalls: number) {
+    const { error } = await this.db
+      .from("ai_tasks")
+      .update({ transcript: messages, model_calls: modelCalls, updated_at: new Date().toISOString() })
+      .eq("id", taskId);
+    if (error) throw new Error(`Could not save the task conversation: ${error.message}`);
   }
 
   async requestApproval(input: { taskId: string; tenantId: string; tool: string; args: Record<string, unknown>; reason: string }) {

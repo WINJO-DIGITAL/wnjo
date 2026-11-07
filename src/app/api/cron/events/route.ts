@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
-import { processDueEvents, processQueuedTasks } from "@/lib/ai/sweep";
+import { after } from "next/server";
+import { kickWorker, processDueEvents, processQueuedTasks } from "@/lib/ai/sweep";
 import { sendDueNotifications } from "@/lib/notify/send-due";
 
 export const runtime = "nodejs";
@@ -22,6 +23,7 @@ export async function GET(request: NextRequest) {
   try {
     const events = await processDueEvents(db);
     const tasks = await processQueuedTasks(db);
+    if (tasks.hasMore) after(() => kickWorker(1));
     const notifications = await sendDueNotifications(db);
     return NextResponse.json({ events, tasks, notifications });
   } catch {
