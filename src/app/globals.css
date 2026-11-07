@@ -8286,6 +8286,12 @@ ol.bs {
     inset 0 1px 0 rgb(255 255 255 / 0.1);
   -webkit-tap-highlight-color: transparent;
 }
+/* Press feedback: the button gives a little when it is pressed, so the tap is felt before the page moves on. */
+.deck__btn { transition: transform 0.12s ease, opacity 0.2s ease; }
+.deck__btn:active { transform: scale(0.96); }
+.deck__btn[data-pressed="true"] { opacity: 0.85; }
+@media (prefers-reduced-motion: reduce) { .deck__btn { transition: none; } }
+
 /* Two lines in one button: the action, then the example it prices (it follows the swipe). */
 .deck__btn-text {
   display: grid;
