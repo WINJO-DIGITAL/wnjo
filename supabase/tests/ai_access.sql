@@ -13,7 +13,9 @@ begin
   insert into public.tenant_members (tenant_id, user_id, role) values (W, A, 'staff');
   insert into public.organizations (id, tenant_id, name) values (org1, W, 'x');
   insert into public.organization_members (organization_id, user_id, role) values (org1, C, 'client_member');
-  insert into public.ai_agents (tenant_id, agent_key, name) values (W, 'developer', 'Developer');
+  -- 'developer' is seeded by migration 20261106270100; reuse it rather than insert a duplicate.
+  insert into public.ai_agents (tenant_id, agent_key, name) values (W, 'developer', 'Developer')
+    on conflict (tenant_id, agent_key) do nothing;
   insert into public.ai_permissions (tenant_id, agent_key, tool, allowed) values (W, 'developer', 'read_project', true);
   insert into public.ai_tasks (tenant_id, agent_key, title) values (W, 'developer', 'Fix homepage');
 

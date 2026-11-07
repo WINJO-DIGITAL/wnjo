@@ -23,6 +23,7 @@ begin
     (B, 'authenticated', 'authenticated', 'owner-b@test.invalid'),
     (C, 'authenticated', 'authenticated', 'client-c@test.invalid'),
     (D, 'authenticated', 'authenticated', 'client-d@test.invalid');
+  insert into public.tenants (id, slug, name) values (T, 'test-other-msg', 'Other agency');
   insert into public.tenant_members (tenant_id, user_id, role) values (W, A, 'staff'), (T, B, 'owner');
   insert into public.organizations (id, tenant_id, name) values (org1, W, 'Client one'), (org2, W, 'Client two');
   insert into public.organization_members (organization_id, user_id, role) values (org1, C, 'client_member'), (org2, D, 'client_member');
