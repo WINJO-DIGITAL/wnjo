@@ -7889,15 +7889,15 @@ ol.bs {
     gap: 0;
   }
   .hero-ed--work .hero-ed__title {
-    font-size: min(9.2vw, 4.6svh);
+    font-size: min(8.4vw, 3.9svh);
     line-height: 1.02;
   }
   .hero-ed--work .lede {
     display: block;
     max-width: 25rem;
-    margin-top: 0.6rem;
-    font-size: 0.9375rem;
-    line-height: 1.4;
+    margin-top: 0.4rem;
+    font-size: 0.875rem;
+    line-height: 1.35;
     color: var(--color-ink-2);
   }
   .hero-ed--work .btn-row,
@@ -7905,7 +7905,7 @@ ol.bs {
     display: none;
   }
   .hero-ed--work .showcase-section {
-    padding: var(--space-4) 0 var(--space-5);
+    padding: var(--space-2) 0 var(--space-3);
   }
 }
 
@@ -8302,6 +8302,59 @@ ol.bs {
   text-transform: none;
   letter-spacing: 0;
   color: #f0b48f;
+}
+
+/* Phones: every part above and below the stage is tighter, so the hero device gets the height. */
+@media (max-width: 39.99rem) {
+  .deck {
+    --deck-fixed: 390px;
+  }
+  .deck__rail {
+    height: 50px;
+    padding-block: 5px;
+  }
+  .deck__pill {
+    height: 40px;
+    padding: 0 14px 0 6px;
+    gap: 8px;
+    font-size: 14px;
+  }
+  .deck__pill img {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+  .deck__panel {
+    padding-top: 4px;
+  }
+  .deck__bar {
+    height: 40px;
+  }
+  .deck__switch {
+    width: 160px;
+    height: 36px;
+  }
+  .deck__switch i {
+    height: 30px;
+  }
+  .deck__switch button {
+    height: 36px;
+    font-size: 12px;
+  }
+  .deck__cta {
+    padding-top: 10px;
+  }
+  .deck__btn {
+    min-height: 60px;
+    padding: 10px 14px;
+    border-radius: 30px;
+  }
+  .deck__btn-main {
+    font-size: min(19px, 5vw);
+  }
+  .deck__btn-sub {
+    font-size: min(13px, 3.6vw);
+  }
 }
 
 .deck :is(.deck__pill, .deck__btn, .deck__switch button, .deck__arrow):focus-visible,
