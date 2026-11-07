@@ -185,6 +185,11 @@ Built in sub-steps, each tested before the next.
 - Gap still open: a client only sees a quote once they are a member of its organisation. There is no screen yet to invite a prospect into an organisation, so a new client's quote stays internal until that is added.
 - The configurator still shows the browser estimate while the customer is choosing. The issued quote is the figure that counts; the two use the same rules, checked by the parity test.
 
+### 4j. More AI event sources — built, tested
+- A client's file upload raises `client_uploaded_files` (migration `20261107110000`, checked live: client upload raises one event, staff upload none).
+- Deadlines: the daily sweep raises `deadline_approaching` for open projects due within 7 days, once per project and target date (`src/lib/ai/deadlines.ts`, 4 tests; the sweep runs it before processing events).
+- Not added: approval decisions and failed tasks, because the event list has no types for them; and a website-down check, which needs an uptime monitor first.
+
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.
