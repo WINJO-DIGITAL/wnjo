@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { breadcrumbTrail } from "@/lib/breadcrumbs";
+import { articleLabels } from "@/lib/articles";
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.wnjoweb.co.uk").replace(/\/+$/, "");
 
@@ -11,7 +12,7 @@ const SITE = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.wnjoweb.c
  * Rendered on the server too, so it shows without JavaScript.
  */
 export function Breadcrumbs() {
-  const trail = breadcrumbTrail(usePathname() ?? "/");
+  const trail = breadcrumbTrail(usePathname() ?? "/", articleLabels);
   if (!trail) return null;
   const schema = {
     "@context": "https://schema.org",

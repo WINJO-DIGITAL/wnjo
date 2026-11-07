@@ -169,6 +169,7 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
     links: [
       { href: "/about", label: "About" },
       { href: "/faq", label: "FAQ" },
+      { href: "/resources", label: "Resources" },
       { href: "/contact", label: "Contact" },
       { href: "/privacy", label: "Privacy" },
       { href: "/terms", label: "Terms" },
