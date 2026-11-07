@@ -500,20 +500,29 @@ function OrderManager({ client, tenantId, orderId }: { client: SupabaseClient; t
 
       <div>
         <p className="admin-label">Stage</p>
-        <div className="admin-stages" role="group" aria-label="Order stage">
-          {ORDER_STAGES.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              className="admin-stage"
-              aria-pressed={order.stage === s.id}
-              disabled={busy}
-              onClick={() => setStage(s.id)}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
+        <ol className="track__rail admin-rail" aria-label="Order stage">
+          <li className="track__line" aria-hidden="true">
+            <span className="track__fill" style={{ "--fill": `${(Math.max(0, ORDER_STAGES.findIndex((s) => s.id === order.stage)) / (ORDER_STAGES.length - 1)) * 100}%` } as React.CSSProperties} />
+          </li>
+          {ORDER_STAGES.map((s, i) => {
+            const current = ORDER_STAGES.findIndex((x) => x.id === order.stage);
+            const state = i < current ? "done" : i === current ? "current" : "todo";
+            return (
+              <li key={s.id} className={`track__item track__step--${state}`}>
+                <button
+                  type="button"
+                  className="track__step admin-rail__step"
+                  aria-pressed={order.stage === s.id}
+                  disabled={busy}
+                  onClick={() => setStage(s.id)}
+                >
+                  <span className="track__node" aria-hidden="true">{state === "done" ? "\u2713" : i + 1}</span>
+                  <span className="track__label">{s.label}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
       </div>
 
       <form onSubmit={post} className="acct-form">

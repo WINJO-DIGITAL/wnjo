@@ -8936,3 +8936,67 @@ tr[aria-selected="true"] {
 .account-menu__item:hover {
   background: var(--color-bg);
 }
+
+
+/* Redesign: the order card is the centrepiece; the progress rail is large and tappable. */
+.acct-order {
+  padding: 32px 28px;
+  border: 0;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 1px 0 #e9e1d3;
+}
+.acct-order .track {
+  margin-top: 36px;
+  gap: 32px;
+}
+.acct-order .track__rail {
+  margin-top: 0;
+}
+.acct-order .track__line,
+.admin-rail .track__line {
+  top: 30px;
+  height: 4px;
+}
+.acct-order .track__node,
+.admin-rail .track__node {
+  width: 64px;
+  height: 64px;
+  font-size: 18px;
+}
+.acct-order .track__step--current .track__node,
+.admin-rail .track__step--current .track__node {
+  box-shadow: 0 0 0 8px rgba(168, 74, 38, 0.14);
+}
+.acct-order .track__label,
+.admin-rail .track__label {
+  font-size: 15px;
+}
+.acct-order .track__title {
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+.acct-order .track__detail {
+  padding: 22px 24px;
+  border-top: 0;
+  border-radius: 20px;
+  background: #f5f0e8;
+}
+.admin-rail {
+  margin: 20px 0 0;
+}
+.admin-rail .track__item {
+  position: relative;
+}
+.admin-rail__step {
+  min-height: 44px;
+}
+.admin-rail .track__line {
+  top: 20px;
+}
+.admin-rail .track__node {
+  width: 44px;
+  height: 44px;
+  font-size: 15px;
+}
