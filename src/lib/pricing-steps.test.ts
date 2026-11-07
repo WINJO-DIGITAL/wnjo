@@ -21,7 +21,8 @@ describe("pricingSteps", () => {
     expect(steps[3].figure).toBe("30 days of support");
   });
 
-  it("describes the handover from the Essential package", () => {
-    expect(steps[3].text).toContain("30 days of handover support");
+  it("says what to do after the handover without repeating the figure", () => {
+    expect(steps[3].text).toContain("host the site yourself");
+    expect(steps[3].text).not.toContain("30 days");
   });
 });
