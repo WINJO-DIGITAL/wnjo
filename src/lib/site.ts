@@ -161,7 +161,7 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
     links: [
       { href: "/app-development", label: "App development" },
       { href: "/booking-software", label: "Booking software" },
-      { href: "/work", label: "Case studies" },
+      { href: "/work", label: "Our work" },
     ],
   },
   {

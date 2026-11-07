@@ -12,6 +12,7 @@ export function Footer() {
               <Logo />
             </Link>
             <p>{site.tagline}</p>
+            <p className="site-footer__place">Based in Thornton-Cleveleys, Lancashire.</p>
             {/* Contact without showing the details: a call button when the number is set, and the enquiry form for email. */}
             <ul role="list" className="site-footer__contact" aria-label="Contact WNJO">
               {contactPhoneHref && (
@@ -41,10 +42,9 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} {site.name}
           </p>
-          <ul role="list" className="build-line" aria-label="Privacy">
-            <li>No cookies</li>
-            <li>No trackers</li>
-          </ul>
+          <p className="build-line">
+            <Link href="/cookies">No tracking or advertising cookies</Link>
+          </p>
         </div>
       </div>
     </footer>
