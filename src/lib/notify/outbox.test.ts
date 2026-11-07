@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildNotificationEmail, sendOutbox, type OutboxRow } from "@/lib/notify/outbox";
 
-const row = (id: string, recipient = "u1"): OutboxRow => ({ id, recipient_user_id: recipient, title: "New message from WNJO", body: "Your homepage is ready to review.", link: "/account" });
+const row = (id: string, recipient = "u1", attempts = 0): OutboxRow => ({ id, recipient_user_id: recipient, title: "New message from WNJO", body: "Your homepage is ready to review.", link: "/account", email_attempts: attempts });
 
 describe("buildNotificationEmail", () => {
   it("links to the account page on the site", () => {
@@ -27,11 +27,16 @@ describe("sendOutbox", () => {
   function ports(rows: OutboxRow[], opts: { emails?: Record<string, string | null>; fail?: string[] } = {}) {
     const sent: Array<{ to: string; subject: string }> = [];
     const marked: string[] = [];
+    const failedRows: string[] = [];
     return {
       sent,
       marked,
+      failedRows,
       ports: {
         loadUnsent: async () => rows,
+        markFailed: async (r: OutboxRow) => {
+          failedRows.push(r.id);
+        },
         emailFor: async (userId: string) => (opts.emails ?? { u1: "a@example.test", u2: "b@example.test" })[userId] ?? null,
         send: async (to: string, email: { subject: string; text: string }) => {
           if (opts.fail?.includes(to)) return false;
@@ -53,17 +58,20 @@ describe("sendOutbox", () => {
     expect(f.marked).toEqual(["n1", "n2"]);
   });
 
-  it("leaves a failed email unmarked so the next run tries it again", async () => {
+  it("leaves a failed email unmarked and counts the attempt, so the next run tries it again", async () => {
     const f = ports([row("n1")], { fail: ["a@example.test"] });
     const result = await sendOutbox(f.ports, { siteUrl: "https://www.wnjoweb.co.uk" });
     expect(result).toEqual({ sent: 0, failed: 1, skipped: 0 });
     expect(f.marked).toEqual([]);
+    expect(f.failedRows).toEqual(["n1"]);
   });
+
 
   it("skips a recipient with no email address rather than failing the batch", async () => {
     const f = ports([row("n1", "ghost"), row("n2")]);
     const result = await sendOutbox(f.ports, { siteUrl: "https://www.wnjoweb.co.uk" });
     expect(result).toEqual({ sent: 1, failed: 0, skipped: 1 });
     expect(f.marked).toEqual(["n2"]);
+    expect(f.failedRows).toEqual(["n1"]);
   });
 });

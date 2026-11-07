@@ -159,6 +159,7 @@ Built in sub-steps, each tested before the next.
 - Migration `20261107070000`: a claimed customer is notified when their order's stage changes and when a progress update is posted. Unclaimed orders queue nothing. Repeats are ignored. Tests: `supabase/tests/progress_notifications.sql`, 6 checks, passing live.
 - Emails: `src/lib/notify/outbox.ts` sends queued notifications as plain text with a link to the account page. A row is marked sent only after Resend accepts it, so failures are retried. Tests: 6 in `outbox.test.ts`.
 - Sending happens straight after a staff stage change, update, customer message or approval request (`POST /api/notifications/send`, staff only). The daily sweep sends anything missed.
+- A notification whose email fails (or whose recipient has no address) is retried up to 5 times, then left for a person to look at. Migration `20261107090000` adds the attempt count; the due-query was checked live. One bad address can no longer block the queue.
 - Known limits: progress emails are not switched off per customer yet (the preference screen only covers the older kinds); email needs the Resend key and sender address in Vercel. Nothing has been sent to a real inbox yet.
 
 ### 4i. Business events from the database — built, tested
