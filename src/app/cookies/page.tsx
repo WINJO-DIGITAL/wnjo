@@ -10,7 +10,7 @@ export const metadata = pageMetadata(
 
 /*
  * Describes what the code in this repository stores. Re-check this page whenever analytics, advertising or any
- * new third-party script is added. DRAFT for owner and legal review.
+ * new third-party script is added.
  */
 export default function CookiesPage() {
   return (
@@ -30,6 +30,11 @@ export default function CookiesPage() {
               <strong>Your sign-in session.</strong> If you sign in to follow your order, your session is kept in your
               browser&apos;s local storage so you stay signed in. It is removed when you sign out or clear your browser
               data. It is needed for the service you asked for.
+            </p>
+            <p>
+              <strong>Your unsent enquiry.</strong> While you fill in the contact form, what you have typed is kept in
+              this tab&apos;s session storage, so a reload doesn&apos;t lose it. It is cleared when you send the form or
+              close the tab.
             </p>
             <p>
               <strong>Your configurator answers.</strong> The price configurator saves your answers in local storage so

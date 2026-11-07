@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
 import { projectAccess, userIdFromRequest } from "@/lib/files/server";
+import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { fileAccess, storagePath, validateUpload } from "@/lib/files/rules";
 
 export const runtime = "nodejs";
@@ -19,6 +20,10 @@ export async function POST(request: NextRequest) {
   if (!db) return NextResponse.json({ error: "not_configured" }, { status: 503 });
   const userId = await userIdFromRequest(db, request.headers.get("authorization"));
   if (!userId) return NextResponse.json({ error: "sign_in" }, { status: 401 });
+  const limit = LIMITS_PER_ROUTE.uploadUrl;
+  if (await sharedRateLimited(db, "upload", userId, limit.max, limit.windowSeconds)) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const projectId = typeof body?.projectId === "string" ? body.projectId : "";

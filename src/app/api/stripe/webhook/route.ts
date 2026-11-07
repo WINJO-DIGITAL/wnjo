@@ -1,6 +1,6 @@
 import { after, NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
-import { verifyStripeSignature } from "@/lib/stripe";
+import { paymentMatches, verifyStripeSignature } from "@/lib/stripe";
 import { recordEvent } from "@/lib/ai/event-store";
 import { kickWorker, processDueEvents } from "@/lib/ai/sweep";
 
@@ -23,7 +23,15 @@ export async function POST(request: NextRequest) {
 
   const event = JSON.parse(payload) as {
     type?: string;
-    data?: { object?: { id?: string; payment_status?: string; payment_intent?: string | null } };
+    data?: {
+      object?: {
+        id?: string;
+        payment_status?: string;
+        payment_intent?: string | null;
+        amount_total?: number | null;
+        currency?: string | null;
+      };
+    };
   };
   const session = event.data?.object;
   if (event.type !== "checkout.session.completed" || !session?.id || session.payment_status !== "paid") {
@@ -32,6 +40,20 @@ export async function POST(request: NextRequest) {
 
   const db = serviceClient();
   if (!db) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+
+  // The amount Stripe charged must be the amount on record before anything is marked paid.
+  const { data: expected, error: expectedError } = await db
+    .from("deposits")
+    .select("amount_pence, status")
+    .eq("stripe_checkout_session_id", session.id)
+    .maybeSingle();
+  if (expectedError) return NextResponse.json({ error: "retry" }, { status: 500 });
+  const row = expected as { amount_pence: number; status: string } | null;
+  if (row && row.status !== "paid" && !paymentMatches(session, row.amount_pence)) {
+    console.error("Stripe payment does not match the amount on record; not marked paid");
+    return NextResponse.json({ received: true, handled: false, reason: "amount_mismatch" });
+  }
+
   const { error } = await db
     .from("deposits")
     .update({

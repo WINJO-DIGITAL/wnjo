@@ -148,7 +148,6 @@ export const projects: Project[] = [
       "Class timetable with booking",
       "Group, one-to-one and small group coaching, each with its price",
       "Four membership plans and pay-as-you-go pricing",
-      "A free first class for new customers",
     ],
     url: "https://raengfitness.co.uk",
     host: "raengfitness.co.uk",

@@ -3,6 +3,7 @@ import { serviceClient } from "@/lib/quote-store";
 import { depositPence } from "@/lib/deposit";
 import { createDepositCheckout, testSecretKey } from "@/lib/stripe";
 import { userIdFromRequest } from "@/lib/files/server";
+import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,6 +24,10 @@ export async function POST(request: NextRequest) {
 
   const userId = await userIdFromRequest(db, request.headers.get("authorization"));
   if (!userId) return NextResponse.json({ error: "sign_in" }, { status: 401 });
+  const limit = LIMITS_PER_ROUTE.checkout;
+  if (await sharedRateLimited(db, "checkout", userId, limit.max, limit.windowSeconds)) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
   const { data: userData } = await db.auth.admin.getUserById(userId);
   const email = userData.user?.email;
   if (!email) return NextResponse.json({ error: "sign_in" }, { status: 401 });

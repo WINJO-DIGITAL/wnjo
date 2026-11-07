@@ -36,16 +36,15 @@ preview or production until the owner asks.
 - **Trust:** no years-in-business or launch-count claims. Reviews from clients and a Google Business profile come later.
 - **Examples:** the four example businesses in the homepage styler are labelled as examples, not real websites. Real client sites are shown as real.
 
-## Needs business information before it can go further
+## Business information (status)
 
-- Confirm the town for the address: the notes say "Taunton Cleveleys" and the postcode is FY5 (Cleveleys).
-- Confirm the legal name wording: "WNJO" or your full name trading as WNJO.
-- Confirm the hosting cancellation notice period, and how UK consumer cancellation rights apply to online orders.
-- Terms: revision rounds and extra-round charges, hosting and care terms, cancellation and refund terms, liability,
-  governing law, use of stock or third-party material.
-- Permission and details for each portfolio item and testimonial (full name, business, location, photo, live URL).
-- Years in business, number of sites launched, and any certifications or memberships. Only add what can be verified.
-- Confirmation of the "No cookies / No trackers" wording given that sign-in stores a session in the browser.
+- Town: Thornton-Cleveleys, FY5 3UP, as in the owner-confirmed terms ("Taunton" in older notes was a typo).
+- Legal name: WNJO (confirmed round three). Hosting notice: 30 days (confirmed). Terms confirmed 7 November 2026.
+- Portfolio and testimonials: client-approved (owner, round three). No years-in-business or launch-count claims.
+- Cookie wording: checked against the code in round four. The sign-in session and drafts live in browser storage,
+  and the cookie page says so; nothing tracks visitors.
+- Still the owner's call: whether prices are final (the "Provisional pricing" notice stays until then), and when to
+  switch Stripe to live mode (the code refuses live keys until then).
 
 ## Next batches (in order)
 
@@ -106,3 +105,36 @@ preview or production until the owner asks.
 - Quote follow-up: one reminder to customers whose quote is still open after 3 days, sent by the daily sweep, once per quote (migration 20261107190000; due-quote selection checked live).
 - Booking demo: each listed step moves the replay to its screen and holds there; start times are read from the replay's timeline.
 - Live checks: `node scripts/live-check.mjs https://www.wnjoweb.co.uk` covers pages, 404, sitemap, robots, canonical and Open Graph after every deploy. Still to run: enquiry and email delivery by hand, and Google's Rich Results Test on the homepage.
+
+## Round four: full audit and fixes (7 November 2026)
+
+Audit scope: every page and link, the price form, contact and sign-in flows (browser, with submissions stubbed),
+keyboard use, accessibility (axe, all pages, phone and desktop), Lighthouse (home, pricing, build, work), the API
+routes and their checks, row-level security on all tables, database functions, Supabase security/performance/health
+advisors, dependencies (`npm audit`: 0), secrets in the repository (none), cookies and third-party requests (none),
+security headers, structured data, the sending domain (verified), and database-level tests as the test client
+(sees only its own quote, deposit and organisation; invalid accepts and declines are refused; a stranger is refused).
+
+Fixed in code:
+- Notifications route: only staff or members of a client organisation may trigger it, and it is rate limited. A
+  fresh sign-in with no account behind it was able to run the email queue.
+- Stripe webhook: a payment is only marked paid if the amount and currency match the payment on record.
+- Shared rate limiting (database-backed, hashed keys) on enquiries, checkout, upload links and notifications; the
+  per-instance limiter stays as a first line. Fails open if the database is unreachable.
+- Content-Security-Policy and HSTS headers; checked on 16 pages at two sizes with no blocked resources.
+- Copy: care plans no longer promise reply times; the RAENG case study no longer names an offer; the quote terms
+  version shown to clients is "2026-11-07" instead of a draft label; the cookie page lists the contact form draft.
+- `/.well-known/security.txt` pointing to the contact form.
+
+Database migrations written, awaiting the owner's approval to apply (the Supabase connector asks first):
+- `20261107220000_shared_rate_limit.sql`: the shared limiter's table and function (until applied, the limiter
+  allows requests and logs once).
+- `20261107221000_audit_indexes_and_policies.sql`: indexes on 39 foreign keys, and `auth.uid()` evaluated once per
+  query in the two customer order policies.
+
+Owner settings (dashboard, not code): turn on leaked-password protection in Supabase Auth; review Supabase Auth
+rate limits for sign-in emails.
+
+Not testable from the build environment (left for last): live response headers and protected-route answers on the
+live domain, a real enquiry and quote email arriving, the deposit payment in Stripe test mode as a signed-in client,
+the admin screens as staff, and Google's Rich Results Test.

@@ -15,6 +15,22 @@ export function testSecretKey(raw: string | undefined): string | null {
 }
 
 /**
+ * True only when a completed Checkout Session charged exactly the amount we asked for, in pounds. A signed event
+ * proves Stripe sent it; this proves it is for the payment on record, so a mismatch is never marked paid.
+ */
+export function paymentMatches(
+  session: { amount_total?: number | null; currency?: string | null },
+  expectedPence: number,
+): boolean {
+  return (
+    Number.isInteger(expectedPence) &&
+    expectedPence > 0 &&
+    session.amount_total === expectedPence &&
+    (session.currency ?? "").toLowerCase() === "gbp"
+  );
+}
+
+/**
  * Checks a webhook's Stripe-Signature header: HMAC-SHA256 of "timestamp.payload" with the endpoint secret,
  * compared in constant time, and rejected if the timestamp is more than five minutes old.
  */

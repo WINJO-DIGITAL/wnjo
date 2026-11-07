@@ -8,6 +8,8 @@ import { enquiryStoreConfigured, saveEnquiry } from "@/lib/enquiry-store";
 import { formatBrief } from "@/lib/brief";
 import { PROJECT_TYPES, estimate, parseAnswers } from "@/lib/pricing";
 import { rateLimited } from "@/lib/rate-limit";
+import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
+import { serviceClient } from "@/lib/quote-store";
 
 export const runtime = "nodejs";
 
@@ -101,7 +103,8 @@ export async function POST(request: NextRequest) {
 
   // Only deliverable submissions count towards the limit, so correcting a form never locks anyone out.
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (rateLimited(ip)) {
+  const shared = LIMITS_PER_ROUTE.enquiry;
+  if (rateLimited(ip) || (await sharedRateLimited(serviceClient(), "enquiry", ip, shared.max, shared.windowSeconds))) {
     return reply(429, { error: "Too many submissions from this connection. Please try again in a few minutes." });
   }
 

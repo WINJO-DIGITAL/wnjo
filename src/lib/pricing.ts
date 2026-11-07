@@ -111,7 +111,7 @@ export const CARE_PLANS = {
       "Everything in Hosting",
       "Routine updates",
       "Up to 1 hour of small content changes per month",
-      "Email support, replies within 2 working days",
+      "Email support",
     ],
   },
   carePlus: {
@@ -122,7 +122,7 @@ export const CARE_PLANS = {
       "Everything in Care",
       "Up to 3 hours of changes or improvements per month",
       "Quarterly performance and accessibility review",
-      "Email support, replies within 1 working day",
+      "Priority email support",
     ],
   },
 } as const;

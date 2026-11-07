@@ -9,8 +9,9 @@ export const metadata = pageMetadata(
 );
 
 /*
- * DRAFT for owner and legal review. Items in square brackets are not yet confirmed by the business and must be
- * completed before this page is relied on. Nothing here has been checked by a lawyer.
+ * Confirmed by the owner on 7 November 2026 (quote terms version 2026-11-07, see lib/terms). Not reviewed by a
+ * lawyer; a short legal review is recommended before taking live payments. Bump QUOTE_TERMS_VERSION whenever the
+ * payment, cancellation or refund wording here changes.
  */
 export default function TermsPage() {
   return (
