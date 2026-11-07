@@ -1,0 +1,45 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { serviceClient } from "@/lib/quote-store";
+import { verifyStripeSignature } from "@/lib/stripe";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/**
+ * Stripe calls this when a payment completes. The signature is checked before anything is read or
+ * changed; an unsigned or replayed request is refused. Only a paid Checkout Session marks a deposit paid.
+ */
+export async function POST(request: NextRequest) {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim() ?? "";
+  if (!secret) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+
+  const payload = await request.text();
+  const now = Math.floor(Date.now() / 1000);
+  if (!verifyStripeSignature(payload, request.headers.get("stripe-signature"), secret, now)) {
+    return NextResponse.json({ error: "bad_signature" }, { status: 400 });
+  }
+
+  const event = JSON.parse(payload) as {
+    type?: string;
+    data?: { object?: { id?: string; payment_status?: string; payment_intent?: string | null } };
+  };
+  const session = event.data?.object;
+  if (event.type !== "checkout.session.completed" || !session?.id || session.payment_status !== "paid") {
+    return NextResponse.json({ received: true, handled: false });
+  }
+
+  const db = serviceClient();
+  if (!db) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  const { error } = await db
+    .from("deposits")
+    .update({
+      status: "paid",
+      paid_at: new Date().toISOString(),
+      stripe_payment_intent_id: session.payment_intent ?? null,
+    })
+    .eq("stripe_checkout_session_id", session.id)
+    .neq("status", "paid");
+  // A database error asks Stripe to retry the event rather than losing the payment.
+  if (error) return NextResponse.json({ error: "retry" }, { status: 500 });
+  return NextResponse.json({ received: true, handled: true });
+}

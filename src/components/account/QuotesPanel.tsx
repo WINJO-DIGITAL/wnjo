@@ -3,6 +3,9 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { QUOTE_TERMS_VERSION } from "@/lib/terms";
+import { depositPence } from "@/lib/deposit";
+
+const gbp = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
 type Item = { label: string; amount_pence: number; position: number };
 type Version = {
@@ -90,13 +93,15 @@ function QuoteCard({
   const [message, setMessage] = useState<{ kind: "error" | "ok"; text: string } | null>(null);
   const [confirmingDecline, setConfirmingDecline] = useState(false);
   const open = quote.status === "sent";
+  const [acceptanceId, setAcceptanceId] = useState<string | null>(null);
+  const deposit = gbp.format(depositPence(version.build_pence) / 100);
   const items = [...version.quote_version_items].sort((a, b) => a.position - b.position);
 
   const accept = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setBusy(true);
     setMessage(null);
-    const { error } = await client.rpc("accept_quote", {
+    const { data, error } = await client.rpc("accept_quote", {
       p_version_id: version.id,
       p_accepted_name: name,
       p_terms_version: QUOTE_TERMS_VERSION,
@@ -107,8 +112,32 @@ function QuoteCard({
       setMessage({ kind: "error", text: error.message || "We couldn't accept this quote. Please try again." });
       return;
     }
+    setAcceptanceId(typeof data === "string" ? data : null);
     setMessage({ kind: "ok", text: "Thank you. Your acceptance has been recorded and we'll be in touch about the next steps." });
     onChanged();
+  };
+
+  /** Sends the client to the Stripe Checkout page for their 50% deposit. The server checks their access. */
+  const payDeposit = async () => {
+    if (!acceptanceId) return;
+    setBusy(true);
+    setMessage(null);
+    const { data: session } = await client.auth.getSession();
+    const token = session.session?.access_token;
+    const res = token
+      ? await fetch("/api/deposits/checkout", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ acceptanceId }),
+        }).catch(() => null)
+      : null;
+    const json = res ? ((await res.json().catch(() => null)) as { url?: string; error?: string } | null) : null;
+    if (json?.url) {
+      window.location.href = json.url;
+      return;
+    }
+    setBusy(false);
+    setMessage({ kind: "error", text: "We couldn't start the deposit payment. Please try again, or ask us for help." });
   };
 
   const decline = async () => {
@@ -208,6 +237,15 @@ function QuoteCard({
             )}
           </div>
         </form>
+      )}
+
+      {acceptanceId && (
+        <div className="acct-deposit">
+          <p>To start the work, pay the 50% deposit of {deposit}. The balance is due on launch. No VAT is charged.</p>
+          <button type="button" className="btn btn--primary" onClick={payDeposit} disabled={busy}>
+            Pay the 50% deposit
+          </button>
+        </div>
       )}
 
       {message && (
