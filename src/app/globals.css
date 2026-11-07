@@ -9531,68 +9531,25 @@ body:has(.dash-header) .site-footer {
 /* Styler: one line on what the site does for the chosen kind of business. */
 .ss-benefit { margin: var(--space-3) 0 var(--space-4); color: var(--color-ink-2); max-width: 36rem; }
 
-/* Portfolio: a swipeable deck on phones and tablets; an index beside the work on desktop. */
-.portfolio__deck { display: none; }
-.portfolio__n { font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-ink-3); }
-
-/* Phones and tablets: one project at a time, swiped sideways with the arrows as a fallback. */
-@media (max-width: 63.99rem) {
-  .portfolio--js .work-list {
-    display: flex;
-    gap: var(--space-5);
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-  .portfolio--js .work-list::-webkit-scrollbar { display: none; }
-  .portfolio--js .work-row { flex: 0 0 100%; scroll-snap-align: start; }
-  .portfolio--js .portfolio__deck {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: var(--space-5);
-  }
-  .portfolio--js .portfolio__index { display: none; }
+/* Portfolio: industry filter. Hidden rows are removed with CSS, so the list itself is plain server-rendered HTML. */
+.portfolio__filter { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: var(--space-6); }
+.portfolio__filter button {
+  font: inherit;
+  min-height: 2.75rem;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-line);
+  background: transparent;
+  color: var(--color-ink-2);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease);
 }
-
-/* Desktop: the business types in a sticky index, the matching projects beside it. */
-@media (min-width: 64rem) {
-  .portfolio--js {
-    display: grid;
-    grid-template-columns: 14rem minmax(0, 1fr);
-    gap: var(--space-8);
-    align-items: start;
-  }
-  .portfolio__index { position: sticky; top: 7rem; }
-  .portfolio__index ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-line); }
-  .portfolio__index li { border-bottom: 1px solid var(--color-line); }
-  .portfolio__index button {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: var(--space-3);
-    width: 100%;
-    min-height: 2.75rem;
-    padding: 0.75rem 0;
-    font: inherit;
-    text-align: left;
-    background: transparent;
-    border: 0;
-    color: var(--color-ink-2);
-    cursor: pointer;
-  }
-  .portfolio__index button:hover { color: var(--color-ink); }
-  .portfolio__index button[aria-pressed="true"] { color: var(--color-ink); font-weight: 600; }
-  .portfolio__index button[aria-pressed="true"] .portfolio__n { color: var(--color-accent); }
-  .portfolio__index button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-  .portfolio--js .work-list { min-width: 0; }
-}
-
-.portfolio--js[data-filter="hospitality"] [data-industry]:not([data-industry="hospitality"]),
-.portfolio--js[data-filter="beauty"] [data-industry]:not([data-industry="beauty"]),
-.portfolio--js[data-filter="trades"] [data-industry]:not([data-industry="trades"]),
-.portfolio--js[data-filter="other"] [data-industry]:not([data-industry="other"]) { display: none; }
+.portfolio__filter button[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); border-color: var(--color-ink); }
+.portfolio__filter p { margin: 0 0 0 0.25rem; }
+.portfolio[data-filter="hospitality"] [data-industry]:not([data-industry="hospitality"]),
+.portfolio[data-filter="beauty"] [data-industry]:not([data-industry="beauty"]),
+.portfolio[data-filter="trades"] [data-industry]:not([data-industry="trades"]),
+.portfolio[data-filter="other"] [data-industry]:not([data-industry="other"]) { display: none; }
 
 /* Breadcrumbs: a quiet line under the header on internal pages. */
 .breadcrumbs { padding-top: var(--space-4); }
