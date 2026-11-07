@@ -141,3 +141,8 @@ Built in sub-steps, each tested before the next.
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.
+
+## Documentation (Phase 7 started)
+- Written: `ARCHITECTURE.md`, `DATABASE_SCHEMA.md`, `AI_AGENTS.md`, `AI_PERMISSIONS.md`, `SECURITY.md`, `TESTING.md`, `DEPLOYMENT.md`, `ENVIRONMENT_VARIABLES.md`, and this file.
+- Still to write: `README.md` (currently the project's original readme), and the API reference.
+- Still to do in Phase 7: security testing beyond the database suites, payment and webhook testing (needs Stripe), end-to-end testing on signed-in flows, performance and accessibility audits of new screens, backup and recovery validation.
