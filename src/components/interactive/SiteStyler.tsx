@@ -39,12 +39,14 @@ const SITES = [
     title: "Wood-fired, all day.",
     line: "Breakfast till late, in the heart of Leeds.",
     cta: "Book a table",
+    second: "See the menu",
+    strip: "Open daily from 8am · Walk-ins welcome",
     nav: ["Menu", "Visit", "Events"],
     photo: cafeHero,
     cards: [
-      ["Sourdough", cafeSourdough],
-      ["Small plates", cafePlates],
-      ["Natural wine", cafeWine],
+      ["Sourdough", cafeSourdough, "Baked every morning"],
+      ["Small plates", cafePlates, "From £6"],
+      ["Natural wine", cafeWine, "By the glass"],
     ],
   },
   {
@@ -56,12 +58,14 @@ const SITES = [
     title: "Sharp cuts. Hot towels.",
     line: "Walk-ins and bookings in Sheffield.",
     cta: "Book a cut",
+    second: "Prices",
+    strip: "Open 7 days · Walk-ins and bookings",
     nav: ["Cuts", "Barbers", "Prices"],
     photo: barberHero,
     cards: [
-      ["Cut & style", barberCut],
-      ["Skin fade", barberFade],
-      ["Hot towel shave", barberShave],
+      ["Cut & style", barberCut, "£22 · 40 min"],
+      ["Skin fade", barberFade, "£20 · 35 min"],
+      ["Hot towel shave", barberShave, "£18 · 30 min"],
     ],
   },
   {
@@ -73,12 +77,14 @@ const SITES = [
     title: "Safe. Certified. On time.",
     line: "Electricians across Greater Manchester.",
     cta: "Get a free quote",
+    second: "Call now",
+    strip: "Same-day call-outs across Greater Manchester",
     nav: ["Services", "Areas", "Reviews"],
     photo: tradesHero,
     cards: [
-      ["Rewires", tradesRewires],
-      ["Fuse boards", tradesFuse],
-      ["Testing", tradesTesting],
+      ["Rewires", tradesRewires, "Free survey"],
+      ["Fuse boards", tradesFuse, "Fixed price"],
+      ["Testing", tradesTesting, "Certificate included"],
     ],
   },
   {
@@ -90,12 +96,14 @@ const SITES = [
     title: "Move freely again.",
     line: "Same-week physiotherapy in Bristol.",
     cta: "Book online",
+    second: "Fees",
+    strip: "Same-week appointments · Evening slots",
     nav: ["Treatments", "About", "Fees"],
     photo: clinicHero,
     cards: [
-      ["Sports injury", clinicSports],
-      ["Rehab", clinicRehab],
-      ["Knee pain", clinicKnee],
+      ["Sports injury", clinicSports, "45 min · £55"],
+      ["Rehab", clinicRehab, "A plan made for you"],
+      ["Knee pain", clinicKnee, "Assessment first"],
     ],
   },
 ] as const;
@@ -114,26 +122,31 @@ function Photo({ src, sizes }: { src: StaticImageData; sizes: string }) {
 function Desktop({ site }: { site: Site }) {
   return (
     <div className="ss-site" key={site.id}>
-      <div className="ss-nav">
-        <b className="ss-logo">{site.name}</b>
-        {site.nav.map((n) => (
-          <span key={n}>{n}</span>
-        ))}
-        <span className="ss-btn ss-btn--sm">{site.cta}</span>
-      </div>
       <div className="ss-hero">
-        <div>
+        <Photo src={site.photo} sizes="(min-width: 56rem) 760px, 70vw" />
+        <div className="ss-nav">
+          <b className="ss-logo">{site.name}</b>
+          {site.nav.map((n) => (
+            <span key={n}>{n}</span>
+          ))}
+          <span className="ss-btn ss-btn--sm">{site.cta}</span>
+        </div>
+        <div className="ss-hero__copy">
           <b className="ss-title">{site.title}</b>
           <span className="ss-line">{site.line}</span>
-          <span className="ss-btn">{site.cta}</span>
+          <span className="ss-actions">
+            <span className="ss-btn">{site.cta}</span>
+            <span className="ss-btn ss-btn--ghost">{site.second}</span>
+          </span>
         </div>
-        <Photo src={site.photo} sizes="(min-width: 56rem) 400px, 40vw" />
       </div>
+      <span className="ss-strip">{site.strip}</span>
       <div className="ss-cards">
-        {site.cards.map(([c, img]) => (
+        {site.cards.map(([c, img, detail]) => (
           <span key={c}>
             <Photo src={img} sizes="(min-width: 56rem) 240px, 25vw" />
-            {c}
+            <b>{c}</b>
+            <small>{detail}</small>
           </span>
         ))}
       </div>
@@ -144,19 +157,25 @@ function Desktop({ site }: { site: Site }) {
 function Mobile({ site }: { site: Site }) {
   return (
     <div className="ss-site" key={site.id}>
-      <div className="ss-nav">
-        <b className="ss-logo">{site.name}</b>
-        <i className="ss-menu" />
+      <div className="ss-hero">
+        <Photo src={site.photo} sizes="(min-width: 56rem) 260px, 30vw" />
+        <div className="ss-nav">
+          <b className="ss-logo">{site.name}</b>
+          <i className="ss-menu" />
+        </div>
+        <div className="ss-hero__copy">
+          <b className="ss-title">{site.title}</b>
+          <span className="ss-line">{site.line}</span>
+          <span className="ss-btn">{site.cta}</span>
+        </div>
       </div>
-      <Photo src={site.photo} sizes="(min-width: 56rem) 260px, 30vw" />
-      <b className="ss-title">{site.title}</b>
-      <span className="ss-line">{site.line}</span>
-      <span className="ss-btn">{site.cta}</span>
+      <span className="ss-strip">{site.strip}</span>
       <div className="ss-cards">
-        {site.cards.slice(0, 2).map(([c, img]) => (
+        {site.cards.slice(0, 2).map(([c, img, detail]) => (
           <span key={c}>
             <Photo src={img} sizes="(min-width: 56rem) 120px, 15vw" />
-            {c}
+            <b>{c}</b>
+            <small>{detail}</small>
           </span>
         ))}
       </div>

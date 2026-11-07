@@ -6544,14 +6544,16 @@ main #process ol.steps li::after {
 }
 
 .ss-view--desktop .ss-site {
-  gap: 1.6em;
-  padding: 1.4em 2.6em;
+  --pad: 2.6em;
+  gap: 1.3em;
+  padding: 0 0 1.4em;
   font-size: calc(100cqw / 60);
 }
 
 .ss-view--mobile .ss-site {
-  gap: 0.9em;
-  padding: 2.6em 1.2em 1.2em;
+  --pad: 1.1em;
+  gap: 0.8em;
+  padding: 0 0 1.1em;
   font-size: calc(100cqw / 16);
 }
 
@@ -6673,25 +6675,97 @@ main #process ol.steps li::after {
   object-fit: cover;
 }
 
+/* Hero: the photo fills it, a gradient keeps the words readable, and the menu sits over the top. */
 .ss-hero {
+  position: relative;
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  align-items: center;
-  gap: 2.4em;
+  align-content: space-between;
+  min-height: 36cqw;
+  padding: 1.2em var(--pad) 1.8em;
+  color: #fff;
+  isolation: isolate;
 }
 
-.ss-hero .ss-photo {
-  aspect-ratio: 4 / 3;
+.ss-view--mobile .ss-hero {
+  min-height: 128cqw;
+  padding: 2.6em var(--pad) 1.3em;
 }
 
-.ss-view--mobile > .ss-site > .ss-photo {
-  aspect-ratio: 4 / 3;
+.ss-view--mobile .ss-hero .ss-line {
+  margin-top: 0.35em;
+}
+
+.ss-view--mobile .ss-hero .ss-btn {
+  margin-top: 0.8em;
+}
+
+.ss-hero > .ss-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 0;
+}
+
+.ss-hero > .ss-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(10 8 6 / 0.82), rgb(10 8 6 / 0.25) 55%, rgb(10 8 6 / 0.45));
+}
+
+.ss-hero .ss-nav,
+.ss-hero .ss-logo {
+  color: #fff;
+}
+
+.ss-hero .ss-nav span:not(.ss-btn) {
+  color: rgb(255 255 255 / 0.82);
+}
+
+.ss-hero .ss-menu {
+  border-color: #fff;
+}
+
+.ss-hero__copy {
+  display: grid;
+  justify-items: start;
+  max-width: 34em;
+}
+
+.ss-hero .ss-line {
+  color: rgb(255 255 255 / 0.86);
+}
+
+.ss-actions {
+  display: flex;
+  gap: 0.7em;
+}
+
+.ss-btn--ghost {
+  background: transparent;
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.7);
+}
+
+/* A one-line strip under the hero, in the site's own colours. */
+.ss-strip {
+  margin-inline: var(--pad);
+  padding-bottom: 0.9em;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  color: var(--muted);
+  font-size: 1em;
+}
+
+.ss-view--mobile .ss-strip {
+  font-size: 0.72em;
+  padding-bottom: 0.7em;
 }
 
 .ss-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.2em;
+  margin-inline: var(--pad);
 }
 
 .ss-view--mobile .ss-cards {
@@ -6702,11 +6776,22 @@ main #process ol.steps li::after {
 
 .ss-cards span {
   display: grid;
-  gap: 0.6em;
-  padding: 0.6em;
-  border-radius: var(--r);
-  background: var(--card);
+  gap: 0.35em;
   font-weight: 600;
+}
+
+.ss-cards b {
+  margin-top: 0.3em;
+  font-family: var(--h-font);
+  font-weight: var(--h-weight);
+  text-transform: var(--h-transform);
+  letter-spacing: var(--h-spacing);
+}
+
+.ss-cards small {
+  color: var(--muted);
+  font-size: 0.85em;
+  font-weight: 500;
 }
 
 .ss-cards .ss-photo {
