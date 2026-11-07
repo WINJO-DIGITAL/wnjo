@@ -9064,3 +9064,72 @@ tr[aria-selected="true"] {
   text-transform: uppercase;
   color: var(--color-accent);
 }
+
+/* Customer page: one calm layout. White cards, even spacing, quiet labels. */
+.acct {
+  display: grid;
+  gap: 32px;
+  max-width: 880px;
+}
+.acct-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+}
+.acct-bar .acct-meta {
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 0 #e9e1d3;
+}
+.acct .h2 {
+  margin: 0 0 16px;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: -0.01em;
+}
+.acct-quotes {
+  display: grid;
+  gap: 20px;
+}
+.acct-quote-table,
+.acct-messages,
+.acct-approvals,
+.acct-thread,
+.acct-scope {
+  padding: 24px 26px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 1px 0 #e9e1d3;
+}
+.acct-form {
+  padding: 24px 26px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 1px 0 #e9e1d3;
+}
+.acct .acct-label,
+.acct .acct-meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+.acct .acct-input {
+  border-radius: 14px;
+  background: var(--color-bg);
+}
+.acct .btn--primary {
+  border-radius: 999px;
+  min-height: 48px;
+  padding: 12px 24px;
+}
+.acct .btn--secondary {
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 10px 20px;
+}
