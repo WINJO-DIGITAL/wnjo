@@ -70,11 +70,9 @@ describe("POST /api/enquiry", () => {
     expect(sent.text).toContain("Timeline: Within 1 to 3 months");
   });
 
-  it("requires budget and timeline on contact enquiries, but not on briefs", async () => {
-    const res = await post({ ...contact, budget: undefined, timeline: "soon" });
-    expect(res.status).toBe(422);
-    const body = await res.json();
-    expect(Object.keys(body.fields).sort()).toEqual(["budget", "timeline"]);
+  it("accepts contact enquiries and briefs without a budget or timeline, which are optional", async () => {
+    const res = await post({ ...contact, budget: undefined, timeline: undefined });
+    expect(res.status).toBe(200);
     const brief = await post({
       ...contact,
       kind: "brief",

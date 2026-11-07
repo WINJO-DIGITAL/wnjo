@@ -57,7 +57,7 @@ export default function TermsPage() {
             <h2>Hosting and care</h2>
             <p>
               Managed hosting is £25 a month. It covers hosting, the SSL certificate, daily backups and uptime monitoring.
-              [Notice period for cancelling hosting to be confirmed.]
+              You can cancel hosting with 30 days&apos; notice. We will help move your site to another host if you ask.
             </p>
 
             <h2>Cancellation</h2>

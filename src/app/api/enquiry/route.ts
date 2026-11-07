@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
   }
 
   const kind = body.kind === "brief" ? "brief" : "contact";
-  // The plain form asks only for a name, email and message, so budget and timeline are optional there.
-  const result = validateEnquiry(body, { messageRequired: kind === "contact", detailsRequired: kind === "contact" && !fromForm });
+  // Budget and timeline help, but are optional everywhere, so nobody is stopped for not knowing yet.
+  const result = validateEnquiry(body, { messageRequired: kind === "contact", detailsRequired: false });
   if (!result.ok) return reply(422, { error: "Please check the highlighted fields.", fields: result.errors });
   const fields = result.data;
 

@@ -37,7 +37,7 @@ type FieldKey = keyof FieldErrors;
 
 const STEPS: { title: string; short: string; fields: FieldKey[] }[] = [
   { title: "What can we help with?", short: "Project", fields: ["topic", "message"] },
-  { title: "What budget and timing do you have in mind?", short: "Budget", fields: ["budget", "timeline"] },
+  { title: "Any budget or timing in mind? (optional)", short: "Budget", fields: ["budget", "timeline"] },
   { title: "Where should we reply?", short: "Details", fields: ["name", "email"] },
   { title: "Ready to send?", short: "Review", fields: [] },
 ];
@@ -333,7 +333,8 @@ function EnquiryForm({
 
   const errorsFor = (from: number, to: number) => {
     const keys = STEPS.slice(from, to + 1).flatMap((s) => s.fields);
-    const check = validateEnquiry({ ...fields, message: composeMessage(fields) }, { detailsRequired: true });
+    // Budget and timing are optional: they help, but nobody should be stopped for not knowing yet.
+    const check = validateEnquiry({ ...fields, message: composeMessage(fields) }, { detailsRequired: false });
     const found: FieldErrors = check.ok ? {} : { ...check.errors };
     // The server files anything unrecognised under "Something else"; here we ask for a clear choice.
     if (!fields.topic) found.topic = "Choose the option closest to what you need.";
