@@ -2,6 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { EventMark, QueuedEvent } from "@/lib/ai/event-processor";
 import type { EventType, AgentKey } from "@/lib/ai/events";
+import { recoveredStatus, stuckBefore } from "@/lib/ai/recovery";
 
 /** An event is retried by the sweep until this many failed attempts, then it waits for a person to look. */
 export const MAX_EVENT_ATTEMPTS = 5;
@@ -80,4 +81,36 @@ export async function listQueuedTasks(db: SupabaseClient, limit = 10): Promise<s
     .limit(limit);
   if (error) throw new Error(`Could not list tasks: ${error.message}`);
   return ((data ?? []) as Array<{ id: unknown }>).map((row) => String(row.id));
+}
+
+/**
+ * Moves tasks left in "running" by a worker that stopped back to the queue (or fails them when they are out of
+ * attempts). Returns how many were re-queued and how many failed.
+ */
+export async function recoverStuckTasks(db: SupabaseClient, now: Date = new Date()): Promise<{ requeued: number; failed: number }> {
+  const { data, error } = await db
+    .from("ai_tasks")
+    .select("id, attempts, max_attempts")
+    .eq("status", "running")
+    .lt("updated_at", stuckBefore(now))
+    .limit(50);
+  if (error) throw new Error(`Could not find stuck tasks: ${error.message}`);
+  let requeued = 0;
+  let failed = 0;
+  for (const row of (data ?? []) as Array<{ id: string; attempts: number; max_attempts: number }>) {
+    const status = recoveredStatus(Number(row.attempts), Number(row.max_attempts));
+    // Only a task that is still "running" is changed, so a task that finished meanwhile is left alone.
+    const { data: changed, error: updateError } = await db
+      .from("ai_tasks")
+      .update({ status, updated_at: now.toISOString() })
+      .eq("id", row.id)
+      .eq("status", "running")
+      .select("id");
+    if (updateError) throw new Error(`Could not recover task: ${updateError.message}`);
+    if (changed && changed.length > 0) {
+      if (status === "queued") requeued += 1;
+      else failed += 1;
+    }
+  }
+  return { requeued, failed };
 }

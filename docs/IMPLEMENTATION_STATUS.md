@@ -121,7 +121,7 @@ Built in sub-steps, each tested before the next.
 - Running the real store and the live provider end to end. This needs the server key and the xAI key.
 - The approval queue screens.
 - Event triggers (the event-driven queue), the five agents' instructions, and the morning briefing.
-- Known limitation: if the store itself fails while a task is running, the task is left in `running` and nothing sweeps it yet. A recovery job is still to be built.
+- Stuck tasks: a task left in `running` for 20 minutes is re-queued (or failed when out of attempts) by the daily sweep. Its old run record stays `running`; a later pass can close those. A long attempt is limited to 8 model calls, so 20 minutes leaves room.
 
 ### 4c. Agent set-up and staff AI view — built
 - Migration `20261106270100`: the five agents for WNJO, all switched off, and a global AI budget of £0. Verified in the database: 5 agents, 0 enabled.

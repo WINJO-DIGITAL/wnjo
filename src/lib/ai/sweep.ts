@@ -4,7 +4,7 @@ import { processEvents } from "@/lib/ai/event-processor";
 import { listDueEvents, markEvent } from "@/lib/ai/event-store";
 import { buildAgentRuntime } from "@/lib/ai/agent-runtime";
 import { SupabaseTaskQueue } from "@/lib/ai/task-queue";
-import { listQueuedTasks } from "@/lib/ai/event-store";
+import { listQueuedTasks, recoverStuckTasks } from "@/lib/ai/event-store";
 
 /**
  * Processes due business events once: plans their tasks, runs the new ones, and records each result. Used by
@@ -26,6 +26,8 @@ export async function processDueEvents(db: SupabaseClient, limit = 20) {
  * by an earlier failure. A task that errors is recorded by the runner and does not stop the rest.
  */
 export async function processQueuedTasks(db: SupabaseClient, limit = 10) {
+  // Tasks whose worker stopped are returned to the queue first, so this sweep can pick them up.
+  const recovered = await recoverStuckTasks(db);
   const runtime = buildAgentRuntime(db);
   const tasks = await listQueuedTasks(db, limit);
   let ran = 0;
@@ -38,5 +40,5 @@ export async function processQueuedTasks(db: SupabaseClient, limit = 10) {
       errors += 1;
     }
   }
-  return { ran, errors };
+  return { ran, errors, recovered };
 }
