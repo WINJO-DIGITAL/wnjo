@@ -33,6 +33,7 @@ const SITES = [
   {
     id: "cafe",
     kind: "Café",
+    benefit: "An online menu, table bookings, and easy to find on Google and maps.",
     name: "Oak & Ember",
     host: "oakandember.co.uk",
     title: "Wood-fired, all day.",
@@ -49,6 +50,7 @@ const SITES = [
   {
     id: "barber",
     kind: "Barber",
+    benefit: "Services and prices up front, with appointments booked from a phone.",
     name: "Blade & Co",
     host: "bladeandco.co.uk",
     title: "Sharp cuts. Hot towels.",
@@ -65,6 +67,7 @@ const SITES = [
   {
     id: "trades",
     kind: "Electrician",
+    benefit: "The areas you cover, a call button on every page, and quote requests.",
     name: "Spark & Co",
     host: "sparkandco.co.uk",
     title: "Safe. Certified. On time.",
@@ -81,6 +84,7 @@ const SITES = [
   {
     id: "clinic",
     kind: "Physio",
+    benefit: "Treatments explained, and appointments requested without a phone call.",
     name: "Calm Physio",
     host: "calmphysio.co.uk",
     title: "Move freely again.",
@@ -228,6 +232,7 @@ export function SiteStyler() {
           ))}
         </div>
       </fieldset>
+      <p className="ss-benefit">{site.benefit}</p>
       <Link href={href} className="btn btn--primary">
         {auto ? "Get my website price" : `Price my ${site.kind.toLowerCase()} website`}
         <ArrowRight />

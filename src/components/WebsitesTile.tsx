@@ -31,7 +31,7 @@ export function WebsitesTile({
         <h2 id={titleId} className="tile__title">
           Built to win <span className="serif-em">customers.</span>
         </h2>
-        <p className="tile__line">Bespoke design, fast on every phone.</p>
+        <p className="tile__line">Designed around your business, built for phones first.</p>
         {/* Both prices in one place: the website, and the care that keeps it running. */}
         <dl className="price-pair">
           <div>

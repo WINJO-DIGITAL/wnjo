@@ -9488,3 +9488,6 @@ body:has(.dash-header) .site-footer {
 .pricing-steps__label { margin: 0; font-size: 0.875rem; color: var(--color-ink-2); }
 .pricing-steps__figure { margin: 0; font-family: var(--font-serif); font-size: 1.6rem; line-height: 1.15; color: var(--color-ink); }
 .pricing-steps__text { margin: 0; color: var(--color-ink-2); }
+
+/* Styler: one line on what the site does for the chosen kind of business. */
+.ss-benefit { margin: var(--space-3) 0 var(--space-4); color: var(--color-ink-2); max-width: 36rem; }
