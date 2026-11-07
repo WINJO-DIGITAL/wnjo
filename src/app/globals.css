@@ -9526,3 +9526,7 @@ body:has(.dash-header) .site-footer {
 .bd__steps span { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; opacity: 0.75; }
 .bd__note { margin: var(--space-3) auto var(--space-4); padding: 0 var(--space-4); width: min(100%, 64rem); font-size: 0.8125rem; opacity: 0.8; text-align: left; white-space: normal; }
 @media (min-width: 64rem) { .bd__steps { grid-template-columns: repeat(3, 1fr); } }
+
+/* Owner quotes: where the business is, and its live site. */
+.owner-quotes__meta { display: block; margin-top: 0.15rem; font-size: 0.8125rem; color: var(--color-ink-3); }
+.owner-quotes__meta a { color: inherit; }

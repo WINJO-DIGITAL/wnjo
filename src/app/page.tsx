@@ -56,7 +56,16 @@ export default function HomePage() {
                 </blockquote>
                 <figcaption>
                   <Image src={project.logo} alt="" width={36} height={36} />
-                  Owner, {project.name}
+                  <span>
+                    Owner, {project.name}
+                    <span className="owner-quotes__meta">
+                      {project.location} ·{" "}
+                      <a href={project.url} target="_blank" rel="noopener noreferrer">
+                        Visit {project.host}
+                        <span className="visually-hidden"> (opens in a new tab)</span>
+                      </a>
+                    </span>
+                  </span>
                 </figcaption>
               </figure>
             ))}
