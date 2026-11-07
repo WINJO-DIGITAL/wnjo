@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { ArrowRight } from "@/components/Icons";
+import { ArrowRight, Stopwatch } from "@/components/Icons";
 import { SiteStyler } from "@/components/interactive/SiteStyler";
-import { PriceChooser } from "@/components/PriceChooser";
 import { archivo, jost } from "@/lib/fonts";
 import { CARE_PLANS, PACKAGES, formatGBP } from "@/lib/pricing";
 
@@ -49,7 +48,10 @@ export function WebsitesTile({
         </dl>
         {ctas ? (
           <div className="tile__ctas">
-            <PriceChooser />
+            <Link href="/build" className="btn btn--primary">
+              <Stopwatch />
+              Get my price
+            </Link>
             <Link href="/pricing" className="btn btn--secondary">
               See all prices
             </Link>
