@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildBriefing, londonOffsetMinutes, londonTimeToUtc, nextBriefingAt, type BriefingFacts } from "@/lib/briefing";
+import { buildBriefing, londonOffsetMinutes, londonTimeToUtc, nextBriefingAt, londonDay, type BriefingFacts } from "@/lib/briefing";
 
 const empty: BriefingFacts = {
   activeProjects: 0,
@@ -63,5 +63,14 @@ describe("briefing", () => {
   it("states the AI spend in pounds", () => {
     const b = buildBriefing({ ...empty, aiSpendThisMonthPence: 1234 }, "2026-11-07");
     expect(b.facts.some((f) => f.text === "AI spend this month: £12.34.")).toBe(true);
+  });
+});
+
+describe("londonDay", () => {
+  it("uses the London date, not UTC, so an agency gets one briefing per local day", () => {
+    // 23:30 UTC in June is already the next day in London (BST, UTC+1).
+    expect(londonDay(new Date("2026-06-01T23:30:00Z"))).toBe("2026-06-02");
+    // 23:30 UTC in November is still the same day in London (GMT).
+    expect(londonDay(new Date("2026-11-07T23:30:00Z"))).toBe("2026-11-07");
   });
 });

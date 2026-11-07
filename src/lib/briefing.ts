@@ -91,3 +91,8 @@ export function buildBriefing(facts: BriefingFacts, generatedFor: string): Brief
 
   return { generatedFor, facts: items, recommendations };
 }
+
+/** Today's date in London as YYYY-MM-DD, so each agency gets one briefing per local day. */
+export function londonDay(now: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+}
