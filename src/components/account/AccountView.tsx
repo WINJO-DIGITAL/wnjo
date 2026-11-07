@@ -25,10 +25,26 @@ const STAGE_NOTES: Record<Stage, string> = {
   live: "It's live. Thanks for choosing WNJO.",
 };
 
-/** The order's progress as a rail: done stages tick, the current one pulses, the line fills to it. */
+/** What the customer does next, shown under the current stage. Kept to one sentence. */
+const STAGE_NEXT: Record<Stage, string> = {
+  brief_received: "Design starts once you approve the plan.",
+  designing: "We'll share the layouts here for you to review.",
+  building: "Nothing needed from you. We'll tell you when it's ready to review.",
+  reviewing: "Approve when you're happy, and we'll launch.",
+  live: "Your first care report arrives next month.",
+};
+
+/**
+ * The order's progress. Done stages tick, the current one pulses, and the line fills to it.
+ * Tap any step to read what happens there; the current step also says what comes next.
+ */
 function OrderTracker({ stage }: { stage: Stage }) {
   const current = Math.max(0, STAGES.findIndex((s) => s.id === stage));
+  const [picked, setPicked] = useState<number | null>(null);
+  const shown = picked ?? current;
   const fill = `${(current / (STAGES.length - 1)) * 100}%`;
+  const shownStage = STAGES[shown];
+  const when = shown === current ? "Now" : shown < current ? "Done" : "Coming up";
   return (
     <div className="track">
       <div className="track__now">
@@ -43,23 +59,37 @@ function OrderTracker({ stage }: { stage: Stage }) {
         <li className="track__line" aria-hidden="true"><span className="track__fill" /></li>
         {STAGES.map((s, i) => {
           const state = i < current ? "done" : i === current ? "current" : "todo";
+          const isShown = i === shown;
           return (
-            <li key={s.id} className={`track__step track__step--${state}`} aria-current={state === "current" ? "step" : undefined}>
-              <span className="track__node" aria-hidden="true">
-                {state === "done" ? (
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M2.5 7.5 5.5 10.5 11.5 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                ) : (
-                  i + 1
-                )}
-              </span>
-              <span className="track__label">{s.short}</span>
+            <li key={s.id} className={`track__item track__step--${state}`}>
+              <button
+                type="button"
+                className="track__step"
+                aria-pressed={isShown}
+                aria-current={state === "current" ? "step" : undefined}
+                onClick={() => setPicked(i)}
+              >
+                <span className={`track__node${isShown ? " track__node--shown" : ""}`} aria-hidden="true">
+                  {state === "done" ? (
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M2.5 7.5 5.5 10.5 11.5 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ) : (
+                    i + 1
+                  )}
+                </span>
+                <span className="track__label">{s.short}</span>
+              </button>
             </li>
           );
         })}
       </ol>
-      <p className="track__note">{STAGE_NOTES[stage]}</p>
+      <div className="track__detail" aria-live="polite">
+        <p className="track__detail-when">{when}</p>
+        <p className="track__detail-title">{shownStage.label}</p>
+        <p className="track__note">{STAGE_NOTES[shownStage.id]}</p>
+        {shown === current && <p className="track__next"><span>Next</span> {STAGE_NEXT[stage]}</p>}
+      </div>
     </div>
   );
 }

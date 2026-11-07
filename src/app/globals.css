@@ -8479,12 +8479,63 @@ ol.bs {
   background: var(--color-accent);
   transition: width 0.9s var(--ease);
 }
-.track__step {
+.track__item {
   position: relative;
   display: grid;
   justify-items: center;
+}
+/* Each step is a real button, so it works with a keyboard and a screen reader. */
+.track__step {
+  display: grid;
+  justify-items: center;
   gap: 0.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: inherit;
+  font: inherit;
   text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.track__step:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+.track__node--shown {
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+.track__detail {
+  display: grid;
+  gap: 0.25rem;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line);
+}
+.track__detail-when {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+.track__detail-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.track__next {
+  margin: 0.5rem 0 0;
+  color: var(--color-ink);
+}
+.track__next span {
+  margin-right: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
 }
 .track__node {
   display: grid;
