@@ -56,3 +56,31 @@ preview or production until the owner asks.
 4. Homepage: remove repeated calls to action and repeated slogan lines; clearer section order.
 5. Portfolio with industry filters, using only verified projects.
 6. Metadata, Open Graph, structured data and sitemap checks.
+
+## Progress against the 26-point brief (local commits, not pushed)
+
+| # | Item | State |
+|---|---|---|
+| 1 | Visual identity | The existing identity (Playfair, Inter and mono type; sand, espresso and terracotta palette; one button system with hover, press, focus and disabled states; 30 reduced-motion rules) was reviewed and kept. No full redesign: needs a design direction from the owner. The "Bespoke" letter-spacing was not found in the build. |
+| 2 | Homepage | One Get my price under the hero, carried by the bottom bar after the hero; repeated buttons removed; "bespoke" repetition and the unmeasured speed claim removed; trust row and owner quote details added. Oak & Ember is a fictional example, so it is labelled as one, not linked. |
+| 3 | Pricing | "How the money works" cards on the pricing page, from the price list. |
+| 4 | Industries | One line per business type under the homepage styler (café, barber, electrician, physio). |
+| 5 | Portfolio | Industry filter on /work for the four real projects; works without JavaScript. |
+| 6 | Testimonials | Owner quotes show business location and a link to the live site. No invented details. |
+| 7 | Booking demo | Three-step explanation and an example-details note; pause control labelled. |
+| 8 | Enquiry | Tested in a browser: validation stops empty steps, busy state while sending, clear failure message. Plain no-JavaScript form with Message received / not sent pages. Live delivery needs the deployed site. |
+| 9 | Navigation | Breadcrumbs on internal pages; footer links updated. |
+| 10 | Phone | Call us in the footer, bottom bar and phone menu (placeholder number until the EV Exec number is confirmed). |
+| 11 | Footer | Location, contact buttons, Our work, Resources, Terms, Cookies, precise cookie line. |
+| 12 | Legal | Terms and Cookies drafts; Privacy existed. Solicitor review recommended. |
+| 13 | Accessibility | axe WCAG 2.2 AA on 19 pages at 390 and 1280 px: no violations except incidental text in the decorative spreadsheet illustration on /app-development (exempt under 1.4.3; the illustration has a text alternative). Keyboard: every stop on tested pages shows a focus ring. |
+| 14 | FAQ | Topics, search, accordion; works without JavaScript. |
+| 15 | JavaScript | Contact and build pages work without JavaScript; dead controls hidden; phone hero server-rendered. |
+| 16 | Performance | Lighthouse (local production build, simulated slow phone): accessibility, best practices and SEO 100 on /, /pricing, /websites, /contact; performance 82–94; CLS 0–0.03. Homepage LCP 4.8 s is now the family line's typing effect (protected; owner decision). Lab figures only, so no speed claim is made on the site. |
+| 17 | Trust | Published commitments only (written price, 50/50, support period) and real projects. |
+| 18 | Resources | /resources with one practical article; sitemap and robots checked. |
+| 19 | Structured data | ProfessionalService, WebSite, BreadcrumbList and Article, checked in rendered HTML. Google's Rich Results Test needs the live site. |
+| 20 | Social sharing | Open Graph and X cards on every page, 1200 × 630 image, canonical URLs, checked in rendered HTML. |
+| 21 | Errors | 404 links to Pricing, Websites and Contact; form failure pages; unknown articles return 404. |
+| 22 | Domain | Unchanged. |
+| 25 | Verification | 19 pages at two widths: right status, no broken images, no console errors, 30 internal links all resolve. Unit tests, typecheck, lint and build pass. |
