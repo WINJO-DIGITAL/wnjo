@@ -157,3 +157,13 @@ Built in sub-steps, each tested before the next.
 - `claim_client_invites()` (signed-in customers only): claims invites matching the verified sign-in email, attaches the order, and adds the customer to the organisations of that order's projects. An order that already belongs to someone else is never taken over.
 - `/admin` → Orders: invite a customer by email to an order, and see whether it is waiting or linked. `/account` claims pending invites when a customer signs in.
 - Tests: `supabase/tests/client_invites.sql`, 16 checks, all passing against the live database.
+
+### 3h. Staff order tools — built, tested
+- Migrations `20261107020000` and `20261107020100`: staff can change an order's stage only (the stage date updates itself), and post updates on their own agency's orders. Updates are append-only.
+- `/admin` → Orders: open an order to set its stage and post updates the customer reads.
+- Tests: `supabase/tests/order_tools.sql`, 15 checks, all passing against the live database.
+
+### Verification after these changes
+- Isolation suite re-run against the live database after the order and invite migrations: 19 of 19 PASS.
+- `client_invites` (16) and `order_tools` (15) passing against the live database.
+- The other suites don't read or write orders, invites or order updates, so their last full run still stands. A full re-run is still to do before the next release.
