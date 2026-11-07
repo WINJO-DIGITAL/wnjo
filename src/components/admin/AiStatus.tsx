@@ -6,8 +6,8 @@ import { nextBriefingAt, type Briefing } from "@/lib/briefing";
 
 /**
  * The AI workforce: agents and their switches, recent tasks, budgets, and the approval queue. Owners and admins
- * can approve or reject high-risk actions; staff can see them but not decide. Switching agents on and changing
- * budgets still have no controls.
+ * can approve or reject high-risk actions, change the budget, and switch agents on, off or paused (through the
+ * server, which records each change). Staff can see all of it but change nothing.
  */
 
 type Agent = { agent_key: string; name: string; enabled: boolean; paused: boolean };
@@ -26,7 +26,9 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
   const [error, setError] = useState(false);
   const [briefing, setBriefing] = useState<ReportRow | null | "loading">("loading");
   const [approvals, setApprovals] = useState<Approval[] | null>(null);
-  const [canDecide, setCanDecide] = useState(false);
+  const [manage, setManage] = useState<{ tenantId: string } | null>(null);
+  const [settingsNote, setSettingsNote] = useState<string | null>(null);
+  const [budgetDraft, setBudgetDraft] = useState<{ monthly: string; warn: string } | null>(null);
   const [decisionNote, setDecisionNote] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -44,10 +46,12 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
       if (!data.user) return;
       const { data: roles } = await client
         .from("tenant_members")
-        .select("role")
+        .select("tenant_id, role")
         .eq("user_id", data.user.id)
-        .in("role", ["owner", "admin"]);
-      setCanDecide(Boolean(roles && roles.length > 0));
+        .in("role", ["owner", "admin"])
+        .limit(1);
+      const row = ((roles ?? []) as Array<{ tenant_id: string }>)[0];
+      setManage(row ? { tenantId: row.tenant_id } : null);
     });
     // loadApprovals is stable for this client; reload when the client changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,7 +91,7 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
       .then(({ data }) => setBriefing(((data as ReportRow[]) ?? [])[0] ?? null));
   }, [client]);
 
-  useEffect(() => {
+  const loadStatus = () =>
     Promise.all([
       client.from("ai_agents").select("agent_key, name, enabled, paused").order("agent_key"),
       client.from("ai_tasks").select("id, agent_key, title, status, spent_pence, created_at").order("created_at", { ascending: false }).limit(20),
@@ -98,7 +102,48 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
       setTasks(t.error ? null : ((t.data as Task[]) ?? []));
       setBudgets(b.error ? null : ((b.data as Budget[]) ?? []));
     });
+
+  useEffect(() => {
+    loadStatus();
+    // loadStatus only reads through this client; reload when the client changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client]);
+
+  const saveSettings = async (change: Record<string, unknown>, done: string) => {
+    if (!manage) return;
+    setSettingsNote(null);
+    const { data } = await client.auth.getSession();
+    const token = data.session?.access_token;
+    const res = token
+      ? await fetch("/api/admin/ai/settings", {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+          body: JSON.stringify({ tenantId: manage.tenantId, change }),
+        })
+      : null;
+    if (res?.ok) {
+      setSettingsNote(done);
+      setBudgetDraft(null);
+      loadStatus();
+    } else {
+      const body = res ? ((await res.json().catch(() => null)) as { reason?: string } | null) : null;
+      setSettingsNote(body?.reason ?? "The change couldn't be saved. Please try again.");
+    }
+  };
+
+  const saveBudget = () => {
+    if (!budgetDraft) return;
+    const monthly = Math.round(Number(budgetDraft.monthly) * 100);
+    const warn = Math.round(Number(budgetDraft.warn) * 100);
+    saveSettings({ action: "budget", monthlyPence: monthly, warnAtPence: warn }, "Budget saved. Agents can only spend within it.");
+  };
+
+  const agentState = (a: Agent) => (!a.enabled ? "off" : a.paused ? "paused" : "on");
+  const setAgentState = (a: Agent, state: string) => {
+    const enabled = state !== "off";
+    const paused = state === "paused";
+    saveSettings({ action: "agent", agentKey: a.agent_key, enabled, paused }, `${a.name} is now ${state === "off" ? "off" : state}.`);
+  };
 
   if (error) return <p role="alert">The AI status couldn&apos;t be loaded.</p>;
   if (!agents || !tasks || !budgets) return <p className="lede">Loading…</p>;
@@ -106,7 +151,46 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
   const global = budgets.find((b) => b.scope === "global");
   return (
     <div className="admin-stack">
-      <p className="acct-meta">Read-only. Agents are switched off, and the global budget is {global ? pounds(global.monthly_limit_pence) : "not set"} a month.</p>
+      <p className="acct-meta">
+        The global budget is {global ? pounds(global.monthly_limit_pence) : "not set (so no agent can spend)"} a month.
+        {manage ? " You can change it below." : " Only owners and admins can change it."}
+      </p>
+      {settingsNote && <p role="status" className="acct-meta">{settingsNote}</p>}
+
+      {manage && (
+        <div className="admin-stack">
+          <h3 className="acct-label">Monthly budget</h3>
+          {budgetDraft ? (
+            <form className="admin-form" onSubmit={(e) => { e.preventDefault(); saveBudget(); }}>
+              <label className="acct-label">
+                Monthly limit (£)
+                <input className="acct-input" inputMode="decimal" value={budgetDraft.monthly} onChange={(e) => setBudgetDraft({ ...budgetDraft, monthly: e.target.value })} />
+              </label>
+              <label className="acct-label">
+                Warn me at (£)
+                <input className="acct-input" inputMode="decimal" value={budgetDraft.warn} onChange={(e) => setBudgetDraft({ ...budgetDraft, warn: e.target.value })} />
+              </label>
+              <div className="admin-actions">
+                <button type="submit" className="btn btn--primary">Save budget</button>
+                <button type="button" className="btn btn--secondary" onClick={() => setBudgetDraft(null)}>Cancel</button>
+              </div>
+            </form>
+          ) : (
+            <button
+              type="button"
+              className="btn btn--secondary"
+              onClick={() =>
+                setBudgetDraft({
+                  monthly: String((global?.monthly_limit_pence ?? 0) / 100),
+                  warn: String((global?.warn_at_pence ?? 0) / 100),
+                })
+              }
+            >
+              Change budget
+            </button>
+          )}
+        </div>
+      )}
 
       <h3 className="acct-label">Morning briefing</h3>
       {briefing === "loading" && <p className="acct-meta">Loading the briefing…</p>}
@@ -140,7 +224,7 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
                 <span className="acct-meta"> · {a.reason}</span>
               </span>
               <span className="acct-meta">{when.format(new Date(a.created_at))}</span>
-              {canDecide && (
+              {manage && (
                 <span className="admin-actions">
                   <button type="button" className="btn btn--primary" disabled={busy === a.id} onClick={() => decide(a, "approve")}>Approve</button>
                   <button type="button" className="btn btn--secondary" disabled={busy === a.id} onClick={() => decide(a, "reject")}>Reject</button>
@@ -156,7 +240,20 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
         {agents.map((a) => (
           <li key={a.agent_key} className="admin-row-static">
             <span>{a.name}</span>
-            <span className="acct-meta">{!a.enabled ? "Off" : a.paused ? "Paused" : "On"}</span>
+            {manage ? (
+              <select
+                aria-label={`${a.name} state`}
+                className="acct-input"
+                value={agentState(a)}
+                onChange={(e) => setAgentState(a, e.target.value)}
+              >
+                <option value="off">Off</option>
+                <option value="on">On</option>
+                <option value="paused">Paused</option>
+              </select>
+            ) : (
+              <span className="acct-meta">{!a.enabled ? "Off" : a.paused ? "Paused" : "On"}</span>
+            )}
           </li>
         ))}
       </ul>

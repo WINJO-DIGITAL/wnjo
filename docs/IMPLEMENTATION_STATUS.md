@@ -166,6 +166,11 @@ Built in sub-steps, each tested before the next.
 - Processing: the staff and client send route (`POST /api/notifications/send`) processes queued events and then sends customer emails, so a client's message reaches its agent straight away. Any signed-in person may trigger it, because it only works through rows already written. The daily sweep does the same for anything missed.
 - Not yet raised as events: client file uploads, approvals decided, task failures and the deadline and website checks.
 
+### 4j. AI controls for owners — built, tested
+- `POST /api/admin/ai/settings` (owner or admin of the agency): sets the global monthly budget and warning level, and switches each agent off, on or paused. Only the server writes these; each change is written to the audit log with who made it and the values. Validation is pure and tested (8 checks): whole pence, no negatives, a warning level no higher than the budget, known agents only.
+- The AI tab shows the controls to owners and admins. Staff see the same status and change nothing.
+- Safety: the budget stays at £0 until an owner sets it, and a zero budget stops every agent before any model call. Agents are still off by default.
+
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.
