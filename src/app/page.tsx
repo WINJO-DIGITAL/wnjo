@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CtaBand } from "@/components/Blocks";
-import { ArrowRight, Stopwatch } from "@/components/Icons";
+import { ArrowRight } from "@/components/Icons";
 import { BookingDemo } from "@/components/interactive/BookingDemo";
 import { FamilyLine } from "@/components/interactive/FamilyLine";
 import { SheetToApp } from "@/components/interactive/SheetToApp";
