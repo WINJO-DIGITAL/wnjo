@@ -133,3 +133,7 @@ Built in sub-steps, each tested before the next.
 - Migration `20261106280000`: `ai_reports` table, staff read-only. The AI tab shows the latest briefing, or when the next one is due.
 - Not yet built: the server job that gathers the facts from the database and writes the report each morning. It needs the server key, and the scheduling mechanism still needs choosing.
 - Not AI-written yet: the wording is fixed and comes from the facts. Grok can add prose later, once enabled.
+
+### 4e. Event routing — built, tested
+- `src/lib/ai/events.ts`: maps 11 business events (deposit paid, QA failed, client message, deadline approaching, and others) to the agent tasks they create. Each task has a stable key, so a repeated event never creates duplicate work. An agent's own events never re-trigger that agent, which prevents loops. 6 tests, all passing.
+- Not yet built: the queue that delivers events and runs the tasks. It needs the server key, and the scheduling choice from the briefing job applies here too.
