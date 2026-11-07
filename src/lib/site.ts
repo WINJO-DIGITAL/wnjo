@@ -177,3 +177,15 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
     ],
   },
 ];
+
+/**
+ * The business telephone number, set in the environment (NEXT_PUBLIC_CONTACT_PHONE) once the owner confirms it.
+ * It is never written into the code. When unset, no call link is shown. Shown as a button, not as digits.
+ */
+export const contactPhoneHref: string | null = (() => {
+  const raw = process.env.NEXT_PUBLIC_CONTACT_PHONE?.trim();
+  if (!raw) return null;
+  const digits = raw.replace(/[^\d+]/g, "");
+  const international = digits.startsWith("+") ? digits : digits.replace(/^0/, "+44");
+  return /^\+\d{8,15}$/.test(international) ? `tel:${international}` : null;
+})();

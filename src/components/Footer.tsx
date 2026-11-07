@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { footerNav, site } from "@/lib/site";
+import { contactPhoneHref, footerNav, site } from "@/lib/site";
 import { Logo } from "./Logo";
 
 export function Footer() {
@@ -12,6 +12,17 @@ export function Footer() {
               <Logo />
             </Link>
             <p>{site.tagline}</p>
+            {/* Contact without showing the details: a call button when the number is set, and the enquiry form for email. */}
+            <ul role="list" className="site-footer__contact" aria-label="Contact WNJO">
+              {contactPhoneHref && (
+                <li>
+                  <a href={contactPhoneHref}>Call us</a>
+                </li>
+              )}
+              <li>
+                <Link href="/contact?topic=other">Email us</Link>
+              </li>
+            </ul>
           </div>
           {footerNav.map((group) => (
             <nav key={group.title} aria-label={`${group.title} links`}>

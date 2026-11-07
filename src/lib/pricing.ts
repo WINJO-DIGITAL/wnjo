@@ -13,7 +13,7 @@
 
 export const PRICING_STATUS: "provisional" | "confirmed" = "provisional";
 export const CURRENCY = "GBP";
-export const VAT_NOTE = "Prices exclude VAT. VAT treatment is still to be confirmed.";
+export const VAT_NOTE = "WNJO is not VAT registered, so no VAT is added to our prices.";
 
 /* ------------------------------------------------------------------ */
 /* Option catalogue                                                    */

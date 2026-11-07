@@ -25,8 +25,8 @@ export default function TermsPage() {
 
             <h2>Who we are</h2>
             <p>
-              These terms are between you and [legal business name], trading as {site.name}, of [registered address].
-              [Company or sole trader status and registration number to be confirmed.]
+              These terms are between you and {site.name}, a sole trader business based at 3 Knoxwood Close,
+              Cleveleys, FY5 3UP. [Town to confirm: Cleveleys or Taunton.]
             </p>
 
             <h2>Quotes</h2>
@@ -37,9 +37,9 @@ export default function TermsPage() {
 
             <h2>Deposits and balances</h2>
             <p>
-              When you accept a quote, a deposit of 50% of the quoted price is payable. The balance is requested once
-              the site is ready for final review, before launch, and is payable from your account. Payments are taken
-              through Stripe. [VAT treatment to be confirmed.]
+              When you accept a quote, a deposit of 50% of the quoted price is payable. The remaining 50% is payable
+              once the site is ready for your final review, before it goes live, so you can see the finished work
+              first. Payments are taken through Stripe. {site.name} is not VAT registered, so no VAT is charged.
             </p>
 
             <h2>Your content</h2>
@@ -56,18 +56,24 @@ export default function TermsPage() {
 
             <h2>Hosting and care</h2>
             <p>
-              [Hosting and care terms, including the monthly charge, what it covers and how it can be cancelled, to be
-              confirmed.]
+              Managed hosting is £25 a month. It covers hosting, the SSL certificate, daily backups and uptime monitoring.
+              [Notice period for cancelling hosting to be confirmed.]
             </p>
 
             <h2>Cancellation</h2>
-            <p>[Cancellation and refund terms to be confirmed, including how they apply to the deposit once work has started.]</p>
+            <p>
+              You can cancel before work starts. Once work has started, the deposit covers the work already done and is
+              not refundable. [Confirm how UK consumer cancellation rights apply to online orders.]
+            </p>
 
             <h2>Liability</h2>
-            <p>[Limits of liability to be confirmed.]</p>
+            <p>
+              Our liability for any work is limited to the price you have paid for it, except where the law does not
+              allow that limit.
+            </p>
 
             <h2>Governing law</h2>
-            <p>[Governing law and jurisdiction to be confirmed.]</p>
+            <p>These terms are governed by the law of England and Wales.</p>
 
             <p className="fine">Questions about these terms? <a href="/contact?topic=other">Contact us</a>.</p>
           </div>

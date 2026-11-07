@@ -27,12 +27,20 @@ preview or production until the owner asks.
 - 404 page routes to Pricing, Websites and Contact.
 - Booking demo control labelled clearly.
 
+## Decisions from the owner (recorded)
+
+- **Phone:** the EV Exec business number is shared by both companies. It is shown only as a "Call us" button, never as digits. It is set in the environment as `NEXT_PUBLIC_CONTACT_PHONE` and no call link appears until it is set.
+- **Email:** never shown or linked as an address. "Email us" opens the enquiry form.
+- **VAT:** WNJO is not VAT registered. The shared VAT note and the terms say so.
+- **Payment terms:** 50% deposit on acceptance, 50% once the owner has reviewed the finished site and before it goes live. Otherwise standard industry terms.
+- **Trust:** no years-in-business or launch-count claims. Reviews from clients and a Google Business profile come later.
+- **Examples:** the four example businesses in the homepage styler are labelled as examples, not real websites. Real client sites are shown as real.
+
 ## Needs business information before it can go further
 
-- Telephone number for click-to-call and the footer.
-- Public contact email address.
-- Legal entity name, trading name, registered address, company or sole-trader status, and registration number.
-- VAT status (the deposit text says no VAT is charged; confirm).
+- Confirm the town for the address: the notes say "Taunton Cleveleys" and the postcode is FY5 (Cleveleys).
+- Confirm the legal name wording: "WNJO" or your full name trading as WNJO.
+- Confirm the hosting cancellation notice period, and how UK consumer cancellation rights apply to online orders.
 - Terms: revision rounds and extra-round charges, hosting and care terms, cancellation and refund terms, liability,
   governing law, use of stock or third-party material.
 - Permission and details for each portfolio item and testimonial (full name, business, location, photo, live URL).

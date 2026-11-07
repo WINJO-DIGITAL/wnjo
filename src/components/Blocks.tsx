@@ -74,7 +74,7 @@ export function PricingNotice({ compact = false }: { compact?: boolean }) {
     return (
       <p className="notice notice--compact">
         <span>
-          <strong>Provisional pricing.</strong> Indicative, excluding VAT, and confirmed in writing before you commit.{" "}
+          <strong>Provisional pricing.</strong> Indicative, with no VAT added, and confirmed in writing before you commit.{" "}
           <Link href="/pricing">Details</Link>
         </span>
       </p>

@@ -232,6 +232,9 @@ export function SiteStyler() {
         {auto ? "Get my website price" : `Price my ${site.kind.toLowerCase()} website`}
         <ArrowRight />
       </Link>
+      <p className="fine ss-example-note">
+        Example designs only. These businesses and addresses are not real websites or clients.
+      </p>
     </div>
   );
 }
