@@ -143,9 +143,9 @@ Built in sub-steps, each tested before the next.
 - `src/lib/ai/event-worker.ts` plans an event's tasks and queues each one under its dedupe key; only new tasks run. `src/lib/ai/event-processor.ts` marks each event processed, or failed with its error so the sweep retries it (up to 5 attempts).
 - `src/lib/ai/task-queue.ts` and `src/lib/ai/event-store.ts`: the database adapters. The insert-if-new SQL they use was checked live (first insert creates, repeat is ignored, existing row found).
 - `src/lib/ai/agent-runtime.ts` runs queued tasks through the runner with the database store, budget gate and read-only tools. With no Grok key configured, queued tasks are suspended, not run.
-- Triggers: a Stripe-confirmed deposit records `deposit_paid` and processes it straight away (`/api/stripe/webhook`). A daily sweep (`/api/cron/events`, 07:45 UTC) picks up anything left over. The webhook looks the deposit up on every delivery, so a Stripe retry still records the event.
+- Triggers: a Stripe-confirmed deposit records `deposit_paid` and processes it straight away, after the webhook has answered Stripe (`after()` in `/api/stripe/webhook`). A daily sweep (`/api/cron/events`, 07:45 UTC) picks up anything left over. The webhook looks the deposit up on every delivery, so a Stripe retry still records the event.
 - Tests: 11 new unit tests (worker and processor), 123 across the suite, all passing.
-- Not yet done: an end-to-end run with a real event through the real store, which needs the service key in a test environment; and before any agent is switched on, the inline processing in the webhook must move to a background job.
+- Not yet done: an end-to-end run with a real event through the real store, which needs the service key in a test environment.
 
 ### 4h. Approval queue — built, tested (tier 2, part 2)
 - Migration `20261107060000`: `ai_approvals` (one open request per task and tool, staff read only) and `ai_tasks.approved_tools`. Tests: `supabase/tests/ai_approvals.sql`, 7 checks, passing live. The decision SQL (claim once, then re-queue) was also checked live.

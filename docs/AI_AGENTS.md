@@ -19,7 +19,7 @@ Five agents are defined for WNJO. **All are switched off**, and nothing calls a 
 ## Still to build before enabling
 - Connect the database-backed store to the budget limits (needs the server key).
 - Budget-setting screens for staff.
-- Background processing of events and tasks, so a slow model call never holds up a webhook (required before any agent is switched on).
+- Background processing of events and tasks now runs after the webhook responds (`after()`). A slow model call still runs inside a single serverless invocation, so long tasks need a proper worker before heavy use.
 - The agent instructions and their version history.
 - Connect the Grok provider once `XAI_API_KEY`, `XAI_MODEL` and the price settings are configured. The adapter has not been checked against the live API.
 
