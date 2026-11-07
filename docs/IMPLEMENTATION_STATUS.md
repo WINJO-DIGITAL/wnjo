@@ -193,7 +193,7 @@ Built in sub-steps, each tested before the next.
 ### 3j. Customer notifications and preferences — built, tested
 - Customers see their recent notices on `/account` (newest first, unread marked, mark one or all as read) and choose, for progress, messages, approvals and quotes, whether to get each one on the site and by email.
 - Progress notices now follow those choices: a switched-off on-site notice is not queued at all, and a switched-off email leaves it on the site only. Migration `20261107120000`, checked live (default emails; email off stays on site; on-site off queues nothing).
-- Gap: the quote notice still ignores these choices, because its trigger predates them. To fix in the next change.
+- Quote notices follow the same switches (migration `20261107130000`, checked live: default emails, email off stays on the site, site off queues nothing).
 
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
