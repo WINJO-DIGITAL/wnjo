@@ -30,9 +30,10 @@ const canSpotlight = () =>
  * becomes the primary one. A soft spotlight and accent edge follow the cursor
  * across each card; inert on touch and with reduced motion.
  */
-export function PlanSwiper({ plans, initial, label }: { plans: PlanCard[]; initial?: string; label: string }) {
+export function PlanSwiper({ plans, label }: { plans: PlanCard[]; label: string }) {
   const { trackRef, active, atStart, atEnd, scrollable, step, trackProps } = useDragScroll<HTMLUListElement>();
-  const [selected, setSelected] = useState(initial ?? plans[0]?.id);
+  // Nothing is chosen until the visitor picks a card, so no card is marked "Selected" on arrival.
+  const [selected, setSelected] = useState<string | null>(null);
 
   const onMove = (e: React.PointerEvent) => {
     trackProps.onPointerMove(e);
