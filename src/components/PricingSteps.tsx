@@ -10,7 +10,7 @@ export function PricingSteps() {
     <section className="pricing-steps" aria-labelledby="pricing-steps-title">
       <p className="eyebrow">How the money works</p>
       <h2 id="pricing-steps-title" className="h2">Four things to know before you commit.</h2>
-      <ol className="pricing-steps__grid">
+      <ol className="pricing-steps__grid" tabIndex={0} aria-label="Four things to know">
         {steps.map((step, i) => (
           <li key={step.id} className="pricing-steps__card">
             <span className="pricing-steps__count">{String(i + 1).padStart(2, "0")} / 04</span>

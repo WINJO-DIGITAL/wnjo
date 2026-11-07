@@ -1391,6 +1391,37 @@ main {
   font-weight: 450;
 }
 
+/* Phones: a two-column table stacks, each row an item over how it's handled, so nothing is cut off. */
+@media (max-width: 39.99rem) {
+  .table--stack {
+    min-width: 0;
+  }
+  .table--stack thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .table--stack tr {
+    display: block;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .table--stack tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .table--stack th,
+  .table--stack td {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+  .table--stack td {
+    margin-top: 0.2rem;
+  }
+}
+
 /* CTA band: centred like the tiles above it, the buttons right under the words. */
 .cta-band {
   display: grid;
@@ -3530,6 +3561,11 @@ ol.steps li::after {
   box-shadow: 0 0 0 1px var(--color-accent);
 }
 
+/* Once a package is chosen its bar takes the bottom of the screen, so the general call bar steps aside. */
+body:has(.plan-bar) .sticky-cta {
+  display: none;
+}
+
 /* The pricing flow's bar: the running total, the deposit and Continue, held to the bottom of the screen. */
 .plan-bar {
   position: fixed;
@@ -4708,15 +4744,6 @@ main #process ol.steps li::after {
   .sticky-cta {
     transform: translate(-50%, 0);
   }
-}
-
-/* Reply-time promise under the closing call to action. */
-.reply-note {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-inverse-ink-2);
 }
 
 /* ==========================================================================
@@ -6214,7 +6241,7 @@ main #process ol.steps li::after {
    the next (the second peeking in); wider screens show both side by side. */
 .owner-quotes {
   position: relative;
-  padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem) clamp(4.5rem, 3rem + 6vw, 8rem);
+  padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem) 0;
 }
 
 .owner-quotes__row {
@@ -8317,8 +8344,7 @@ ol.bs {
   border-radius: 37px;
   background: linear-gradient(180deg, #3a2e25, #2a2019);
   color: #f6f0e6;
-  font: 700 min(18px, 4.8vw) / 1 var(--font-sans);
-  text-transform: uppercase;
+  font: 600 min(18px, 4.8vw) / 1 var(--font-sans);
   white-space: nowrap;
   text-decoration: none;
   box-shadow:
@@ -8339,8 +8365,7 @@ ol.bs {
   text-align: left;
 }
 .deck__btn-main {
-  font: 700 min(22px, 5.8vw) / 1 var(--font-sans);
-  text-transform: uppercase;
+  font: 600 min(22px, 5.8vw) / 1 var(--font-sans);
 }
 .deck__btn-sub {
   font: 600 min(15px, 4vw) / 1 var(--font-sans);
@@ -9513,6 +9538,20 @@ body:has(.dash-header) .site-footer {
 /* Pricing: how the money works, four cards. */
 .pricing-steps { display: grid; gap: var(--space-4); max-width: 64rem; margin: 0 auto; padding: 0 var(--gutter, 1rem); }
 .pricing-steps__grid { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
+@media (max-width: 47.99rem) {
+  .pricing-steps__grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 78%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding-bottom: var(--space-2);
+  }
+  .pricing-steps__grid::-webkit-scrollbar { display: none; }
+  .pricing-steps__card { scroll-snap-align: start; }
+}
 @media (min-width: 48rem) { .pricing-steps__grid { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 64rem) { .pricing-steps__grid { grid-template-columns: repeat(4, 1fr); } }
 /* Editorial, not boxed: a rule above each step instead of a rounded card. */

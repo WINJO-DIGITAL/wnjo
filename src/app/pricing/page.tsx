@@ -126,7 +126,7 @@ export default function PricingPage() {
               aria-label="Costs not included in any plan"
               tabIndex={0}
             >
-              <table className="table">
+              <table className="table table--stack">
                 <thead>
                   <tr>
                     <th scope="col">Item</th>
