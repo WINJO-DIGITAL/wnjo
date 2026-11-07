@@ -27,9 +27,9 @@ import fystayLogo from "../../public/work/logos/fystay.png";
  */
 export const INDUSTRIES = [
   { id: "hospitality", label: "Hospitality" },
-  { id: "beauty", label: "Beauty and wellness" },
-  { id: "trades", label: "Trades and services" },
-  { id: "other", label: "Other businesses" },
+  { id: "beauty", label: "Beauty" },
+  { id: "trades", label: "Trades" },
+  { id: "other", label: "Other" },
 ] as const;
 export type Industry = (typeof INDUSTRIES)[number]["id"];
 

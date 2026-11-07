@@ -23,17 +23,19 @@ export function PortfolioFilter({ counts, children }: { counts: Record<Industry,
       {ready && (
         <div className="portfolio__filter" role="group" aria-label="Show work for">
           <button type="button" aria-pressed={filter === "all"} onClick={() => setFilter("all")}>
-            All work
+            All <span className="portfolio__n">{total}</span>
           </button>
           {groups.map((g) => (
             <button key={g.id} type="button" aria-pressed={filter === g.id} onClick={() => setFilter(g.id)}>
-              {g.label}
+              {g.label} <span className="portfolio__n">{counts[g.id]}</span>
             </button>
           ))}
-          <p className="acct-meta" aria-live="polite">
-            {filter === "all" ? "" : `${shown} ${shown === 1 ? "project" : "projects"}`}
-          </p>
         </div>
+      )}
+      {ready && (
+        <p className="portfolio__status" aria-live="polite">
+          {filter === "all" ? "" : `Showing ${shown} ${shown === 1 ? "project" : "projects"}`}
+        </p>
       )}
       {children}
     </div>

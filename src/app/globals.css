@@ -1686,7 +1686,7 @@ main {
   /* The two-line headline leaves room: spread the copy down the wall above the desk. The
      laptop's lid starts about a screen-width above the photo's foot, so the copy ends there. */
   .hero-ed__copy {
-    gap: clamp(0.75rem, 2.4svh, 1.5rem);
+    gap: clamp(1rem, 3.2svh, 1.75rem);
     padding-bottom: calc(100vw * 0.96);
   }
   .hero-ed__title {
@@ -1696,6 +1696,7 @@ main {
   .hero-ed .lede {
     font-size: clamp(0.9375rem, 2.05svh, 1.0625rem);
     line-height: 1.45;
+    margin-top: 1rem;
   }
   .hero-ed .btn-row {
     margin-top: 0;
@@ -9571,20 +9572,45 @@ body:has(.dash-header) .site-footer {
 .ss-benefit { margin: var(--space-3) 0 var(--space-4); color: var(--color-ink-2); max-width: 36rem; }
 
 /* Portfolio: industry filter. Hidden rows are removed with CSS, so the list itself is plain server-rendered HTML. */
-.portfolio__filter { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: var(--space-6); }
+/* Text tabs on a hairline: no boxes. The chosen one is ink with a terracotta underline; counts sit small in monospace. */
+.portfolio__filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem clamp(1rem, 0.5rem + 2vw, 2rem);
+  margin-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-line);
+}
 .portfolio__filter button {
   font: inherit;
+  font-size: 1rem;
+  position: relative;
   min-height: 2.75rem;
-  padding: 0.45rem 1rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--color-line);
+  padding: 0.5rem 0 0.7rem;
+  border: 0;
   background: transparent;
-  color: var(--color-ink-2);
+  color: var(--color-ink-3);
   cursor: pointer;
-  transition: background-color var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease);
+  transition: color var(--duration-fast) var(--ease);
 }
-.portfolio__filter button[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); border-color: var(--color-ink); }
-.portfolio__filter p { margin: 0 0 0 0.25rem; }
+.portfolio__filter button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-fast) var(--ease);
+}
+.portfolio__filter button:hover { color: var(--color-ink); }
+.portfolio__filter button[aria-pressed="true"] { color: var(--color-ink); }
+.portfolio__filter button[aria-pressed="true"]::after { transform: scaleX(1); }
+.portfolio__filter button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.portfolio__n { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.04em; margin-left: 0.2rem; vertical-align: 0.15em; opacity: 0.8; }
+.portfolio__status { margin: 0 0 var(--space-6); font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.04em; color: var(--color-ink-3); min-height: 1em; }
+.portfolio__status:empty { margin-bottom: var(--space-6); }
 .portfolio[data-filter="hospitality"] [data-industry]:not([data-industry="hospitality"]),
 .portfolio[data-filter="beauty"] [data-industry]:not([data-industry="beauty"]),
 .portfolio[data-filter="trades"] [data-industry]:not([data-industry="trades"]),
