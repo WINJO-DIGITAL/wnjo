@@ -10,11 +10,28 @@ type Membership = { tenant_id: string; role: "owner" | "admin" | "staff" };
 type Enquiry = { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string };
 type QuoteRow = { id: string; reference: string; status: string; created_at: string; expires_at: string | null; quote_versions: { version: number; range_high_pence: number; range_low_pence: number }[] };
 type OrderRow = { id: string; business_name: string; project_type: string; stage: string; created_at: string };
+type ApprovalRow = {
+  id: string;
+  title: string;
+  kind: string;
+  status: string;
+  created_at: string;
+  decided_at: string | null;
+  projects: { name: string } | null;
+  approval_responses: { decision: string; responder_email: string; comment: string; created_at: string }[];
+};
+
+const approvalStatus: Record<string, string> = {
+  open: "Waiting for client",
+  approved: "Approved",
+  changes_requested: "Changes requested",
+  withdrawn: "Withdrawn",
+};
 
 const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-type Tab = "enquiries" | "quotes" | "orders" | "projects" | "ai";
+type Tab = "enquiries" | "quotes" | "orders" | "approvals" | "projects" | "ai";
 
 /**
  * The agency's read-only control area for this step. Every query is limited by row-level security, so
@@ -74,7 +91,7 @@ export function AdminView() {
         </button>
       </div>
       <nav className="admin-tabs" aria-label="Admin sections">
-        {(["enquiries", "quotes", "orders", "projects", "ai"] as Tab[]).map((t) => (
+        {(["enquiries", "quotes", "orders", "approvals", "projects", "ai"] as Tab[]).map((t) => (
           <button
             key={t}
             type="button"
@@ -89,6 +106,7 @@ export function AdminView() {
       {tab === "enquiries" && <EnquiriesTable client={client} />}
       {tab === "quotes" && <QuotesTable client={client} />}
       {tab === "orders" && <OrdersTable client={client} />}
+      {tab === "approvals" && <ApprovalsTable client={client} />}
       {tab === "ai" && <AiStatus client={client} />}
       {tab === "projects" && <ProjectsAdmin client={client} tenantId={membership.tenant_id} userId={session.user.id} />}
     </div>
@@ -188,6 +206,50 @@ function QuotesTable({ client }: { client: SupabaseClient }) {
               <td>{r.status}</td>
               <td>{latest ? `${money.format(latest.range_low_pence / 100)} to ${money.format(latest.range_high_pence / 100)}` : "-"}</td>
               <td>{r.expires_at ? when.format(new Date(r.expires_at)) : "-"}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+function ApprovalsTable({ client }: { client: SupabaseClient }) {
+  const [rows, setRows] = useState<ApprovalRow[] | null>(null);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    client
+      .from("approval_requests")
+      .select(
+        "id, title, kind, status, created_at, decided_at, projects(name), approval_responses(decision, responder_email, comment, created_at)",
+      )
+      .order("created_at", { ascending: false })
+      .limit(100)
+      .then(({ data, error: err }) => {
+        setError(Boolean(err));
+        setRows(err ? null : ((data as unknown as ApprovalRow[]) ?? []));
+      });
+  }, [client]);
+  if (error) return <p role="alert">Approvals couldn&apos;t be loaded.</p>;
+  if (rows === null) return <p className="lede">Loading…</p>;
+  if (rows.length === 0) return <Empty text="No approval requests yet." />;
+  return (
+    <table className="admin-table">
+      <thead><tr><th scope="col">Requested</th><th scope="col">Project</th><th scope="col">Item</th><th scope="col">Status</th><th scope="col">Client response</th></tr></thead>
+      <tbody>
+        {rows.map((r) => {
+          const response = r.approval_responses[0];
+          return (
+            <tr key={r.id}>
+              <td>{when.format(new Date(r.created_at))}</td>
+              <td>{r.projects?.name ?? "-"}</td>
+              <td>{r.title} <span className="acct-meta">({r.kind})</span></td>
+              <td>{approvalStatus[r.status] ?? r.status}</td>
+              <td>
+                {response
+                  ? `${response.decision === "approve" ? "Approved" : "Asked for changes"} by ${response.responder_email} on ${when.format(new Date(response.created_at))}${response.comment ? `: "${response.comment}"` : ""}`
+                  : "-"}
+              </td>
             </tr>
           );
         })}
