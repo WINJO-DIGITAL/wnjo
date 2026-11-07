@@ -190,6 +190,11 @@ Built in sub-steps, each tested before the next.
 - Deadlines: the daily sweep raises `deadline_approaching` for open projects due within 7 days, once per project and target date (`src/lib/ai/deadlines.ts`, 4 tests; the sweep runs it before processing events).
 - Not added: approval decisions and failed tasks, because the event list has no types for them; and a website-down check, which needs an uptime monitor first.
 
+### 3j. Customer notifications and preferences — built, tested
+- Customers see their recent notices on `/account` (newest first, unread marked, mark one or all as read) and choose, for progress, messages, approvals and quotes, whether to get each one on the site and by email.
+- Progress notices now follow those choices: a switched-off on-site notice is not queued at all, and a switched-off email leaves it on the site only. Migration `20261107120000`, checked live (default emails; email off stays on site; on-site off queues nothing).
+- Gap: the quote notice still ignores these choices, because its trigger predates them. To fix in the next change.
+
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.

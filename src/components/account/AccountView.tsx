@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { QuotesPanel } from "./QuotesPanel";
 import { ProjectsPanel } from "./ProjectsPanel";
 import { Confirmation } from "./Confirmation";
+import { NotificationsPanel } from "./NotificationsPanel";
 
 export const STAGES = [
   { id: "brief_received", label: "Brief received", short: "Brief" },
@@ -257,6 +258,7 @@ export function AccountView() {
         </p>
       )}
 
+      {client && <NotificationsPanel client={client} userId={session.user.id} />}
       {client && <ProjectsPanel client={client} userId={session.user.id} />}
       {client && <QuotesPanel client={client} />}
 
