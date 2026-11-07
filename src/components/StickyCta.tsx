@@ -20,6 +20,42 @@ export function StickyCta() {
 
   useEffect(() => {
     if (HIDDEN_ON.includes(pathname)) return;
+    if (pathname === "/") {
+      // Homepage: the bar takes over from the top "Get my price" button. It shows once that button scrolls away, and
+      // steps aside only over the footer.
+      let topVisible = true;
+      let footerVisible = false;
+      const apply = () => setShow(!topVisible && !footerVisible);
+      const topObserver = new IntersectionObserver(([entry]) => {
+        topVisible = entry.isIntersecting;
+        apply();
+      });
+      const footerObserver = new IntersectionObserver(([entry]) => {
+        footerVisible = entry.isIntersecting;
+        apply();
+      });
+      // The top button is rendered by the page's own components, so it may arrive after this bar; wait for it.
+      let watched: Element | null = null;
+      const attach = () => {
+        const top = document.querySelector(".deck__btn");
+        const footer = document.querySelector(".site-footer");
+        if (top && top !== watched) {
+          watched = top;
+          topObserver.observe(top);
+        }
+        if (footer) footerObserver.observe(footer);
+        return Boolean(top);
+      };
+      const found = attach();
+      const waiter = found ? null : new MutationObserver(() => attach() && waiter?.disconnect());
+      waiter?.observe(document.body, { childList: true, subtree: true });
+      return () => {
+        waiter?.disconnect();
+        topObserver.disconnect();
+        footerObserver.disconnect();
+        setShow(false);
+      };
+    }
     const blockers = new Set<Element>();
     let frame = 0;
     const update = () => {

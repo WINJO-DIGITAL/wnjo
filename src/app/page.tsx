@@ -34,16 +34,7 @@ export default function HomePage() {
             <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
               Bespoke websites, apps and booking software for cafés, salons and trades. Priced upfront.
             </p>
-            {/* The lowest-risk step first (a price in two minutes), a person second. */}
-            <div className="btn-row rise" style={{ "--i": 3 } as React.CSSProperties}>
-              <Link href="/build" className="btn btn--primary hero-btn">
-                <Stopwatch />
-                <span className="hero-btn__text">
-                  <span className="hero-btn__main">Get my price</span>
-                  <span className="hero-btn__sub">No obligation · In 2 minutes</span>
-                </span>
-              </Link>
-            </div>
+
           </div>
         </div>
         <div aria-label="Recent work" className="container container--wide showcase-section">
@@ -150,10 +141,6 @@ export default function HomePage() {
           </>
         }
       >
-        <Link href="/build" className="btn btn--primary">
-          <Stopwatch />
-          Get my price
-        </Link>
         <Link href="/contact?topic=website" className="btn btn--secondary">
           Talk to us
         </Link>
