@@ -17,7 +17,7 @@ const playfair = Playfair_Display({
   style: ["normal", "italic"],
 });
 
-const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap", preload: false });
 
 const url = siteUrl();
 
