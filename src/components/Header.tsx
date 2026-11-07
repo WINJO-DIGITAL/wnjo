@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { primaryNav, type NavItem, type NavLink, type NavMenu } from "@/lib/site";
+import { primaryNav, type NavItem, type NavLink, type NavMenu, contactPhoneHref } from "@/lib/site";
 import { AccountMenu } from "./account/AccountMenu";
 import { DashboardHeader } from "./dashboard/DashboardHeader";
 import { Stopwatch } from "./Icons";
@@ -556,6 +556,15 @@ function SiteHeader() {
             <Stopwatch />
             Get my price
           </Link>
+          {contactPhoneHref && (
+            <a
+              href={contactPhoneHref}
+              className="btn btn--secondary mm-cta"
+              style={{ "--i": primaryNav.length + 1 } as React.CSSProperties}
+            >
+              Call us
+            </a>
+          )}
         </nav>
 
         <div className="mm-pane mm-pane--sub" inert={sub === null} aria-hidden={sub === null}>
