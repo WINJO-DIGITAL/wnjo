@@ -45,6 +45,17 @@ All are `security definer` with `search_path` set, are granted to `authenticated
 
 Errors are raised with a Postgres error code and a message safe to show: `42501` (not signed in), `P0002` (not found, which is also returned for records the caller can't see), `22023` (the request is not allowed in the current state).
 
+## Background and staff endpoints
+
+Routes that act for the business. None of them accept a payload that decides who they act for: identity comes from the caller's own sign-in token, or from the server's `CRON_SECRET`.
+
+| Route | Who calls it | Effect | Responses |
+|---|---|---|---|
+| `GET /api/cron/events` | Vercel Cron, daily 07:45 UTC, with `Authorization: Bearer $CRON_SECRET` | Processes due AI events, runs queued agent tasks (including tasks re-queued by an approval, and stuck tasks recovered), then sends queued customer emails. | 200 `{ events, tasks, notifications }`; 401 wrong secret; 503 not configured; 500 failed. |
+| `POST /api/notifications/send` | Any signed-in person, from the staff and client screens after a change | Processes due AI events, then sends queued customer emails. Only work already written to the database is done. | 200 `{ events, mail }`; 401 not signed in; 503 mail not configured (with `events`); 500 failed. |
+| `POST /api/admin/approvals/[id]` | Owner or admin of the approval's agency | Body `{ "decision": "approve" \| "reject" }`. Approving allows that tool for that task and re-queues it; rejecting fails the task. | 200 `{ status }`; 401 not signed in; 404 not found or not an owner/admin; 409 already decided; 422 invalid. |
+| `POST /api/stripe/webhook` | Stripe, with a signed request | A paid deposit is marked paid, a `deposit_paid` event is recorded and processed. A retry still records the event. | 200 handled or ignored; 400 bad signature; 500 retry. |
+
 ## Server-only operations
 Quote storage (`store_quote`), enquiry saving and agent run recording use the server's secret key and are not callable from the browser. They are described in [SECURITY.md](SECURITY.md).
 
