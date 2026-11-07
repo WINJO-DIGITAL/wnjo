@@ -84,3 +84,17 @@ preview or production until the owner asks.
 | 21 | Errors | 404 links to Pricing, Websites and Contact; form failure pages; unknown articles return 404. |
 | 22 | Domain | Unchanged. |
 | 25 | Verification | 19 pages at two widths: right status, no broken images, no console errors, 30 internal links all resolve. Unit tests, typecheck, lint and build pass. |
+
+## Round 2 (owner feedback)
+
+- Hero: Phone/Tablet switch and arrow row removed; pills, phone, one price button. Tablet screenshots no longer load.
+- Avoiding template tells (purple gradients, rounded boxed cards with matching shadows, three icon cards, emoji, many
+  competing calls to action, stock headings): pricing steps and resources restyled as editorial rules.
+- Example sites in the styler: full-photo hero, two buttons, info strip, detailed cards, per-business type and colour.
+- Price form: Skip the details and see my estimate on every step before the review; confirmation says the estimate is
+  followed by a bespoke quote by email (no time promised).
+- Contact form: budget and timing optional. Phone number confirmed as the work number. Hosting: 30 days' notice.
+- Lighthouse homepage (local, simulated slow phone): 82, LCP 4.7 s, the family line's typing. Measured without the
+  family line: 84, LCP 4.3 s, the first owner quote; that remaining delay is to investigate after the family line
+  decision.
+- Pending owner: second confirmation to remove the family line (CLAUDE.md requires two); live checks need a deploy.
