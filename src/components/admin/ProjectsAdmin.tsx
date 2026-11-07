@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { Confirmation } from "@/components/account/Confirmation";
 
 /**
  * Staff project management. Every action is a plain database call that row-level security checks for the
@@ -88,7 +89,8 @@ function ProjectDetail({ client, tenantId, userId, project, onSaved }: { client:
         <label htmlFor="proj-target" className="acct-label">Target date</label>
         <input id="proj-target" type="date" className="acct-input" value={target} onChange={(e) => setTarget(e.target.value)} />
         <button type="submit" className="btn btn--primary">Save progress</button>
-        {message && <p role={message.kind === "error" ? "alert" : "status"}>{message.text}</p>}
+        {message && message.kind === "ok" && <Confirmation title={message.text} />}
+        {message && message.kind === "error" && <p role="alert" className="acct-error">{message.text}</p>}
       </form>
 
       <Conversations client={client} tenantId={tenantId} userId={userId} projectId={project.id} />

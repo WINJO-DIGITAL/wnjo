@@ -5,6 +5,7 @@ import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { ProjectsAdmin } from "./ProjectsAdmin";
 import { AiStatus } from "./AiStatus";
+import { Confirmation } from "@/components/account/Confirmation";
 
 type Membership = { tenant_id: string; role: "owner" | "admin" | "staff" };
 type Enquiry = { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string };
@@ -386,7 +387,8 @@ function InvitesPanel({ client, tenantId }: { client: SupabaseClient; tenantId: 
           ))}
         </select>
         <button type="submit" className="btn btn--primary" disabled={busy || !orderId}>Create invite</button>
-        {message && <p role={message.kind === "error" ? "alert" : "status"}>{message.text}</p>}
+        {message && message.kind === "ok" && <Confirmation title={message.text} />}
+        {message && message.kind === "error" && <p role="alert" className="acct-error">{message.text}</p>}
       </form>
       {invites === null && <p className="lede">Invites couldn&apos;t be loaded.</p>}
       {invites && invites.length === 0 && <Empty text="No invites yet." />}
@@ -591,7 +593,8 @@ function OrderManager({ client, tenantId, orderId }: { client: SupabaseClient; t
         <button type="submit" className="btn btn--primary" disabled={busy || message.trim() === ""}>Post update</button>
       </form>
 
-      {status && <p role={status.kind === "error" ? "alert" : "status"}>{status.text}</p>}
+      {status && status.kind === "ok" && <Confirmation title={status.text} />}
+        {status && status.kind === "error" && <p role="alert" className="acct-error">{status.text}</p>}
 
       <div>
         <p className="admin-label">Updates</p>
