@@ -212,7 +212,8 @@ Built in sub-steps, each tested before the next.
 - Staff request the balance once the deposit is paid (`POST /api/admin/balance`). It records the balance as due (the total minus the 50% deposit, no VAT) and tells the client, following their quote notice choices.
 - The client pays it from their quote (`POST /api/deposits/checkout` with `kind: "balance"`). Payment is refused until staff have requested it. Stripe return pages say so.
 - The webhook marks the balance paid but does not raise a "deposit paid" event, so no work is started by it.
-- Open decisions for the owner: when the balance is requested (currently by hand, from staff), whether it should be requested automatically at launch, and the wording of the request.
+- The balance is requested automatically when the order moves to "Reviewing with you", the stage before launch, if the deposit is paid (migration `20261107170000`, checked live: created once, not again when the stage goes back and forth, not created before the deposit is paid). Staff keep the manual button as a fallback.
+- Chosen by default: request at the pre-launch review stage (industry standard for web agencies, so the final payment is settled before handover). Wording of the client notice is a draft for the owner to approve.
 - Not yet run through a real Stripe test payment end to end; the routes are type-checked and the database rules are checked live.
 
 ### 4f. Budget gate wired into the runner — built, tested
