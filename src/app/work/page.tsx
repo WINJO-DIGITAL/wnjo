@@ -6,7 +6,8 @@ import { ScrollShot } from "@/components/interactive/ScrollShot";
 import { Tilt } from "@/components/interactive/Tilt";
 import { ArrowRight, Stopwatch } from "@/components/Icons";
 import { pageMetadata } from "@/lib/metadata";
-import { projects } from "@/lib/projects";
+import { INDUSTRIES, projects, type Industry } from "@/lib/projects";
+import { PortfolioFilter } from "@/components/interactive/PortfolioFilter";
 
 export const metadata = pageMetadata(
   "/work",
@@ -15,6 +16,7 @@ export const metadata = pageMetadata(
 );
 
 export default function WorkPage() {
+  const counts = Object.fromEntries(INDUSTRIES.map((g) => [g.id, projects.filter((p) => p.industry === g.id).length])) as Record<Industry, number>;
   return (
     <>
       <PageHero
@@ -25,11 +27,13 @@ export default function WorkPage() {
 
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">
+          <PortfolioFilter counts={counts}>
           <div className="work-list">
             {projects.map((p, i) => (
               <article
                 key={p.slug}
                 id={p.slug}
+                data-industry={p.industry}
                 className="work-row"
                 data-reveal
                 aria-labelledby={`${p.slug}-title`}
@@ -97,6 +101,7 @@ export default function WorkPage() {
               </article>
             ))}
           </div>
+          </PortfolioFilter>
         </div>
       </section>
 

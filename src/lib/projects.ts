@@ -25,12 +25,22 @@ import fystayLogo from "../../public/work/logos/fystay.png";
  * by the owner). Descriptions state only what the live site itself shows: no invented
  * outcomes, metrics or testimonials (README §5, §15). Screenshots are of the live sites.
  */
+export const INDUSTRIES = [
+  { id: "hospitality", label: "Hospitality" },
+  { id: "beauty", label: "Beauty and wellness" },
+  { id: "trades", label: "Trades and services" },
+  { id: "other", label: "Other businesses" },
+] as const;
+export type Industry = (typeof INDUSTRIES)[number]["id"];
+
 export type Project = {
   slug: string;
   name: string;
   /** "client" for work built for a business; "product" for platforms WNJO runs. */
   kind: "client" | "product";
   sector: string;
+  /** The portfolio filter group: the kind of business, for visitors looking for work like theirs. */
+  industry: Industry;
   location: string;
   /** One line: what the business or product is. */
   summary: string;
@@ -62,6 +72,7 @@ export const projects: Project[] = [
     name: "EV Exec",
     kind: "client",
     sector: "Executive airport transfers",
+    industry: "trades",
     location: "Blackpool & Fylde Coast",
     summary:
       "Fixed-price executive transfers to every UK airport in electric vehicles. The business our driver and operator software was developed for.",
@@ -94,6 +105,7 @@ export const projects: Project[] = [
     name: "Boonma",
     kind: "client",
     sector: "Traditional Thai massage",
+    industry: "beauty",
     location: "Wallasey, Wirral",
     summary: "An independent Thai massage studio, presented with the warmth and calm of the treatment room.",
     challenge:
@@ -125,6 +137,7 @@ export const projects: Project[] = [
     name: "RAENG Fitness",
     kind: "client",
     sector: "Kettlebell training",
+    industry: "other",
     location: "Cumbernauld",
     summary: "Kettlebell classes, one-to-one and small group coaching, and memberships from a studio in Cumbernauld.",
     challenge:
@@ -156,6 +169,7 @@ export const projects: Project[] = [
     name: "FYStay",
     kind: "product",
     sector: "Holiday stays platform",
+    industry: "hospitality",
     location: "Blackpool & the Fylde Coast",
     summary:
       "Our own platform for independent holiday homes, apartments and guest houses from local hosts, with the full price shown before you book.",

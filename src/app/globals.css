@@ -9491,3 +9491,23 @@ body:has(.dash-header) .site-footer {
 
 /* Styler: one line on what the site does for the chosen kind of business. */
 .ss-benefit { margin: var(--space-3) 0 var(--space-4); color: var(--color-ink-2); max-width: 36rem; }
+
+/* Portfolio: industry filter. Hidden rows are removed with CSS, so the list itself is plain server-rendered HTML. */
+.portfolio__filter { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: var(--space-6); }
+.portfolio__filter button {
+  font: inherit;
+  min-height: 2.75rem;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-line);
+  background: transparent;
+  color: var(--color-ink-2);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease);
+}
+.portfolio__filter button[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); border-color: var(--color-ink); }
+.portfolio__filter p { margin: 0 0 0 0.25rem; }
+.portfolio[data-filter="hospitality"] [data-industry]:not([data-industry="hospitality"]),
+.portfolio[data-filter="beauty"] [data-industry]:not([data-industry="beauty"]),
+.portfolio[data-filter="trades"] [data-industry]:not([data-industry="trades"]),
+.portfolio[data-filter="other"] [data-industry]:not([data-industry="other"]) { display: none; }
