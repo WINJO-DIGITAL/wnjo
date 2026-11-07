@@ -28,6 +28,12 @@ type Quote = {
   latest_version: number;
   quote_versions: Version[];
 };
+/** The acceptance of a quote, with its deposit if one has been started. Null until the client accepts. */
+type Acceptance = {
+  id: string;
+  quote_id: string;
+  deposits: { status: "pending" | "paid" | "expired"; amount_pence: number }[];
+};
 
 const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const pounds = (pence: number) => money.format(pence / 100);
@@ -40,19 +46,24 @@ export function QuotesPanel({ client }: { client: SupabaseClient }) {
   const [quotes, setQuotes] = useState<Quote[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const [acceptances, setAcceptances] = useState<Acceptance[]>([]);
 
   useEffect(() => {
     let cancelled = false;
-    client
-      .from("quotes")
-      .select(
-        "id, reference, status, expires_at, latest_version, quote_versions(id, version, package_code, build_pence, range_low_pence, range_high_pence, monthly_pence, requires_scope, scope_reasons, quote_version_items(label, amount_pence, position))",
-      )
-      .order("created_at", { ascending: false })
-      .then(({ data, error }) => {
+    Promise.all([
+      client
+        .from("quotes")
+        .select(
+          "id, reference, status, expires_at, latest_version, quote_versions(id, version, package_code, build_pence, range_low_pence, range_high_pence, monthly_pence, requires_scope, scope_reasons, quote_version_items(label, amount_pence, position))",
+        )
+        .order("created_at", { ascending: false }),
+      client.from("quote_acceptances").select("id, quote_id, deposits(status, amount_pence)"),
+    ]).then(([quoteRes, acceptRes]) => {
         if (cancelled) return;
-        setLoadError(Boolean(error));
-        setQuotes(error ? null : ((data as unknown as Quote[]) ?? []));
+        const failed = Boolean(quoteRes.error || acceptRes.error);
+        setLoadError(failed);
+        setAcceptances(acceptRes.error ? [] : ((acceptRes.data as unknown as Acceptance[]) ?? []));
+        setQuotes(quoteRes.error ? null : ((quoteRes.data as unknown as Quote[]) ?? []));
       });
     return () => {
       cancelled = true;
@@ -71,7 +82,17 @@ export function QuotesPanel({ client }: { client: SupabaseClient }) {
       {quotes.map((quote) => {
         const version = quote.quote_versions.find((v) => v.version === quote.latest_version);
         if (!version) return null;
-        return <QuoteCard key={quote.id} client={client} quote={quote} version={version} onChanged={() => setRefresh((r) => r + 1)} />;
+        const acceptance = acceptances.find((a) => a.quote_id === quote.id) ?? null;
+        return (
+          <QuoteCard
+            key={quote.id}
+            client={client}
+            quote={quote}
+            version={version}
+            acceptance={acceptance}
+            onChanged={() => setRefresh((r) => r + 1)}
+          />
+        );
       })}
     </section>
   );
@@ -81,11 +102,13 @@ function QuoteCard({
   client,
   quote,
   version,
+  acceptance,
   onChanged,
 }: {
   client: SupabaseClient;
   quote: Quote;
   version: Version;
+  acceptance: Acceptance | null;
   onChanged: () => void;
 }) {
   const [name, setName] = useState("");
@@ -93,7 +116,9 @@ function QuoteCard({
   const [message, setMessage] = useState<{ kind: "error" | "ok"; text: string } | null>(null);
   const [confirmingDecline, setConfirmingDecline] = useState(false);
   const open = quote.status === "sent";
-  const [acceptanceId, setAcceptanceId] = useState<string | null>(null);
+  const [newAcceptanceId, setAcceptanceId] = useState<string | null>(null);
+  const acceptanceId = newAcceptanceId ?? acceptance?.id ?? null;
+  const deposit_row = acceptance?.deposits?.[0] ?? null;
   const deposit = gbp.format(depositPence(version.build_pence) / 100);
   const items = [...version.quote_version_items].sort((a, b) => a.position - b.position);
 
@@ -239,7 +264,12 @@ function QuoteCard({
         </form>
       )}
 
-      {acceptanceId && (
+      {acceptanceId && deposit_row?.status === "paid" && (
+        <div className="acct-deposit">
+          <p role="status">Deposit received: {pounds(deposit_row.amount_pence)}. Thank you. The balance is due on launch.</p>
+        </div>
+      )}
+      {acceptanceId && deposit_row?.status !== "paid" && (
         <div className="acct-deposit">
           <p>To start the work, pay the 50% deposit of {deposit}. The balance is due on launch. No VAT is charged.</p>
           <button type="button" className="btn btn--primary" onClick={payDeposit} disabled={busy}>

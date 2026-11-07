@@ -116,6 +116,14 @@ export function AccountView() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [loadError, setLoadError] = useState(false);
+  // Set once from the Stripe return address (?deposit=paid or ?deposit=cancelled); read before first paint.
+  const [depositNotice] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    const outcome = new URLSearchParams(window.location.search).get("deposit");
+    if (outcome === "paid") return "Thank you. We're confirming your deposit now. It will show on your quote within a minute.";
+    if (outcome === "cancelled") return "Your deposit wasn't taken. You can try again from your quote.";
+    return null;
+  });
 
   useEffect(() => {
     if (!client) return;
@@ -201,6 +209,7 @@ export function AccountView() {
       </div>
 
       {loadError && <p role="alert">We couldn&apos;t load your orders. Please refresh the page.</p>}
+      {depositNotice && <p role="status">{depositNotice}</p>}
 
       {orders && orders.length === 0 && (
         <p className="lede">
