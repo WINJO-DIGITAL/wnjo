@@ -27,7 +27,7 @@ export default async function BuildPage({
       <PageHero
         eyebrow="Website configurator"
         title={<>Build <span className="serif-em">your website.</span></>}
-        lede="Answer a few short questions and watch the estimate update as you go. You can change any answer before sending, and nothing is charged at this stage."
+        lede="A few quick answers, and your written quote arrives instantly. Nothing is charged."
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">

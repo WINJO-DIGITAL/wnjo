@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { contactPhoneHref } from "@/lib/site";
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { EMPTY_DETAILS, describeAnswers, formatBrief, type BriefDetails } from "@/lib/brief";
 import { LIMITS, validateEnquiry, type FieldErrors } from "@/lib/enquiry";
@@ -229,7 +228,6 @@ function ConfiguratorInner({ params, inBrowser }: { params: ConfiguratorParams; 
               <strong>{contact.email}</strong>. Nothing is booked or charged until you accept it.
             </p>
           )}
-          {state.callback && <p>{state.callback}</p>}
           <SummaryList answers={answers} details={details} />
           <EstimateBreakdown result={result} answers={answers} />
           <div className="btn-row">
@@ -237,11 +235,6 @@ function ConfiguratorInner({ params, inBrowser }: { params: ConfiguratorParams; 
               <Link href="/account" className="btn btn--primary">
                 Sign in to see your quote
               </Link>
-            )}
-            {contactPhoneHref && (
-              <a href={contactPhoneHref} className="btn btn--secondary">
-                Call us
-              </a>
             )}
             <Link href="/" className="btn btn--secondary">
               Back to home

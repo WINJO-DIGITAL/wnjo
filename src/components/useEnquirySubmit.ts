@@ -6,7 +6,7 @@ import type { FieldErrors } from "@/lib/enquiry";
 export type SubmitState =
   | { status: "idle" }
   | { status: "submitting" }
-  | { status: "success"; reference?: string; quoteReference?: string; callback?: string }
+  | { status: "success"; reference?: string; quoteReference?: string }
   | { status: "not_configured"; message: string }
   | { status: "error"; message: string; fields?: FieldErrors };
 
@@ -36,10 +36,9 @@ export function useEnquirySubmit() {
         code?: string;
         reference?: string;
         quoteReference?: string;
-        callback?: string;
         fields?: FieldErrors;
       };
-      if (res.ok) return settle({ status: "success", reference: data.reference, quoteReference: data.quoteReference, callback: data.callback });
+      if (res.ok) return settle({ status: "success", reference: data.reference, quoteReference: data.quoteReference });
       if (data.code === "not_configured") {
         return settle({ status: "not_configured", message: data.error ?? "Online enquiries aren't connected yet." });
       }

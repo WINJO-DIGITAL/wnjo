@@ -164,13 +164,12 @@ describe("POST /api/enquiry with storage", () => {
     expect(res.status).toBe(502);
   });
 
-  it("issues an instant quote for a saved brief, emails it to the customer, and promises a call back", async () => {
+  it("issues an instant quote for a saved brief and emails it to the customer", async () => {
     vi.mocked(issueInstantQuote).mockResolvedValueOnce({ quoteReference: "Q-0000AB12" });
     const res = await post({ ...contact, kind: "brief", message: "", answers: DEFAULT_ANSWERS });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.quoteReference).toBe("Q-0000AB12");
-    expect(body.callback).toMatch(/call you/);
     const customerEmail = fetchMock.mock.calls.map(([, init]) => JSON.parse(init.body)).find((m) => m.subject.includes("Q-0000AB12"));
     expect(customerEmail.to).toEqual(["ada@example.com"]);
     expect(customerEmail.text).toContain("sign in at");

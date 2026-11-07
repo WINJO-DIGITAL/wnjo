@@ -49,7 +49,7 @@ export function WebsitesTile({
         </dl>
         {/* Reasons to trust the price, each one a published commitment rather than a claim. */}
         <ul className="trust-row" role="list">
-          <li>Your price in writing before you commit</li>
+          <li>Your written quote, instantly</li>
           <li>50% to start, 50% once you&apos;re happy</li>
           <li>{handoverDays} days of support after launch</li>
         </ul>

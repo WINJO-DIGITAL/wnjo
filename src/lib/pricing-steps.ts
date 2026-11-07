@@ -15,7 +15,7 @@ export function pricingSteps() {
       id: "start",
       label: "To start",
       figure: `from ${formatGBP(essential.from)}`,
-      text: `Your exact price comes in writing first. Then a 50% deposit (${formatGBP(deposit / 100)} on Essential) starts the work.`,
+      text: `Your written quote arrives instantly. Then a 50% deposit (${formatGBP(deposit / 100)} on Essential) starts the work.`,
     },
     {
       id: "finish",
