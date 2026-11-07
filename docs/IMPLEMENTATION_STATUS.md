@@ -166,4 +166,4 @@ Built in sub-steps, each tested before the next.
 ### Verification after these changes
 - Isolation suite re-run against the live database after the order and invite migrations: 19 of 19 PASS.
 - `client_invites` (16) and `order_tools` (15) passing against the live database.
-- The other suites don't read or write orders, invites or order updates, so their last full run still stands. A full re-run is still to do before the next release.
+- Full database suite re-run against the live database: all 13 suites pass, 142 checks, 0 failures (isolation 19, quotes 11, acceptance 12, store_quote 4, messages 16, approvals 16, files 9, notifications 11, project_columns 3, staff_projects 4, ai_access 6, client_invites 16, order_tools 15).
