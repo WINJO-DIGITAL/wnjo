@@ -47,7 +47,7 @@ export default function HomePage() {
 
       {/* The owners of EV Exec and Boonma, in their own words (approved by them), right after the line that says they're ours. Phones swipe between them. */}
       <section className="owner-quotes" aria-label="From the owners">
-        <div className="container container--wide" data-reveal>
+        <div className="container container--wide">
           <div className="owner-quotes__row" tabIndex={0}>
             {OWNER_QUOTES.map(({ project, quote }) => (
               <figure key={project.slug}>
