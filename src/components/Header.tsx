@@ -432,7 +432,7 @@ function SiteHeader() {
           </nav>
 
           <div className="header-cta" onMouseEnter={() => hoverItem(null)}>
-            <AccountMenu />
+            <AccountMenu signedOutLink />
             <Link href="/build" className="btn btn--primary btn--sm" onClick={closeIfSamePage} transitionTypes={NAV}>
               Get my price
             </Link>

@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
  * A signed-in person's own menu in the header: their orders and quotes, the staff admin if they are
  * staff, and sign out. Shown only when there is a session, alongside the normal site menu.
  */
-export function AccountMenu() {
+export function AccountMenu({ signedOutLink = false }: { signedOutLink?: boolean }) {
   const client = supabase();
   const [session, setSession] = useState<Session | null>(null);
   const [isStaff, setIsStaff] = useState(false);
@@ -57,7 +57,16 @@ export function AccountMenu() {
     };
   }, [open]);
 
-  if (!client || !session) return null;
+  if (!client) return null;
+  if (!session) {
+    // Visitors who aren't signed in get a quiet link to the customer sign-in, from the site header.
+    if (!signedOutLink) return null;
+    return (
+      <Link href="/account" className="account-menu__signin">
+        Client sign-in
+      </Link>
+    );
+  }
 
   const email = session.user.email ?? "";
   const initial = (email.charAt(0) || "?").toUpperCase();

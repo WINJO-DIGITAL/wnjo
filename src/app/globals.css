@@ -9444,3 +9444,23 @@ tr[aria-selected="true"] {
 body:has(.dash-header) .site-footer {
   display: none;
 }
+
+/* Quiet "Client sign-in" link in the site header, for visitors who are not signed in. */
+.account-menu__signin {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--color-ink);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.account-menu__signin:hover {
+  background: rgb(36 25 15 / 0.06);
+}
+.account-menu__signin:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
