@@ -40,7 +40,6 @@ const subscribeReduced = (onChange: () => void) => {
  */
 export function DeviceDeck({ items }: { items: Item[] }) {
   const [index, setIndex] = useState(0);
-  const [pressed, setPressed] = useState(false);
   const [mode, setMode] = useState<Mode>("phone");
   // Tablet screenshots are fetched once the visitor reaches for the switch (or the page is idle).
   const [tabletReady, setTabletReady] = useState(false);
@@ -366,10 +365,10 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       </div>
 
       <div className="deck__cta">
-        <Link href="/build" className="deck__btn" data-pressed={pressed} onClick={() => setPressed(true)}>
+        <Link href="/build" className="deck__btn">
           <Stopwatch size={20} />
           <span className="deck__btn-text">
-            <span className="deck__btn-main">{pressed ? "Opening your price…" : "Get my price"}</span>
+            <span className="deck__btn-main">Get my price</span>
             <span className="deck__btn-sub">
               Like {current.name}? In 2 minutes.
             </span>
