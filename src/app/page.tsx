@@ -12,6 +12,7 @@ import { WebsitesTile } from "@/components/WebsitesTile";
 import { jost } from "@/lib/fonts";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
+import { businessSchema } from "@/lib/structured-data";
 
 // Title, description and share image come from the root layout; only the canonical URL is added here.
 export const metadata: Metadata = siteUrl() ? { alternates: { canonical: "/" } } : {};
@@ -19,8 +20,10 @@ export const metadata: Metadata = siteUrl() ? { alternates: { canonical: "/" } }
 const evexec = projectBySlug("ev-exec")!;
 
 export default function HomePage() {
+  const schema = businessSchema(siteUrl() ?? "https://www.wnjoweb.co.uk");
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       {/*
         Hero: the message, then our real work straight beneath it, crisp and live: the
         project showcase (laptop and phone, walkthroughs playing, tabs to switch site).
