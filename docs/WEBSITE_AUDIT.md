@@ -98,3 +98,11 @@ preview or production until the owner asks.
   family line: 84, LCP 4.3 s, the first owner quote; that remaining delay is to investigate after the family line
   decision.
 - Pending owner: second confirmation to remove the family line (CLAUDE.md requires two); live checks need a deploy.
+
+## Round three
+
+- Owner: business name WNJO; terms confirmed (draft notices removed); Duratec and offers left out.
+- Owner quotes are visible on load (no reveal wrapper). Lighthouse varies between runs (81 to 88); the largest element waits on the page's CSS and fonts.
+- Quote follow-up: one reminder to customers whose quote is still open after 3 days, sent by the daily sweep, once per quote (migration 20261107190000; due-quote selection checked live).
+- Booking demo: each listed step moves the replay to its screen and holds there; start times are read from the replay's timeline.
+- Live checks: `node scripts/live-check.mjs https://www.wnjoweb.co.uk` covers pages, 404, sitemap, robots, canonical and Open Graph after every deploy. Still to run: enquiry and email delivery by hand, and Google's Rich Results Test on the homepage.
