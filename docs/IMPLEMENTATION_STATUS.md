@@ -147,6 +147,14 @@ Built in sub-steps, each tested before the next.
 - Tests: 11 new unit tests (worker and processor), 123 across the suite, all passing.
 - Not yet done: an end-to-end run with a real event through the real store, which needs the service key in a test environment; and before any agent is switched on, the inline processing in the webhook must move to a background job.
 
+### 4h. Approval queue — built, tested (tier 2, part 2)
+- Migration `20261107060000`: `ai_approvals` (one open request per task and tool, staff read only) and `ai_tasks.approved_tools`. Tests: `supabase/tests/ai_approvals.sql`, 7 checks, passing live. The decision SQL (claim once, then re-queue) was also checked live.
+- The runner records a pending approval when a task asks for a high-risk tool, then pauses the task. `POST /api/admin/approvals/[id]` lets an owner or admin approve or reject; staff are refused. Approving re-queues the task with that tool allowed for that task only; rejecting fails it. A second decision is refused.
+- The queue is shown in the AI tab of `/admin` ("Waiting for approval"). Staff see it, owners and admins can decide.
+- The daily sweep also runs queued tasks, so an approved task runs again.
+- Known limits: approval covers the tool for that task, not the exact arguments, so write tools must check their own arguments. If the task update fails after the decision is recorded, the approval stays decided and the task needs a manual look.
+- Tests: `approvals.test.ts` (3), `engine.test.ts` gained 3 approval tests. Full suite passing.
+
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.

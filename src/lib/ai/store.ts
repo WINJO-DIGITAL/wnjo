@@ -12,7 +12,7 @@ export class SupabaseRunStore implements RunStore {
   async loadTask(taskId: string) {
     const { data, error } = await this.db
       .from("ai_tasks")
-      .select("id, tenant_id, agent_key, project_id, title, status, attempts, max_attempts, budget_pence, spent_pence")
+      .select("id, tenant_id, agent_key, project_id, title, status, attempts, max_attempts, budget_pence, spent_pence, approved_tools")
       .eq("id", taskId)
       .single();
     if (error || !data) throw new Error(`Could not load task: ${error?.message ?? "not found"}`);
@@ -28,6 +28,7 @@ export class SupabaseRunStore implements RunStore {
       maxAttempts: Number(row.max_attempts),
       budgetPence: Number(row.budget_pence),
       spentPence: Number(row.spent_pence),
+      approvedTools: Array.isArray(row.approved_tools) ? (row.approved_tools as string[]) : [],
     };
   }
 
@@ -87,6 +88,28 @@ export class SupabaseRunStore implements RunStore {
       })
       .eq("id", runId);
     if (error) throw new Error(`Could not finish run: ${error.message}`);
+  }
+
+  async requestApproval(input: { taskId: string; tenantId: string; tool: string; args: Record<string, unknown>; reason: string }) {
+    // One open request per task and tool: if one is already waiting, that is the request the owner will see.
+    const { data: open, error: openError } = await this.db
+      .from("ai_approvals")
+      .select("id")
+      .eq("task_id", input.taskId)
+      .eq("tool", input.tool)
+      .eq("status", "pending")
+      .maybeSingle();
+    if (openError) throw new Error(`Could not check approvals: ${openError.message}`);
+    if (open) return;
+    const { error } = await this.db.from("ai_approvals").insert({
+      tenant_id: input.tenantId,
+      task_id: input.taskId,
+      tool: input.tool.slice(0, 80),
+      arguments: input.args,
+      reason: input.reason.slice(0, 300),
+    });
+    // 23505 means a concurrent request just created the same open approval, which is what we wanted.
+    if (error && error.code !== "23505") throw new Error(`Could not request approval: ${error.message}`);
   }
 
   async recordToolCall(input: { runId: string; tenantId: string; tool: string; allowed: boolean; denialReason?: string; args: Record<string, unknown>; resultSummary?: string }) {

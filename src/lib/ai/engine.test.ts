@@ -30,12 +30,18 @@ function forever(response: ProviderResponse): AiProvider & { calls: number } {
   return scripted([response]);
 }
 
-type Row = { id: string; tenantId: string; agentKey: string; projectId: string | null; title: string; status: string; attempts: number; maxAttempts: number; budgetPence: number; spentPence: number };
+type Row = { id: string; tenantId: string; agentKey: string; projectId: string | null; title: string; status: string; attempts: number; maxAttempts: number; budgetPence: number; spentPence: number; approvedTools: string[] };
 
 /** An in-memory store that records everything the engine writes. */
-function memoryStore(opts: { agent?: { enabled: boolean; paused: boolean } | null; permissions?: Record<string, boolean>; budgetPence?: number; maxAttempts?: number }) {
-  const task: Row = { id: "t1", tenantId: "tenant", agentKey: "developer", projectId: "p1", title: "Fix the homepage", status: "queued", attempts: 0, maxAttempts: opts.maxAttempts ?? 3, budgetPence: opts.budgetPence ?? 500, spentPence: 0 };
-  const log = { statuses: [] as string[], runs: [] as Array<{ status: string; error?: string; costPence: number }>, calls: [] as Array<{ tool: string; allowed: boolean; denialReason?: string }>, runCount: 0 };
+function memoryStore(opts: { agent?: { enabled: boolean; paused: boolean } | null; permissions?: Record<string, boolean>; budgetPence?: number; maxAttempts?: number; approvedTools?: string[] }) {
+  const task: Row = { id: "t1", tenantId: "tenant", agentKey: "developer", projectId: "p1", title: "Fix the homepage", status: "queued", attempts: 0, maxAttempts: opts.maxAttempts ?? 3, budgetPence: opts.budgetPence ?? 500, spentPence: 0, approvedTools: opts.approvedTools ?? [] };
+  const log = {
+    statuses: [] as string[],
+    runs: [] as Array<{ status: string; error?: string; costPence: number }>,
+    calls: [] as Array<{ tool: string; allowed: boolean; denialReason?: string }>,
+    approvals: [] as Array<{ tool: string; args: Record<string, unknown>; reason: string }>,
+    runCount: 0,
+  };
   const store: RunStore = {
     async loadTask() {
       return { ...task };
@@ -61,6 +67,9 @@ function memoryStore(opts: { agent?: { enabled: boolean; paused: boolean } | nul
     },
     async recordToolCall(input) {
       log.calls.push({ tool: input.tool, allowed: input.allowed, denialReason: input.denialReason });
+    },
+    async requestApproval(input) {
+      log.approvals.push({ tool: input.tool, args: input.args, reason: input.reason });
     },
   };
   return { store, task, log };
@@ -160,6 +169,36 @@ describe("agent task runner", () => {
     const second = await runTask({ taskId: "t1", provider: provider2, tools: r, store: approved.store, system: "sys", approvedTools: ["change_quote_price"], retryDelayMs: NO_DELAY });
     expect(second.status).toBe("succeeded");
     expect(ran).toBe(true);
+  });
+
+  it("records the approval the owner must decide, with the exact call it asked for", async () => {
+    const r = new ToolRegistry();
+    r.register(priceTool);
+    const { store, log } = memoryStore({ permissions: { change_quote_price: true } });
+    const provider = scripted([{ kind: "tool_call", tool: "change_quote_price", args: { amount: 900 }, usage }]);
+    await runTask({ taskId: "t1", provider, tools: r, store, system: "sys", retryDelayMs: NO_DELAY });
+    expect(log.approvals).toEqual([{ tool: "change_quote_price", args: { amount: 900 }, reason: "change_quote_price needs an owner approval first." }]);
+  });
+
+  it("runs a high-risk tool that an owner already approved for this task (stored on the task)", async () => {
+    let ran = false;
+    const r = new ToolRegistry();
+    r.register({ ...priceTool, run: async () => { ran = true; return "changed"; } });
+    const { store, log } = memoryStore({ permissions: { change_quote_price: true }, approvedTools: ["change_quote_price"] });
+    const provider = scripted([{ kind: "tool_call", tool: "change_quote_price", args: {}, usage }, { kind: "final", text: "ok", usage }]);
+    const outcome = await runTask({ taskId: "t1", provider, tools: r, store, system: "sys", retryDelayMs: NO_DELAY });
+    expect(outcome.status).toBe("succeeded");
+    expect(ran).toBe(true);
+    expect(log.approvals).toEqual([]);
+  });
+
+  it("does not let an approval for one tool allow a different high-risk tool", async () => {
+    const r = new ToolRegistry();
+    r.register({ ...priceTool, name: "change_scope", run: async () => "should not run" });
+    const { store } = memoryStore({ permissions: { change_scope: true }, approvedTools: ["change_quote_price"] });
+    const provider = scripted([{ kind: "tool_call", tool: "change_scope", args: {}, usage }]);
+    const outcome = await runTask({ taskId: "t1", provider, tools: r, store, system: "sys", retryDelayMs: NO_DELAY });
+    expect(outcome).toMatchObject({ status: "awaiting_approval", tool: "change_scope" });
   });
 
   it("does nothing for a paused agent, and never calls the model", async () => {

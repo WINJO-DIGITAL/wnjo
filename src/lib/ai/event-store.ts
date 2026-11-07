@@ -69,3 +69,15 @@ export async function markEvent(db: SupabaseClient, eventId: string, attempts: n
   const { error } = await db.from("ai_events").update(update).eq("id", eventId);
   if (error) throw new Error(`Could not mark event: ${error.message}`);
 }
+
+/** Tasks waiting in the queue, oldest first. Running them is the caller's choice. */
+export async function listQueuedTasks(db: SupabaseClient, limit = 10): Promise<string[]> {
+  const { data, error } = await db
+    .from("ai_tasks")
+    .select("id")
+    .eq("status", "queued")
+    .order("created_at", { ascending: true })
+    .limit(limit);
+  if (error) throw new Error(`Could not list tasks: ${error.message}`);
+  return ((data ?? []) as Array<{ id: unknown }>).map((row) => String(row.id));
+}

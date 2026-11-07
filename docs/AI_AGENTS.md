@@ -13,13 +13,13 @@ Five agents are defined for WNJO. **All are switched off**, and nothing calls a 
 ## How work flows
 1. A business event arrives (for example a deposit paid or a client message). `src/lib/ai/events.ts` maps it to tasks. Each task has a stable key, so duplicates do nothing. An agent's own events never trigger that agent.
 2. The runner (`src/lib/ai/runner.ts`) works through a task. Before every model call it checks the budget (task, agent, project and global limits), and it refuses tools the agent isn't permitted to use.
-3. High-risk tools stop the task and wait for an owner approval.
+3. High-risk tools stop the task and wait for an owner approval, shown in the AI tab. Approving allows that tool for that task only.
 4. Failures are retried only when they're transient, with backoff, up to a fixed number of attempts. Authentication and invalid-response errors are not retried. A runaway tool loop fails the task at once.
 
 ## Still to build before enabling
 - Connect the database-backed store to the budget limits (needs the server key).
-- The approval queue and budget-setting screens for staff.
-- The event queue that delivers events and runs tasks.
+- Budget-setting screens for staff.
+- Background processing of events and tasks, so a slow model call never holds up a webhook (required before any agent is switched on).
 - The agent instructions and their version history.
 - Connect the Grok provider once `XAI_API_KEY`, `XAI_MODEL` and the price settings are configured. The adapter has not been checked against the live API.
 

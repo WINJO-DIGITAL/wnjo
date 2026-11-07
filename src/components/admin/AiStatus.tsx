@@ -5,14 +5,16 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { nextBriefingAt, type Briefing } from "@/lib/briefing";
 
 /**
- * Read-only view of the AI workforce: agents and their switches, recent tasks, and budgets. There are no
- * controls here yet; switching agents on and changing budgets comes with the approval screens.
+ * The AI workforce: agents and their switches, recent tasks, budgets, and the approval queue. Owners and admins
+ * can approve or reject high-risk actions; staff can see them but not decide. Switching agents on and changing
+ * budgets still have no controls.
  */
 
 type Agent = { agent_key: string; name: string; enabled: boolean; paused: boolean };
 type Task = { id: string; agent_key: string; title: string; status: string; spent_pence: number; created_at: string };
 type Budget = { scope: string; scope_id: string | null; monthly_limit_pence: number; warn_at_pence: number };
 type ReportRow = { report_date: string; body: Briefing; generated_at: string };
+type Approval = { id: string; task_id: string; tool: string; reason: string; arguments: Record<string, unknown>; created_at: string };
 
 const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 const pounds = (pence: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(pence / 100);
@@ -23,6 +25,57 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
   const [budgets, setBudgets] = useState<Budget[] | null>(null);
   const [error, setError] = useState(false);
   const [briefing, setBriefing] = useState<ReportRow | null | "loading">("loading");
+  const [approvals, setApprovals] = useState<Approval[] | null>(null);
+  const [canDecide, setCanDecide] = useState(false);
+  const [decisionNote, setDecisionNote] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const loadApprovals = () =>
+    client
+      .from("ai_approvals")
+      .select("id, task_id, tool, reason, arguments, created_at")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .then(({ data, error }) => setApprovals(error ? null : ((data as Approval[]) ?? [])));
+
+  useEffect(() => {
+    loadApprovals();
+    client.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const { data: roles } = await client
+        .from("tenant_members")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .in("role", ["owner", "admin"]);
+      setCanDecide(Boolean(roles && roles.length > 0));
+    });
+    // loadApprovals is stable for this client; reload when the client changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client]);
+
+  const decide = async (approval: Approval, decision: "approve" | "reject") => {
+    setBusy(approval.id);
+    setDecisionNote(null);
+    const { data } = await client.auth.getSession();
+    const token = data.session?.access_token;
+    const res = token
+      ? await fetch(`/api/admin/approvals/${approval.id}`, {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+          body: JSON.stringify({ decision }),
+        })
+      : null;
+    setBusy(null);
+    if (res?.ok) {
+      setDecisionNote(decision === "approve" ? `Approved ${approval.tool}. The task will run again shortly.` : `Rejected ${approval.tool}. The task has stopped.`);
+      loadApprovals();
+    } else if (res?.status === 409) {
+      setDecisionNote("That request was already decided.");
+      loadApprovals();
+    } else {
+      setDecisionNote("The decision couldn't be saved. Please try again.");
+    }
+  };
 
   useEffect(() => {
     client
@@ -72,6 +125,30 @@ export function AiStatus({ client }: { client: SupabaseClient }) {
             {briefing.body.recommendations.map((r, i) => <li key={`r${i}`} className="admin-row-static">{r.text}</li>)}
           </ul>
         </div>
+      )}
+
+      <h3 className="acct-label">Waiting for approval</h3>
+      {approvals === null && <p role="alert">The approval queue couldn&apos;t be loaded.</p>}
+      {approvals && approvals.length === 0 && <p className="acct-meta">Nothing is waiting for an owner.</p>}
+      {decisionNote && <p role="status" className="acct-meta">{decisionNote}</p>}
+      {approvals && approvals.length > 0 && (
+        <ul className="admin-list" aria-label="Approvals waiting">
+          {approvals.map((a) => (
+            <li key={a.id} className="admin-row-static">
+              <span>
+                {a.tool}
+                <span className="acct-meta"> · {a.reason}</span>
+              </span>
+              <span className="acct-meta">{when.format(new Date(a.created_at))}</span>
+              {canDecide && (
+                <span className="admin-actions">
+                  <button type="button" className="btn btn--primary" disabled={busy === a.id} onClick={() => decide(a, "approve")}>Approve</button>
+                  <button type="button" className="btn btn--secondary" disabled={busy === a.id} onClick={() => decide(a, "reject")}>Reject</button>
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
 
       <h3 className="acct-label">Agents</h3>

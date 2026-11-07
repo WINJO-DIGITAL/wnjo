@@ -4,6 +4,7 @@ import { processEvents } from "@/lib/ai/event-processor";
 import { listDueEvents, markEvent } from "@/lib/ai/event-store";
 import { buildAgentRuntime } from "@/lib/ai/agent-runtime";
 import { SupabaseTaskQueue } from "@/lib/ai/task-queue";
+import { listQueuedTasks } from "@/lib/ai/event-store";
 
 /**
  * Processes due business events once: plans their tasks, runs the new ones, and records each result. Used by
@@ -18,4 +19,24 @@ export async function processDueEvents(db: SupabaseClient, limit = 20) {
     runQueuedTask: runtime.runQueuedTask,
     markEvent: (eventId, mark) => markEvent(db, eventId, attempts.get(eventId) ?? 0, mark),
   });
+}
+
+/**
+ * Runs queued tasks that are not already running: those re-queued by an owner's approval, and any left behind
+ * by an earlier failure. A task that errors is recorded by the runner and does not stop the rest.
+ */
+export async function processQueuedTasks(db: SupabaseClient, limit = 10) {
+  const runtime = buildAgentRuntime(db);
+  const tasks = await listQueuedTasks(db, limit);
+  let ran = 0;
+  let errors = 0;
+  for (const taskId of tasks) {
+    try {
+      await runtime.runQueuedTask(taskId);
+      ran += 1;
+    } catch {
+      errors += 1;
+    }
+  }
+  return { ran, errors };
 }

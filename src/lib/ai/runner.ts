@@ -12,13 +12,15 @@ export type AgentRecord = { enabled: boolean; paused: boolean };
 
 /** Everything the runner reads or writes goes through this port, so it can be tested without a database. */
 export interface RunStore {
-  loadTask(taskId: string): Promise<{ id: string; tenantId: string; agentKey: string; projectId: string | null; title: string; status: string; attempts: number; maxAttempts: number; budgetPence: number; spentPence: number }>;
+  loadTask(taskId: string): Promise<{ id: string; tenantId: string; agentKey: string; projectId: string | null; title: string; status: string; attempts: number; maxAttempts: number; budgetPence: number; spentPence: number; approvedTools?: string[] }>;
   loadAgent(tenantId: string, agentKey: string): Promise<AgentRecord | null>;
   loadPermissions(tenantId: string, agentKey: string): Promise<Record<string, boolean>>;
   setTaskStatus(taskId: string, status: string, patch?: { attempts?: number; spentPence?: number }): Promise<void>;
   startRun(input: { taskId: string; tenantId: string; attempt: number; provider: string; model: string }): Promise<string>;
   finishRun(runId: string, input: { status: "succeeded" | "failed" | "stopped"; inputTokens: number; outputTokens: number; costPence: number; error?: string }): Promise<void>;
   recordToolCall(input: { runId: string; tenantId: string; tool: string; allowed: boolean; denialReason?: string; args: Record<string, unknown>; resultSummary?: string }): Promise<void>;
+  /** Records that a high-risk tool needs an owner's decision. Optional so simple stores can skip it. */
+  requestApproval?(input: { taskId: string; tenantId: string; tool: string; args: Record<string, unknown>; reason: string }): Promise<void>;
 }
 
 export type RunOutcome =
@@ -49,7 +51,8 @@ export async function runTask(input: {
     return { status: "suspended", reason: "The agent is disabled or paused." };
   }
   const permissions = await input.store.loadPermissions(task.tenantId, task.agentKey);
-  const approved = new Set(input.approvedTools ?? []);
+  // Tools an owner approved for this task (stored on the task) plus any approved by the caller for this run.
+  const approved = new Set([...(input.approvedTools ?? []), ...(task.approvedTools ?? [])]);
   let spent = task.spentPence;
   let attempts = task.attempts;
   let lastCallCost = 0;
@@ -114,6 +117,7 @@ export async function runTask(input: {
           const reason = decision.outcome === "allow" ? "Unknown tool" : decision.reason;
           await input.store.recordToolCall({ runId, tenantId: task.tenantId, tool: response.tool, allowed: false, denialReason: reason, args: response.args });
           if (decision.outcome === "needs_approval") {
+            await input.store.requestApproval?.({ taskId: task.id, tenantId: task.tenantId, tool: response.tool, args: response.args, reason });
             await input.store.finishRun(runId, { status: "stopped", inputTokens, outputTokens, costPence, error: reason });
             await input.store.setTaskStatus(task.id, "awaiting_approval", { spentPence: spent, attempts });
             return { status: "awaiting_approval", tool: response.tool, reason };
