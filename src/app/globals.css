@@ -8864,3 +8864,75 @@ tr[aria-selected="true"] {
   border-style: dashed;
   border-color: var(--color-ink-3);
 }
+
+/* Signed-in person's own menu, in the header beside the price button. */
+.account-menu {
+  position: relative;
+  margin-right: var(--space-2);
+}
+.account-menu__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.account-menu__button:focus-visible,
+.account-menu__item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.account-menu__avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--color-ink-2);
+  color: var(--color-surface);
+  font-weight: 600;
+}
+.account-menu__panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 60;
+  display: grid;
+  min-width: 240px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  background: var(--color-surface);
+  box-shadow: 0 16px 32px -16px rgb(46 36 29 / 0.35);
+}
+.account-menu__who {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-3);
+  overflow-wrap: anywhere;
+}
+.account-menu__item {
+  display: block;
+  padding: 0.75rem;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 0.9375rem;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.account-menu__item:hover {
+  background: var(--color-bg);
+}

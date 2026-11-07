@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { primaryNav, type NavItem, type NavLink, type NavMenu } from "@/lib/site";
+import { AccountMenu } from "./account/AccountMenu";
 import { Stopwatch } from "./Icons";
 import { Logo } from "./Logo";
 
@@ -430,6 +431,7 @@ export function Header() {
           </nav>
 
           <div className="header-cta" onMouseEnter={() => hoverItem(null)}>
+            <AccountMenu />
             <Link href="/build" className="btn btn--primary btn--sm" onClick={closeIfSamePage} transitionTypes={NAV}>
               Get my price
             </Link>
