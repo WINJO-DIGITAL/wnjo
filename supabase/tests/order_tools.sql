@@ -65,11 +65,11 @@ begin
   end;
 
   -- Staff post a dated update on their own order
-  insert into public.order_updates (id, order_id, message) values (u_w, o_w, 'Layouts are drawn. Three directions to choose from.');
+  insert into public.order_updates (id, tenant_id, order_id, message) values (u_w, W, o_w, 'Layouts are drawn. Three directions to choose from.');
   report := report || E'PASS staff can post an update on their own order\n';
   -- ...but not on another agency's order
   begin
-    insert into public.order_updates (order_id, message) values (o_t, 'Not ours');
+    insert into public.order_updates (tenant_id, order_id, message) values (T, o_t, 'Not ours');
     report := report || E'FAIL staff posted an update on another agency''s order\n';
   exception when insufficient_privilege then
     report := report || E'PASS staff cannot post on another agency''s order\n';
@@ -89,7 +89,7 @@ begin
   end;
   -- Empty updates are refused
   begin
-    insert into public.order_updates (order_id, message) values (o_w, '');
+    insert into public.order_updates (tenant_id, order_id, message) values (W, o_w, '');
     report := report || E'FAIL an empty update was accepted\n';
   exception when check_violation then
     report := report || E'PASS an empty update is refused\n';
@@ -105,7 +105,7 @@ begin
   get diagnostics n = row_count;
   report := report || format(E'%s the customer cannot move the stage (rows %s, want 0)\n', case when n = 0 then 'PASS' else 'FAIL' end, n);
   begin
-    insert into public.order_updates (order_id, message) values (o_w, 'Sneaky');
+    insert into public.order_updates (tenant_id, order_id, message) values (W, o_w, 'Sneaky');
     report := report || E'FAIL the customer posted an update\n';
   exception when insufficient_privilege then
     report := report || E'PASS the customer cannot post updates\n';
