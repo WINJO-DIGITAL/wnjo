@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { contactPhoneHref } from "@/lib/site";
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { EMPTY_DETAILS, describeAnswers, formatBrief, type BriefDetails } from "@/lib/brief";
 import { LIMITS, validateEnquiry, type FieldErrors } from "@/lib/enquiry";
@@ -213,17 +214,35 @@ function ConfiguratorInner({ params, inBrowser }: { params: ConfiguratorParams; 
         <div className="card card--raised stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
           <p className="eyebrow">Brief received</p>
           <h2 className="h2" tabIndex={-1} ref={(el) => el?.focus()}>
-            Thank you, {contact.name.split(" ")[0]}. Your brief is with us.
+            {state.quoteReference
+              ? <>Your quote is ready, {contact.name.split(" ")[0]}.</>
+              : <>Thank you, {contact.name.split(" ")[0]}. Your brief is with us.</>}
           </h2>
-          <p className="muted">
-            The price above is your estimate. We&apos;ll check your answers and send your bespoke quote to{" "}
-            <strong>{contact.email}</strong>
-            {result.requiresScope ? ", after a short call to agree the scope" : ""}. Nothing is booked or charged until you
-            accept it.
-          </p>
+          {state.quoteReference ? (
+            <p className="muted">
+              Quote <strong>{state.quoteReference}</strong> is on its way to <strong>{contact.email}</strong>. Sign in with
+              that email to see it in full and accept it. Nothing is charged until you do.
+            </p>
+          ) : (
+            <p className="muted">
+              The price above is your estimate. We&apos;ll check your answers and send your bespoke quote to{" "}
+              <strong>{contact.email}</strong>. Nothing is booked or charged until you accept it.
+            </p>
+          )}
+          {state.callback && <p>{state.callback}</p>}
           <SummaryList answers={answers} details={details} />
           <EstimateBreakdown result={result} answers={answers} />
           <div className="btn-row">
+            {state.quoteReference && (
+              <Link href="/account" className="btn btn--primary">
+                Sign in to see your quote
+              </Link>
+            )}
+            {contactPhoneHref && (
+              <a href={contactPhoneHref} className="btn btn--secondary">
+                Call us
+              </a>
+            )}
             <Link href="/" className="btn btn--secondary">
               Back to home
             </Link>

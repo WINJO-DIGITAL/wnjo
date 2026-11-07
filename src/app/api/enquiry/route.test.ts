@@ -3,11 +3,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_ANSWERS } from "@/lib/pricing";
 import { POST } from "./route";
 import { saveEnquiry } from "@/lib/enquiry-store";
+import { issueInstantQuote } from "@/lib/instant-quote";
 
 // Storage is switched on per test with STORE_ON, so the other tests keep their behaviour.
 vi.mock("@/lib/enquiry-store", () => ({
   enquiryStoreConfigured: () => process.env.STORE_ON === "1",
   saveEnquiry: vi.fn(async () => true),
+}));
+
+// The instant quote needs the database; it is stubbed, and returns no quote unless a test says otherwise.
+vi.mock("@/lib/instant-quote", () => ({
+  issueInstantQuote: vi.fn(async () => null),
 }));
 
 let ipCounter = 0;
@@ -156,5 +162,32 @@ describe("POST /api/enquiry with storage", () => {
     fetchMock.mockResolvedValue(new Response("{}", { status: 500 }));
     const res = await post(contact);
     expect(res.status).toBe(502);
+  });
+
+  it("issues an instant quote for a saved brief, emails it to the customer, and promises a call back", async () => {
+    vi.mocked(issueInstantQuote).mockResolvedValueOnce({ quoteReference: "Q-0000AB12" });
+    const res = await post({ ...contact, kind: "brief", message: "", answers: DEFAULT_ANSWERS });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.quoteReference).toBe("Q-0000AB12");
+    expect(body.callback).toMatch(/call you/);
+    const customerEmail = fetchMock.mock.calls.map(([, init]) => JSON.parse(init.body)).find((m) => m.subject.includes("Q-0000AB12"));
+    expect(customerEmail.to).toEqual(["ada@example.com"]);
+    expect(customerEmail.text).toContain("sign in at");
+  });
+
+  it("still succeeds without an instant quote when issuing one fails", async () => {
+    vi.mocked(issueInstantQuote).mockRejectedValueOnce(new Error("database down"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await post({ ...contact, kind: "brief", message: "", answers: DEFAULT_ANSWERS });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.quoteReference).toBeUndefined();
+  });
+
+  it("does not issue a quote for a contact message", async () => {
+    vi.mocked(issueInstantQuote).mockClear();
+    await post(contact);
+    expect(issueInstantQuote).not.toHaveBeenCalled();
   });
 });

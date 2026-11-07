@@ -1,10 +1,12 @@
 import { randomBytes } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { BUDGETS, LIMITS, MIN_FILL_MS, TIMELINES, TOPICS, clean, validateEnquiry } from "@/lib/enquiry";
-import { mailConfig, sendEnquiryEmail } from "@/lib/mailer";
+import { mailConfig, notificationMailConfig, sendEmail, sendEnquiryEmail } from "@/lib/mailer";
+import { issueInstantQuote } from "@/lib/instant-quote";
+import { callbackPromise, quoteEmail } from "@/lib/callback";
 import { enquiryStoreConfigured, saveEnquiry } from "@/lib/enquiry-store";
 import { formatBrief } from "@/lib/brief";
-import { PROJECT_TYPES, parseAnswers } from "@/lib/pricing";
+import { PROJECT_TYPES, estimate, parseAnswers } from "@/lib/pricing";
 import { rateLimited } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -129,5 +131,34 @@ export async function POST(request: NextRequest) {
   if (!saved && !sent) {
     return reply(502, { error: "We couldn't send your message just now. Please try again shortly." });
   }
-  return reply(200, { ok: true, reference });
+
+  // A price brief gets its written quote straight away, by email and in the customer's account, plus a call-back
+  // promise. Any failure here leaves the enquiry as it is: the team still has it and can quote by hand.
+  let quoteReference: string | undefined;
+  let callback: string | undefined;
+  if (kind === "brief" && saved && briefAnswers) {
+    callback = callbackPromise(new Date());
+    try {
+      const quote = await issueInstantQuote({
+        enquiryReference: reference,
+        name: fields.name,
+        email: fields.email,
+        company: fields.company || undefined,
+        answers: briefAnswers,
+      });
+      if (quote) {
+        quoteReference = quote.quoteReference;
+        const config = notificationMailConfig();
+        if (config) {
+          const range = estimate(briefAnswers).range;
+          const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.wnjoweb.co.uk";
+          const email = quoteEmail({ name: fields.name, quoteReference, low: range.low, high: range.high, siteUrl: site, callback });
+          await sendEmail(config, { to: fields.email, subject: email.subject, text: email.text }, "Quote");
+        }
+      }
+    } catch (error) {
+      console.error("Instant quote failed:", error instanceof Error ? error.message.slice(0, 120) : "unknown error");
+    }
+  }
+  return reply(200, { ok: true, reference, quoteReference, callback });
 }
