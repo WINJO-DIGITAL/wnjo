@@ -57,12 +57,22 @@ export function QuotesPanel({ client }: { client: SupabaseClient }) {
           "id, reference, status, expires_at, latest_version, quote_versions(id, version, package_code, build_pence, range_low_pence, range_high_pence, monthly_pence, requires_scope, scope_reasons, quote_version_items(label, amount_pence, position))",
         )
         .order("created_at", { ascending: false }),
-      client.from("quote_acceptances").select("id, quote_id, deposits(status, amount_pence)"),
-    ]).then(([quoteRes, acceptRes]) => {
+      client.from("quote_acceptances").select("id, quote_id"),
+      client.from("deposits").select("quote_acceptance_id, status, amount_pence"),
+    ]).then(([quoteRes, acceptRes, depositRes]) => {
         if (cancelled) return;
         const failed = Boolean(quoteRes.error || acceptRes.error);
         setLoadError(failed);
-        setAcceptances(acceptRes.error ? [] : ((acceptRes.data as unknown as Acceptance[]) ?? []));
+        // Deposits are matched to acceptances here, in one place, rather than through a nested query.
+        const deposits = depositRes.error ? [] : ((depositRes.data as unknown as { quote_acceptance_id: string; status: "pending" | "paid" | "expired"; amount_pence: number }[]) ?? []);
+        const accepted = acceptRes.error ? [] : ((acceptRes.data as unknown as { id: string; quote_id: string }[]) ?? []);
+        setAcceptances(
+          accepted.map((a) => ({
+            id: a.id,
+            quote_id: a.quote_id,
+            deposits: deposits.filter((d) => d.quote_acceptance_id === a.id).map((d) => ({ status: d.status, amount_pence: d.amount_pence })),
+          })),
+        );
         setQuotes(quoteRes.error ? null : ((quoteRes.data as unknown as Quote[]) ?? []));
       });
     return () => {
@@ -162,6 +172,11 @@ function QuoteCard({
       return;
     }
     setBusy(false);
+    if (json?.error === "already_paid") {
+      // The deposit is already paid: refresh so the quote shows it.
+      onChanged();
+      return;
+    }
     setMessage({ kind: "error", text: "We couldn't start the deposit payment. Please try again, or ask us for help." });
   };
 
