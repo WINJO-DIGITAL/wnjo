@@ -207,6 +207,14 @@ Built in sub-steps, each tested before the next.
 - Migration `20261107150000`: two notification trigger functions could be called directly through the API by anonymous visitors. They can no longer be; their triggers still fire (checked live). A helper's search path is now fixed.
 - Still open, by choice or outside the code: signed-in users can call the access-check helpers (accepted in the database notes); leaked-password protection is off in Supabase Auth settings, which the owner needs to switch on in the dashboard.
 
+### 3l. Balance payment — built, test mode only (terms to confirm)
+- A quote's deposit and balance are now separate rows (migration `20261107160000`), checked live: both can exist on one quote, and a second balance is refused.
+- Staff request the balance once the deposit is paid (`POST /api/admin/balance`). It records the balance as due (the total minus the 50% deposit, no VAT) and tells the client, following their quote notice choices.
+- The client pays it from their quote (`POST /api/deposits/checkout` with `kind: "balance"`). Payment is refused until staff have requested it. Stripe return pages say so.
+- The webhook marks the balance paid but does not raise a "deposit paid" event, so no work is started by it.
+- Open decisions for the owner: when the balance is requested (currently by hand, from staff), whether it should be requested automatically at launch, and the wording of the request.
+- Not yet run through a real Stripe test payment end to end; the routes are type-checked and the database rules are checked live.
+
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.

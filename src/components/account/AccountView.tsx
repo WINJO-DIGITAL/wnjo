@@ -118,12 +118,15 @@ export function AccountView() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [loadError, setLoadError] = useState(false);
-  // Set once from the Stripe return address (?deposit=paid or ?deposit=cancelled); read before first paint.
+  // Set once from the Stripe return address (?deposit= or ?balance= with paid or cancelled); read before first paint.
   const [depositNotice] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
-    const outcome = new URLSearchParams(window.location.search).get("deposit");
+    const params = new URLSearchParams(window.location.search);
+    const outcome = params.get("deposit");
     if (outcome === "paid") return "Thank you. We're confirming your deposit now. It will show on your quote within a minute.";
     if (outcome === "cancelled") return "Your deposit wasn't taken. You can try again from your quote.";
+    if (params.get("balance") === "paid") return "Thank you. We're confirming your final payment now. It will show on your quote within a minute.";
+    if (params.get("balance") === "cancelled") return "Your final payment wasn't taken. You can try again from your quote.";
     return null;
   });
 

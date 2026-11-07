@@ -33,7 +33,7 @@ type Quote = {
 type Acceptance = {
   id: string;
   quote_id: string;
-  deposits: { status: "pending" | "paid" | "expired"; amount_pence: number }[];
+  deposits: { kind: "deposit" | "balance"; status: "pending" | "paid" | "expired"; amount_pence: number }[];
 };
 
 const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
@@ -59,19 +59,19 @@ export function QuotesPanel({ client }: { client: SupabaseClient }) {
         )
         .order("created_at", { ascending: false }),
       client.from("quote_acceptances").select("id, quote_id"),
-      client.from("deposits").select("quote_acceptance_id, status, amount_pence"),
+      client.from("deposits").select("quote_acceptance_id, kind, status, amount_pence"),
     ]).then(([quoteRes, acceptRes, depositRes]) => {
         if (cancelled) return;
         const failed = Boolean(quoteRes.error || acceptRes.error);
         setLoadError(failed);
         // Deposits are matched to acceptances here, in one place, rather than through a nested query.
-        const deposits = depositRes.error ? [] : ((depositRes.data as unknown as { quote_acceptance_id: string; status: "pending" | "paid" | "expired"; amount_pence: number }[]) ?? []);
+        const deposits = depositRes.error ? [] : ((depositRes.data as unknown as { quote_acceptance_id: string; kind: "deposit" | "balance"; status: "pending" | "paid" | "expired"; amount_pence: number }[]) ?? []);
         const accepted = acceptRes.error ? [] : ((acceptRes.data as unknown as { id: string; quote_id: string }[]) ?? []);
         setAcceptances(
           accepted.map((a) => ({
             id: a.id,
             quote_id: a.quote_id,
-            deposits: deposits.filter((d) => d.quote_acceptance_id === a.id).map((d) => ({ status: d.status, amount_pence: d.amount_pence })),
+            deposits: deposits.filter((d) => d.quote_acceptance_id === a.id).map((d) => ({ kind: d.kind, status: d.status, amount_pence: d.amount_pence })),
           })),
         );
         setQuotes(quoteRes.error ? null : ((quoteRes.data as unknown as Quote[]) ?? []));
@@ -129,7 +129,8 @@ function QuoteCard({
   const open = quote.status === "sent";
   const [newAcceptanceId, setAcceptanceId] = useState<string | null>(null);
   const acceptanceId = newAcceptanceId ?? acceptance?.id ?? null;
-  const deposit_row = acceptance?.deposits?.[0] ?? null;
+  const deposit_row = acceptance?.deposits?.find((d) => d.kind === "deposit") ?? null;
+  const balance_row = acceptance?.deposits?.find((d) => d.kind === "balance") ?? null;
   const deposit = gbp.format(depositPence(version.build_pence) / 100);
   const items = [...version.quote_version_items].sort((a, b) => a.position - b.position);
 
@@ -153,8 +154,8 @@ function QuoteCard({
     onChanged();
   };
 
-  /** Sends the client to the Stripe Checkout page for their 50% deposit. The server checks their access. */
-  const payDeposit = async () => {
+  /** Sends the client to the Stripe Checkout page for their deposit or their balance. The server checks their access. */
+  const payDeposit = async (kind: "deposit" | "balance" = "deposit") => {
     if (!acceptanceId) return;
     setBusy(true);
     setMessage(null);
@@ -164,7 +165,7 @@ function QuoteCard({
       ? await fetch("/api/deposits/checkout", {
           method: "POST",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ acceptanceId }),
+          body: JSON.stringify({ acceptanceId, kind }),
         }).catch(() => null)
       : null;
     const json = res ? ((await res.json().catch(() => null)) as { url?: string; error?: string } | null) : null;
@@ -178,7 +179,11 @@ function QuoteCard({
       onChanged();
       return;
     }
-    setMessage({ kind: "error", text: "We couldn't start the deposit payment. Please try again, or ask us for help." });
+    if (json?.error === "not_requested" || json?.error === "deposit_not_paid") {
+      setMessage({ kind: "error", text: json.error === "not_requested" ? "The balance hasn't been requested yet. We'll let you know when it can be paid." : "The deposit needs to be paid first." });
+      return;
+    }
+    setMessage({ kind: "error", text: kind === "balance" ? "We couldn't start the balance payment. Please try again, or ask us for help." : "We couldn't start the deposit payment. Please try again, or ask us for help." });
   };
 
   const decline = async () => {
@@ -292,8 +297,25 @@ function QuoteCard({
       {acceptanceId && deposit_row?.status !== "paid" && (
         <div className="acct-deposit">
           <p>To start the work, pay the 50% deposit of {deposit}. The balance is due on launch. No VAT is charged.</p>
-          <button type="button" className="btn btn--primary" onClick={payDeposit} disabled={busy}>
+          <button type="button" className="btn btn--primary" onClick={() => payDeposit("deposit")} disabled={busy}>
             Pay the 50% deposit
+          </button>
+        </div>
+      )}
+      {acceptanceId && deposit_row?.status === "paid" && balance_row?.status === "paid" && (
+        <div className="acct-deposit">
+          <Confirmation
+            title="Balance paid"
+            detail={`${pounds(balance_row.amount_pence)} received. Thank you, the quote is settled.`}
+            reference={quote.reference}
+          />
+        </div>
+      )}
+      {acceptanceId && deposit_row?.status === "paid" && balance_row?.status !== "paid" && balance_row && (
+        <div className="acct-deposit">
+          <p>Your final payment of {pounds(balance_row.amount_pence)} is ready. No VAT is charged.</p>
+          <button type="button" className="btn btn--primary" onClick={() => payDeposit("balance")} disabled={busy}>
+            Pay the balance
           </button>
         </div>
       )}

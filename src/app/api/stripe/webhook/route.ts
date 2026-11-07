@@ -48,12 +48,14 @@ export async function POST(request: NextRequest) {
   // the update above matches nothing, but this lookup still finds the paid deposit, so the event is recorded then.
   const { data: deposit, error: lookupError } = await db
     .from("deposits")
-    .select("id, tenant_id")
+    .select("id, tenant_id, kind")
     .eq("stripe_checkout_session_id", session.id)
     .eq("status", "paid")
     .maybeSingle();
   if (lookupError) return NextResponse.json({ error: "retry" }, { status: 500 });
   if (!deposit) return NextResponse.json({ received: true, handled: true });
+  // Only a deposit starts work. A balance payment is recorded on the quote and raises no event.
+  if ((deposit as { kind: string }).kind !== "deposit") return NextResponse.json({ received: true, handled: true });
   try {
     await recordEvent(db, {
       tenantId: (deposit as { tenant_id: string }).tenant_id,
