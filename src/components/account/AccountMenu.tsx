@@ -77,9 +77,11 @@ export function AccountMenu() {
       {open && (
         <div className="account-menu__panel" role="menu">
           <p className="account-menu__who">{email}</p>
-          <Link href="/account" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
-            Your orders and quotes
-          </Link>
+          {!isStaff && (
+            <Link href="/account" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
+              Your orders and quotes
+            </Link>
+          )}
           {isStaff && (
             <Link href="/admin" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
               Staff admin

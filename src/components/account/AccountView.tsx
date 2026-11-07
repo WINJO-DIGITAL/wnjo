@@ -152,6 +152,23 @@ export function AccountView() {
     };
   }, [client, session]);
 
+  // Staff accounts use the staff admin, not the customer pages. Checked once per session.
+  const [isStaff, setIsStaff] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!client || !session) return;
+    let cancelled = false;
+    client
+      .from("tenant_members")
+      .select("role")
+      .eq("user_id", session.user.id)
+      .then(({ data }) => {
+        if (!cancelled) setIsStaff(Boolean(data && data.length > 0));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [client, session]);
+
   if (!client) {
     return <p className="lede">Customer accounts aren&apos;t switched on yet. Please check back soon.</p>;
   }
@@ -196,6 +213,23 @@ export function AccountView() {
           <p role="alert">We couldn&apos;t send the link. Please check the address and try again.</p>
         )}
       </form>
+    );
+  }
+
+  if (isStaff) {
+    return (
+      <div className="acct">
+        <div className="acct-bar">
+          <p className="acct-meta">Signed in as {session.user.email}</p>
+          <button type="button" className="btn btn--secondary" onClick={() => client.auth.signOut()}>
+            Sign out
+          </button>
+        </div>
+        <p className="lede">
+          This is a staff account. Staff sign in to the staff admin, not the customer pages. Please{" "}
+          <a href="/admin">go to the staff admin</a> to continue.
+        </p>
+      </div>
     );
   }
 
