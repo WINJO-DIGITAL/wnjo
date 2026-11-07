@@ -9469,3 +9469,22 @@ body:has(.dash-header) .site-footer {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
+
+/* Pricing: how the money works, four cards. */
+.pricing-steps { display: grid; gap: var(--space-4); max-width: 64rem; margin: 0 auto; padding: 0 var(--gutter, 1rem); }
+.pricing-steps__grid { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
+@media (min-width: 48rem) { .pricing-steps__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 64rem) { .pricing-steps__grid { grid-template-columns: repeat(4, 1fr); } }
+.pricing-steps__card {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+.pricing-steps__count { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; color: var(--color-ink-3); }
+.pricing-steps__label { margin: 0; font-size: 0.875rem; color: var(--color-ink-2); }
+.pricing-steps__figure { margin: 0; font-family: var(--font-serif); font-size: 1.6rem; line-height: 1.15; color: var(--color-ink); }
+.pricing-steps__text { margin: 0; color: var(--color-ink-2); }

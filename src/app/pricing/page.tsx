@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CtaBand, PageHero, PricingNotice, SectionHead } from "@/components/Blocks";
 import { Stopwatch } from "@/components/Icons";
 import { PlanSwiper } from "@/components/interactive/PlanSwiper";
+import { PricingSteps } from "@/components/PricingSteps";
 import { pageMetadata } from "@/lib/metadata";
 import { appPlanCard, carePlanCards, packagePlanCards } from "@/lib/plans";
 
@@ -44,6 +45,10 @@ export default function PricingPage() {
           </Link>
         </div>
       </PageHero>
+
+      <section className="section--tight" style={{ paddingTop: 0 }} aria-label="How the money works">
+        <PricingSteps />
+      </section>
 
       <section id="packages" className="section--tight" style={{ paddingTop: 0 }} aria-labelledby="packages-title">
         <h2 id="packages-title" className="visually-hidden">
