@@ -178,6 +178,13 @@ Built in sub-steps, each tested before the next.
 - The AI tab shows the controls to owners and admins. Staff see the same status and change nothing.
 - Safety: the budget stays at £0 until an owner sets it, and a zero budget stops every agent before any model call. Agents are still off by default.
 
+### 2e. Quotes from briefs — built, tested
+- Fixed: website enquiries were never saved to the database. The enquiry insert didn't set the agency, which the table requires, so every save failed silently and only the email went out. The live table had 0 rows. Fixed in `src/lib/enquiry-store.ts` (`enquiryRow`, tested) and checked live.
+- Brief enquiries now keep their validated answers (migration `20261107100000`).
+- Staff can issue a quote from a brief in Sales → Enquiries: `POST /api/admin/quotes` prices it on the server from the agency's catalogue (the browser's figure is never used) and stores it through the existing `store_quote` function. An optional client organisation makes it visible to that client; without one it stays internal.
+- Gap still open: a client only sees a quote once they are a member of its organisation. There is no screen yet to invite a prospect into an organisation, so a new client's quote stays internal until that is added.
+- The configurator still shows the browser estimate while the customer is choosing. The issued quote is the figure that counts; the two use the same rules, checked by the parity test.
+
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.

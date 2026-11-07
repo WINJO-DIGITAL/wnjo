@@ -55,9 +55,11 @@ export async function POST(request: NextRequest) {
   ];
   let subject = `Enquiry from ${fields.name}: ${TOPICS[fields.topic]}`;
 
+  let briefAnswers: ReturnType<typeof parseAnswers> = null;
   if (kind === "brief") {
     const answers = parseAnswers(body.answers);
     if (!answers) return reply(422, { error: "Some project answers were missing. Please review your brief." });
+    briefAnswers = answers;
     // The brief (including the estimate) is recalculated here; the browser's figure is never trusted.
     const details = {
       business: clean(body.business, LIMITS.message),
@@ -101,6 +103,7 @@ export async function POST(request: NextRequest) {
         timeline: fields.timeline ? TIMELINES[fields.timeline] : undefined,
         subject: emailSubject,
         body: text,
+        answers: kind === "brief" ? briefAnswers : undefined,
       })
     : false;
   const sent = config

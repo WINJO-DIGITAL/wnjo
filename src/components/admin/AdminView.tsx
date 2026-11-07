@@ -9,7 +9,7 @@ import { Confirmation } from "@/components/account/Confirmation";
 import { sendQueuedEmails } from "@/lib/notify-client";
 
 type Membership = { tenant_id: string; role: "owner" | "admin" | "staff" };
-type Enquiry = { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string };
+type Enquiry = { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string; answers: unknown };
 type QuoteRow = { id: string; reference: string; status: string; created_at: string; expires_at: string | null; quote_versions: { version: number; range_high_pence: number; range_low_pence: number }[] };
 type OrderRow = { id: string; business_name: string; project_type: string; stage: string; created_at: string };
 type ApprovalRow = {
@@ -211,7 +211,7 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
   useEffect(() => {
     client
       .from("enquiries")
-      .select("id, reference, kind, name, email, topic, created_at")
+      .select("id, reference, kind, name, email, topic, created_at, answers")
       .order("created_at", { ascending: false })
       .limit(100)
       .then(({ data, error: err }) => {
@@ -224,7 +224,7 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
   if (rows.length === 0) return <Empty text="No enquiries yet." />;
   return (
     <table className="admin-table">
-      <thead><tr><th scope="col">Received</th><th scope="col">Reference</th><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Email</th></tr></thead>
+      <thead><tr><th scope="col">Received</th><th scope="col">Reference</th><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Email</th><th scope="col">Quote</th></tr></thead>
       <tbody>
         {rows.map((r) => (
           <tr key={r.id}>
@@ -233,10 +233,81 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
             <td>{r.name}</td>
             <td>{r.kind === "brief" ? "Brief" : "Contact"}</td>
             <td><a href={`mailto:${r.email}`}>{r.email}</a></td>
+            <td>{r.kind === "brief" && r.answers ? <QuoteFromBrief client={client} enquiryId={r.id} /> : <span className="acct-meta">—</span>}</td>
           </tr>
         ))}
       </tbody>
     </table>
+  );
+}
+
+/**
+ * Prices a brief on the server and issues the quote. The client organisation is optional: a quote with none is kept
+ * internal until the client is linked. The price is never typed in here.
+ */
+function QuoteFromBrief({ client, enquiryId }: { client: SupabaseClient; enquiryId: string }) {
+  const [open, setOpen] = useState(false);
+  const [orgs, setOrgs] = useState<Array<{ id: string; name: string }> | null>(null);
+  const [orgId, setOrgId] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+
+  const openPanel = () => {
+    setOpen(true);
+    if (orgs === null) {
+      client
+        .from("organizations")
+        .select("id, name")
+        .order("name")
+        .then(({ data }) => setOrgs(((data as Array<{ id: string; name: string }>) ?? [])));
+    }
+  };
+
+  const issue = async () => {
+    setBusy(true);
+    setNote(null);
+    const { data } = await client.auth.getSession();
+    const token = data.session?.access_token;
+    const res = token
+      ? await fetch("/api/admin/quotes", {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+          body: JSON.stringify({ enquiryId, organizationId: orgId || null }),
+        })
+      : null;
+    setBusy(false);
+    const body = res ? ((await res.json().catch(() => null)) as { reference?: string; reason?: string } | null) : null;
+    if (res?.ok && body?.reference) {
+      setNote({ kind: "ok", text: `Quote ${body.reference} issued.${orgId ? "" : " It is internal until a client is linked."}` });
+      setOpen(false);
+    } else {
+      setNote({ kind: "error", text: body?.reason ?? "The quote couldn't be issued. Please try again." });
+    }
+  };
+
+  if (!open) {
+    return (
+      <span>
+        <button type="button" className="btn btn--secondary" onClick={openPanel}>Create quote</button>
+        {note && <span role="status" className="acct-meta"> {note.text}</span>}
+      </span>
+    );
+  }
+  return (
+    <span className="admin-stack">
+      <label className="acct-meta">
+        Client organisation
+        <select className="acct-input" value={orgId} onChange={(e) => setOrgId(e.target.value)}>
+          <option value="">None yet (keep internal)</option>
+          {(orgs ?? []).map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
+        </select>
+      </label>
+      <span className="admin-actions">
+        <button type="button" className="btn btn--primary" disabled={busy} onClick={issue}>{busy ? "Pricing…" : "Issue quote"}</button>
+        <button type="button" className="btn btn--secondary" onClick={() => setOpen(false)}>Cancel</button>
+      </span>
+      {note && note.kind === "error" && <span role="alert">{note.text}</span>}
+    </span>
   );
 }
 

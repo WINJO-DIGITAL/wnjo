@@ -58,6 +58,7 @@ Routes that act for the business. None of them accept a payload that decides who
 | `POST /api/files/upload-url` | Signed-in person with access to the project | Body `{ projectId, fileName, mimeType, sizeBytes, internal? }`. Returns a one-time upload link for a new path. Clients cannot request internal uploads. | 200 `{ path, token }`; 401; 403 not allowed; 404 no such project for this person; 422 invalid (with `reason`). |
 | `POST /api/files/confirm` | Same | Body `{ projectId, path, fileName, mimeType, sizeBytes, internal? }`. Records the file once the object is confirmed in storage with the declared size. | 200 `{ id }`; 401; 403; 404; 409 not uploaded or already recorded; 422. |
 | `GET /api/files/[id]` | Anyone who can read the file | Returns a 5-minute download link `{ url, fileName }`. | 200; 401; 404 (also for files the person may not see); 422. |
+| `POST /api/admin/quotes` | Staff of the agency | Body `{ "enquiryId", "organizationId"? }`. Prices a brief enquiry on the server and stores the quote. Without an organisation the quote stays internal. | 200 `{ quoteId, reference }`; 401; 404 not found or not staff; 422 (no brief answers, or invalid input, with `reason`); 500. |
 | `POST /api/stripe/webhook` | Stripe, with a signed request | A paid deposit is marked paid, a `deposit_paid` event is recorded and processed. A retry still records the event. | 200 handled or ignored; 400 bad signature; 500 retry. |
 
 ## Server-only operations
