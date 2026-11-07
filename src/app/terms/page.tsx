@@ -26,7 +26,7 @@ export default function TermsPage() {
             <h2>Who we are</h2>
             <p>
               These terms are between you and {site.name}, a sole trader business based at 3 Knoxwood Close,
-              Cleveleys, FY5 3UP. [Town to confirm: Cleveleys or Taunton.]
+              Thornton-Cleveleys, FY5 3UP.
             </p>
 
             <h2>Quotes</h2>
@@ -62,8 +62,17 @@ export default function TermsPage() {
 
             <h2>Cancellation</h2>
             <p>
-              You can cancel before work starts. Once work has started, the deposit covers the work already done and is
-              not refundable. [Confirm how UK consumer cancellation rights apply to online orders.]
+              You have 14 days from accepting a quote to cancel, as UK consumer law allows. If you ask us to start work
+              straight away, and you cancel within those 14 days, you pay for the work done up to the point you cancel,
+              and we refund the rest of what you have paid. Once you have asked us to start, we will ask you to confirm
+              that you understand you may lose the right to cancel once work is complete.
+            </p>
+
+            <h2>Your website and files</h2>
+            <p>
+              The design and build are ours until the final payment is made. We release the finished site, its files
+              and its source code once that payment has cleared. Copyright in the bespoke design passes to you on
+              full payment. Until then, the site is hosted and shown to you for review only.
             </p>
 
             <h2>Liability</h2>
@@ -74,6 +83,10 @@ export default function TermsPage() {
 
             <h2>Governing law</h2>
             <p>These terms are governed by the law of England and Wales.</p>
+
+            <p className="fine">
+              This section should be checked by a solicitor before it is relied on.
+            </p>
 
             <p className="fine">Questions about these terms? <a href="/contact?topic=other">Contact us</a>.</p>
           </div>

@@ -13,8 +13,8 @@ async function hrefFor(value: string | undefined) {
 }
 
 describe("contactPhoneHref", () => {
-  it("shows no call link until a number is set", async () => {
-    expect(await hrefFor(undefined)).toBeNull();
+  it("uses the placeholder number until another number is set", async () => {
+    expect(await hrefFor(undefined)).toBe("tel:+447474144600");
   });
 
   it("turns a UK mobile into an international tel link", async () => {
@@ -25,7 +25,7 @@ describe("contactPhoneHref", () => {
     expect(await hrefFor("+44 7700 900123")).toBe("tel:+447700900123");
   });
 
-  it("refuses a value that is not a phone number", async () => {
+  it("falls back to the placeholder for a value that is not a phone number", async () => {
     expect(await hrefFor("call me")).toBeNull();
   });
 });

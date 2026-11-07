@@ -179,12 +179,13 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
 ];
 
 /**
- * The business telephone number, set in the environment (NEXT_PUBLIC_CONTACT_PHONE) once the owner confirms it.
- * It is never written into the code. When unset, no call link is shown. Shown as a button, not as digits.
+ * The business telephone number, shown only as a "Call us" button, never as digits. The environment value
+ * (NEXT_PUBLIC_CONTACT_PHONE) overrides the placeholder below. PLACEHOLDER: the owner's own number, to be replaced
+ * with the EV Exec business number once it is confirmed.
  */
+const CONTACT_PHONE_PLACEHOLDER = "07474 144 600";
 export const contactPhoneHref: string | null = (() => {
-  const raw = process.env.NEXT_PUBLIC_CONTACT_PHONE?.trim();
-  if (!raw) return null;
+  const raw = process.env.NEXT_PUBLIC_CONTACT_PHONE?.trim() || CONTACT_PHONE_PLACEHOLDER;
   const digits = raw.replace(/[^\d+]/g, "");
   const international = digits.startsWith("+") ? digits : digits.replace(/^0/, "+44");
   return /^\+\d{8,15}$/.test(international) ? `tel:${international}` : null;
