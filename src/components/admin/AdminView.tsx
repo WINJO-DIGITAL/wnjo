@@ -249,6 +249,8 @@ function QuoteFromBrief({ client, enquiryId }: { client: SupabaseClient; enquiry
   const [open, setOpen] = useState(false);
   const [orgs, setOrgs] = useState<Array<{ id: string; name: string }> | null>(null);
   const [orgId, setOrgId] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
 
@@ -268,17 +270,29 @@ function QuoteFromBrief({ client, enquiryId }: { client: SupabaseClient; enquiry
     setNote(null);
     const { data } = await client.auth.getSession();
     const token = data.session?.access_token;
+    const auth = { "content-type": "application/json", authorization: `Bearer ${token ?? ""}` };
+    let organizationId: string | null = orgId || null;
+    let invited = false;
+    if (newName.trim() || newEmail.trim()) {
+      // A new client: create their organisation and invite their email first, so the quote can be shown to them.
+      const res = token ? await fetch("/api/admin/clients", { method: "POST", headers: auth, body: JSON.stringify({ name: newName, email: newEmail }) }) : null;
+      const body = res ? ((await res.json().catch(() => null)) as { organizationId?: string; reason?: string } | null) : null;
+      if (!res?.ok || !body?.organizationId) {
+        setBusy(false);
+        setNote({ kind: "error", text: body?.reason ?? "The new client couldn't be added. Please try again." });
+        return;
+      }
+      organizationId = body.organizationId;
+      invited = true;
+    }
     const res = token
-      ? await fetch("/api/admin/quotes", {
-          method: "POST",
-          headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-          body: JSON.stringify({ enquiryId, organizationId: orgId || null }),
-        })
+      ? await fetch("/api/admin/quotes", { method: "POST", headers: auth, body: JSON.stringify({ enquiryId, organizationId }) })
       : null;
     setBusy(false);
     const body = res ? ((await res.json().catch(() => null)) as { reference?: string; reason?: string } | null) : null;
     if (res?.ok && body?.reference) {
-      setNote({ kind: "ok", text: `Quote ${body.reference} issued.${orgId ? "" : " It is internal until a client is linked."}` });
+      const tail = invited ? ` ${newEmail.trim()} has been invited and will see it when they sign in.` : organizationId ? "" : " It is internal until a client is linked.";
+      setNote({ kind: "ok", text: `Quote ${body.reference} issued.${tail}` });
       setOpen(false);
     } else {
       setNote({ kind: "error", text: body?.reason ?? "The quote couldn't be issued. Please try again." });
@@ -301,6 +315,14 @@ function QuoteFromBrief({ client, enquiryId }: { client: SupabaseClient; enquiry
           <option value="">None yet (keep internal)</option>
           {(orgs ?? []).map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
         </select>
+      </label>
+      <label className="acct-meta">
+        Or a new client: business name
+        <input className="acct-input" value={newName} onChange={(e) => setNewName(e.target.value)} />
+      </label>
+      <label className="acct-meta">
+        Their email (they sign in with this to see the quote)
+        <input className="acct-input" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
       </label>
       <span className="admin-actions">
         <button type="button" className="btn btn--primary" disabled={busy} onClick={issue}>{busy ? "Pricing…" : "Issue quote"}</button>

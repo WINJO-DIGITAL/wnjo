@@ -143,6 +143,7 @@ export function AccountView() {
     // Attach any orders staff have invited this email to. A failure here must not block the page.
     client
       .rpc("claim_client_invites")
+      .then(() => client.rpc("claim_org_invites"))
       .then(() => client
         .from("orders")
         .select("id, business_name, project_type, stage, stage_updated_at, created_at, order_updates(id, message, created_at)")

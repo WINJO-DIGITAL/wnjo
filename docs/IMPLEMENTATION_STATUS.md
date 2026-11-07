@@ -182,7 +182,7 @@ Built in sub-steps, each tested before the next.
 - Fixed: website enquiries were never saved to the database. The enquiry insert didn't set the agency, which the table requires, so every save failed silently and only the email went out. The live table had 0 rows. Fixed in `src/lib/enquiry-store.ts` (`enquiryRow`, tested) and checked live.
 - Brief enquiries now keep their validated answers (migration `20261107100000`).
 - Staff can issue a quote from a brief in Sales → Enquiries: `POST /api/admin/quotes` prices it on the server from the agency's catalogue (the browser's figure is never used) and stores it through the existing `store_quote` function. An optional client organisation makes it visible to that client; without one it stays internal.
-- Gap still open: a client only sees a quote once they are a member of its organisation. There is no screen yet to invite a prospect into an organisation, so a new client's quote stays internal until that is added.
+- New clients: staff add a client's business and email in the quote panel (`POST /api/admin/clients`). The email is invited to that organisation (migration `20261107180000`), and when they sign in with it they join and see their quotes. Checked live: the invite is claimed once, and another person cannot see it.
 - The configurator still shows the browser estimate while the customer is choosing. The issued quote is the figure that counts; the two use the same rules, checked by the parity test.
 
 ### 4j. More AI event sources — built, tested
