@@ -28,7 +28,7 @@ import fystayLogo from "../../public/work/logos/fystay.png";
 export const INDUSTRIES = [
   { id: "hospitality", label: "Hospitality" },
   { id: "beauty", label: "Beauty" },
-  { id: "trades", label: "Trades" },
+  { id: "transport", label: "Transport" },
   { id: "other", label: "Other" },
 ] as const;
 export type Industry = (typeof INDUSTRIES)[number]["id"];
@@ -72,7 +72,7 @@ export const projects: Project[] = [
     name: "EV Exec",
     kind: "client",
     sector: "Executive airport transfers",
-    industry: "trades",
+    industry: "transport",
     location: "Blackpool & Fylde Coast",
     summary:
       "Fixed-price executive transfers to every UK airport in electric vehicles. The business our driver and operator software was developed for.",
