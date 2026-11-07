@@ -69,7 +69,13 @@ Built in sub-steps, each tested before the next.
 - Client screen: approvals appear under each project on `/account`, with approve and request-changes controls. Built and type-checked; not yet tested signed in.
 - Not yet built: staff screens to create approvals and handle revision requests.
 
-### 3c. Project files — database built and tested
+### 3c. Project files — built and tested (upload and download added)
+- Uploads: the browser asks the server for a one-time link (`POST /api/files/upload-url`), uploads straight to the private `project-files` bucket, then confirms (`POST /api/files/confirm`). The server checks the object exists, is the declared size, and sits under the project's path, and only then records it.
+- Downloads: `GET /api/files/[id]` returns a link valid for 5 minutes, forced to download as an attachment, only to someone allowed to read the file.
+- Rules are pure and tested (`src/lib/files/rules.test.ts`, 11 checks): allowed types (no HTML, SVG, scripts), 50 MB limit, safe names, project-bound paths, and who may upload or read. Clients can never upload internal files; the server decides.
+- Screens: customers see shared files on each project; staff upload (optionally internal) and download on the project screen.
+- Not yet run against the live storage service: needs a deployment and a test upload.
+- Earlier notes below still describe the database rules, which are unchanged.
 - Applied: `project_files` metadata and a private `project-files` bucket (migration `20261106260000`).
 - Tests: `supabase/tests/files.sql`, 9 checks, all passing.
 - Not built: upload and download screens. Both need server-issued signed URLs, which need the server key.

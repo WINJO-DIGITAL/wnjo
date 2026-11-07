@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ApprovalsPanel } from "./ApprovalsPanel";
+import { ProjectFiles } from "@/components/files/ProjectFiles";
 import { sendQueuedEmails } from "@/lib/notify-client";
 
 type Project = { id: string; tenant_id: string; name: string; customer_status: string; target_date: string | null };
@@ -52,6 +53,7 @@ export function ProjectsPanel({ client, userId }: { client: SupabaseClient; user
           <div id={index === 0 ? "approvals" : undefined}>
             <ApprovalsPanel client={client} projectId={project.id} />
           </div>
+          <ProjectFiles client={client} projectId={project.id} />
           {conversations
             .filter((c) => c.project_id === project.id)
             .map((conversation) => (

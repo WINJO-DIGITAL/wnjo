@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Confirmation } from "@/components/account/Confirmation";
+import { ProjectFiles } from "@/components/files/ProjectFiles";
 import { sendQueuedEmails } from "@/lib/notify-client";
 
 /**
@@ -16,7 +17,6 @@ type Conversation = { id: string; project_id: string; tenant_id: string; subject
 type Message = { id: string; body: string; sender_kind: string; is_internal: boolean; created_at: string };
 type Approval = { id: string; title: string; kind: string; status: string; created_at: string };
 type Revision = { id: string; body: string; status: "open" | "in_progress" | "done"; created_at: string };
-type FileRow = { id: string; file_name: string; size_bytes: number; is_internal: boolean; created_at: string };
 
 const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
@@ -97,7 +97,7 @@ function ProjectDetail({ client, tenantId, userId, project, onSaved }: { client:
       <Conversations client={client} tenantId={tenantId} userId={userId} projectId={project.id} />
       <Approvals client={client} tenantId={tenantId} projectId={project.id} />
       <Revisions client={client} projectId={project.id} />
-      <Files client={client} projectId={project.id} />
+      <ProjectFiles client={client} projectId={project.id} staff />
     </div>
   );
 }
@@ -285,29 +285,3 @@ function Revisions({ client, projectId }: { client: SupabaseClient; projectId: s
   );
 }
 
-function Files({ client, projectId }: { client: SupabaseClient; projectId: string }) {
-  const [items, setItems] = useState<FileRow[] | null>(null);
-  const [error, setError] = useState(false);
-  useEffect(() => {
-    client.from("project_files").select("id, file_name, size_bytes, is_internal, created_at").eq("project_id", projectId).order("created_at", { ascending: false }).then(({ data, error: err }) => {
-      setError(Boolean(err));
-      setItems(err ? null : ((data as FileRow[]) ?? []));
-    });
-  }, [client, projectId]);
-  return (
-    <section className="admin-stack" aria-label="Files">
-      <h3 className="acct-label">Files</h3>
-      {error && <p role="alert">Files couldn&apos;t be loaded.</p>}
-      {items?.length === 0 && <p className="acct-meta">No files yet.</p>}
-      <ul className="admin-list">
-        {items?.map((f) => (
-          <li key={f.id} className="admin-row-static">
-            <span>{f.file_name}</span>
-            <span className="acct-meta">{Math.round(f.size_bytes / 1024)} KB · {f.is_internal ? "internal" : "shared with client"}</span>
-          </li>
-        ))}
-      </ul>
-      <p className="acct-meta">Uploading and downloading files is not available yet: it needs the server key.</p>
-    </section>
-  );
-}
