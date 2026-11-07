@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Stopwatch } from "./Icons";
+import { contactPhoneHref } from "@/lib/site";
 
 /** Pages that already are the next step, so the bar would only get in the way. */
 const HIDDEN_ON = ["/contact", "/build", "/account", "/admin"];
@@ -97,9 +98,15 @@ export function StickyCta() {
         <Stopwatch />
         Get my price
       </Link>
-      <Link href="/contact?topic=website" className="btn btn--secondary">
-        Talk to us
-      </Link>
+      {contactPhoneHref ? (
+        <a href={contactPhoneHref} className="btn btn--secondary">
+          Call us
+        </a>
+      ) : (
+        <Link href="/contact?topic=website" className="btn btn--secondary">
+          Email us
+        </Link>
+      )}
     </aside>
   );
 }
