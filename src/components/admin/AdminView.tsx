@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { ProjectsAdmin } from "./ProjectsAdmin";
 import { AiStatus } from "./AiStatus";
 import { Confirmation } from "@/components/account/Confirmation";
+import { sendQueuedEmails } from "@/lib/notify-client";
 
 type Membership = { tenant_id: string; role: "owner" | "admin" | "staff" };
 type Enquiry = { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string };
@@ -523,6 +524,7 @@ function OrderManager({ client, tenantId, orderId }: { client: SupabaseClient; t
     const row = data[0] as Pick<OrderDetail, "id" | "stage" | "stage_updated_at">;
     setOrder((prev) => (prev ? { ...prev, stage: row.stage, stage_updated_at: row.stage_updated_at } : prev));
     setStatus({ kind: "ok", text: "Stage updated. The customer sees it on their order." });
+    void sendQueuedEmails(client);
   };
 
   const post = async (event: FormEvent<HTMLFormElement>) => {
@@ -540,6 +542,7 @@ function OrderManager({ client, tenantId, orderId }: { client: SupabaseClient; t
     }
     setMessage("");
     setStatus({ kind: "ok", text: "Update posted. The customer can read it on their order." });
+    void sendQueuedEmails(client);
     loadUpdates();
   };
 

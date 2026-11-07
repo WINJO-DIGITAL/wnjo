@@ -15,9 +15,25 @@ export function mailConfig(): MailConfig | null {
   return apiKey && to && from ? { apiKey, to, from } : null;
 }
 
+/** Sender for customer emails (progress updates and the like). Uses the same Resend key and sender address. */
+export function notificationMailConfig(): { apiKey: string; from: string } | null {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const from = process.env.ENQUIRY_FROM_EMAIL?.trim();
+  return apiKey && from ? { apiKey, from } : null;
+}
+
 export async function sendEnquiryEmail(
   config: MailConfig,
   message: { subject: string; text: string; replyTo: string },
+): Promise<boolean> {
+  return sendEmail(config, { to: config.to, subject: message.subject, text: message.text, replyTo: message.replyTo }, "Enquiry");
+}
+
+/** Sends one plain-text email through Resend. Returns false on any failure, and logs only the status. */
+export async function sendEmail(
+  config: { apiKey: string; from: string },
+  message: { to: string; subject: string; text: string; replyTo?: string },
+  label = "Email",
 ): Promise<boolean> {
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -25,7 +41,7 @@ export async function sendEnquiryEmail(
       headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         from: config.from,
-        to: [config.to],
+        to: [message.to],
         reply_to: message.replyTo,
         subject: message.subject,
         text: message.text,
@@ -34,11 +50,11 @@ export async function sendEnquiryEmail(
     });
     if (!res.ok) {
       // Log status only: the response body may echo personal data.
-      console.error(`Enquiry delivery failed with status ${res.status}`);
+      console.error(`${label} delivery failed with status ${res.status}`);
     }
     return res.ok;
   } catch (error) {
-    console.error("Enquiry delivery failed:", error instanceof Error ? error.name : "unknown error");
+    console.error(`${label} delivery failed:`, error instanceof Error ? error.name : "unknown error");
     return false;
   }
 }

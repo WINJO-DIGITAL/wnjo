@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Confirmation } from "@/components/account/Confirmation";
+import { sendQueuedEmails } from "@/lib/notify-client";
 
 /**
  * Staff project management. Every action is a plain database call that row-level security checks for the
@@ -169,6 +170,7 @@ function Thread({ client, tenantId, userId, conversation }: { client: SupabaseCl
     else {
       setBody("");
       setRefresh((r) => r + 1);
+      if (!internal) void sendQueuedEmails(client);
     }
   };
 
@@ -216,6 +218,7 @@ function Approvals({ client, tenantId, projectId }: { client: SupabaseClient; te
     else {
       setTitle("");
       setRefresh((r) => r + 1);
+      void sendQueuedEmails(client);
     }
   };
 

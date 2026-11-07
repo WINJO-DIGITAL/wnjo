@@ -155,6 +155,12 @@ Built in sub-steps, each tested before the next.
 - Known limits: approval covers the tool for that task, not the exact arguments, so write tools must check their own arguments. If the task update fails after the decision is recorded, the approval stays decided and the task needs a manual look.
 - Tests: `approvals.test.ts` (3), `engine.test.ts` gained 3 approval tests. Full suite passing.
 
+### 3i. Progress and customer emails — built, tested
+- Migration `20261107070000`: a claimed customer is notified when their order's stage changes and when a progress update is posted. Unclaimed orders queue nothing. Repeats are ignored. Tests: `supabase/tests/progress_notifications.sql`, 6 checks, passing live.
+- Emails: `src/lib/notify/outbox.ts` sends queued notifications as plain text with a link to the account page. A row is marked sent only after Resend accepts it, so failures are retried. Tests: 6 in `outbox.test.ts`.
+- Sending happens straight after a staff stage change, update, customer message or approval request (`POST /api/notifications/send`, staff only). The daily sweep sends anything missed.
+- Known limits: progress emails are not switched off per customer yet (the preference screen only covers the older kinds); email needs the Resend key and sender address in Vercel. Nothing has been sent to a real inbox yet.
+
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.

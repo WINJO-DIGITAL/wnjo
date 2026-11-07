@@ -1,13 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
 import { processDueEvents, processQueuedTasks } from "@/lib/ai/sweep";
+import { sendDueNotifications } from "@/lib/notify/send-due";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Daily sweep: processes business events not yet handled (or failed and due a retry), then runs queued tasks
- * such as those re-queued by an owner's approval.
+ * Daily sweep: processes business events not yet handled (or failed and due a retry), runs queued tasks such as
+ * those re-queued by an owner's approval, and sends any customer emails still waiting.
  * Vercel sends CRON_SECRET as a bearer token; anything else is refused.
  */
 export async function GET(request: NextRequest) {
@@ -21,7 +22,8 @@ export async function GET(request: NextRequest) {
   try {
     const events = await processDueEvents(db);
     const tasks = await processQueuedTasks(db);
-    return NextResponse.json({ events, tasks });
+    const notifications = await sendDueNotifications(db);
+    return NextResponse.json({ events, tasks, notifications });
   } catch {
     console.error("Event sweep failed");
     return NextResponse.json({ error: "failed" }, { status: 500 });
