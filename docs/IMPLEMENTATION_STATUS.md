@@ -146,3 +146,8 @@ Built in sub-steps, each tested before the next.
 - Written: `ARCHITECTURE.md`, `DATABASE_SCHEMA.md`, `AI_AGENTS.md`, `AI_PERMISSIONS.md`, `SECURITY.md`, `TESTING.md`, `DEPLOYMENT.md`, `ENVIRONMENT_VARIABLES.md`, and this file.
 - Written since: `README.md` (rewritten for developers; the original brief is kept at `docs/PROJECT_BRIEF.md`), and `docs/API.md`.
 - Still to do in Phase 7: security testing beyond the database suites, payment and webhook testing (needs Stripe), end-to-end testing on signed-in flows, performance and accessibility audits of new screens, backup and recovery validation.
+
+## Production state
+- `main` fast-forwarded to `845ac72` (the working branch merged, 22 commits) and pushed. Vercel production built from `main` and is READY.
+- Checked live on `www.wnjoweb.co.uk`: `/account` and `/admin` serve (both `noindex`), and the homepage serves. `wnjoweb.co.uk` now returns a 308 redirect to `www`, so the earlier 404 on the bare domain is resolved.
+- Still open: the database test suites in `supabase/tests/` have not been re-run since the latest migrations; the Resend and IONOS keys need rotating; Stripe, xAI and the GitHub App are not connected.
