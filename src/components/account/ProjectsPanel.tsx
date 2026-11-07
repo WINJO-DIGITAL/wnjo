@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ApprovalsPanel } from "./ApprovalsPanel";
+import { sendQueuedEmails } from "@/lib/notify-client";
 
 type Project = { id: string; tenant_id: string; name: string; customer_status: string; target_date: string | null };
 type Conversation = { id: string; tenant_id: string; project_id: string; subject: string };
@@ -102,6 +103,7 @@ function Thread({ client, conversation, userId }: { client: SupabaseClient; conv
       setStatus({ kind: "error", text: "Your message couldn't be sent. Please try again." });
       return;
     }
+    void sendQueuedEmails(client);
     setBody("");
     setStatus({ kind: "ok", text: "Sent. We'll reply here." });
     setRefresh((r) => r + 1);

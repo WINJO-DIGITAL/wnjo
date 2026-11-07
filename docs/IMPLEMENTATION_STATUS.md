@@ -161,6 +161,11 @@ Built in sub-steps, each tested before the next.
 - Sending happens straight after a staff stage change, update, customer message or approval request (`POST /api/notifications/send`, staff only). The daily sweep sends anything missed.
 - Known limits: progress emails are not switched off per customer yet (the preference screen only covers the older kinds); email needs the Resend key and sender address in Vercel. Nothing has been sent to a real inbox yet.
 
+### 4i. Business events from the database — built, tested
+- Migration `20261107080000`: a new project and a client's message each raise one AI event (dedupe-keyed). Staff messages and internal notes raise none. Tests: `supabase/tests/ai_event_triggers.sql`, 4 checks, passing live.
+- Processing: the staff and client send route (`POST /api/notifications/send`) processes queued events and then sends customer emails, so a client's message reaches its agent straight away. Any signed-in person may trigger it, because it only works through rows already written. The daily sweep does the same for anything missed.
+- Not yet raised as events: client file uploads, approvals decided, task failures and the deadline and website checks.
+
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.
