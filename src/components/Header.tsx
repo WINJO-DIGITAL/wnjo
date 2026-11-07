@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { primaryNav, type NavItem, type NavLink, type NavMenu } from "@/lib/site";
 import { AccountMenu } from "./account/AccountMenu";
+import { DashboardHeader } from "./dashboard/DashboardHeader";
 import { Stopwatch } from "./Icons";
 import { Logo } from "./Logo";
 
@@ -124,7 +125,7 @@ function currentLink(menu: NavMenu, pathname: string, picked: NavLink | null): N
   return links.find((l) => l.href === pathname) ?? null;
 }
 
-export function Header() {
+function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false); // mobile menu
   const [sub, setSub] = useState<number | null>(null); // mobile submenu
@@ -583,4 +584,12 @@ export function Header() {
       </div>
     </>
   );
+}
+
+/** The client and staff dashboards get their own top bar; every other page gets the site header. */
+export function Header() {
+  const pathname = usePathname();
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) return <DashboardHeader variant="staff" />;
+  if (pathname === "/account" || pathname.startsWith("/account/")) return <DashboardHeader variant="customer" />;
+  return <SiteHeader />;
 }

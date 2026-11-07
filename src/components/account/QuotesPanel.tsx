@@ -86,7 +86,7 @@ export function QuotesPanel({ client }: { client: SupabaseClient }) {
   if (quotes.length === 0) return null;
 
   return (
-    <section className="acct-quotes" aria-labelledby="acct-quotes-title">
+    <section id="quotes" className="acct-quotes" aria-labelledby="acct-quotes-title">
       <h2 id="acct-quotes-title" className="h2">
         Your quotes
       </h2>

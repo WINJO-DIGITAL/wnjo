@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Stopwatch } from "./Icons";
 
 /** Pages that already are the next step, so the bar would only get in the way. */
-const HIDDEN_ON = ["/contact", "/build"];
+const HIDDEN_ON = ["/contact", "/build", "/account", "/admin"];
 
 /**
  * Phones and tablets: once the visitor has scrolled past the opening screen, a slim bar

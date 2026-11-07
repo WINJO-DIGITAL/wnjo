@@ -31,7 +31,25 @@ const approvalStatus: Record<string, string> = {
 const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-type Tab = "enquiries" | "quotes" | "orders" | "approvals" | "projects" | "ai";
+type Tab = "overview" | "enquiries" | "quotes" | "orders" | "approvals" | "projects" | "ai";
+
+const TABS: Tab[] = ["overview", "enquiries", "quotes", "orders", "approvals", "projects", "ai"];
+const TAB_INFO: Record<Tab, { group: string; title: string }> = {
+  overview: { group: "Overview", title: "Today" },
+  enquiries: { group: "Sales", title: "Enquiries" },
+  quotes: { group: "Sales", title: "Quotes" },
+  orders: { group: "Delivery", title: "Orders" },
+  projects: { group: "Delivery", title: "Projects" },
+  approvals: { group: "Delivery", title: "Approvals" },
+  ai: { group: "Studio", title: "AI agents" },
+};
+
+/** The section named in the address hash (set by the dashboard menu), or the overview. */
+function tabFromHash(): Tab {
+  if (typeof window === "undefined") return "overview";
+  const hash = window.location.hash.replace("#", "") as Tab;
+  return TABS.includes(hash) ? hash : "overview";
+}
 
 /**
  * The agency's read-only control area for this step. Every query is limited by row-level security, so
@@ -41,7 +59,14 @@ export function AdminView() {
   const client = supabase();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [membership, setMembership] = useState<Membership | null | "loading">("loading");
-  const [tab, setTab] = useState<Tab>("enquiries");
+  const [tab, setTab] = useState<Tab>(tabFromHash);
+
+  // The dashboard menu changes the hash; follow it.
+  useEffect(() => {
+    const onHash = () => setTab(tabFromHash());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
 
   useEffect(() => {
@@ -85,25 +110,11 @@ export function AdminView() {
 
   return (
     <div className="admin">
-      <div className="acct-bar">
-        <p className="acct-meta">Signed in as {session.user.email} · {membership.role}</p>
-        <button type="button" className="btn btn--secondary" onClick={() => client.auth.signOut()}>
-          Sign out
-        </button>
+      <div className="dash-page__head">
+        <p className="dash-eyebrow">{TAB_INFO[tab].group}</p>
+        <h1 className="dash-title">{TAB_INFO[tab].title}</h1>
       </div>
-      <nav className="admin-tabs" aria-label="Admin sections">
-        {(["enquiries", "quotes", "orders", "approvals", "projects", "ai"] as Tab[]).map((t) => (
-          <button
-            key={t}
-            type="button"
-            className="admin-tab"
-            aria-current={tab === t ? "page" : undefined}
-            onClick={() => setTab(t)}
-          >
-            {t === "ai" ? "AI" : t[0].toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-      </nav>
+      {tab === "overview" && <StaffOverview client={client} />}
       {tab === "enquiries" && <EnquiriesTable client={client} />}
       {tab === "quotes" && <QuotesTable client={client} />}
       {tab === "orders" && (
@@ -118,6 +129,48 @@ export function AdminView() {
       {tab === "approvals" && <ApprovalsTable client={client} />}
       {tab === "ai" && <AiStatus client={client} />}
       {tab === "projects" && <ProjectsAdmin client={client} tenantId={membership.tenant_id} userId={session.user.id} />}
+    </div>
+  );
+}
+
+type Stat = { label: string; value: string; href: string; note: string };
+
+/** The staff home: four figures that matter today, each a link to the section behind it. */
+function StaffOverview({ client }: { client: SupabaseClient }) {
+  const [stats, setStats] = useState<Stat[] | null>(null);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+    Promise.all([
+      client.from("enquiries").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
+      client.from("quotes").select("id", { count: "exact", head: true }).eq("status", "sent"),
+      client.from("orders").select("id", { count: "exact", head: true }).neq("stage", "live"),
+      client.from("deposits").select("amount_pence").eq("status", "paid"),
+    ]).then(([enq, quotes, orders, deposits]) => {
+      if (enq.error || quotes.error || orders.error || deposits.error) {
+        setError(true);
+        return;
+      }
+      const paid = ((deposits.data as { amount_pence: number }[]) ?? []).reduce((sum, d) => sum + d.amount_pence, 0);
+      setStats([
+        { label: "New enquiries", value: String(enq.count ?? 0), href: "#enquiries", note: "Last 7 days" },
+        { label: "Quotes waiting", value: String(quotes.count ?? 0), href: "#quotes", note: "Sent, not yet answered" },
+        { label: "Orders in progress", value: String(orders.count ?? 0), href: "#orders", note: "Not live yet" },
+        { label: "Deposits received", value: money.format(paid / 100), href: "#orders", note: "All time" },
+      ]);
+    });
+  }, [client]);
+  if (error) return <p role="alert">The overview couldn&apos;t be loaded.</p>;
+  if (!stats) return <p className="lede">Loading…</p>;
+  return (
+    <div className="dash-stats">
+      {stats.map((s) => (
+        <a key={s.label} href={s.href} className="dash-stat">
+          <span className="dash-stat__label">{s.label}</span>
+          <span className="dash-stat__value">{s.value}</span>
+          <span className="dash-stat__note">{s.note}</span>
+        </a>
+      ))}
     </div>
   );
 }

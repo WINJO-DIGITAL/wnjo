@@ -190,6 +190,12 @@ export function AccountView() {
     };
 
     return (
+      <div className="dash-signin">
+        <div className="dash-page__head">
+          <p className="dash-eyebrow">Client dashboard</p>
+          <h1 className="dash-title">Follow your website.</h1>
+          <p className="dash-lede">Sign in with the email you ordered with. We&apos;ll email you a link.</p>
+        </div>
       <form onSubmit={send} className="acct-form" noValidate={false}>
         <label htmlFor="acct-email" className="acct-label">
           Email address
@@ -214,6 +220,7 @@ export function AccountView() {
           <p role="alert">We couldn&apos;t send the link. Please check the address and try again.</p>
         )}
       </form>
+      </div>
     );
   }
 
@@ -236,11 +243,9 @@ export function AccountView() {
 
   return (
     <div className="acct">
-      <div className="acct-bar">
-        <p className="acct-meta">Signed in as {session.user.email}</p>
-        <button type="button" className="btn btn--secondary" onClick={() => client.auth.signOut()}>
-          Sign out
-        </button>
+      <div className="dash-page__head">
+        <p className="dash-eyebrow">Client dashboard</p>
+        <h1 className="dash-title">Your website</h1>
       </div>
 
       {loadError && <p role="alert">We couldn&apos;t load your orders. Please refresh the page.</p>}
@@ -255,6 +260,7 @@ export function AccountView() {
       {client && <ProjectsPanel client={client} userId={session.user.id} />}
       {client && <QuotesPanel client={client} />}
 
+      <div id="progress" className="dash-anchor" />
       {orders?.map((order) => (
         <article key={order.id} className="acct-order" aria-labelledby={`order-${order.id}`}>
           <p className="eyebrow">{order.project_type}</p>

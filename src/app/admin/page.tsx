@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function AdminPage() {
   return (
-    <section className="section--tight" style={{ paddingTop: "var(--space-6)" }}>
+    <section className="dash-shell">
       <div className="container container--wide">
         <AdminView />
       </div>

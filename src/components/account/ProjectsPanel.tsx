@@ -41,14 +41,16 @@ export function ProjectsPanel({ client, userId }: { client: SupabaseClient; user
   if (projects.length === 0) return null;
 
   return (
-    <section className="acct-quotes" aria-labelledby="acct-projects-title">
+    <section id="projects" className="acct-quotes" aria-labelledby="acct-projects-title">
       <h2 id="acct-projects-title" className="h2">Your projects</h2>
-      {projects.map((project) => (
+      {projects.map((project, index) => (
         <article key={project.id} className="acct-order" aria-labelledby={`project-${project.id}`}>
           <p className="eyebrow">{project.customer_status}</p>
           <h3 id={`project-${project.id}`} className="h2">{project.name}</h3>
           {project.target_date && <p className="acct-meta">Target: {day.format(new Date(project.target_date))}</p>}
-          <ApprovalsPanel client={client} projectId={project.id} />
+          <div id={index === 0 ? "approvals" : undefined}>
+            <ApprovalsPanel client={client} projectId={project.id} />
+          </div>
           {conversations
             .filter((c) => c.project_id === project.id)
             .map((conversation) => (
