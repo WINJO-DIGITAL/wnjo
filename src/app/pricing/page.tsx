@@ -55,7 +55,7 @@ export default function PricingPage() {
           Websites and apps
         </h2>
         <div data-reveal>
-          <PlanSwiper plans={[...packagePlanCards, appPlanCard]} label="Starting prices" />
+          <PlanSwiper plans={[...packagePlanCards, appPlanCard]} initial="professional" label="Starting prices" />
         </div>
         <div className="container container--wide mt-6" style={{ display: "grid", gap: "var(--space-5)" }}>
           <PricingNotice />
@@ -83,7 +83,7 @@ export default function PricingPage() {
           </SectionHead>
         </div>
         <div data-reveal>
-          <PlanSwiper plans={carePlanCards} label="Hosting and care plans" />
+          <PlanSwiper plans={carePlanCards} initial="care" label="Hosting and care plans" />
         </div>
 
         <div className="container container--wide">
