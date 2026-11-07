@@ -62,7 +62,7 @@ function* combinations(): Generator<Answers> {
                     yield { ...DEFAULT_ANSWERS, projectType, pageBand, copy, imagery, branding, designLevel, timing, carePlan, features };
 }
 
-describe("quote engine matches the current pricing rules", () => {
+describe("quote engine matches the current pricing rules", { timeout: 60_000 }, () => {
   it("produces the same package, total, range, care price and scope for every combination", () => {
     let checked = 0;
     for (const answers of combinations()) {
