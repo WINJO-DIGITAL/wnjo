@@ -42,6 +42,7 @@ export function AdminView() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [membership, setMembership] = useState<Membership | null | "loading">("loading");
   const [tab, setTab] = useState<Tab>("enquiries");
+  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
 
   useEffect(() => {
     if (!client) return;
@@ -107,7 +108,10 @@ export function AdminView() {
       {tab === "quotes" && <QuotesTable client={client} />}
       {tab === "orders" && (
         <>
-          <OrdersTable client={client} />
+          <OrdersTable client={client} selectedId={selectedOrder} onSelect={setSelectedOrder} />
+          {selectedOrder && (
+            <OrderManager key={selectedOrder} client={client} tenantId={membership.tenant_id} orderId={selectedOrder} />
+          )}
           <InvitesPanel client={client} tenantId={membership.tenant_id} />
         </>
       )}
@@ -352,7 +356,15 @@ function InvitesPanel({ client, tenantId }: { client: SupabaseClient; tenantId: 
   );
 }
 
-function OrdersTable({ client }: { client: SupabaseClient }) {
+function OrdersTable({
+  client,
+  selectedId,
+  onSelect,
+}: {
+  client: SupabaseClient;
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}) {
   const [rows, setRows] = useState<OrderRow[] | null>(null);
   const [error, setError] = useState(false);
   useEffect(() => {
@@ -371,17 +383,169 @@ function OrdersTable({ client }: { client: SupabaseClient }) {
   if (rows.length === 0) return <Empty text="No orders yet." />;
   return (
     <table className="admin-table">
-      <thead><tr><th scope="col">Created</th><th scope="col">Business</th><th scope="col">Project</th><th scope="col">Stage</th></tr></thead>
+      <thead><tr><th scope="col">Created</th><th scope="col">Business</th><th scope="col">Project</th><th scope="col">Stage</th><th scope="col"><span className="sr-only">Open</span></th></tr></thead>
       <tbody>
         {rows.map((r) => (
-          <tr key={r.id}>
+          <tr key={r.id} aria-selected={selectedId === r.id}>
             <td>{when.format(new Date(r.created_at))}</td>
             <td>{r.business_name}</td>
             <td>{r.project_type}</td>
-            <td>{r.stage}</td>
+            <td>{ORDER_STAGES.find((s) => s.id === r.stage)?.label ?? r.stage}</td>
+            <td>
+              <button
+                type="button"
+                className="btn btn--secondary"
+                aria-pressed={selectedId === r.id}
+                onClick={() => onSelect(r.id)}
+              >
+                {selectedId === r.id ? "Open" : "Manage"}
+              </button>
+            </td>
           </tr>
         ))}
       </tbody>
     </table>
+  );
+}
+
+type OrderDetail = { id: string; business_name: string; project_type: string; stage: string; stage_updated_at: string };
+type UpdateRow = { id: string; message: string; created_at: string };
+
+const ORDER_STAGES = [
+  { id: "brief_received", label: "Brief received" },
+  { id: "designing", label: "Designing" },
+  { id: "building", label: "Building" },
+  { id: "reviewing", label: "Reviewing with client" },
+  { id: "live", label: "Live" },
+] as const;
+
+/**
+ * Move one order to its stage and post updates the customer reads on their order. Both are limited by
+ * row-level security to this agency's orders, and updates can be posted but never edited or deleted.
+ */
+function OrderManager({ client, tenantId, orderId }: { client: SupabaseClient; tenantId: string; orderId: string }) {
+  const [order, setOrder] = useState<OrderDetail | null>(null);
+  const [updates, setUpdates] = useState<UpdateRow[] | null>(null);
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const loadUpdates = () =>
+    client
+      .from("order_updates")
+      .select("id, message, created_at")
+      .eq("order_id", orderId)
+      .order("created_at", { ascending: false })
+      .limit(50)
+      .then(({ data, error }) => setUpdates(error ? null : ((data as UpdateRow[]) ?? [])));
+
+  useEffect(() => {
+    client
+      .from("orders")
+      .select("id, business_name, project_type, stage, stage_updated_at")
+      .eq("id", orderId)
+      .single()
+      .then(({ data, error }) => setOrder(error ? null : (data as OrderDetail)));
+    loadUpdates();
+    // Reloads when the order changes; the parent gives each order its own instance (keyed by id).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client, orderId]);
+
+  const setStage = async (stage: string) => {
+    if (!order || order.stage === stage) return;
+    setBusy(true);
+    setStatus(null);
+    const { data, error } = await client
+      .from("orders")
+      .update({ stage })
+      .eq("id", order.id)
+      .select("id, stage, stage_updated_at");
+    setBusy(false);
+    if (error || !data || data.length === 0) {
+      setStatus({ kind: "error", text: "The stage couldn't be changed. Please try again." });
+      return;
+    }
+    const row = data[0] as Pick<OrderDetail, "id" | "stage" | "stage_updated_at">;
+    setOrder((prev) => (prev ? { ...prev, stage: row.stage, stage_updated_at: row.stage_updated_at } : prev));
+    setStatus({ kind: "ok", text: "Stage updated. The customer sees it on their order." });
+  };
+
+  const post = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!order) return;
+    const text = message.trim();
+    if (!text) return;
+    setBusy(true);
+    setStatus(null);
+    const { error } = await client.from("order_updates").insert({ tenant_id: tenantId, order_id: order.id, message: text });
+    setBusy(false);
+    if (error) {
+      setStatus({ kind: "error", text: "The update couldn't be posted. Check it is under 1,000 characters." });
+      return;
+    }
+    setMessage("");
+    setStatus({ kind: "ok", text: "Update posted. The customer can read it on their order." });
+    loadUpdates();
+  };
+
+  if (!order) return <p className="lede">Loading order…</p>;
+
+  return (
+    <section className="admin-order" aria-labelledby="order-manage-heading">
+      <div>
+        <p className="admin-label">Order</p>
+        <h2 id="order-manage-heading" className="h3">{order.business_name}</h2>
+        <p className="acct-meta">{order.project_type} · stage set {when.format(new Date(order.stage_updated_at))}</p>
+      </div>
+
+      <div>
+        <p className="admin-label">Stage</p>
+        <div className="admin-stages" role="group" aria-label="Order stage">
+          {ORDER_STAGES.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              className="admin-stage"
+              aria-pressed={order.stage === s.id}
+              disabled={busy}
+              onClick={() => setStage(s.id)}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <form onSubmit={post} className="acct-form">
+        <label htmlFor="order-update-text" className="acct-label">Post an update for the customer</label>
+        <textarea
+          id="order-update-text"
+          className="acct-input admin-textarea"
+          rows={3}
+          maxLength={1000}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <button type="submit" className="btn btn--primary" disabled={busy || message.trim() === ""}>Post update</button>
+      </form>
+
+      {status && <p role={status.kind === "error" ? "alert" : "status"}>{status.text}</p>}
+
+      <div>
+        <p className="admin-label">Updates</p>
+        {updates === null && <p role="alert">Updates couldn&apos;t be loaded.</p>}
+        {updates && updates.length === 0 && <Empty text="No updates posted yet." />}
+        {updates && updates.length > 0 && (
+          <ol className="admin-updates">
+            {updates.map((u) => (
+              <li key={u.id}>
+                <span className="acct-meta">{when.format(new Date(u.created_at))}</span>
+                <p>{u.message}</p>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+    </section>
   );
 }
