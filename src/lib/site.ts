@@ -171,6 +171,8 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
       { href: "/faq", label: "FAQ" },
       { href: "/contact", label: "Contact" },
       { href: "/privacy", label: "Privacy" },
+      { href: "/terms", label: "Terms" },
+      { href: "/cookies", label: "Cookies" },
       { href: "/account", label: "Client sign-in" },
     ],
   },
