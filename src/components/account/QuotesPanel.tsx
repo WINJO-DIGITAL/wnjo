@@ -281,7 +281,7 @@ function QuoteCard({
 
       {acceptanceId && deposit_row?.status === "paid" && (
         <div className="acct-deposit">
-          <p role="status">Deposit received: {pounds(deposit_row.amount_pence)}. Thank you. The balance is due on launch.</p>
+          <p role="status">Deposit paid: {pounds(deposit_row.amount_pence)}. Thank you. The balance is due on launch.</p>
         </div>
       )}
       {acceptanceId && deposit_row?.status !== "paid" && (
