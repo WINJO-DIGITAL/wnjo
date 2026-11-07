@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { PriceChooser } from "@/components/PriceChooser";
+import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
-
+import { Stopwatch } from "@/components/Icons";
 import type { Project } from "@/lib/projects";
 
 type Item = Pick<Project, "slug" | "name" | "mobile" | "tablet" | "logo">;
@@ -365,7 +365,15 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       </div>
 
       <div className="deck__cta">
-        <PriceChooser variant="deck" sub={`Like ${current.name}? In 2 minutes.`} />
+        <Link href="/build" className="deck__btn">
+          <Stopwatch size={20} />
+          <span className="deck__btn-text">
+            <span className="deck__btn-main">Get my price</span>
+            <span className="deck__btn-sub">
+              Like {current.name}? In 2 minutes.
+            </span>
+          </span>
+        </Link>
       </div>
     </div>
   );

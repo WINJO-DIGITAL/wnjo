@@ -9497,7 +9497,3 @@ body:has(.dash-header) .site-footer {
 .price-chooser__list { margin: 0 0 1.1rem; padding-left: 1.1rem; color: var(--color-ink-2); display: grid; gap: 0.35rem; }
 @keyframes price-chooser-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .price-chooser__card, .price-chooser__panel { animation: none; transition: none; } }
-.price-chooser:has(.price-chooser__deck) { width: 100%; justify-items: stretch; }
-.price-chooser__deck { cursor: pointer; border: 0; font-family: var(--font-sans); }
-.price-chooser__deck[aria-expanded="true"] { background: linear-gradient(180deg, #5a4636, #3a2e25); }
-.price-chooser:has(.price-chooser__deck) .price-chooser__panel { width: 100%; }
