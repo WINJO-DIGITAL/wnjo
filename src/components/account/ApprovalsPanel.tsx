@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { Confirmation } from "./Confirmation";
 
 type Approval = {
   id: string;
@@ -107,7 +108,8 @@ function ApprovalCard({ client, item, onDecided }: { client: SupabaseClient; ite
           </div>
         </form>
       )}
-      {message && <p role={message.kind === "error" ? "alert" : "status"} className={message.kind === "error" ? "acct-error" : undefined}>{message.text}</p>}
+      {message && message.kind === "ok" && <Confirmation title={message.text} />}
+      {message && message.kind === "error" && <p role="alert" className="acct-error">{message.text}</p>}
     </article>
   );
 }

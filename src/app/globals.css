@@ -9000,3 +9000,67 @@ tr[aria-selected="true"] {
   height: 44px;
   font-size: 15px;
 }
+
+/* One confirmation style for anything the customer has just done. */
+.confirm {
+  display: grid;
+  gap: 10px;
+  padding: 28px 26px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 1px 0 #e9e1d3;
+  outline: none;
+}
+.confirm:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+.confirm__mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border-radius: 999px;
+  background: #2f6b3f;
+  color: #fff;
+}
+.confirm__title {
+  margin: 6px 0 0;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--color-ink);
+}
+.confirm__detail {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+.confirm__ref {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--color-ink-3);
+}
+.confirm__next {
+  margin: 8px 0 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--color-bg);
+  font-size: 15px;
+  color: var(--color-ink);
+}
+.confirm__next span {
+  margin-right: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}

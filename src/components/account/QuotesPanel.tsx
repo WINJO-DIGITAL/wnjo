@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { QUOTE_TERMS_VERSION } from "@/lib/terms";
 import { depositPence } from "@/lib/deposit";
+import { Confirmation } from "./Confirmation";
 
 const gbp = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
@@ -281,7 +282,11 @@ function QuoteCard({
 
       {acceptanceId && deposit_row?.status === "paid" && (
         <div className="acct-deposit">
-          <p role="status">Deposit paid: {pounds(deposit_row.amount_pence)}. Thank you. The balance is due on launch.</p>
+          <Confirmation
+            title="Deposit paid"
+            detail={`${pounds(deposit_row.amount_pence)} received. Thank you. The balance is due on launch.`}
+            reference={quote.reference}
+          />
         </div>
       )}
       {acceptanceId && deposit_row?.status !== "paid" && (
@@ -293,8 +298,9 @@ function QuoteCard({
         </div>
       )}
 
-      {message && (
-        <p role={message.kind === "error" ? "alert" : "status"} className={message.kind === "error" ? "acct-error" : undefined}>
+      {message && message.kind === "ok" && <Confirmation title={message.text} />}
+      {message && message.kind === "error" && (
+        <p role="alert" className="acct-error">
           {message.text}
         </p>
       )}

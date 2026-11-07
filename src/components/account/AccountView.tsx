@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { QuotesPanel } from "./QuotesPanel";
 import { ProjectsPanel } from "./ProjectsPanel";
+import { Confirmation } from "./Confirmation";
 
 export const STAGES = [
   { id: "brief_received", label: "Brief received", short: "Brief" },
@@ -243,7 +244,7 @@ export function AccountView() {
       </div>
 
       {loadError && <p role="alert">We couldn&apos;t load your orders. Please refresh the page.</p>}
-      {depositNotice && <p role="status">{depositNotice}</p>}
+      {depositNotice && <Confirmation title={depositNotice} />}
 
       {orders && orders.length === 0 && (
         <p className="lede">
