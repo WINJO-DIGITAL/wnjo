@@ -138,6 +138,15 @@ Built in sub-steps, each tested before the next.
 - `src/lib/ai/events.ts`: maps 11 business events (deposit paid, QA failed, client message, deadline approaching, and others) to the agent tasks they create. Each task has a stable key, so a repeated event never creates duplicate work. An agent's own events never re-trigger that agent, which prevents loops. 6 tests, all passing.
 - Not yet built: the queue that delivers events and runs the tasks. It needs the server key, and the scheduling choice from the briefing job applies here too.
 
+### 4g. Event queue and worker — built, tested (tier 2, part 1)
+- Migration `20261107050000`: `ai_events` (one row per business event, unique on tenant and dedupe key, staff read only). Tests: `supabase/tests/ai_events.sql`, 7 checks, passing against the live database.
+- `src/lib/ai/event-worker.ts` plans an event's tasks and queues each one under its dedupe key; only new tasks run. `src/lib/ai/event-processor.ts` marks each event processed, or failed with its error so the sweep retries it (up to 5 attempts).
+- `src/lib/ai/task-queue.ts` and `src/lib/ai/event-store.ts`: the database adapters. The insert-if-new SQL they use was checked live (first insert creates, repeat is ignored, existing row found).
+- `src/lib/ai/agent-runtime.ts` runs queued tasks through the runner with the database store, budget gate and read-only tools. With no Grok key configured, queued tasks are suspended, not run.
+- Triggers: a Stripe-confirmed deposit records `deposit_paid` and processes it straight away (`/api/stripe/webhook`). A daily sweep (`/api/cron/events`, 07:45 UTC) picks up anything left over. The webhook looks the deposit up on every delivery, so a Stripe retry still records the event.
+- Tests: 11 new unit tests (worker and processor), 123 across the suite, all passing.
+- Not yet done: an end-to-end run with a real event through the real store, which needs the service key in a test environment; and before any agent is switched on, the inline processing in the webhook must move to a background job.
+
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
 - Still to do before any agent is switched on: the database-backed store must supply the budget limits (`loadBudgets`), reading `ai_budget_settings` and the agent, project and task spend. That needs the server key.

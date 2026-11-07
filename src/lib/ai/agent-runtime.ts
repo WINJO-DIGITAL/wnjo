@@ -1,0 +1,52 @@
+import "server-only";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { AiProvider } from "@/lib/ai/provider";
+import { XaiProvider, xaiConfigFromEnv } from "@/lib/ai/xai";
+import { runTask, type RunOutcome } from "@/lib/ai/runner";
+import { SupabaseRunStore } from "@/lib/ai/store";
+import { loadBudgetLimits } from "@/lib/ai/budget-loader";
+import { buildReadToolRegistry } from "@/lib/ai/read-tools";
+import type { ToolRegistry } from "@/lib/ai/tools";
+
+/** The model provider, or null when Grok is not configured. Nothing is guessed: missing settings mean no provider. */
+export function providerFromEnv(): AiProvider | null {
+  try {
+    return new XaiProvider(xaiConfigFromEnv());
+  } catch {
+    return null;
+  }
+}
+
+const SYSTEM_PROMPT =
+  "You work for WNJO, a web design and booking-systems agency. Use only the tools you are given. " +
+  "Never invent client details. Keep your answers short and factual.";
+
+/**
+ * Builds what the worker needs to run a queued task: the database-backed store, the budget gate, the read-only
+ * tools, and the provider. With no provider configured, a queued task is suspended rather than run.
+ */
+export function buildAgentRuntime(db: SupabaseClient, provider: AiProvider | null = providerFromEnv()): {
+  tools: ToolRegistry;
+  runQueuedTask: (taskId: string) => Promise<RunOutcome>;
+} {
+  const tools = buildReadToolRegistry(db);
+  const store = new SupabaseRunStore(db);
+  return {
+    tools,
+    runQueuedTask: async (taskId: string) => {
+      const task = await store.loadTask(taskId);
+      if (!provider) {
+        await store.setTaskStatus(task.id, "suspended");
+        return { status: "suspended", reason: "No model provider is configured." };
+      }
+      return runTask({
+        taskId,
+        provider,
+        tools,
+        store,
+        system: SYSTEM_PROMPT,
+        loadBudgets: () => loadBudgetLimits(db, task),
+      });
+    },
+  };
+}

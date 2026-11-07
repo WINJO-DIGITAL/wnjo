@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
 import { verifyStripeSignature } from "@/lib/stripe";
+import { recordEvent } from "@/lib/ai/event-store";
+import { processDueEvents } from "@/lib/ai/sweep";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,5 +43,35 @@ export async function POST(request: NextRequest) {
     .neq("status", "paid");
   // A database error asks Stripe to retry the event rather than losing the payment.
   if (error) return NextResponse.json({ error: "retry" }, { status: 500 });
+
+  // Look the deposit up on every delivery, not just the first. If recording the event fails and Stripe retries,
+  // the update above matches nothing, but this lookup still finds the paid deposit, so the event is recorded then.
+  const { data: deposit, error: lookupError } = await db
+    .from("deposits")
+    .select("id, tenant_id")
+    .eq("stripe_checkout_session_id", session.id)
+    .eq("status", "paid")
+    .maybeSingle();
+  if (lookupError) return NextResponse.json({ error: "retry" }, { status: 500 });
+  if (!deposit) return NextResponse.json({ received: true, handled: true });
+  try {
+    await recordEvent(db, {
+      tenantId: (deposit as { tenant_id: string }).tenant_id,
+      type: "deposit_paid",
+      projectId: null,
+      dedupeKey: `deposit_paid:${(deposit as { id: string }).id}`,
+    });
+  } catch {
+    // The payment is recorded. Ask Stripe to retry, so the event is not lost; the retry is a no-op for the deposit.
+    return NextResponse.json({ error: "retry" }, { status: 500 });
+  }
+  // Agents react straight away, and the work is awaited so serverless does not stop it early. A failure here
+  // does not undo the payment: the event stays recorded and the daily sweep retries it.
+  // Before any agent is switched on, this must move to a background job, since a model call can be slow.
+  try {
+    await processDueEvents(db);
+  } catch {
+    console.error("Event processing after deposit payment failed");
+  }
   return NextResponse.json({ received: true, handled: true });
 }
