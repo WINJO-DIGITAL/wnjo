@@ -216,9 +216,10 @@ function ConfiguratorInner({ params, inBrowser }: { params: ConfiguratorParams; 
             Thank you, {contact.name.split(" ")[0]}. Your brief is with us.
           </h2>
           <p className="muted">
-            We&apos;ll review it and reply to <strong>{contact.email}</strong> to{" "}
-            {result.requiresScope ? "arrange a short scoping call" : "confirm your package and price in writing"}.
-            Nothing is booked or charged until you&apos;ve agreed the scope and terms.
+            The price above is your estimate. We&apos;ll check your answers and send your bespoke quote to{" "}
+            <strong>{contact.email}</strong>
+            {result.requiresScope ? ", after a short call to agree the scope" : ""}. Nothing is booked or charged until you
+            accept it.
           </p>
           <SummaryList answers={answers} details={details} />
           <EstimateBreakdown result={result} answers={answers} />
@@ -483,8 +484,7 @@ function ConfiguratorInner({ params, inBrowser }: { params: ConfiguratorParams; 
             {step.id === "send" && (
               <form className="form" onSubmit={onSend} noValidate>
                 <p className="muted">
-                  We&apos;ll send your brief and a server-checked estimate to our team, and reply by email. Online
-                  checkout isn&apos;t available yet, so nothing is charged at this stage.
+                  This is your estimate. We&apos;ll check your answers and email your bespoke quote. Nothing is charged now.
                 </p>
                 <div className="form-row">
                   <TextField
@@ -590,6 +590,14 @@ function ConfiguratorInner({ params, inBrowser }: { params: ConfiguratorParams; 
               </button>
             )}
           </div>
+          {/* The fast path: skip the detail, see a rough price now, and get the bespoke quote afterwards. */}
+          {stepIndex < STEPS.findIndex((s) => s.id === "review") && (
+            <p className={styles.skip}>
+              <button type="button" className="arrow-link" onClick={() => goToId("review")}>
+                Skip the details and see my estimate <ArrowRight />
+              </button>
+            </p>
+          )}
         </section>
       </div>
 
