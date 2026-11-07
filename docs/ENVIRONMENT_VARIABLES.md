@@ -7,8 +7,9 @@ Never commit real values. Set them in Vercel (Project → Settings → Environme
 | `NEXT_PUBLIC_SITE_URL` | public | Canonical URLs, sitemap, Open Graph | Set to `https://www.wnjoweb.co.uk` (Vercel, production and preview). The bare domain redirects to `www`. |
 | `NEXT_PUBLIC_SUPABASE_URL` | public | Supabase project URL | Set in Vercel (production and preview) |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | public | Browser key, protected by row-level security | Set in Vercel (production and preview) |
-| `SUPABASE_SERVICE_ROLE_KEY` | **server only, sensitive** | Writes enquiries, quotes and other server records | **Not set. Required before the server writes can run.** Copy from Supabase → Project Settings → API keys. Mark as sensitive in Vercel. |
-| `RESEND_API_KEY` | server only, sensitive | Sends enquiry email | **Not set.** Create a sending key in Resend and add it to Vercel as sensitive. |
+| `SUPABASE_SERVICE_ROLE_KEY` | server only, sensitive | Writes enquiries, quotes and other server records | Set in Vercel (production and preview). |
+| `RESEND_API_KEY` | server only, sensitive | Sends enquiry email | Set in Vercel (production and preview) to a send-only key, rotated 7 Nov 2026. |
+| `CRON_SECRET` | server only, sensitive | Bearer token Vercel Cron sends to `/api/cron/briefing`; requests without it are refused | Set in Vercel (production and preview), generated 7 Nov 2026. |
 | `ENQUIRY_TO_EMAIL` | server only, sensitive | Where enquiries are delivered (never shown on the website) | Set to the owner's inbox |
 | `ENQUIRY_FROM_EMAIL` | server only | Sender address (domain must be verified in Resend) | Set to `WNJO <enquiries@wnjoweb.co.uk>`. Works once `wnjoweb.co.uk` is verified in Resend. |
 
