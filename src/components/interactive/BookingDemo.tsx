@@ -100,6 +100,18 @@ at(900, { step: 4, sending: false, scroll: 0 });
 at(700, { ping: true });
 const END = clock;
 const LOOP = END + 4500;
+/**
+ * When each listed step starts on the replay clock, read from the timeline itself so they cannot drift: the first
+ * screen (choosing the journey), the second (airport and address) and the third (dates and details).
+ */
+const STEP_STARTS = (() => {
+  const first = (test: (patch: Event[1]) => boolean) => events.find(([, patch]) => test(patch))?.[0] ?? 0;
+  return [
+    0,
+    first((p) => typeof p === "object" && p !== null && "step" in p && p.step === 2),
+    first((p) => typeof p === "object" && p !== null && "step" in p && p.step === 3),
+  ] as const;
+})();
 
 function stateAt(t: number): State {
   let s = START;
@@ -124,6 +136,8 @@ export function BookingDemo() {
   );
   const [t, setT] = useState(0);
   const [paused, setPaused] = useState(false);
+  // Which step the visitor picked from the list; the replay moves to it and holds there until they play it on.
+  const [stepShown, setStepShown] = useState<number | null>(null);
   const [inView, setInView] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -347,9 +361,25 @@ export function BookingDemo() {
       </div>
 
       <ol className="bd__steps">
-        <li><span>01</span> The customer picks a journey and a time on their phone.</li>
-        <li><span>02</span> They send the request in under a minute.</li>
-        <li><span>03</span> It lands in your app straight away, with every detail.</li>
+        {[
+          { at: 0, text: "The customer picks a journey and a time on their phone." },
+          { at: 2, text: "They send the request in under a minute." },
+          { at: 3, text: "It lands in your app straight away, with every detail." },
+        ].map((item, i) => (
+          <li key={i}>
+            <button
+              type="button"
+              aria-pressed={stepShown === i}
+              onClick={() => {
+                setPaused(true);
+                setStepShown(i);
+                setT(STEP_STARTS[i]);
+              }}
+            >
+              <span>{String(i + 1).padStart(2, "0")}</span> {item.text}
+            </button>
+          </li>
+        ))}
       </ol>
       <p className="bd__note">A replay of EV Exec&apos;s real booking flow. Customer details are examples.</p>
 

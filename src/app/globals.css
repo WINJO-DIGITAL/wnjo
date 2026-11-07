@@ -9552,3 +9552,15 @@ body:has(.dash-header) .site-footer {
 
 /* Phone menu: Call us sits just under Get my price. */
 .mm-cta + .mm-cta { margin-top: var(--space-3); }
+
+/* Booking demo: each step is a button that moves the replay to it. */
+.bd__steps li button {
+  all: unset;
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}
+.bd__steps li button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.bd__steps li button[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 0.25em; }
