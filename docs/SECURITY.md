@@ -20,7 +20,7 @@
 
 ## Open items before launch
 - Set `SUPABASE_SERVICE_ROLE_KEY` in Vercel for Production and Preview. Done for both.
-- Rotate the Resend and IONOS keys that appeared in chat, then update Vercel and remove the IONOS key from the shared environment.
+- Rotate the Resend and IONOS keys that appeared in chat (owner action: the owner is doing this). Then update the Vercel variable for Resend, and remove the IONOS key from the shared environment's settings.
 - Remove database connection strings and the JWT secret from Vercel if the app doesn't need them.
 - Review the quote terms wording and privacy notice with a solicitor. Nothing here is legal advice.
 - Connect a custom email sender for Supabase sign-in emails (the built-in sender is for testing).

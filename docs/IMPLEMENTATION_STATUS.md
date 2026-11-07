@@ -144,5 +144,5 @@ Built in sub-steps, each tested before the next.
 
 ## Documentation (Phase 7 started)
 - Written: `ARCHITECTURE.md`, `DATABASE_SCHEMA.md`, `AI_AGENTS.md`, `AI_PERMISSIONS.md`, `SECURITY.md`, `TESTING.md`, `DEPLOYMENT.md`, `ENVIRONMENT_VARIABLES.md`, and this file.
-- Still to write: `README.md` (currently the project's original readme), and the API reference.
+- Written since: `README.md` (rewritten for developers; the original brief is kept at `docs/PROJECT_BRIEF.md`), and `docs/API.md`.
 - Still to do in Phase 7: security testing beyond the database suites, payment and webhook testing (needs Stripe), end-to-end testing on signed-in flows, performance and accessibility audits of new screens, backup and recovery validation.
