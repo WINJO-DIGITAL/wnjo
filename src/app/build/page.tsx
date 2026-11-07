@@ -31,7 +31,15 @@ export default async function BuildPage({
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">
-          <Configurator params={params} />
+          <div className="js-only">
+            <Configurator params={params} />
+          </div>
+          <noscript>
+            <p className="lede">
+              The price calculator needs JavaScript. You can <a href="/contact">send us a message</a> instead, and we&apos;ll
+              come back to you with a price.
+            </p>
+          </noscript>
         </div>
       </section>
     </>

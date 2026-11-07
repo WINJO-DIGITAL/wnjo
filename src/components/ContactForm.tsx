@@ -478,7 +478,7 @@ function EnquiryForm({
   ];
 
   return (
-    <form className="form onboard" onSubmit={onSubmit} noValidate aria-labelledby="onboard-step-title">
+    <form className="form onboard js-only" onSubmit={onSubmit} noValidate aria-labelledby="onboard-step-title">
       <ol role="list" className="onboard-steps" aria-label="Progress">
         {STEPS.map((s, i) => (
           <li key={s.short} aria-current={i === step ? "step" : undefined} data-done={i < step || undefined}>

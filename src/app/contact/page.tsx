@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NoScriptContact } from "@/components/NoScriptContact";
 import { PageHero } from "@/components/Blocks";
 import { ContactForm } from "@/components/ContactForm";
 import { ArrowRight } from "@/components/Icons";
@@ -36,6 +37,7 @@ export default async function ContactPage({
                 topic={Array.isArray(topic) ? topic[0] : topic}
                 brief={Array.isArray(brief) ? brief[0] : brief}
               />
+              <NoScriptContact />
             </div>
             <div className="stack" style={{ "--stack": "var(--space-7)" } as React.CSSProperties}>
               <div>

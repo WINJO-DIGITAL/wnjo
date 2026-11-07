@@ -347,7 +347,7 @@ export function BookingDemo() {
       </div>
 
       {!reduced && (
-        <button type="button" className="bd__pause" onClick={() => setPaused((p) => !p)} aria-pressed={paused}>
+        <button type="button" className="bd__pause js-only" onClick={() => setPaused((p) => !p)} aria-pressed={paused}>
           {paused ? "Play animation" : "Pause animation"}
         </button>
       )}

@@ -48,6 +48,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en-GB" data-scroll-behavior="smooth" className={`${inter.variable} ${playfair.variable} ${mono.variable}`}>
       <body>
+        {/* Without JavaScript, controls that need it are hidden rather than left doing nothing. */}
+        <noscript>
+          <style>{".js-only{display:none!important}"}</style>
+        </noscript>
         <a href="#main" className="skip-link">
           Skip to content
         </a>

@@ -12,12 +12,23 @@ export const runtime = "nodejs";
 const MAX_BODY_BYTES = 32 * 1024;
 
 type Json = Record<string, unknown>;
-const reply = (status: number, body: Json) => NextResponse.json(body, { status });
 
 /** A short reference quoted to the customer and in the email subject, so follow-up can be matched up. */
 const newReference = () => `WNJO-${randomBytes(3).toString("hex").toUpperCase()}`;
 
 export async function POST(request: NextRequest) {
+  // The plain-HTML form (for visitors without JavaScript) posts form fields and gets a page back; the normal form
+  // posts JSON and gets JSON back. Both go through the same checks below.
+  const fromForm = (request.headers.get("content-type") ?? "").includes("application/x-www-form-urlencoded");
+  const reply = (status: number, json: Json) => {
+    if (!fromForm) return NextResponse.json(json, { status });
+    const target =
+      status === 200
+        ? `/contact/sent${typeof json.reference === "string" ? `?ref=${encodeURIComponent(json.reference)}` : ""}`
+        : `/contact/not-sent?status=${status}`;
+    return NextResponse.redirect(new URL(target, request.url), 303);
+  };
+
   const length = Number(request.headers.get("content-length") ?? 0);
   if (length > MAX_BODY_BYTES) return reply(413, { error: "That submission is too large." });
 
@@ -25,9 +36,13 @@ export async function POST(request: NextRequest) {
   try {
     const raw = await request.text();
     if (raw.length > MAX_BODY_BYTES) return reply(413, { error: "That submission is too large." });
-    const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("not an object");
-    body = parsed as Json;
+    if (fromForm) {
+      body = Object.fromEntries(new URLSearchParams(raw));
+    } else {
+      const parsed: unknown = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("not an object");
+      body = parsed as Json;
+    }
   } catch {
     return reply(400, { error: "We couldn't read that submission. Please try again." });
   }
@@ -40,7 +55,8 @@ export async function POST(request: NextRequest) {
   }
 
   const kind = body.kind === "brief" ? "brief" : "contact";
-  const result = validateEnquiry(body, { messageRequired: kind === "contact", detailsRequired: kind === "contact" });
+  // The plain form asks only for a name, email and message, so budget and timeline are optional there.
+  const result = validateEnquiry(body, { messageRequired: kind === "contact", detailsRequired: kind === "contact" && !fromForm });
   if (!result.ok) return reply(422, { error: "Please check the highlighted fields.", fields: result.errors });
   const fields = result.data;
 
