@@ -32,17 +32,16 @@ const subscribeReduced = (onChange: () => void) => {
 };
 
 /**
- * The phone hero's showcase: a swipeable coverflow of our work in a panel, with the Phone/Tablet
- * switch inside that panel, a rail of project pills and the price button.
+ * The phone hero's showcase, kept deliberately quiet: a rail of project pills, a swipeable
+ * coverflow of our work on phones, and the price button. No device switch or arrow row: the pills,
+ * a swipe or the arrow keys move between projects.
  * It moves on by itself every few seconds, pausing on hover, focus and while the panel is
  * off screen, and stopping for good once the visitor takes over. Reduced motion turns it off.
  * Only transform and opacity animate; dragging writes CSS variables and reads no layout.
  */
 export function DeviceDeck({ items }: { items: Item[] }) {
   const [index, setIndex] = useState(0);
-  const [mode, setMode] = useState<Mode>("phone");
-  // Tablet screenshots are fetched once the visitor reaches for the switch (or the page is idle).
-  const [tabletReady, setTabletReady] = useState(false);
+  const mode: Mode = "phone";
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -111,11 +110,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
     const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.5 });
     io.observe(el);
     return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const t = window.setTimeout(() => setTabletReady(true), 3500);
-    return () => window.clearTimeout(t);
   }, []);
 
   const stopNudge = useCallback(() => {
@@ -220,7 +214,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
 
   const current = items[index];
   const theme = THEME[current.slug] ?? FALLBACK;
-  const showTablet = tabletReady || mode === "tablet";
 
   return (
     <div className="deck" data-mode={mode}>
@@ -253,38 +246,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
           if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false);
         }}
       >
-        <div className="deck__bar">
-          <span aria-hidden="true" />
-          <div className="deck__switch" role="group" aria-label="Choose a device">
-            <i aria-hidden="true" />
-            <button
-              type="button"
-              aria-pressed={mode === "phone"}
-              onClick={() => setMode("phone")}
-              onPointerDown={() => setTabletReady(true)}
-            >
-              <svg width="12" height="14" viewBox="0 0 14 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                <rect x="2.5" y="1" width="9" height="14" rx="2.2" />
-                <path d="M6 12.5h2" strokeLinecap="round" />
-              </svg>
-              Phone
-            </button>
-            <button
-              type="button"
-              aria-pressed={mode === "tablet"}
-              onClick={() => setMode("tablet")}
-              onPointerDown={() => setTabletReady(true)}
-              onFocus={() => setTabletReady(true)}
-            >
-              <svg width="14" height="16" viewBox="0 0 16 18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                <rect x="1.5" y="1" width="13" height="16" rx="2.4" />
-                <path d="M6.5 14.5h3" strokeLinecap="round" />
-              </svg>
-              Tablet
-            </button>
-          </div>
-        </div>
-
         <div
           ref={stageRef}
           className="deck__stage"
@@ -323,43 +284,12 @@ export function DeviceDeck({ items }: { items: Item[] }) {
                   />
                 </div>
               </div>
-              <div className="deck__dev deck__dev--tablet" onClick={() => tap(k)}>
-                <div className="deck__screen">
-                  {showTablet && (
-                    <Image
-                      src={p.tablet}
-                      alt={k === index ? `The ${p.name} website on a tablet` : ""}
-                      fill
-                      sizes="300px"
-                    />
-                  )}
-                </div>
-              </div>
             </div>
           ))}
           </div>
           <span className="visually-hidden" aria-live="polite">
             {`${current.name}, ${index + 1} of ${items.length}`}
           </span>
-        </div>
-
-        {/* Prev / next sit in their own row under the stage, so they never cover a mockup. */}
-        <div className="deck__nav">
-          <button type="button" className="deck__arrow" aria-label="Previous example" onClick={() => step(-1)}>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M10 3 5 8l5 5" />
-            </svg>
-          </button>
-          <div className="deck__dots" aria-hidden="true">
-            {items.map((p, k) => (
-              <span key={p.slug} className={k === index ? "is-on" : undefined} />
-            ))}
-          </div>
-          <button type="button" className="deck__arrow" aria-label="Next example" onClick={() => step(1)}>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="m6 3 5 5-5 5" />
-            </svg>
-          </button>
         </div>
 
       </div>
