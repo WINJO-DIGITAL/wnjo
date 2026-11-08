@@ -10619,3 +10619,63 @@ body:has(.dash-header) .site-footer {
 .cfg-total--main small {
   color: var(--color-inverse-ink-2);
 }
+
+/* Customer payment link (/subscribe). */
+.sub-page {
+  max-width: 46rem;
+}
+.sub-facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+  color: var(--color-ink-2);
+}
+.sub-facts li,
+.sub-facts--dl > div {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-line);
+}
+.sub-facts--dl dt {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+.sub-facts--dl dd {
+  margin: var(--space-1) 0 0;
+  color: var(--color-ink);
+}
+.sub-agree {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+.sub-agree input {
+  margin-top: 0.3em;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: none;
+}
+
+/* Admin: website subscriptions. */
+.admin-sub-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--space-3);
+}
+.admin-sub-link {
+  word-break: break-all;
+  font-size: 0.85rem;
+}
+.admin-sub-manage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+.admin-sub-manage .acct-input {
+  width: 8rem;
+}

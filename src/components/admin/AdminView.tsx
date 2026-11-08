@@ -6,6 +6,7 @@ import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { ProjectsAdmin } from "./ProjectsAdmin";
 import { AiStatus } from "./AiStatus";
+import { SubscriptionsAdmin } from "./SubscriptionsAdmin";
 import { Confirmation } from "@/components/account/Confirmation";
 import { sendQueuedEmails } from "@/lib/notify-client";
 
@@ -34,13 +35,14 @@ const approvalStatus: Record<string, string> = {
 const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-type Tab = "overview" | "enquiries" | "quotes" | "orders" | "approvals" | "projects" | "ai";
+type Tab = "overview" | "enquiries" | "quotes" | "subscriptions" | "orders" | "approvals" | "projects" | "ai";
 
-const TABS: Tab[] = ["overview", "enquiries", "quotes", "orders", "approvals", "projects", "ai"];
+const TABS: Tab[] = ["overview", "enquiries", "quotes", "subscriptions", "orders", "approvals", "projects", "ai"];
 const TAB_INFO: Record<Tab, { group: string; title: string }> = {
   overview: { group: "Overview", title: "Today" },
   enquiries: { group: "Sales", title: "Enquiries" },
   quotes: { group: "Sales", title: "Quotes" },
+  subscriptions: { group: "Sales", title: "Website subscriptions" },
   orders: { group: "Delivery", title: "Orders" },
   projects: { group: "Delivery", title: "Projects" },
   approvals: { group: "Delivery", title: "Approvals" },
@@ -120,6 +122,7 @@ export function AdminView() {
       {tab === "overview" && <StaffOverview client={client} />}
       {tab === "enquiries" && <EnquiriesTable client={client} />}
       {tab === "quotes" && <QuotesTable client={client} />}
+      {tab === "subscriptions" && <SubscriptionsAdmin client={client} />}
       {tab === "orders" && (
         <>
           <OrdersTable client={client} selectedId={selectedOrder} onSelect={setSelectedOrder} />
@@ -234,9 +237,9 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
             <td>{when.format(new Date(r.created_at))}</td>
             <td>{r.reference}</td>
             <td>{r.name}</td>
-            <td>{r.kind === "brief" ? "Brief" : "Contact"}</td>
+            <td>{(r.answers as { type?: string } | null)?.type === "website" ? r.topic ?? "Website quote" : r.kind === "brief" ? "Brief" : "Contact"}</td>
             <td><a href={`mailto:${r.email}`}>{r.email}</a></td>
-            <td>{r.kind === "brief" && r.answers ? <QuoteFromBrief client={client} enquiryId={r.id} /> : <span className="acct-meta">—</span>}</td>
+            <td>{(r.answers as { type?: string } | null)?.type === "website" ? <a href="#subscriptions" className="acct-meta">Payment link: Subscriptions</a> : r.kind === "brief" && r.answers ? <QuoteFromBrief client={client} enquiryId={r.id} /> : <span className="acct-meta">—</span>}</td>
           </tr>
         ))}
       </tbody>

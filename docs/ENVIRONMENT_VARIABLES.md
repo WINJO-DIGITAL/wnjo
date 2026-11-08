@@ -25,3 +25,24 @@ Rules:
 - Old domain: `wnjoweb.co.uk` and `www.wnjoweb.co.uk` are attached to the same Vercel project and redirect to `winjodigital.co.uk` with a 308, keeping the path (restored 8 November 2026; they had been returning Vercel's 404). Their DNS stays at IONOS, pointing at Vercel.
 - Resend sending domain: `winjodigital.co.uk` (eu-west-1), verified, sending enabled.
 - Customer correspondence goes through the website. The owner's email address is never published on the site.
+
+## Website subscriptions (Stage 6, preview)
+
+- Tables `website_subscriptions` and `website_subscription_payments` (migration `20261108140000`) are live in the
+  shared database; nothing on the live site uses them yet.
+- `STRIPE_PORTAL_CONFIGURATION_ID` (optional, server only): the Stripe billing-portal configuration customers use to
+  update their card and see invoices, with cancellation and plan changes switched off (the minimum term is handled
+  under the agreement). Test mode: `bpc_1UZev9FZtOV6mSdmIeyyYYgZ` (also the test-mode default). Create the live one
+  the same way at launch.
+- Stripe webhook endpoints need these events: `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed`,
+  `customer.subscription.updated`, `customer.subscription.deleted`. Test endpoint updated 8 November 2026 to
+  `https://winjodigital.co.uk/api/stripe/webhook`. The live endpoint still points at the old domain (see below).
+- `CALCOM_API_KEY` and `CALCOM_EVENT_TYPE_ID` (server only): when both are set, the calculator offers consultation
+  booking (Stage 4). Until then it offers callbacks only.
+
+### Open issue: live Stripe webhook points at the old domain
+
+The live webhook endpoint (`we_1UZKdaFZtOV6mSdmHzzgDd3z`) is set to `https://www.wnjoweb.co.uk/api/stripe/webhook`.
+That domain now redirects, and Stripe does not follow redirects, so live deposit payments are not being marked paid on
+the site. Fix: change the endpoint URL to `https://winjodigital.co.uk/api/stripe/webhook` (owner approval needed).
+

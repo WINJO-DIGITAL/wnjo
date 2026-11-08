@@ -4,6 +4,22 @@ import { paymentMatches, stripeConfig, verifyStripeSignature } from "@/lib/strip
 import { recordEvent } from "@/lib/ai/event-store";
 import { notificationMailConfig, sendEmail } from "@/lib/mailer";
 import { kickWorker, processDueEvents } from "@/lib/ai/sweep";
+import { handleWebsiteSubscriptionEvent } from "@/lib/website-subscription-events";
+
+/** Events that can belong to a website subscription or one-off website payment. */
+const WEBSITE_EVENTS = new Set([
+  "checkout.session.completed",
+  "invoice.paid",
+  "invoice.payment_failed",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
+]);
+
+async function emailCustomer(to: string, message: { subject: string; text: string }): Promise<void> {
+  const config = notificationMailConfig();
+  if (!config) return;
+  await sendEmail(config, { to, subject: message.subject, text: message.text }, "Subscription email").catch(() => {});
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,7 +49,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "bad_signature" }, { status: 400 });
   }
 
-  const event = JSON.parse(payload) as {
+  const raw = JSON.parse(payload) as { type?: string; livemode?: boolean; data?: { object?: Record<string, unknown> } };
+
+  // Website subscriptions and one-off website payments first; anything that isn't theirs falls through to deposits.
+  if (raw.type && WEBSITE_EVENTS.has(raw.type)) {
+    const db = serviceClient();
+    if (!db) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+    const outcome = await handleWebsiteSubscriptionEvent(db, raw, { emailCustomer, alertStaff });
+    if (outcome === "retry") return NextResponse.json({ error: "retry" }, { status: 500 });
+    if (outcome === "handled") return NextResponse.json({ received: true, handled: true });
+  }
+
+  const event = raw as {
     type?: string;
     data?: {
       object?: {

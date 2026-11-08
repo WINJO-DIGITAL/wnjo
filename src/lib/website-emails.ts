@@ -70,3 +70,139 @@ export function ownerSubject(details: WebsiteDetails, quote: WebsiteQuote, inten
   const kind = intent === "callback" ? "Callback request" : "Website quote";
   return `${kind} from ${details.businessName || details.name}: ${what} [${reference}]`.replace(/\s+/g, " ").slice(0, 200);
 }
+
+/* ------------------------------------------------------------------ */
+/* Subscription lifecycle (Stage 6)                                    */
+/* ------------------------------------------------------------------ */
+
+export type SubscriptionEmailFacts = {
+  reference: string;
+  name: string;
+  packageName: string;
+  kind: "subscription" | "one_off";
+  setupPence: number;
+  monthlyPence: number;
+  oneOffPence: number;
+  paymentsCount?: number;
+  ownershipAfterPayments: number;
+  minimumTermMonths: number;
+};
+
+const gbpPence = (p: number) => formatGBP(p / 100);
+const sign = ["", "WINJO DIGITAL"];
+
+/** The private payment link, sent once the written proposal is agreed. */
+export function offerEmail(f: SubscriptionEmailFacts, link: string): { subject: string; text: string } {
+  const lines =
+    f.kind === "subscription"
+      ? [
+          `Package: ${f.packageName}`,
+          `First payment: ${gbpPence(f.setupPence + f.oneOffPence + f.monthlyPence)} (setup${f.oneOffPence ? ", one-off extras" : ""} and your first month)`,
+          `Then: ${gbpPence(f.monthlyPence)} a month, ${f.minimumTermMonths}-month minimum term`,
+          `Ownership of your agreed website transfers to you after ${f.ownershipAfterPayments} successful monthly payments.`,
+        ]
+      : [`${f.packageName}`, `Amount due now: ${gbpPence(f.oneOffPence)}`];
+  return {
+    subject: `Your WINJO DIGITAL payment link [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      "Thank you for agreeing your proposal. Here's your private link to review the terms and make your first payment:",
+      link,
+      "",
+      ...lines,
+      "",
+      "The link works for 30 days. Please don't share it.",
+      ...sign,
+    ].join("\n"),
+  };
+}
+
+export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
+  return {
+    subject: `Welcome to WINJO DIGITAL: your ${f.packageName} package [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `Your ${f.packageName} website package is set up and your first payment has been received. Thank you.`,
+      "",
+      `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month.`,
+      `Minimum term: ${f.minimumTermMonths} months.`,
+      `Ownership: after ${f.ownershipAfterPayments} successful monthly payments, ownership of your agreed website deliverables transfers to you.`,
+      "",
+      "What happens next: we'll be in touch within one working day to start your website. Stripe emails a receipt for every payment.",
+      ...sign,
+    ].join("\n"),
+  };
+}
+
+export function paymentReceivedEmail(f: SubscriptionEmailFacts, amountPence: number): { subject: string; text: string } {
+  const count = f.paymentsCount ?? 0;
+  const left = Math.max(0, f.ownershipAfterPayments - count);
+  return {
+    subject: `Payment received: ${count} of ${f.ownershipAfterPayments} [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `We've received your payment of ${gbpPence(amountPence)} for your ${f.packageName} package. Thank you.`,
+      left > 0
+        ? `That's payment ${count} of ${f.ownershipAfterPayments}. ${left} more and ownership of your website transfers to you.`
+        : "Your website ownership milestone has been reached.",
+      ...sign,
+    ].join("\n"),
+  };
+}
+
+export function paymentFailedEmail(f: SubscriptionEmailFacts, manageLink: string | null): { subject: string; text: string } {
+  return {
+    subject: `Your payment didn't go through [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `This month's payment of ${gbpPence(f.monthlyPence)} for your ${f.packageName} package didn't go through. Stripe will try again automatically over the next few days.`,
+      manageLink ? `To update your card now, use your billing link: ${manageLink}` : "Reply to this email and we'll help you update your card.",
+      "Your website stays live while we sort it out.",
+      ...sign,
+    ].join("\n"),
+  };
+}
+
+export function ownershipEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
+  return {
+    subject: `Your website is now yours [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `Thank you for ${f.ownershipAfterPayments} successful payments. Ownership of your agreed website deliverables now transfers to you, as set out in your agreement.`,
+      "",
+      "Your subscription carries on month to month, with hosting, maintenance and support as before. If you'd like us to transfer the website to you instead, reply to this email and we'll explain the transfer policy.",
+      ...sign,
+    ].join("\n"),
+  };
+}
+
+export function cancelledEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
+  return {
+    subject: `Your subscription has ended [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `Your ${f.packageName} subscription has ended and no further payments will be taken.`,
+      "If this isn't what you expected, reply to this email and we'll look into it straight away.",
+      ...sign,
+    ].join("\n"),
+  };
+}
+
+export function oneOffPaidEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
+  return {
+    subject: `Payment received [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `We've received your payment of ${gbpPence(f.oneOffPence)} for your ${f.packageName}. Thank you. We'll be in touch within one working day to start.`,
+      "Stripe emails you a receipt for the payment.",
+      ...sign,
+    ].join("\n"),
+  };
+}
