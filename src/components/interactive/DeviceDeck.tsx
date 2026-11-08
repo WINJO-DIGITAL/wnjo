@@ -10,17 +10,18 @@ type Item = Pick<Project, "slug" | "name" | "mobile" | "tablet" | "logo">;
 type Mode = "phone" | "tablet";
 
 /** Stage colour and glow for each project (decoration only). */
+/* Light panels in a soft tint of each project's own colour, so the hero stays on-brand (cream) rather than a dark block. */
 const THEME: Record<string, { bg: string; glow: string }> = {
-  "ev-exec": { bg: "#1b2233", glow: "#c9a24b" },
-  boonma: { bg: "#4a3a4f", glow: "#b78fb8" },
-  "raeng-fitness": { bg: "#262624", glow: "#d8d2c4" },
+  "ev-exec": { bg: "#e6e3dc", glow: "#c9a24b" },
+  boonma: { bg: "#ece2e7", glow: "#b78fb8" },
+  "raeng-fitness": { bg: "#e8e4dd", glow: "#9c958a" },
 };
-const FALLBACK = { bg: "#2a2019", glow: "#a84a26" };
+const FALLBACK = { bg: "#ebe3d7", glow: "#a84a26" };
 
 /** The stage is laid out at 410px tall; everything scales from there (see --u in the CSS). */
 const BASE_H = 410;
 /** Centre-to-centre spacing of the cards at that size. */
-const SPACING: Record<Mode, number> = { phone: 150, tablet: 262 };
+const SPACING: Record<Mode, number> = { phone: 126, tablet: 262 };
 /** How long each project stays up before the carousel moves on by itself. */
 const AUTO_MS = 6000;
 
@@ -220,7 +221,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       <div
         ref={panelRef}
         className="deck__panel"
-        style={{ "--bg": theme.bg, "--glow": `${theme.glow}66`, "--glow-0": `${theme.glow}00` } as React.CSSProperties}
+        style={{ "--bg": theme.bg, "--glow": `${theme.glow}40`, "--glow-0": `${theme.glow}00` } as React.CSSProperties}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         onFocus={() => setFocused(true)}
