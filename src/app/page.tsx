@@ -12,7 +12,7 @@ import { StageSwiper } from "@/components/interactive/StageSwiper";
 import { WebStages } from "@/components/WebStages";
 import { WebsitesTile } from "@/components/WebsitesTile";
 import { jost } from "@/lib/fonts";
-import { ONE_OFF_WEBSITE, OWNERSHIP, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { ONE_OFF_WEBSITE, OWNERSHIP, formatGBP } from "@/lib/pricing";
 import { PackageSelector } from "@/components/pricing/PackageSelector";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
