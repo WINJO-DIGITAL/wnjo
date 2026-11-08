@@ -86,12 +86,6 @@ export default function HomePage() {
               <span className="hero-ed__line">Better business,</span>{" "}
               <span className="serif-em">through better technology.</span>
             </h1>
-            <p
-              className="lede rise"
-              style={{ "--i": 2 } as React.CSSProperties}
-            >
-              We find what&apos;s costing you customers and hours, then build the digital solution that fixes it.
-            </p>
             <div
               className="btn-row rise"
               style={{ "--i": 3 } as React.CSSProperties}
@@ -120,6 +114,11 @@ export default function HomePage() {
           <h2 id="what-title" className="tile__title">
             Every project starts with <span className="serif-em">a problem.</span>
           </h2>
+          <div className="tile__aside">
+            <p className="tile__line">
+              We find what&apos;s costing you customers and hours, then build the digital solution that fixes it.
+            </p>
+          </div>
         </div>
         <div className="container container--wide home-flow" data-reveal>
           <p className="home-flow__step">The problem</p>
