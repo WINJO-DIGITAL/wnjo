@@ -53,13 +53,11 @@ export default function HomePage() {
               className="hero-ed__title rise"
               style={{ "--i": 1 } as React.CSSProperties}
             >
-              <span className="hero-ed__line">More enquiries.</span>{" "}
-              <span className="hero-ed__line">Less admin.</span>{" "}
-              <span className="serif-em">A better website.</span>
+              <span className="hero-ed__line">Bespoke websites</span>{" "}
+              <span className="serif-em">from £99 a month.</span>
             </h1>
             <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
-              Bespoke websites, booking systems and digital solutions designed around your business. Choose an
-              affordable monthly website package or invest in a fully bespoke project.
+              Built around your business. Hosting and support included, yours after 12 payments, or £999 up front.
             </p>
             <div
               className="btn-row rise"
