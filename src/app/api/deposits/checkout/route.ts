@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
 import { depositPence } from "@/lib/deposit";
-import { createDepositCheckout, testSecretKey } from "@/lib/stripe";
+import { createDepositCheckout, stripeSecretKey } from "@/lib/stripe";
 import { userIdFromRequest } from "@/lib/files/server";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 
@@ -11,13 +11,13 @@ export const dynamic = "force-dynamic";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
- * Starts a payment for an accepted quote, in Stripe test mode (see lib/stripe.ts). Two kinds:
+ * Starts a payment for an accepted quote, in Stripe test or live mode (STRIPE_MODE; see lib/stripe.ts). Two kinds:
  * - deposit: the 50% when the quote is accepted.
  * - balance: the rest, only after the deposit is paid and staff have requested the balance.
  * The signed-in client must belong to the quote's organisation. Returns a Stripe Checkout page to send them to.
  */
 export async function POST(request: NextRequest) {
-  const key = testSecretKey(process.env.STRIPE_SECRET_KEY);
+  const key = stripeSecretKey(process.env.STRIPE_SECRET_KEY);
   if (!key) return NextResponse.json({ error: "not_configured" }, { status: 503 });
   const db = serviceClient();
   if (!db) return NextResponse.json({ error: "not_configured" }, { status: 503 });

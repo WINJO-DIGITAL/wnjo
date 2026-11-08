@@ -1,11 +1,24 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 /**
- * Minimal Stripe support, server-side only. Test mode only: a live-mode key is refused until the owner
+ * Minimal Stripe support, server-side only. Test mode unless STRIPE_MODE is "live" (see stripeSecretKey): a live key
+ * is refused in test mode and a test key in live mode, so the two can never be mixed by accident. Originally test
+ * mode only: a live-mode key was refused until the owner
  * approves going live. Calls use Stripe's HTTP API directly, so there is no extra dependency to keep updated.
  */
 
 export const STRIPE_API = "https://api.stripe.com/v1";
+
+/**
+ * The secret key to use, or null. With STRIPE_MODE set to "live", only a live secret or restricted key
+ * (sk_live_ / rk_live_) is accepted; otherwise only a test secret key (sk_test_).
+ */
+export function stripeSecretKey(raw: string | undefined, mode: string | undefined = process.env.STRIPE_MODE): string | null {
+  const key = raw?.trim();
+  if (!key) return null;
+  if (mode?.trim().toLowerCase() === "live") return /^(sk|rk)_live_/.test(key) ? key : null;
+  return key.startsWith("sk_test_") ? key : null;
+}
 
 /** Returns the key only if it is a test-mode secret key. Anything else is refused. */
 export function testSecretKey(raw: string | undefined): string | null {

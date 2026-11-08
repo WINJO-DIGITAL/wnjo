@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { paymentMatches, testSecretKey, verifyStripeSignature } from "@/lib/stripe";
+import { paymentMatches, stripeSecretKey, testSecretKey, verifyStripeSignature } from "@/lib/stripe";
 
 const secret = "whsec_test_example";
 const payload = '{"id":"evt_1","type":"checkout.session.completed"}';
@@ -59,5 +59,24 @@ describe("paymentMatches", () => {
   it("refuses a zero or invalid amount on record", () => {
     expect(paymentMatches({ amount_total: 0, currency: "gbp" }, 0)).toBe(false);
     expect(paymentMatches({ amount_total: 1.5, currency: "gbp" }, 1.5)).toBe(false);
+  });
+});
+
+describe("stripeSecretKey", () => {
+  it("accepts only a test key unless live mode is switched on", () => {
+    expect(stripeSecretKey("sk_test_abc", undefined)).toBe("sk_test_abc");
+    expect(stripeSecretKey("sk_live_abc", undefined)).toBeNull();
+    expect(stripeSecretKey("sk_live_abc", "test")).toBeNull();
+  });
+
+  it("in live mode accepts only live secret or restricted keys, never a test key", () => {
+    expect(stripeSecretKey("sk_live_abc", "live")).toBe("sk_live_abc");
+    expect(stripeSecretKey("rk_live_abc", " LIVE ")).toBe("rk_live_abc");
+    expect(stripeSecretKey("sk_test_abc", "live")).toBeNull();
+  });
+
+  it("refuses an empty key", () => {
+    expect(stripeSecretKey("", "live")).toBeNull();
+    expect(stripeSecretKey(undefined, undefined)).toBeNull();
   });
 });
