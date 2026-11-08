@@ -99,14 +99,21 @@ export const CARE_PLANS = {
   },
   hosting: {
     label: "Hosting",
-    monthly: 25,
-    summary: "Managed hosting for your site.",
-    includes: ["Managed hosting", "SSL certificate", "Daily backups", "Uptime monitoring"],
+    monthly: 49,
+    summary: "Managed hosting and technical upkeep for a site you own.",
+    includes: [
+      "Managed hosting",
+      "SSL certificate",
+      "Daily backups",
+      "Uptime monitoring",
+      "Security updates",
+      "Technical support",
+    ],
   },
   care: {
     label: "Care",
     monthly: 95,
-    summary: "Hosting plus routine maintenance and small changes.",
+    summary: "Hosting plus routine updates and small changes each month.",
     includes: [
       "Everything in Hosting",
       "Routine updates",
@@ -206,24 +213,10 @@ export const SCOPED_FROM = {
 export const DAY_RATE = 450;
 
 /**
- * Monthly subscriptions: a setup fee, then a monthly fee that covers the build, hosting, care and agreed
- * improvements. 12-month minimum term from go-live, then month to month on 30 days' notice (see /terms).
+ * Monthly subscriptions for scoped work (Simplify and Build). Website subscriptions are the Bronze, Silver and
+ * Gold packages below. Setup and term are confirmed in the written proposal.
  */
 export const SUBSCRIPTIONS = {
-  grow: {
-    name: "Grow",
-    setup: 295,
-    monthly: 149,
-    summary: "A bespoke website, kept live and improving.",
-    includes: ["Website up to 5 pages", "Hosting, updates and support", "1 hour of changes a month"],
-  },
-  growPlus: {
-    name: "Grow Plus",
-    setup: 495,
-    monthly: 249,
-    summary: "A fuller website that changes often.",
-    includes: ["Up to 12 pages", "Content you can edit yourself", "3 hours of changes a month", "Quarterly review"],
-  },
   simplify: {
     name: "Simplify",
     setup: 995,
@@ -241,11 +234,157 @@ export const SUBSCRIPTIONS = {
 } as const;
 export type SubscriptionId = keyof typeof SUBSCRIPTIONS;
 
+/* ------------------------------------------------------------------ */
+/* Website packages (Grow): monthly subscriptions and the one-off site  */
+/* Set by the owner on 8 November 2026. Every price, allowance and      */
+/* inclusion below is configurable; nothing else hardcodes them.        */
+/* ------------------------------------------------------------------ */
+
 /**
- * Buy-out on a subscription: the build price less the build share of payments made, never below a quarter of
- * the build price. The quote sets the build price and its share of each payment.
+ * Ownership and term rules for website subscriptions. LEGAL_REVIEW_PENDING keeps a visible "draft" notice on the
+ * terms, pricing and quote summary until the owner confirms a legal review; set it to false at launch.
  */
-export const BUYOUT_FLOOR = 0.25;
+export const OWNERSHIP = {
+  minimumTermMonths: 12,
+  ownershipAfterPayments: 12,
+  noticeDays: 30,
+} as const;
+export const LEGAL_REVIEW_PENDING = true;
+
+/** Add-ons a website can carry. A null price means that payment mode doesn't apply to the add-on. */
+export const ADD_ONS = {
+  booking: { label: "Online booking", monthly: 15, oneOff: 199, thirdParty: "Booking provider fees, if any, are paid to the provider." },
+  calendar: { label: "Appointment calendar", monthly: 10, oneOff: 99 },
+  blog: { label: "Blog", monthly: 10, oneOff: 99 },
+  gallery: { label: "Image gallery", monthly: 5, oneOff: 49 },
+  testimonials: { label: "Testimonials section", monthly: 5, oneOff: 49 },
+  advancedForms: { label: "Advanced enquiry forms", monthly: 10, oneOff: 99 },
+  whatsapp: { label: "WhatsApp integration", monthly: 5, oneOff: 49 },
+  liveChat: { label: "Live chat", monthly: 10, oneOff: 99, thirdParty: "Live chat software fees, if any, are paid to the provider." },
+  ecommerce: { label: "Online shop (e-commerce)", monthly: null, oneOff: 499, from: true, monthlyQuoted: true, thirdParty: "Payment processing fees are charged by the payment provider." },
+  aiAssistant: { label: "AI enquiry assistant", monthly: 29, oneOff: null },
+  leadNotifications: { label: "Automated lead notifications", monthly: 10, oneOff: null },
+  localSeo: { label: "Local SEO setup", monthly: null, oneOff: 199 },
+  seoManagement: { label: "Ongoing SEO management", monthly: 99, oneOff: null, from: true },
+} as const satisfies Record<
+  string,
+  { label: string; monthly: number | null; oneOff: number | null; from?: boolean; monthlyQuoted?: boolean; thirdParty?: string }
+>;
+export type AddOnId = keyof typeof ADD_ONS;
+
+/** Extra pages beyond a package's allowance. */
+export const EXTRA_PAGE = { monthly: 10, oneOff: 75 } as const;
+
+/** Page bands offered in the calculator. Pricing uses the top of the band; above maxQuotedPages needs a quote. */
+export const WEBSITE_PAGE_BANDS = {
+  "1-3": { label: "1 to 3 pages", max: 3 },
+  "4-5": { label: "4 to 5 pages", max: 5 },
+  "6-10": { label: "6 to 10 pages", max: 10 },
+  "11-15": { label: "11 to 15 pages", max: 15 },
+  "16-20": { label: "16 to 20 pages", max: 20 },
+  "20+": { label: "More than 20 pages", max: null },
+} as const;
+export type WebsitePageBand = keyof typeof WEBSITE_PAGE_BANDS;
+
+/** The three monthly website packages. `includedAddOns` are shown as included and never charged. */
+export const WEBSITE_PLANS = {
+  bronze: {
+    name: "Bronze",
+    monthly: 99,
+    setup: 99,
+    pages: 3,
+    popular: false,
+    summary: "For startups and smaller businesses that need a professional online presence.",
+    contentHours: 0,
+    support: "Standard support",
+    design: "Bespoke design",
+    includes: [
+      "Bespoke website design",
+      "Up to 3 pages",
+      "Mobile responsive development",
+      "Contact form",
+      "Domain connection",
+      "Managed website hosting",
+      "SSL certificate",
+      "Basic SEO foundations",
+      "Security updates",
+      "Technical maintenance",
+      "Standard support",
+    ],
+    includedAddOns: [] as AddOnId[],
+  },
+  silver: {
+    name: "Silver",
+    monthly: 149,
+    setup: 99,
+    pages: 5,
+    popular: true,
+    summary: "For businesses wanting a more comprehensive website that generates enquiries.",
+    contentHours: 1,
+    support: "Priority support",
+    design: "More advanced bespoke design",
+    includes: [
+      "Everything in Bronze",
+      "Up to 5 pages",
+      "More advanced bespoke design",
+      "Enhanced SEO foundations",
+      "Google Analytics integration",
+      "Image gallery",
+      "Testimonials section",
+      "WhatsApp integration",
+      "Lead notification emails",
+      "Up to 1 hour of small content updates a month",
+      "Priority support",
+    ],
+    includedAddOns: ["gallery", "testimonials", "whatsapp", "leadNotifications"] as AddOnId[],
+  },
+  gold: {
+    name: "Gold",
+    monthly: 199,
+    setup: 149,
+    pages: 10,
+    popular: false,
+    summary: "For growing businesses requiring a more advanced website.",
+    contentHours: 2,
+    support: "Priority support",
+    design: "Fully bespoke design",
+    includes: [
+      "Everything in Silver",
+      "Up to 10 pages",
+      "Fully bespoke design",
+      "Advanced animations",
+      "Blog",
+      "Advanced enquiry forms",
+      "Booking integration (subject to agreed functionality and third-party costs)",
+      "Conversion tracking",
+      "Enhanced SEO setup",
+      "Up to 2 hours of content updates a month",
+      "Priority support",
+    ],
+    includedAddOns: ["gallery", "testimonials", "whatsapp", "leadNotifications", "blog", "advancedForms", "booking"] as AddOnId[],
+  },
+} as const;
+export type WebsitePlanId = keyof typeof WEBSITE_PLANS;
+
+/** The one-off bespoke website, paid up front. Hosting and care are separate and optional. */
+export const ONE_OFF_WEBSITE = {
+  name: "Bespoke website",
+  from: 999,
+  pages: 5,
+  summary: "For businesses that want to pay for their website up front and own it on full payment.",
+  includes: [
+    "Up to 5 pages",
+    "Bespoke design",
+    "Custom development",
+    "Mobile responsive",
+    "Contact forms",
+    "SEO foundations",
+    "Analytics setup",
+    "Launch support",
+    "Website ownership following full payment",
+  ],
+  includedAddOns: [] as AddOnId[],
+} as const;
 
 /* ------------------------------------------------------------------ */
 /* Rates                                                               */

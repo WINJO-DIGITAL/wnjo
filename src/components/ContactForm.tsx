@@ -13,7 +13,7 @@ import {
   type Timeline,
   type Topic,
 } from "@/lib/enquiry";
-import { PACKAGES, formatGBP } from "@/lib/pricing";
+import { ONE_OFF_WEBSITE, SCOPED_FROM, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { ArrowLeft, ArrowRight } from "./Icons";
 import { useEnquirySubmit } from "./useEnquirySubmit";
 
@@ -251,10 +251,10 @@ const TOPIC_CHOICES: Choice<Topic>[] = (Object.keys(TOPICS) as Topic[]).map((t) 
 
 // Budget notes point at the published starting prices, so they stay in step with lib/pricing.
 const BUDGET_NOTES: Record<Budget, string> = {
-  "under-2k": `Essential starts at ${formatGBP(PACKAGES.essential.from)}`,
-  "2k-5k": `Professional starts at ${formatGBP(PACKAGES.professional.from)}`,
-  "5k-10k": `Premium starts at ${formatGBP(PACKAGES.premium.from)}`,
-  "10k-plus": "Larger sites and software",
+  "under-2k": `Monthly from ${formatGBP(WEBSITE_PLANS.bronze.monthly)}, or bespoke from ${formatGBP(ONE_OFF_WEBSITE.from)}`,
+  "2k-5k": "A larger bespoke website",
+  "5k-10k": `Booking systems from ${formatGBP(SCOPED_FROM.bookingSystem)}`,
+  "10k-plus": `Apps and software from ${formatGBP(SCOPED_FROM.software)}`,
   unsure: "We'll help you work it out",
 };
 const BUDGET_CHOICES: Choice<Budget>[] = (Object.keys(BUDGETS) as Budget[]).map((b) => ({

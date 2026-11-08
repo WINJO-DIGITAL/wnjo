@@ -4,7 +4,6 @@ import Link from "next/link";
 import { CtaBand } from "@/components/Blocks";
 import { BrowserFrame } from "@/components/Devices";
 import { ArrowRight } from "@/components/Icons";
-import { PaymentTimeline } from "@/components/PaymentTimeline";
 import { BookingDemo } from "@/components/interactive/BookingDemo";
 import { SheetToApp } from "@/components/interactive/SheetToApp";
 import { HeroShowcase } from "@/components/interactive/HeroShowcase";
@@ -13,7 +12,8 @@ import { StageSwiper } from "@/components/interactive/StageSwiper";
 import { WebStages } from "@/components/WebStages";
 import { WebsitesTile } from "@/components/WebsitesTile";
 import { jost } from "@/lib/fonts";
-import { PACKAGES, SUBSCRIPTIONS, formatGBP } from "@/lib/pricing";
+import { ONE_OFF_WEBSITE, OWNERSHIP, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { PackageCards } from "@/components/pricing/WebsitePackages";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
 import { siteUrl } from "@/lib/site";
@@ -39,7 +39,7 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      {/* Hero: one sentence, two next steps, and our real work straight beneath. */}
+      {/* Hero: the promise, the starting prices, the calculator, and our real work straight beneath. */}
       <section
         className="hero-ed hero-ed--work"
         data-nav="/work"
@@ -53,21 +53,29 @@ export default function HomePage() {
               className="hero-ed__title rise"
               style={{ "--i": 1 } as React.CSSProperties}
             >
-              <span className="hero-ed__line">More enquiries,</span>{" "}
-              <span className="hero-ed__line">less admin,</span>{" "}
-              <span className="serif-em">and software that fits.</span>
+              <span className="hero-ed__line">More enquiries.</span>{" "}
+              <span className="hero-ed__line">Less admin.</span>{" "}
+              <span className="serif-em">A better website.</span>
             </h1>
+            <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
+              Bespoke websites, booking systems and digital solutions designed around your business. Choose an
+              affordable monthly website package or invest in a fully bespoke project.
+            </p>
             <div
               className="btn-row rise"
-              style={{ "--i": 2 } as React.CSSProperties}
+              style={{ "--i": 3 } as React.CSSProperties}
             >
-              <Link href="/contact" className="btn btn--primary">
-                Let&apos;s talk about your business
+              <Link href="/build" className="btn btn--primary">
+                Get my website price
               </Link>
               <Link href="/work" className="btn btn--secondary">
                 Explore our work
               </Link>
             </div>
+            <p className="hero-from rise" style={{ "--i": 4 } as React.CSSProperties}>
+              Monthly websites from {formatGBP(WEBSITE_PLANS.bronze.monthly)}. Bespoke websites from{" "}
+              {formatGBP(ONE_OFF_WEBSITE.from)}.
+            </p>
           </div>
         </div>
         <div
@@ -75,6 +83,32 @@ export default function HomePage() {
           className="container container--wide showcase-section"
         >
           <HeroShowcase items={heroProjects} />
+        </div>
+      </section>
+
+      {/* Pricing preview: the three monthly packages, Silver highlighted, the calculator as the next step. */}
+      <section id="packages" className="tile home-tile" data-nav="/pricing" aria-labelledby="packages-title">
+        <div className="container container--wide tile__head" data-reveal>
+          <p className="tile__name">Website packages</p>
+          <h2 id="packages-title" className="tile__title">
+            A bespoke website, one monthly price.
+          </h2>
+          <div className="tile__aside">
+            <p className="tile__line">
+              Hosting, maintenance and support included. Yours after {OWNERSHIP.ownershipAfterPayments} payments.
+            </p>
+            <p className="tile__more">
+              <Link href="/pricing#compare" className="arrow-link">
+                Compare every package <ArrowRight />
+              </Link>
+            </p>
+          </div>
+        </div>
+        <div className="container container--wide" data-reveal>
+          <PackageCards compact />
+          <p className="home-terms">
+            Prefer to pay up front? <Link href="/pricing#one-off">Bespoke websites from {formatGBP(ONE_OFF_WEBSITE.from)}</Link>.
+          </p>
         </div>
       </section>
 
@@ -219,31 +253,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Two ways to pay, drawn rather than listed. */}
-      <section className="tile home-tile" data-nav="/pricing" aria-labelledby="ways-title">
+      {/* The ownership promise, in short. */}
+      <section className="tile inverse home-tile" data-nav="/pricing" aria-labelledby="own-title">
         <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Ways to work with us</p>
-          <h2 id="ways-title" className="tile__title">
-            Keep it running, or buy it once.
+          <p className="tile__name">Ownership</p>
+          <h2 id="own-title" className="tile__title">
+            Your website. Your business. Your ownership.
           </h2>
           <div className="tile__aside">
+            <p className="tile__line">
+              A website should be a business asset, not something you rent forever. After{" "}
+              {OWNERSHIP.ownershipAfterPayments} successful monthly payments, your agreed website is yours.
+            </p>
             <p className="tile__more">
-              <Link href="/pricing#ways" className="arrow-link">
-                How each one works <ArrowRight />
+              <Link href="/pricing#monthly" className="arrow-link">
+                How ownership works <ArrowRight />
               </Link>
             </p>
           </div>
-        </div>
-        <div className="container container--wide" data-reveal>
-          <PaymentTimeline />
-          <p className="home-from">
-            Subscriptions from {formatGBP(SUBSCRIPTIONS.grow.monthly)} a month · Websites from{" "}
-            {formatGBP(PACKAGES.essential.from)}
-          </p>
-          <p className="home-terms">
-            A written quote before you commit · Nothing to pay until you approve the scope · 50% to start, 50%
-            once you&apos;re happy
-          </p>
         </div>
       </section>
 
@@ -269,11 +296,11 @@ export default function HomePage() {
         title={<>Let&apos;s talk about your business.</>}
         body={<>Tell us what&apos;s getting in the way. We&apos;ll tell you honestly how we&apos;d fix it.</>}
       >
-        <Link href="/contact" className="btn btn--primary">
-          Let&apos;s talk about your business
+        <Link href="/build" className="btn btn--primary">
+          Get my website price
         </Link>
-        <Link href="/build" className="btn btn--secondary">
-          Get my price
+        <Link href="/contact" className="btn btn--secondary">
+          Let&apos;s talk about your business
         </Link>
       </CtaBand>
     </>

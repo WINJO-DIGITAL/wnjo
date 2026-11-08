@@ -1,4 +1,4 @@
-import { CARE_PLANS, PACKAGES, formatGBP } from "@/lib/pricing";
+import { WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
 /*
  * Four steps, no surprises: the same website at each step, from sticky notes to live.
@@ -30,16 +30,16 @@ function Screen({ stage }: { stage: (typeof STAGES)[number]["id"] }) {
           <span>Oak &amp; Ember</span>
         </div>
         <span className="ws-quote__row">
-          Design &amp; build <b>{formatGBP(PACKAGES.essential.from)}</b>
+          {WEBSITE_PLANS.silver.name} package <b>{formatGBP(WEBSITE_PLANS.silver.monthly)}/mo</b>
         </span>
         <span className="ws-quote__row">
-          Booking form <b>Included</b>
+          Image gallery <b>Included</b>
         </span>
         <span className="ws-quote__row">
-          Hosting &amp; care <b>{formatGBP(CARE_PLANS.hosting.monthly)}/mo</b>
+          Setup <b>{formatGBP(WEBSITE_PLANS.silver.setup)}</b>
         </span>
         <span className="ws-quote__row ws-quote__total">
-          Total <b>{formatGBP(PACKAGES.essential.from)}</b>
+          First payment <b>{formatGBP(WEBSITE_PLANS.silver.setup + WEBSITE_PLANS.silver.monthly)}</b>
         </span>
         <span className="bs-price">Fixed price, in writing</span>
       </div>

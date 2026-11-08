@@ -644,3 +644,20 @@ Confirmed by the owner on 8 November 2026 and live on `winjodigital.co.uk`. This
 - `winjodigital.co.uk` is the main domain; `www` redirects to it.
 - `wnjoweb.co.uk` and `www.wnjoweb.co.uk` redirect to it with a 308, keeping the path.
 
+### 18.6 Website packages (preview, 8 November 2026) — awaiting legal review before going live
+The owner replaced the Grow subscriptions and one-off packages with the model below. It is built on the preview
+branch only; the live site keeps the earlier prices until the redrafted terms have had a legal review
+(`LEGAL_REVIEW_PENDING` in `src/lib/pricing.ts` shows a "draft terms" notice until then).
+
+- Monthly packages (12-month minimum term; ownership of the agreed deliverables after 12 successful payments):
+  Bronze £99/month + £99 setup (3 pages); Silver £149/month + £99 setup (5 pages, most popular); Gold £199/month +
+  £149 setup (10 pages). Inclusions, page allowances and content-update hours are in `WEBSITE_PLANS`.
+- One-off bespoke website from £999 (5 pages), owned on full payment. Extra pages £10/month (monthly) or £75 (one-off).
+- Hosting £49, Care £95, Care Plus £220 a month, for one-off websites only; monthly packages already include hosting.
+- Add-ons with monthly and one-off prices in `ADD_ONS`; a package's included add-ons are never charged.
+- Simplify and Build keep their scoped prices and subscriptions.
+- The calculator (`/build`, `WebsiteConfigurator`) and the server (`/api/enquiry`, kind "website") share one pure
+  module, `src/lib/website-quote.ts`, so the estimate and the stored quote can't disagree.
+- Before launch: legal review of the terms (version 2026-11-08.2); apply a catalogue migration for Hosting £49 and the
+  retired packages; set `LEGAL_REVIEW_PENDING` to false.
+

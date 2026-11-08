@@ -30,7 +30,7 @@ const WNJO_CATALOGUE: Catalogue = {
   designPricePence: { refined: 0, distinctive: 90000, signature: 240000 },
   carePlans: {
     none: { name: "No plan", monthlyPricePence: 0 },
-    hosting: { name: "Hosting", monthlyPricePence: 2500 },
+    hosting: { name: "Hosting", monthlyPricePence: 4900 },
     care: { name: "Care", monthlyPricePence: 9500 },
     carePlus: { name: "Care Plus", monthlyPricePence: 22000 },
   },

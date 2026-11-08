@@ -1,5 +1,7 @@
 import { PageHero } from "@/components/Blocks";
 import { pageMetadata } from "@/lib/metadata";
+import { LegalDraftNotice } from "@/components/pricing/WebsitePackages";
+import { CARE_PLANS, OWNERSHIP, formatGBP } from "@/lib/pricing";
 import { site } from "@/lib/site";
 
 export const metadata = pageMetadata(
@@ -10,7 +12,9 @@ export const metadata = pageMetadata(
 
 /*
  * Confirmed by the owner on 7 November 2026 (quote terms version 2026-11-07, see lib/terms). The monthly
- * subscription section was approved by the owner on 8 November 2026 (version 2026-11-08). Not reviewed by a
+ * subscription section was approved by the owner on 8 November 2026 (version 2026-11-08), then redrafted the same day
+ * for website packages with ownership after 12 payments (version 2026-11-08.2, a DRAFT awaiting legal review: it
+ * shows a notice while LEGAL_REVIEW_PENDING is true and must not go live until it is reviewed). Not reviewed by a
  * lawyer; a short legal review is recommended before taking live payments. Bump QUOTE_TERMS_VERSION whenever the
  * payment, cancellation or refund wording here changes.
  */
@@ -21,6 +25,7 @@ export default function TermsPage() {
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">
           <div className="prose">
+            <LegalDraftNotice />
             <h2>Who we are</h2>
             <p>
               These terms are between you and {site.name}, a sole trader business based at 3 Knoxwood Close,
@@ -40,26 +45,33 @@ export default function TermsPage() {
               first. Payments are taken through Stripe. {site.name} is not VAT registered, so no VAT is charged.
             </p>
 
-            <h2>Monthly subscriptions</h2>
+            <h2>Monthly website packages</h2>
             <p>
-              If you choose a monthly subscription, the cost of building your website or system is spread across your
-              monthly payments, together with hosting, maintenance, security updates, support and any improvements your
-              plan includes. Your quote sets out the monthly price and exactly what it covers. Payments are taken monthly
-              in advance through Stripe.
+              A monthly website package (Bronze, Silver or Gold) has a one-off setup fee, then a monthly payment that
+              covers the design and build of your website, managed hosting, security updates, technical maintenance,
+              support and any content updates your package includes. Your proposal sets out the package, the price and
+              exactly what it covers. Payments are taken monthly in advance through Stripe.
             </p>
             <p>
-              The minimum term is 12 months from the date your website or system goes live. After that, the subscription
-              continues month to month, and either of us can end it with 30 days&apos; notice. If you end it during the
-              minimum term, the payments for the rest of the minimum term become due.
+              The minimum term is {OWNERSHIP.minimumTermMonths} months. After that, the subscription continues month to
+              month, with hosting, maintenance, support and any agreed ongoing services as set out in your agreement.
+              What happens if a subscription ends during the minimum term is set out in your written agreement.
+            </p>
+            <h2>Ownership after {OWNERSHIP.ownershipAfterPayments} payments</h2>
+            <p>
+              After {OWNERSHIP.ownershipAfterPayments} successful monthly payments, ownership of the website deliverables
+              agreed in your proposal transfers to you. You can keep your hosting and support with us, or ask us to
+              transfer the website to you under the transfer policy, with {OWNERSHIP.noticeDays} days&apos; notice.
             </p>
             <p>
-              You can buy the build outright at any time. Your quote sets out the buy-out price, which reduces as you
-              make your monthly payments. Once it is paid, ownership passes to you as described under &ldquo;Your
-              website and files&rdquo;, and you can keep or cancel hosting and care.
+              Your domain is registered in your name, and its registration is documented in your agreement. Third-party
+              licences and subscriptions remain subject to their own terms. Our own reusable tools, components and
+              frameworks are not transferred automatically.
             </p>
+            <h2>Scoped subscriptions</h2>
             <p>
-              Your domain and the content you supply are always yours. If a subscription ends without a buy-out, we hand
-              over your content and help you move your domain. The bespoke design and code remain ours.
+              Booking systems and custom software offered on a monthly subscription are scoped individually. The
+              price, term and ownership arrangements for them are set out in their own written proposal.
             </p>
 
             <h2>Your content</h2>
@@ -75,7 +87,9 @@ export default function TermsPage() {
 
             <h2>Hosting and care</h2>
             <p>
-              Managed hosting is £25 a month. It covers hosting, the SSL certificate, daily backups and uptime monitoring.
+              For websites paid up front, managed hosting is {formatGBP(CARE_PLANS.hosting.monthly)} a month. It covers
+              hosting, the SSL certificate, daily backups, uptime monitoring, security updates and technical support.
+              Monthly website packages already include hosting.
               You can cancel hosting with 30 days&apos; notice. We will help move your site to another host if you ask.
             </p>
 

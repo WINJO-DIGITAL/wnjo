@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "@/components/Icons";
 import { SiteStyler } from "@/components/interactive/SiteStyler";
 import { archivo, jost } from "@/lib/fonts";
-import { CARE_PLANS, PACKAGES, formatGBP } from "@/lib/pricing";
+import { ONE_OFF_WEBSITE, OWNERSHIP, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
 /**
  * Websites, sold by showing: the headline, both prices in one row, and the example site
@@ -31,10 +31,6 @@ export function WebsitesTile({
   visual?: React.ReactNode;
 }) {
   const titleId = `${id ?? "websites"}-title`;
-  const handoverDays =
-    PACKAGES.essential.includes
-      .find((l) => /handover/.test(l))
-      ?.match(/(\d+) days/)?.[1] ?? "30";
   return (
     <section
       id={id}
@@ -53,22 +49,22 @@ export function WebsitesTile({
           {/* Both prices in one place: the website, and the care that keeps it running. */}
           <dl className="price-pair">
             <div>
-              <dt>Website from</dt>
-              <dd>{formatGBP(PACKAGES.essential.from)}</dd>
-            </div>
-            <div>
-              <dt>Hosting &amp; care</dt>
+              <dt>Monthly from</dt>
               <dd>
-                {formatGBP(CARE_PLANS.hosting.monthly)}
+                {formatGBP(WEBSITE_PLANS.bronze.monthly)}
                 <span>/month</span>
               </dd>
+            </div>
+            <div>
+              <dt>Bespoke from</dt>
+              <dd>{formatGBP(ONE_OFF_WEBSITE.from)}</dd>
             </div>
           </dl>
           {/* Reasons to trust the price, each one a published commitment rather than a claim. */}
           <ul className="trust-row" role="list">
-            <li>Your written quote, instantly</li>
-            <li>50% to start, 50% once you&apos;re happy</li>
-            <li>{handoverDays} days of support after launch</li>
+            <li>See your price as you build your quote</li>
+            <li>Hosting and support included monthly</li>
+            <li>Yours after {OWNERSHIP.ownershipAfterPayments} payments</li>
           </ul>
           </>)}
           {compact ? (

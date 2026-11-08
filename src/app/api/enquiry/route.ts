@@ -10,6 +10,10 @@ import { PROJECT_TYPES, estimate, parseAnswers } from "@/lib/pricing";
 import { rateLimited } from "@/lib/rate-limit";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { serviceClient } from "@/lib/quote-store";
+import { INTENTS, cleanDetails, formatDetails, validateDetails, type Intent } from "@/lib/website-enquiry";
+import { customerAcknowledgement, ownerSubject } from "@/lib/website-emails";
+import { ROUTED_WANTS, formatWebsiteQuote, parseWebsiteAnswers, websiteQuote } from "@/lib/website-quote";
+import { formatGBP } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 
@@ -57,6 +61,9 @@ export async function POST(request: NextRequest) {
   if (clean(body.website, 200) !== "" || !Number.isFinite(startedAt) || Date.now() - startedAt < MIN_FILL_MS) {
     return reply(200, { ok: true });
   }
+
+  // The website calculator (/build) sends its own shape: answers, details and what to do next.
+  if (body.kind === "website" && !fromForm) return handleWebsiteQuote(body, request);
 
   const kind = body.kind === "brief" ? "brief" : "contact";
   // Budget and timeline help, but are optional everywhere, so nobody is stopped for not knowing yet.
@@ -163,3 +170,102 @@ export async function POST(request: NextRequest) {
   }
   return reply(200, { ok: true, reference, quoteReference });
 }
+
+/**
+ * A quote from the website calculator. The price is recalculated here from the submitted answers; the browser's
+ * figures are never trusted. Saved as a brief (with the answers and the recalculated figures), emailed to the
+ * owner, and acknowledged to the customer. Success is returned only if it was saved or delivered.
+ */
+async function handleWebsiteQuote(body: Json, request: NextRequest) {
+  const intent: Intent = typeof body.intent === "string" && body.intent in INTENTS ? (body.intent as Intent) : "quote";
+  if (intent === "consultation") {
+    return NextResponse.json(
+      { error: "Online booking isn't available yet. Please request a callback instead.", code: "calendar_unavailable" },
+      { status: 422 },
+    );
+  }
+  const answers = parseWebsiteAnswers(body.answers);
+  if (!answers || ROUTED_WANTS[answers.want]) {
+    return NextResponse.json({ error: "Some of your choices were missing. Please review your quote." }, { status: 422 });
+  }
+  const details = cleanDetails(body.details);
+  const fieldErrors = validateDetails(details, intent);
+  if (Object.keys(fieldErrors).length) {
+    return NextResponse.json({ error: "Please check the highlighted fields.", fields: fieldErrors }, { status: 422 });
+  }
+
+  const config = mailConfig();
+  const storeOn = enquiryStoreConfigured();
+  if (!config && !storeOn) {
+    return NextResponse.json(
+      { error: "Online enquiries aren't connected yet, so this quote has not been sent.", code: "not_configured" },
+      { status: 503 },
+    );
+  }
+
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const shared = LIMITS_PER_ROUTE.enquiry;
+  if (rateLimited(ip) || (await sharedRateLimited(serviceClient(), "enquiry", ip, shared.max, shared.windowSeconds))) {
+    return NextResponse.json(
+      { error: "Too many submissions from this connection. Please try again in a few minutes." },
+      { status: 429 },
+    );
+  }
+
+  const quote = websiteQuote(answers);
+  const reference = newReference();
+  const subject = ownerSubject(details, quote, intent, reference);
+  const text = [
+    `Reference: ${reference}`,
+    `Next step requested: ${INTENTS[intent].label}`,
+    "",
+    formatDetails(details),
+    "",
+    formatWebsiteQuote(answers, quote, formatGBP),
+  ].join("\n");
+
+  const saved = storeOn
+    ? await saveEnquiry({
+        reference,
+        kind: "brief",
+        name: details.name,
+        email: details.email,
+        company: details.businessName,
+        topic: intent === "callback" ? "Callback request" : "Website quote",
+        subject,
+        body: text,
+        answers: {
+          type: "website",
+          version: 1,
+          intent,
+          answers,
+          details: { phone: details.phone, industry: details.industry, launchDate: details.launchDate },
+          figures: {
+            mode: quote.mode,
+            package: quote.packageName,
+            setup: quote.setup,
+            monthly: quote.monthly,
+            oneOffTotal: quote.oneOffTotal,
+            initialPayment: quote.initialPayment,
+            requiresQuote: quote.requiresQuote,
+          },
+        },
+      })
+    : false;
+  const sent = config ? await sendEnquiryEmail(config, { subject, text, replyTo: details.email }) : false;
+
+  if (!saved && !sent) {
+    return NextResponse.json({ error: "We couldn't send your quote just now. Please try again shortly." }, { status: 502 });
+  }
+
+  // The customer's copy. A failure here doesn't undo the enquiry: we already have it.
+  const customerConfig = notificationMailConfig();
+  if (customerConfig) {
+    const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
+    const ack = customerAcknowledgement({ reference, details, quote, intent, siteUrl: site });
+    await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Quote acknowledgement");
+  }
+
+  return NextResponse.json({ ok: true, reference });
+}
+

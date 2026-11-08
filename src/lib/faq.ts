@@ -1,7 +1,9 @@
+import { CARE_PLANS, ONE_OFF_WEBSITE, OWNERSHIP, WEBSITE_PLANS, formatGBP } from "./pricing";
+
 /**
- * Frequently asked questions. Answers state only what the site already commits to
- * (package inclusions, written scope before payment, provisional pricing). Policies
- * still open in README §15 (deposits, refunds, ownership terms) are not invented here.
+ * Frequently asked questions. Answers state only what the site already commits to, with every figure taken from
+ * lib/pricing. Ownership, cancellation and transfer details point to the written agreement rather than inventing
+ * terms: they are awaiting legal review (LEGAL_REVIEW_PENDING).
  * `short` is the answer at a glance, shown large on the card; it must say no more than `a`.
  */
 export const FAQ_CATEGORIES = [
@@ -17,34 +19,58 @@ export type FaqCategory = (typeof FAQ_CATEGORIES)[number]["id"];
 
 export const faqs: { q: string; short: string; a: string; category: FaqCategory }[] = [
   {
-    q: "How long does a project take?",
-    category: "getting-started",
-    short: "A date in writing",
-    a: "It depends on the size of the site and the features it needs: a five-page website is a much smaller job than a web application. Once the scope is agreed, we confirm a delivery date in writing. We don't promise dates before that.",
+    q: "What's included in a monthly website package?",
+    category: "pricing",
+    short: "Hosting and support in",
+    a: `A bespoke website with hosting, an SSL certificate, security updates, technical maintenance and support, for one monthly price. Bronze is ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month for up to ${WEBSITE_PLANS.bronze.pages} pages, Silver ${formatGBP(WEBSITE_PLANS.silver.monthly)} for up to ${WEBSITE_PLANS.silver.pages}, and Gold ${formatGBP(WEBSITE_PLANS.gold.monthly)} for up to ${WEBSITE_PLANS.gold.pages}, each with a one-off setup fee. Silver and Gold also include monthly content updates.`,
   },
   {
-    q: "How many revisions are included?",
+    q: "Is a monthly website a template?",
     category: "website",
-    short: "2–3 rounds",
-    a: "Each package lists its design revision rounds: two for Essential and three for Professional. Premium projects agree their review stages in the written scope. Bigger changes of direction are discussed, and quoted, before any extra work.",
+    short: "No, bespoke",
+    a: "No. Every package is designed for your business. The packages differ in pages, features and the depth of design, not in whether the design is your own.",
   },
   {
     q: "How do payments work?",
     category: "pricing",
     short: "Nothing until agreed",
-    a: "Your written quote sets out the price, any deposit and the payment schedule before you commit to anything. We never take payment for work that hasn't been scoped and agreed. WINJO DIGITAL is not VAT registered, so no VAT is added to our prices.",
+    a: `On a monthly package, the first payment is the setup fee plus your first month, then one payment a month. A one-off website starts from ${formatGBP(ONE_OFF_WEBSITE.from)}, with the payment schedule set out in your proposal. Either way, nothing is charged until you accept a written proposal. WINJO DIGITAL is not VAT registered, so no VAT is added to our prices.`,
   },
   {
-    q: "Who owns the website?",
+    q: "When do I own my website?",
     category: "website",
-    short: "Your brand and domain",
-    a: "Your content, branding and domain are yours, and we can register your domain in your name. Ownership of the design and code is set out clearly in your agreement before any work starts.",
+    short: `After ${OWNERSHIP.ownershipAfterPayments} payments`,
+    a: `On a monthly package, ownership of your agreed website deliverables transfers to you after ${OWNERSHIP.ownershipAfterPayments} successful monthly payments. A one-off website is yours on full payment. Your domain is registered in your name. Third-party licences and subscriptions stay under their own terms, and our own reusable tools and frameworks are not transferred automatically. The details are confirmed in your written agreement.`,
+  },
+  {
+    q: "What happens after the first 12 months?",
+    category: "ongoing",
+    short: "Month to month",
+    a: `Your subscription continues month to month, with hosting, maintenance and support as before. You can also ask us to transfer the website to you under the transfer policy, with ${OWNERSHIP.noticeDays} days' notice.`,
+  },
+  {
+    q: "Can I cancel during the first 12 months?",
+    category: "pricing",
+    short: `${OWNERSHIP.minimumTermMonths}-month minimum`,
+    a: `Monthly packages have a ${OWNERSHIP.minimumTermMonths}-month minimum term. What happens if you need to end it early is set out in your written agreement before you sign up.`,
+  },
+  {
+    q: "How long does a project take?",
+    category: "getting-started",
+    short: "A date in writing",
+    a: "It depends on the size of the site and the features it needs: a three-page website is a much smaller job than a web application. Once the scope is agreed, we confirm a delivery date in writing. We don't promise dates before that.",
+  },
+  {
+    q: "How many revisions are included?",
+    category: "website",
+    short: "Set in your proposal",
+    a: "Your written proposal sets out the review rounds for your website. Bigger changes of direction are discussed, and quoted, before any extra work.",
   },
   {
     q: "What happens after launch?",
     category: "ongoing",
-    short: "30–60 days support",
-    a: "Every package includes handover support: 30 days for Essential and Professional, 60 for Premium. After that you can host the site yourself, or choose a Hosting, Care or Care Plus plan for hosting, updates, small changes and support.",
+    short: "Support continues",
+    a: `Monthly packages include hosting, maintenance and support for as long as you subscribe. A one-off website includes launch support; after that you can host it yourself, or choose Hosting (${formatGBP(CARE_PLANS.hosting.monthly)} a month), Care (${formatGBP(CARE_PLANS.care.monthly)}) or Care Plus (${formatGBP(CARE_PLANS.carePlus.monthly)}).`,
   },
   {
     q: "Can you build an app for my business?",
@@ -56,7 +82,7 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "Can you add features to my site later?",
     category: "ongoing",
     short: "Yes",
-    a: "Yes. New features and improvements are quoted as separate work, or covered by the monthly hours included in Care Plus.",
+    a: "Yes. Add-on features have published prices on the pricing page. Larger improvements are quoted as separate work, or covered by the monthly content allowance in Silver and Gold, or the hours in Care Plus.",
   },
 ];
 

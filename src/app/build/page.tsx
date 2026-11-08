@@ -1,11 +1,15 @@
 import { PageHero } from "@/components/Blocks";
-import { Configurator, type ConfiguratorParams } from "@/components/configurator/Configurator";
+import {
+  WebsiteConfigurator,
+  type WebsiteConfiguratorParams,
+} from "@/components/configurator/WebsiteConfigurator";
 import { pageMetadata } from "@/lib/metadata";
+import { ONE_OFF_WEBSITE, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
 export const metadata = pageMetadata(
   "/build",
-  "Build your website",
-  "Configure your website in a few steps and see an indicative price immediately, with inclusions, exclusions and ongoing costs set out clearly.",
+  "Get your website price",
+  `Build your website quote in a few steps: monthly websites from ${formatGBP(WEBSITE_PLANS.bronze.monthly)} or a one-off bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}, with your first payment and monthly price shown as you go.`,
 );
 
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
@@ -16,23 +20,26 @@ export default async function BuildPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const query = await searchParams;
-  const params: ConfiguratorParams = {
+  const params: WebsiteConfiguratorParams = {
+    plan: first(query.plan),
     type: first(query.type),
-    pages: first(query.pages),
     care: first(query.care),
+    pages: first(query.pages),
     business: first(query.business),
   };
+  // Consultation booking appears only once a real calendar is connected (Cal.com); until then, callbacks.
+  const calendarEnabled = Boolean(process.env.CALCOM_API_KEY?.trim() && process.env.CALCOM_EVENT_TYPE_ID?.trim());
   return (
     <>
       <PageHero
-        eyebrow="Website configurator"
-        title={<>Build your website.</>}
-        lede="A few quick answers, and your written quote arrives instantly. Nothing is charged."
+        eyebrow="Website quote"
+        title={<>Get your website price.</>}
+        lede={`Monthly websites from ${formatGBP(WEBSITE_PLANS.bronze.monthly)}, or bespoke from ${formatGBP(ONE_OFF_WEBSITE.from)}. See your first payment and monthly price as you choose. Nothing is charged.`}
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">
           <div className="js-only">
-            <Configurator params={params} />
+            <WebsiteConfigurator params={params} calendarEnabled={calendarEnabled} />
           </div>
           <noscript>
             <p className="lede">

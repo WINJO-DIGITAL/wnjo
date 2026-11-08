@@ -7,9 +7,9 @@ describe("businessSchema", () => {
   it("describes the business with the published starting prices", () => {
     expect(business["@type"]).toBe("ProfessionalService");
     expect(business.url).toBe("https://winjodigital.co.uk");
-    expect(business.priceRange).toBe("From £2,400");
+    expect(business.priceRange).toBe("From £99 a month");
     const offers = business.makesOffer ?? [];
-    expect(offers.flatMap((o) => (o.priceSpecification ? [o.priceSpecification.price] : []))).toEqual([2400, 25]);
+    expect(offers.flatMap((o) => (o.priceSpecification ? [o.priceSpecification.price] : []))).toEqual([99, 999, 49]);
     // Services without a published price are listed by name only.
     expect(offers.filter((o) => !o.priceSpecification).map((o) => o.name)).toEqual([
       "Booking system development",

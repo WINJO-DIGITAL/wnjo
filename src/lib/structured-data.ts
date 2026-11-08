@@ -1,4 +1,4 @@
-import { CARE_PLANS, PACKAGES } from "@/lib/pricing";
+import { CARE_PLANS, ONE_OFF_WEBSITE, WEBSITE_PLANS } from "@/lib/pricing";
 import { site } from "@/lib/site";
 
 /**
@@ -19,7 +19,7 @@ export function businessSchema(baseUrl: string) {
       image: `${url}/opengraph-image.png`,
       address: { "@type": "PostalAddress", addressLocality: "Thornton-Cleveleys", addressRegion: "Lancashire", addressCountry: "GB" },
       areaServed: { "@type": "Country", name: "United Kingdom" },
-      priceRange: `From £${PACKAGES.essential.from.toLocaleString("en-GB")}`,
+      priceRange: `From £${WEBSITE_PLANS.bronze.monthly} a month`,
       knowsAbout: [
         "Bespoke web development",
         "Web design",
@@ -33,8 +33,19 @@ export function businessSchema(baseUrl: string) {
         { "@type": "Offer", name: "Custom software and app development" },
         {
           "@type": "Offer",
-          name: "Website design and build",
-          priceSpecification: { "@type": "PriceSpecification", price: PACKAGES.essential.from, minPrice: PACKAGES.essential.from, priceCurrency: "GBP" },
+          name: "Monthly website package",
+          priceSpecification: {
+            "@type": "UnitPriceSpecification",
+            price: WEBSITE_PLANS.bronze.monthly,
+            minPrice: WEBSITE_PLANS.bronze.monthly,
+            priceCurrency: "GBP",
+            unitText: "MONTH",
+          },
+        },
+        {
+          "@type": "Offer",
+          name: "Bespoke website design and build",
+          priceSpecification: { "@type": "PriceSpecification", price: ONE_OFF_WEBSITE.from, minPrice: ONE_OFF_WEBSITE.from, priceCurrency: "GBP" },
         },
         {
           "@type": "Offer",
