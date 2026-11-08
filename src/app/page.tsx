@@ -133,7 +133,7 @@ export default function HomePage() {
           navLink="/websites"
           compact
           name="Grow"
-          title="A website that brings in enquiries."
+          title={<>A website that <span className="serif-em">brings in enquiries.</span></>}
           line="Bespoke websites, landing pages and lead capture, built for phones first."
           visual={<SiteFan />}
         />
@@ -148,7 +148,7 @@ export default function HomePage() {
           <div className="container container--wide tile__head" data-reveal>
             <p className="tile__name">Simplify</p>
             <h2 id="simplify-title" className="tile__title">
-              Bookings that run without a phone call.
+              Bookings that run <span className="serif-em">without a phone call.</span>
             </h2>
             <div className="tile__aside">
               <blockquote className="home-quote">
@@ -172,7 +172,7 @@ export default function HomePage() {
           <div className="container container--wide tile__head" data-reveal>
             <p className="tile__name">Build</p>
             <h2 id="build-title" className="tile__title">
-              Stop running the business from spreadsheets.
+              Stop running the business <span className="serif-em">from spreadsheets.</span>
             </h2>
             <div className="tile__aside">
               <p className="tile__line">
