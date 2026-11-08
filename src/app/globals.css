@@ -10151,3 +10151,36 @@ body:has(.dash-header) .site-footer {
   margin-top: var(--space-7);
   text-align: left;
 }
+
+/* "Get my price" chip: a clear response to tap, hover and keyboard focus. */
+.deck__btn {
+  transition:
+    transform 0.14s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.deck__btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 18px 32px -12px rgb(46 36 29 / 0.75),
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
+}
+.deck__btn:active {
+  transform: scale(0.97);
+  background: linear-gradient(180deg, #2e241d, #1f1712);
+  box-shadow:
+    0 6px 14px -10px rgb(46 36 29 / 0.8),
+    inset 0 2px 4px rgb(0 0 0 / 0.35);
+}
+.deck__btn:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+@media (hover: none) {
+  .deck__btn:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deck__btn,
+  .deck__btn:hover,
+  .deck__btn:active { transition: none; transform: none; }
+}
