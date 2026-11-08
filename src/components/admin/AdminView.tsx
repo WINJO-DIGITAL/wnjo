@@ -1,5 +1,6 @@
 "use client";
 
+import { isTestRecord } from "@/lib/test-records";
 import { useEffect, useState, type FormEvent } from "react";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
@@ -147,13 +148,15 @@ function StaffOverview({ client }: { client: SupabaseClient }) {
       client.from("enquiries").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
       client.from("quotes").select("id", { count: "exact", head: true }).eq("status", "sent"),
       client.from("orders").select("id", { count: "exact", head: true }).neq("stage", "live"),
-      client.from("deposits").select("amount_pence").eq("status", "paid"),
+      client.from("deposits").select("amount_pence, quote_acceptance_id").eq("status", "paid"),
     ]).then(([enq, quotes, orders, deposits]) => {
       if (enq.error || quotes.error || orders.error || deposits.error) {
         setError(true);
         return;
       }
-      const paid = ((deposits.data as { amount_pence: number }[]) ?? []).reduce((sum, d) => sum + d.amount_pence, 0);
+      const paid = ((deposits.data as { amount_pence: number; quote_acceptance_id: string }[]) ?? [])
+        .filter((d) => !isTestRecord(d.quote_acceptance_id))
+        .reduce((sum, d) => sum + d.amount_pence, 0);
       setStats([
         { label: "New enquiries", value: String(enq.count ?? 0), href: "#enquiries", note: "Last 7 days" },
         { label: "Quotes waiting", value: String(quotes.count ?? 0), href: "#quotes", note: "Sent, not yet answered" },
@@ -354,8 +357,10 @@ function QuotesTable({ client }: { client: SupabaseClient }) {
       client.from("deposits").select("quote_acceptance_id, kind, status"),
     ]).then(([q, a, d]) => {
       setError(Boolean(q.error));
-      setRows(q.error ? null : ((q.data as unknown as QuoteRow[]) ?? []));
-      const deposits = (d.data as unknown as Array<{ quote_acceptance_id: string; kind: string; status: string }>) ?? [];
+      setRows(q.error ? null : (((q.data as unknown as QuoteRow[]) ?? []).filter((r) => !isTestRecord(r.id))));
+      const deposits = ((d.data as unknown as Array<{ quote_acceptance_id: string; kind: string; status: string }>) ?? []).filter(
+        (x) => !isTestRecord(x.quote_acceptance_id),
+      );
       const map: Record<string, PaymentState> = {};
       for (const acc of ((a.data as unknown as Array<{ id: string; quote_id: string }>) ?? [])) {
         const mine = deposits.filter((x) => x.quote_acceptance_id === acc.id);

@@ -1,5 +1,6 @@
 "use client";
 
+import { isTestRecord } from "@/lib/test-records";
 import { useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { QUOTE_TERMS_VERSION } from "@/lib/terms";
@@ -74,7 +75,7 @@ export function QuotesPanel({ client }: { client: SupabaseClient }) {
             deposits: deposits.filter((d) => d.quote_acceptance_id === a.id).map((d) => ({ kind: d.kind, status: d.status, amount_pence: d.amount_pence })),
           })),
         );
-        setQuotes(quoteRes.error ? null : ((quoteRes.data as unknown as Quote[]) ?? []));
+        setQuotes(quoteRes.error ? null : (((quoteRes.data as unknown as Quote[]) ?? []).filter((q) => !isTestRecord(q.id))));
       });
     return () => {
       cancelled = true;
