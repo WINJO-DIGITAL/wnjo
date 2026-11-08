@@ -45,5 +45,13 @@ Rules:
 The live webhook endpoint (`we_1UZKdaFZtOV6mSdmHzzgDd3z`) pointed at the old domain, which now redirects; Stripe does
 not follow redirects. It was changed to `https://winjodigital.co.uk/api/stripe/webhook` with the owner's approval.
 Stripe held no live `checkout.session.completed` events in its 30-day history, so no live payment was missed. The
-endpoint answers directly (an unsigned request gets 400 bad_signature). Its events are still
-`checkout.session.completed` only; add the four subscription events when Stage 6 goes live.
+endpoint answers directly (an unsigned request gets 400 bad_signature). Its events now include
+the four subscription events as well as `checkout.session.completed` (added 8 November 2026 with the subscription deploy).
+
+### Live launch of website subscriptions (8 November 2026)
+- Live billing portal configuration `bpc_1UZf7FFZtOV6mSdmmOid5SxF` (default, card and invoices only, no self-cancel).
+- Live webhook events extended to the five events the subscription code handles.
+- Live `hosting` care plan set to £49 a month in the database (migration `hosting_price_49`), matching the code.
+- Terms version `2026-11-08.2` published with the draft notice removed on the owner's approval. A lawyer's review is
+  not on record: keep this in mind before changing the terms.
+

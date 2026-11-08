@@ -249,7 +249,7 @@ export const OWNERSHIP = {
   ownershipAfterPayments: 12,
   noticeDays: 30,
 } as const;
-export const LEGAL_REVIEW_PENDING = true;
+export const LEGAL_REVIEW_PENDING = false;
 
 /** Add-ons a website can carry. A null price means that payment mode doesn't apply to the add-on. */
 export const ADD_ONS = {
