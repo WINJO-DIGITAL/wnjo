@@ -1,7 +1,19 @@
 import Image from "next/image";
-import logo from "../../public/brand/wnjo-logo-462.png";
 
-/** The supplied WNJO lockup (W mark, wordmark and "Web Design · Development · SaaS" line), used unmodified. */
+/**
+ * The WINJO DIGITAL logo: the W mark and wordmark as one vector file (public/brand/winjo-digital-logo.svg).
+ * It is an SVG, so it stays sharp at every size and is served as is.
+ */
 export function Logo({ preload = false }: { preload?: boolean }) {
-  return <Image src={logo} alt="WNJO" preload={preload} sizes="(min-width: 64rem) 200px, 170px" />;
+  return (
+    <Image
+      src="/brand/winjo-digital-logo.svg"
+      alt="WINJO Digital"
+      width={220}
+      height={29}
+      unoptimized
+      preload={preload}
+      sizes="(min-width: 64rem) 220px, 180px"
+    />
+  );
 }
