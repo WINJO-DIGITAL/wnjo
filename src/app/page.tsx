@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CtaBand, PricingNotice } from "@/components/Blocks";
+import { CtaBand } from "@/components/Blocks";
 import { ArrowRight } from "@/components/Icons";
 import { BookingDemo } from "@/components/interactive/BookingDemo";
 import { SheetToApp } from "@/components/interactive/SheetToApp";
@@ -40,21 +40,21 @@ const SERVICE_GROUPS = [
   {
     goal: "Grow your business",
     line: "Get found, get enquiries, get customers who trust you.",
-    items: ["Conversion-focused websites", "Landing pages", "Lead generation", "Online presence"],
+    items: "Websites, landing pages, lead generation and online presence",
     href: "/websites",
     cta: "See websites",
   },
   {
     goal: "Simplify your operations",
     line: "Less admin, fewer missed bookings, clearer day-to-day running.",
-    items: ["Booking and appointment systems", "Workflow automation", "Customer management", "Operational dashboards"],
+    items: "Booking systems, workflow automation, customer management and dashboards",
     href: "/booking-software",
     cta: "See booking software",
   },
   {
     goal: "Build something bespoke",
     line: "Software shaped around a problem that no off-the-shelf tool solves.",
-    items: ["Custom software and web apps", "Client portals", "Integrations", "SaaS products"],
+    items: "Custom software, web apps, client portals, integrations and SaaS products",
     href: "/app-development",
     cta: "See app development",
   },
@@ -107,12 +107,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. What we do: the mechanism, shown as a sequence rather than described. */}
-      <section className="tile" data-nav="/" aria-labelledby="what-title">
+      {/* 2. What we do. */}
+      <section className="tile home-tile" data-nav="/" aria-labelledby="what-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">What we do</p>
           <h2 id="what-title" className="tile__title">
-            Every project starts with <span className="serif-em">a problem.</span>
+            Every project starts with a problem.
           </h2>
           <div className="tile__aside">
             <p className="tile__line">
@@ -120,51 +120,35 @@ export default function HomePage() {
             </p>
           </div>
         </div>
-        <div className="container container--wide home-flow" data-reveal>
-          <p className="home-flow__step">The problem</p>
-          <span className="home-flow__arrow" aria-hidden="true">
-            <ArrowRight />
-          </span>
-          <p className="home-flow__step">The digital solution</p>
-          <span className="home-flow__arrow" aria-hidden="true">
-            <ArrowRight />
-          </span>
-          <p className="home-flow__step home-flow__step--result">The result for your business</p>
-        </div>
       </section>
 
       {/* 3. Business problems we solve. */}
-      <section className="tile" data-nav="/" aria-labelledby="problems-title">
+      <section className="tile home-tile" data-nav="/" aria-labelledby="problems-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Problems we solve</p>
           <h2 id="problems-title" className="tile__title">
-            Where businesses lose <span className="serif-em">time and customers.</span>
+            Where businesses lose time and customers.
           </h2>
         </div>
         <div className="container container--wide" data-reveal>
-          <ol className="home-list">
-            {PROBLEMS.map((problem, i) => (
-              <li key={problem}>
-                <span className="home-list__num" aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span>{problem}</span>
-              </li>
+          <ul className="home-plain" role="list">
+            {PROBLEMS.map((problem) => (
+              <li key={problem}>{problem}</li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 
       {/* 4. Outcomes we help businesses achieve. */}
-      <section className="tile inverse" data-nav="/" aria-labelledby="outcomes-title">
+      <section className="tile inverse home-tile" data-nav="/" aria-labelledby="outcomes-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Outcomes</p>
           <h2 id="outcomes-title" className="tile__title">
-            What changes <span className="serif-em">when it works.</span>
+            What changes when it works.
           </h2>
         </div>
         <div className="container container--wide" data-reveal>
-          <ul className="home-outcomes" role="list">
+          <ul className="home-plain home-plain--large" role="list">
             {OUTCOMES.map((outcome) => (
               <li key={outcome}>{outcome}</li>
             ))}
@@ -173,11 +157,11 @@ export default function HomePage() {
       </section>
 
       {/* 5. Services organised around business goals. */}
-      <section className="tile" data-nav="/" aria-labelledby="services-title">
+      <section className="tile home-tile" data-nav="/" aria-labelledby="services-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Services</p>
           <h2 id="services-title" className="tile__title">
-            Start with the goal, <span className="serif-em">not the tool.</span>
+            Start with the goal, not the tool.
           </h2>
         </div>
         <div className="container container--wide home-groups" data-reveal>
@@ -185,11 +169,7 @@ export default function HomePage() {
             <article key={group.goal} className="home-group">
               <h3 className="home-group__goal">{group.goal}</h3>
               <p className="home-group__line">{group.line}</p>
-              <ul className="home-group__items" role="list">
-                {group.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
+              <p className="home-group__items">{group.items}.</p>
               <Link href={group.href} className="arrow-link">
                 {group.cta} <ArrowRight />
               </Link>
@@ -202,16 +182,16 @@ export default function HomePage() {
       <section
         id="booking"
         data-nav="/booking-software"
-        className={`tile inverse ${jost.variable}`}
+        className={`tile inverse home-tile ${jost.variable}`}
         aria-labelledby="booking-title"
       >
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Simplify your operations</p>
           <h2 id="booking-title" className="tile__title">
-            Bookings that run <span className="serif-em">without a phone call.</span>
+            Bookings that run without a phone call.
           </h2>
           <div className="tile__aside">
-            <p className="tile__line">Get bookings while you’re busy working. Proven every day at {evexec.name}.</p>
+            <p className="tile__line">Get bookings while you&apos;re busy working. Proven every day at {evexec.name}.</p>
             <p className="tile__more">
               <Link href="/booking-software#make-it-yours" className="arrow-link">
                 Try the booking demo <ArrowRight />
@@ -224,11 +204,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="apps" data-nav="/app-development" className="tile" aria-labelledby="apps-title">
+      <section id="apps" data-nav="/app-development" className="tile home-tile" aria-labelledby="apps-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Build something bespoke</p>
           <h2 id="apps-title" className="tile__title">
-            Stop running the business <span className="serif-em">from spreadsheets.</span>
+            Stop running the business from spreadsheets.
           </h2>
           <div className="tile__aside">
             <div className="tile__ctas">
@@ -246,12 +226,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Selected work, explained as solutions: the problem, what we built, what it's for. */}
-      <section id="work" className="tile" data-nav="/work" aria-labelledby="work-title">
+      {/* 6. Selected work, explained as solutions. */}
+      <section id="work" className="tile home-tile" data-nav="/work" aria-labelledby="work-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Our work</p>
           <h2 id="work-title" className="tile__title">
-            Problems solved, <span className="serif-em">in production.</span>
+            Problems solved, in production.
           </h2>
         </div>
         <div className="container container--wide home-solutions" data-reveal>
@@ -261,16 +241,7 @@ export default function HomePage() {
                 {project.name} · {project.location}
               </p>
               <h3 className="home-solution__title">{project.summary}</h3>
-              <dl className="home-solution__facts">
-                <div>
-                  <dt>The problem</dt>
-                  <dd>{project.challenge}</dd>
-                </div>
-                <div>
-                  <dt>What we built</dt>
-                  <dd>{project.solution}</dd>
-                </div>
-              </dl>
+              <p className="home-solution__text">{project.challenge}</p>
               <Link href="/work" className="arrow-link">
                 See the project <ArrowRight />
               </Link>
@@ -280,11 +251,11 @@ export default function HomePage() {
       </section>
 
       {/* 7. Our approach. */}
-      <section id="process" data-nav="/about" className="tile" aria-labelledby="process-title">
+      <section id="process" data-nav="/about" className="tile home-tile" aria-labelledby="process-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">How we work</p>
           <h2 id="process-title" className="tile__title">
-            Four steps. <span className="serif-em">No surprises.</span>
+            Four steps. No surprises.
           </h2>
           <div className="tile__aside">
             <p className="tile__line">Nothing to pay until you approve the scope.</p>
@@ -295,44 +266,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. Two ways to work with us. The subscription is the default for ongoing solutions. */}
-      <section className="tile" data-nav="/pricing" aria-labelledby="ways-title">
+      {/* 8. Two ways to work with us. */}
+      <section className="tile home-tile" data-nav="/pricing" aria-labelledby="ways-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Ways to work with us</p>
           <h2 id="ways-title" className="tile__title">
-            Keep it running, <span className="serif-em">or build it once.</span>
+            Keep it running, or build it once.
           </h2>
         </div>
         <div className="container container--wide home-ways" data-reveal>
-          <article className="home-way home-way--primary">
-            <p className="home-way__label">Recommended for most businesses</p>
+          <article className="home-way">
             <h3 className="home-way__name">Digital solution subscription</h3>
-            <ul className="home-way__items" role="list">
-              <li>A monthly payment for a solution that stays live and improving</li>
-              <li>Hosting, maintenance and support included</li>
-              <li>Ongoing improvements, by plan</li>
-              <li>Minimum term and terms agreed in writing</li>
-            </ul>
+            <p className="home-way__text">
+              A monthly payment for a solution that stays live and keeps improving. Hosting, maintenance and
+              support are included. The minimum term is agreed in writing before you start.
+            </p>
             <Link href="/pricing" className="arrow-link">
               See the plans <ArrowRight />
             </Link>
           </article>
           <article className="home-way">
-            <p className="home-way__label">One-off build</p>
             <h3 className="home-way__name">Bespoke project</h3>
-            <ul className="home-way__items" role="list">
-              <li>A one-off fee for the deliverables we agree together</li>
-              <li>Hosting, maintenance and support billed separately</li>
-              <li>An optional ongoing care or development retainer</li>
-              <li>Scope confirmed before any binding price</li>
-            </ul>
+            <p className="home-way__text">
+              A one-off fee for the deliverables we agree together. Hosting, maintenance and support are billed
+              separately, and an ongoing care retainer is optional. The scope is confirmed before any binding price.
+            </p>
             <Link href="/contact?topic=bespoke" className="arrow-link">
               Plan my project <ArrowRight />
             </Link>
           </article>
-        </div>
-        <div className="container container--wide home-ways__notice">
-          <PricingNotice compact />
         </div>
       </section>
 
@@ -353,21 +315,15 @@ export default function HomePage() {
           />
         </div>
         <div className="container container--wide home-trust" data-reveal>
-          <ul className="trust-row" role="list">
-            <li>A written quote before you commit</li>
-            <li>Nothing to pay until you approve the scope</li>
-            <li>50% to start, 50% once you&apos;re happy</li>
-          </ul>
+          <p>A written quote before you commit.</p>
+          <p>Nothing to pay until you approve the scope.</p>
+          <p>50% to start, 50% once you&apos;re happy.</p>
         </div>
       </section>
 
       {/* 10. Closing call to action. */}
       <CtaBand
-        title={
-          <>
-            Let&apos;s solve your <span className="serif-em">business problem.</span>
-          </>
-        }
+        title={<>Let&apos;s solve your business problem.</>}
         body={<>Tell us what&apos;s getting in the way. We&apos;ll tell you honestly how we&apos;d fix it.</>}
       >
         <Link href="/contact?topic=other" className="btn btn--primary">
