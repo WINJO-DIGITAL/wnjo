@@ -10,7 +10,7 @@ export const metadata = pageMetadata(
 
 /*
  * Confirmed by the owner on 7 November 2026 (quote terms version 2026-11-07, see lib/terms). The monthly
- * subscription section was drafted on 8 November 2026 (version 2026-11-08) and awaits the owner's approval. Not reviewed by a
+ * subscription section was approved by the owner on 8 November 2026 (version 2026-11-08). Not reviewed by a
  * lawyer; a short legal review is recommended before taking live payments. Bump QUOTE_TERMS_VERSION whenever the
  * payment, cancellation or refund wording here changes.
  */
