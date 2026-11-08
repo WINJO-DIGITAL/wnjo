@@ -8,9 +8,9 @@ import { quote, type Catalogue } from "@/lib/quote-engine";
  */
 const WNJO_CATALOGUE: Catalogue = {
   packages: {
-    essential: { name: "Essential", basePricePence: 180000, includedDesign: "refined" },
-    professional: { name: "Professional", basePricePence: 380000, includedDesign: "refined" },
-    premium: { name: "Premium", basePricePence: 750000, includedDesign: "distinctive" },
+    essential: { name: "Essential", basePricePence: 240000, includedDesign: "refined" },
+    professional: { name: "Professional", basePricePence: 450000, includedDesign: "refined" },
+    premium: { name: "Premium", basePricePence: 850000, includedDesign: "distinctive" },
   },
   features: {
     cms: { label: "Content management", pricePence: 60000, requiresScope: false, scopeNote: "", includedInPackages: ["professional", "premium"] },
@@ -31,8 +31,8 @@ const WNJO_CATALOGUE: Catalogue = {
   carePlans: {
     none: { name: "No plan", monthlyPricePence: 0 },
     hosting: { name: "Hosting", monthlyPricePence: 2500 },
-    care: { name: "Care", monthlyPricePence: 7500 },
-    carePlus: { name: "Care Plus", monthlyPricePence: 18000 },
+    care: { name: "Care", monthlyPricePence: 9500 },
+    carePlus: { name: "Care Plus", monthlyPricePence: 22000 },
   },
   settings: { soonPremiumBp: 1500, rangeSpreadBp: 2000, roundingStepPence: 5000 },
 };
@@ -103,6 +103,6 @@ describe("quote engine safety", () => {
     const cheaper = { ...WNJO_CATALOGUE, packages: { ...WNJO_CATALOGUE.packages, essential: { ...WNJO_CATALOGUE.packages.essential, basePricePence: 100000 } } };
     const before = quote(DEFAULT_ANSWERS, WNJO_CATALOGUE).buildPence;
     const after = quote(DEFAULT_ANSWERS, cheaper).buildPence;
-    expect(after).toBe(before - 80000);
+    expect(after).toBe(before - 140000);
   });
 });

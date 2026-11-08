@@ -9,12 +9,12 @@ describe("pricingSteps", () => {
   });
 
   it("takes the starting price and the monthly price from the price list", () => {
-    expect(steps[0].figure).toBe("from £1,800");
+    expect(steps[0].figure).toBe("from £2,400");
     expect(steps[2].figure).toBe("£25 a month");
   });
 
   it("states the 50% deposit in pounds, from the same rule the quote uses", () => {
-    expect(steps[0].text).toContain("£900");
+    expect(steps[0].text).toContain("£1,200");
   });
 
   it("shows the handover length from the Essential package", () => {

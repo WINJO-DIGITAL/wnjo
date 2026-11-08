@@ -7,9 +7,9 @@ import { quote } from "@/lib/quote-engine";
 /** The WNJO seed as database rows, exactly as migrations step2a and step2c write them. */
 const SEED: CatalogueRows = {
   packages: [
-    { code: "essential", name: "Essential", base_price_pence: 180000, included_design: "refined", active: true },
-    { code: "professional", name: "Professional", base_price_pence: 380000, included_design: "refined", active: true },
-    { code: "premium", name: "Premium", base_price_pence: 750000, included_design: "distinctive", active: true },
+    { code: "essential", name: "Essential", base_price_pence: 240000, included_design: "refined", active: true },
+    { code: "professional", name: "Professional", base_price_pence: 450000, included_design: "refined", active: true },
+    { code: "premium", name: "Premium", base_price_pence: 850000, included_design: "distinctive", active: true },
   ],
   features: [
     { code: "cms", label: "Content management", price_pence: 60000, requires_scope: false, scope_note: "", included_in_packages: ["professional", "premium"], active: true },
@@ -37,8 +37,8 @@ const SEED: CatalogueRows = {
   carePlans: [
     { code: "none", name: "No plan", monthly_price_pence: 0, active: true },
     { code: "hosting", name: "Hosting", monthly_price_pence: 2500, active: true },
-    { code: "care", name: "Care", monthly_price_pence: 7500, active: true },
-    { code: "carePlus", name: "Care Plus", monthly_price_pence: 18000, active: true },
+    { code: "care", name: "Care", monthly_price_pence: 9500, active: true },
+    { code: "carePlus", name: "Care Plus", monthly_price_pence: 22000, active: true },
   ],
   settings: [
     { key: "soon_premium_bp", value: 1500 },
@@ -53,7 +53,7 @@ const NOW = new Date("2026-11-06T12:00:00Z");
 describe("catalogue mapping", () => {
   it("maps the WNJO seed to the same prices the engine was tested against", () => {
     const catalogue = mapCatalogue(SEED);
-    expect(catalogue.packages.essential.basePricePence).toBe(180000);
+    expect(catalogue.packages.essential.basePricePence).toBe(240000);
     expect(catalogue.features.accounts.scopeNote).toBe("Customer accounts depend on your data and security needs.");
     expect(quote({ ...DEFAULT_ANSWERS, pageBand: "13-25", copy: "writing" }, catalogue).buildPence).toBeGreaterThan(0);
   });
@@ -110,7 +110,7 @@ describe("quote records", () => {
     const records = buildQuoteRecords({ tenantId: TENANT, reference: "Q-3FA91C0B", organizationId: null, enquiryId: null, answers: DEFAULT_ANSWERS, catalogue: mutable, now: NOW });
     const before = records.version.build_pence;
     mutable.packages.essential.basePricePence = 999999;
-    expect(records.version.catalogue_snapshot.packages.essential.basePricePence).toBe(180000);
+    expect(records.version.catalogue_snapshot.packages.essential.basePricePence).toBe(240000);
     expect(records.version.build_pence).toBe(before);
   });
 

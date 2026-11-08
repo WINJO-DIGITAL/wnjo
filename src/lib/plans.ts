@@ -2,6 +2,7 @@ import type { PlanCard } from "@/components/interactive/PlanSwiper";
 import {
   CARE_PLANS,
   PACKAGES,
+  SCOPED_FROM,
   formatGBP,
   type CarePlan,
   type PackageId,
@@ -48,7 +49,8 @@ export const appPlanCard: PlanCard = {
   selectable: false,
   name: "App development",
   summary: "Web and mobile apps, customer portals and internal tools.",
-  price: "Custom quote",
+  price: formatGBP(SCOPED_FROM.software),
+  from: true,
   includes: [
     "Discovery call and written scope",
     "Fixed price and payment schedule",

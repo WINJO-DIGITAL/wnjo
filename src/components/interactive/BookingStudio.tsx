@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "../Icons";
+import { SCOPED_FROM, SUBSCRIPTIONS, formatGBP } from "@/lib/pricing";
 
 /*
  * "Make it yours": a booking app the visitor restyles live, like a car configurator.
@@ -241,10 +242,18 @@ function Screen({ business }: { business: Business }) {
   );
 }
 
-// Two ways to pay for the finished app; prices are confirmed on the call, not shown here.
+// Two ways to pay for the finished app, each with its starting price; the exact price is confirmed on the call.
 const PLANS = {
-  own: { label: "Own it", line: "Pay once. It's yours.", brief: "own it outright" },
-  subscribe: { label: "Subscribe", line: "Pay monthly. We keep it running.", brief: "pay monthly" },
+  own: {
+    label: "Own it",
+    line: `Pay once, from ${formatGBP(SCOPED_FROM.bookingSystem)}. It's yours.`,
+    brief: "own it outright",
+  },
+  subscribe: {
+    label: "Subscribe",
+    line: `From ${formatGBP(SUBSCRIPTIONS.simplify.monthly)} a month. We keep it running.`,
+    brief: "pay monthly",
+  },
 } as const;
 type Plan = keyof typeof PLANS;
 

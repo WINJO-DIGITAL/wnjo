@@ -5,13 +5,13 @@
  * module, so a price is never calculated in two places. Browser-side results are
  * informational; the API route recalculates from the submitted answers.
  *
- * STATUS: PROVISIONAL. Every figure below is a working assumption for the first
- * release and has not been commercially validated. `PRICING_STATUS` drives the
- * notice shown wherever prices appear. Change it to "confirmed" only once the
- * figures, deliverables and VAT treatment are signed off.
+ * STATUS: CONFIRMED by the owner on 8 November 2026 (package, care, subscription,
+ * scoped and day-rate figures set from UK market ranges). `PRICING_STATUS` drives the
+ * notice shown wherever prices appear. The same package and care prices live in the
+ * Supabase pricing catalogue, which quotes are built from: change both together.
  */
 
-export const PRICING_STATUS: "provisional" | "confirmed" = "provisional";
+export const PRICING_STATUS: "provisional" | "confirmed" = "confirmed";
 export const CURRENCY = "GBP";
 export const VAT_NOTE = "WINJO DIGITAL is not VAT registered, so no VAT is added to our prices.";
 
@@ -105,7 +105,7 @@ export const CARE_PLANS = {
   },
   care: {
     label: "Care",
-    monthly: 75,
+    monthly: 95,
     summary: "Hosting plus routine maintenance and small changes.",
     includes: [
       "Everything in Hosting",
@@ -116,7 +116,7 @@ export const CARE_PLANS = {
   },
   carePlus: {
     label: "Care Plus",
-    monthly: 180,
+    monthly: 220,
     summary: "For sites that change often or carry more functionality.",
     includes: [
       "Everything in Care",
@@ -143,7 +143,7 @@ export type TimingOption = keyof typeof TIMING_OPTIONS;
 export const PACKAGES = {
   essential: {
     name: "Essential",
-    from: 1800,
+    from: 2400,
     pageLimit: 5,
     summary: "A polished, professional web presence.",
     includes: [
@@ -158,7 +158,7 @@ export const PACKAGES = {
   },
   professional: {
     name: "Professional",
-    from: 3800,
+    from: 4500,
     pageLimit: 12,
     summary: "A fuller marketing site with richer presentation.",
     includes: [
@@ -173,7 +173,7 @@ export const PACKAGES = {
   },
   premium: {
     name: "Premium",
-    from: 7500,
+    from: 8500,
     pageLimit: 25,
     summary: "A distinctive experience or more advanced functionality.",
     includes: [
@@ -190,7 +190,65 @@ export const PACKAGES = {
 export type PackageId = keyof typeof PACKAGES;
 
 /* ------------------------------------------------------------------ */
-/* Rates (provisional)                                                 */
+/* Services priced outside the website calculator (owner-approved,      */
+/* 8 November 2026, from UK market ranges)                              */
+/* ------------------------------------------------------------------ */
+
+/** Starting prices for bespoke work that is always scoped individually. */
+export const SCOPED_FROM = {
+  /** Simplify: a bespoke booking system with payments and an operator app. */
+  bookingSystem: 6000,
+  /** Build: custom apps, portals and software. */
+  software: 12000,
+} as const;
+
+/** Day rate for extra work and changes outside a plan's allowance. */
+export const DAY_RATE = 450;
+
+/**
+ * Monthly subscriptions: a setup fee, then a monthly fee that covers the build, hosting, care and agreed
+ * improvements. 12-month minimum term from go-live, then month to month on 30 days' notice (see /terms).
+ */
+export const SUBSCRIPTIONS = {
+  grow: {
+    name: "Grow",
+    setup: 295,
+    monthly: 149,
+    summary: "A bespoke website, kept live and improving.",
+    includes: ["Website up to 5 pages", "Hosting, updates and support", "1 hour of changes a month"],
+  },
+  growPlus: {
+    name: "Grow Plus",
+    setup: 495,
+    monthly: 249,
+    summary: "A fuller website that changes often.",
+    includes: ["Up to 12 pages", "Content you can edit yourself", "3 hours of changes a month", "Quarterly review"],
+  },
+  simplify: {
+    name: "Simplify",
+    setup: 995,
+    monthly: 395,
+    summary: "A booking system for your business.",
+    includes: ["Bookings with payments", "Operator app", "Hosting, support and improvements"],
+  },
+  build: {
+    name: "Build",
+    setup: null,
+    monthly: 750,
+    summary: "A custom app or platform.",
+    includes: ["Scoped to your business", "Hosting and support", "An agreed block of development each month"],
+  },
+} as const;
+export type SubscriptionId = keyof typeof SUBSCRIPTIONS;
+
+/**
+ * Buy-out on a subscription: the build price less the build share of payments made, never below a quarter of
+ * the build price. The quote sets the build price and its share of each payment.
+ */
+export const BUYOUT_FLOOR = 0.25;
+
+/* ------------------------------------------------------------------ */
+/* Rates                                                               */
 /* ------------------------------------------------------------------ */
 
 const RATES = {

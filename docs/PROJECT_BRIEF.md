@@ -621,7 +621,14 @@ Confirmed by the owner on 8 November 2026 and live on `winjodigital.co.uk`. This
   - Monthly subscription: the build cost spread across monthly payments with hosting, maintenance, security updates, support and agreed improvements; 12-month minimum term from go-live, then month to month on 30 days' notice; the rest of the minimum term is due on early cancellation; buy the build outright at any time at the price in the quote (it reduces as payments are made); domain and content always the client's.
   - Bespoke project: one-off fee, 50% to start and 50% before launch; hosting and care billed separately; optional development retainer.
 - Terms page updated to match (terms version `2026-11-08`). Not yet reviewed by a lawyer.
-- Open: subscription prices, and whether the Hosting / Care / Care Plus plans are renamed. Plan names live in both `src/lib/pricing.ts` and the Supabase pricing catalogue, so a rename must update both. All prices remain provisional (`PRICING_STATUS`).
+- Prices confirmed by the owner on 8 November 2026, set from UK market ranges (`PRICING_STATUS = "confirmed"`):
+  - Websites (one-off): Essential from £2,400, Professional from £4,500, Premium from £8,500.
+  - Scoped work: booking systems from £6,000; apps and custom software from £12,000; extra work £450 a day.
+  - Care plans: Hosting £25, Care £95, Care Plus £220 a month.
+  - Subscriptions: Grow £149/month + £295 setup; Grow Plus £249/month + £495 setup; Simplify £395/month + £995 setup; Build from £750/month, setup scoped. Priced to recover the build over about 24 months.
+  - Buy-out: the build price less the build share of payments made, never below 25% of the build price.
+- Package and care prices live in both `src/lib/pricing.ts` and the Supabase pricing catalogue (migration `20261108120000`); change both together. Subscription, scoped and day-rate figures live only in `src/lib/pricing.ts`.
+- Open: whether the Hosting / Care / Care Plus plans are renamed (a rename must update both places).
 
 ### 18.4 Visual rules
 - Core colours are fixed (sand, espresso, terracotta, sage). Do not change them.

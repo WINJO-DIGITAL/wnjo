@@ -95,7 +95,7 @@ describe("POST /api/enquiry", () => {
     expect(res.status).toBe(200);
     const sent = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(sent.text).toContain("Recommended package: Professional");
-    expect(sent.text).toContain("£3,800");
+    expect(sent.text).toContain("£4,500");
   });
 
   it("rejects invalid fields and unknown answers", async () => {

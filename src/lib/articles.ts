@@ -21,7 +21,7 @@ export const articles: Article[] = [
       {
         heading: "1. Get a price",
         paragraphs: [
-          "Answer a few questions about your business in the price calculator, or send us a message. Websites start from £1,800 for the Essential package.",
+          "Answer a few questions about your business in the price calculator, or send us a message. Websites start from £2,400 for the Essential package, or from £149 a month on a subscription.",
           "Your written quote arrives instantly, by email and in your account. Nothing is charged at this stage.",
         ],
       },

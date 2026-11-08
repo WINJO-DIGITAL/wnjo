@@ -13,6 +13,7 @@ import { StageSwiper } from "@/components/interactive/StageSwiper";
 import { WebStages } from "@/components/WebStages";
 import { WebsitesTile } from "@/components/WebsitesTile";
 import { jost } from "@/lib/fonts";
+import { PACKAGES, SUBSCRIPTIONS, formatGBP } from "@/lib/pricing";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
 import { siteUrl } from "@/lib/site";
@@ -235,6 +236,10 @@ export default function HomePage() {
         </div>
         <div className="container container--wide" data-reveal>
           <PaymentTimeline />
+          <p className="home-from">
+            Subscriptions from {formatGBP(SUBSCRIPTIONS.grow.monthly)} a month · Websites from{" "}
+            {formatGBP(PACKAGES.essential.from)}
+          </p>
           <p className="home-terms">
             A written quote before you commit · Nothing to pay until you approve the scope · 50% to start, 50%
             once you&apos;re happy

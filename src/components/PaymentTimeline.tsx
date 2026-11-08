@@ -1,6 +1,6 @@
 /**
  * The two ways to pay, drawn on the same month-by-month grid so the difference shows at a glance:
- * a subscription is twelve equal payments then month to month; a bespoke project is two larger
+ * a subscription is a small setup fee then equal monthly payments (12-month minimum); a bespoke project is two larger
  * payments (50% to start, 50% before launch) with optional hosting and care after. Bar heights are an
  * illustration of the shape, not of real amounts, and the caption says so.
  */
@@ -38,10 +38,10 @@ export function PaymentTimeline() {
         <p className="paytl__name">Monthly subscription</p>
         <Track
           bars={subscription}
-          label="Twelve equal monthly payments, then month to month on 30 days' notice."
+          label="A small setup fee, then equal monthly payments with a 12-month minimum, then month to month on 30 days' notice."
         />
         <p className="paytl__note">
-          Twelve equal payments cover the build, hosting, care and improvements. Then month to month.
+          A small setup fee, then equal monthly payments for the build, hosting, care and improvements. 12-month minimum, then month to month.
         </p>
       </div>
       <div className="paytl__row">

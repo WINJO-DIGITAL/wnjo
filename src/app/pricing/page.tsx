@@ -13,6 +13,7 @@ import {
 } from "@/components/interactive/PlanFlow";
 import { PaymentTimeline } from "@/components/PaymentTimeline";
 import { PricingSteps } from "@/components/PricingSteps";
+import { SubscriptionPlans } from "@/components/SubscriptionPlans";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata(
@@ -74,7 +75,7 @@ export default function PricingPage() {
               <h3 className="home-way__name">Monthly subscription</h3>
               <p className="home-way__text">For a website or system you want kept live and improving.</p>
               <ul className="home-way__terms" role="list">
-                <li>The build cost spread across monthly payments, so there&apos;s little or nothing to pay up front</li>
+                <li>A small setup fee, then the build cost spread across monthly payments</li>
                 <li>Hosting, maintenance, security updates and support included</li>
                 <li>Agreed improvements each month, depending on the plan</li>
                 <li>12-month minimum term, then 30 days&apos; notice</li>
@@ -98,10 +99,12 @@ export default function PricingPage() {
               </Link>
             </article>
           </div>
-          <p className="muted small mt-6">
-            Subscription prices depend on what we build and are confirmed in your written quote. The starting
-            prices below are for bespoke projects.
-          </p>
+          <h3 className="h3 mt-6" id="subscriptions" data-reveal>
+            Subscriptions
+          </h3>
+          <div data-reveal>
+            <SubscriptionPlans />
+          </div>
         </div>
       </section>
 
