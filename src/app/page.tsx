@@ -13,7 +13,7 @@ import { WebStages } from "@/components/WebStages";
 import { WebsitesTile } from "@/components/WebsitesTile";
 import { jost } from "@/lib/fonts";
 import { ONE_OFF_WEBSITE, OWNERSHIP, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
-import { PackageCards } from "@/components/pricing/WebsitePackages";
+import { PackageSelector } from "@/components/pricing/PackageSelector";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
 import { siteUrl } from "@/lib/site";
@@ -103,7 +103,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="container container--wide" data-reveal>
-          <PackageCards compact />
+          <PackageSelector />
           <p className="home-terms">
             Prefer to pay up front? <Link href="/pricing#one-off">Bespoke websites from {formatGBP(ONE_OFF_WEBSITE.from)}</Link>.
           </p>

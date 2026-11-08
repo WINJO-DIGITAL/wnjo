@@ -10679,3 +10679,47 @@ body:has(.dash-header) .site-footer {
 .admin-sub-manage .acct-input {
   width: 8rem;
 }
+
+/* Homepage package selector (components/pricing/PackageSelector): cards are light until one is chosen. */
+.pkg-selector .pkg-card--popular {
+  background: var(--color-surface-raised);
+  color: inherit;
+  border-color: var(--color-line-strong);
+  box-shadow: none;
+  transform: none;
+}
+.pkg-selector .pkg-card__badge {
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+.pkg-selector .pkg-card--selected {
+  background: var(--color-inverse-bg);
+  color: var(--color-inverse-ink);
+  border-color: var(--color-inverse-bg);
+  box-shadow: 0 30px 60px -36px rgb(46 36 29 / 0.6);
+  transform: none;
+}
+.pkg-selector .pkg-card--selected .pkg-card__badge {
+  background: var(--color-inverse-ink);
+  color: var(--color-inverse-bg);
+}
+.pkg-selector .pkg-card--selected .pkg-card__cta--selected {
+  background: var(--color-inverse-ink);
+  color: var(--color-inverse-bg);
+  border-color: var(--color-inverse-ink);
+}
+.pkg-selector .pkg-card--selected .pkg-card__unit,
+.pkg-selector .pkg-card--selected .pkg-card__setup {
+  color: var(--color-inverse-ink-2);
+}
+.pkg-selector .pkg-card--selected .pkg-card__points li {
+  border-top-color: var(--color-inverse-line);
+}
+.pkg-selector__next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin: var(--space-5) 0 0;
+  font-size: 1.05rem;
+}

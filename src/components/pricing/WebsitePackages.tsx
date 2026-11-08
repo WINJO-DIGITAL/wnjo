@@ -15,7 +15,7 @@ import {
 const PLAN_ORDER: WebsitePlanId[] = ["bronze", "silver", "gold"];
 
 /** The highlights shown on each card; the full list is in the comparison table. */
-const CARD_POINTS: Record<WebsitePlanId, string[]> = {
+export const CARD_POINTS: Record<WebsitePlanId, string[]> = {
   bronze: ["Bespoke design", "Up to 3 pages", "Hosting, SSL and security updates", "Standard support"],
   silver: [
     "More advanced bespoke design",
