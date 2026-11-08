@@ -21,7 +21,7 @@ export default function WorkPage() {
     <>
       <PageHero
         eyebrow="Our work"
-        title={<>Problems solved, <span className="serif-em">in production.</span></>}
+        title={<>Problems solved, in production.</>}
         lede="Three client businesses and our own platform: the problem each one had, and what we built to solve it."
       />
 
@@ -124,7 +124,7 @@ export default function WorkPage() {
             ))}
           </ul>
         }
-        title={<>Your business <span className="serif-em">could be next.</span></>}
+        title={<>Your business could be next.</>}
         body="Tell us what's getting in the way. We reply with honest advice, a clear price and a plan."
       >
         <Link href="/build" className="btn btn--primary">

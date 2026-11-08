@@ -16,7 +16,7 @@ export default function FaqPage() {
         eyebrow="FAQ"
         title={
           <>
-            Questions, <span className="serif-em">answered.</span>
+            Questions, answered.
           </>
         }
         lede={

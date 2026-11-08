@@ -11,6 +11,7 @@ import {
   PackagePicker,
   PlanFlow,
 } from "@/components/interactive/PlanFlow";
+import { PaymentTimeline } from "@/components/PaymentTimeline";
 import { PricingSteps } from "@/components/PricingSteps";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -44,7 +45,7 @@ export default function PricingPage() {
         eyebrow="Pricing"
         title={
           <>
-            Clear prices. <span className="serif-em">No surprises.</span>
+            Clear prices. No surprises.
           </>
         }
         lede="Pay monthly and we keep it running, or pay once and own it. Every price is confirmed in writing before you commit."
@@ -65,6 +66,9 @@ export default function PricingPage() {
           <h2 id="ways-title" className="h2" data-reveal>
             Two ways to work with us.
           </h2>
+          <div className="mt-6" data-reveal>
+            <PaymentTimeline />
+          </div>
           <div className="home-ways" data-reveal>
             <article className="home-way">
               <h3 className="home-way__name">Monthly subscription</h3>
@@ -141,7 +145,7 @@ export default function PricingPage() {
               title={
                 <>
                   Hosting and care,{" "}
-                  <span className="serif-em">priced separately.</span>
+                  priced separately.
                 </>
               }
               split
@@ -192,7 +196,7 @@ export default function PricingPage() {
         tone="light"
         title={
           <>
-            What would <span className="serif-em">yours cost?</span>
+            What would yours cost?
           </>
         }
         body="Nine quick steps to an instant estimate you can send us."

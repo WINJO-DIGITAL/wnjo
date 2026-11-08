@@ -19,7 +19,7 @@ export default function WebsitesPage() {
         eyebrow="Grow · Websites"
         title={
           <>
-            Bespoke websites, <span className="serif-em">priced in the open.</span>
+            Bespoke websites, priced in the open.
           </>
         }
         lede="Websites that reflect the quality of your business, with the price on the page."
@@ -43,7 +43,7 @@ export default function WebsitesPage() {
             eyebrow="Recent websites"
             title={
               <span id="examples-title">
-                Three clients, <span className="serif-em">three identities.</span>
+                Three clients, three identities.
               </span>
             }
             split
@@ -76,7 +76,7 @@ export default function WebsitesPage() {
       <CtaBand
         title={
           <>
-            See what your website <span className="serif-em">would cost.</span>
+            See what your website would cost.
           </>
         }
         body="Nine quick steps to an instant estimate you can send us."

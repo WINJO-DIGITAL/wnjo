@@ -74,7 +74,7 @@ export function Faq() {
 
       <aside className="faq-ask inverse" aria-labelledby="faq-ask-title">
         <h2 id="faq-ask-title" className="faq-ask__title">
-          Still have a <span className="serif-em">question?</span>
+          Still have a question?
         </h2>
         <p>Ask us anything, and we&apos;ll reply.</p>
         <div className="btn-row">

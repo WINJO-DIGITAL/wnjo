@@ -2,10 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CtaBand } from "@/components/Blocks";
+import { BrowserFrame } from "@/components/Devices";
 import { ArrowRight } from "@/components/Icons";
+import { PaymentTimeline } from "@/components/PaymentTimeline";
 import { BookingDemo } from "@/components/interactive/BookingDemo";
 import { SheetToApp } from "@/components/interactive/SheetToApp";
 import { HeroShowcase } from "@/components/interactive/HeroShowcase";
+import { SiteFan } from "@/components/interactive/SiteStyler";
+import { StageSwiper } from "@/components/interactive/StageSwiper";
 import { WebStages } from "@/components/WebStages";
 import { WebsitesTile } from "@/components/WebsitesTile";
 import { jost } from "@/lib/fonts";
@@ -88,72 +92,85 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Grow: the live site that restyles itself for four businesses. */}
-      <WebsitesTile
-        id="grow"
-        navLink="/websites"
-        compact
-        name="Grow"
-        title="A website that brings in enquiries."
-        line="Bespoke websites, landing pages and lead capture, built for phones first."
-      />
+      {/* Three acts: light, dark, light. On phones they sit side by side and swipe. */}
+      <StageSwiper labels={["Grow", "Simplify", "Build"]}>
+        {/* Grow: four example businesses, each with its own site. */}
+        <WebsitesTile
+          id="grow"
+          navLink="/websites"
+          compact
+          name="Grow"
+          title="A website that brings in enquiries."
+          line="Bespoke websites, landing pages and lead capture, built for phones first."
+          visual={<SiteFan />}
+        />
 
-      {/* Simplify: a customer books, the office is pinged. */}
-      <section
-        id="simplify"
-        data-nav="/booking-software"
-        className={`tile inverse home-tile ${jost.variable}`}
-        aria-labelledby="simplify-title"
-      >
-        <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Simplify</p>
-          <h2 id="simplify-title" className="tile__title">
-            Bookings that run without a phone call.
-          </h2>
-          <div className="tile__aside">
-            <blockquote className="home-quote">
-              <p>&ldquo;{evexecQuote.pull}&rdquo;</p>
-              <footer>Owner, {evexec.name}</footer>
-            </blockquote>
-            <p className="tile__more">
-              <Link href="/booking-software#make-it-yours" className="arrow-link">
-                Try the booking demo <ArrowRight />
-              </Link>
-            </p>
-          </div>
-        </div>
-        <div className="container container--wide tile__visual tile__visual--pad" data-reveal>
-          <BookingDemo />
-        </div>
-      </section>
-
-      {/* Build: the spreadsheet becomes an app; FYStay is our own platform. */}
-      <section id="build" data-nav="/app-development" className="tile home-tile" aria-labelledby="build-title">
-        <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Build</p>
-          <h2 id="build-title" className="tile__title">
-            Stop running the business from spreadsheets.
-          </h2>
-          <div className="tile__aside">
-            <p className="tile__line">
-              Apps, portals and platforms. We run our own: <Link href="/work#fystay">{fystay.name}</Link>.
-            </p>
-            <div className="tile__ctas">
-              <Link href="/contact?topic=bespoke" className="btn btn--primary">
-                Plan my app
-              </Link>
-              <Link href="/app-development" className="btn btn--secondary">
-                See how it works
-              </Link>
+        {/* Simplify: a customer books, the office is pinged. */}
+        <section
+          id="simplify"
+          data-nav="/booking-software"
+          className={`tile inverse home-tile ${jost.variable}`}
+          aria-labelledby="simplify-title"
+        >
+          <div className="container container--wide tile__head" data-reveal>
+            <p className="tile__name">Simplify</p>
+            <h2 id="simplify-title" className="tile__title">
+              Bookings that run without a phone call.
+            </h2>
+            <div className="tile__aside">
+              <blockquote className="home-quote">
+                <p>&ldquo;{evexecQuote.pull}&rdquo;</p>
+                <footer>Owner, {evexec.name}</footer>
+              </blockquote>
+              <p className="tile__more">
+                <Link href="/booking-software#make-it-yours" className="arrow-link">
+                  Try the booking demo <ArrowRight />
+                </Link>
+              </p>
             </div>
           </div>
-        </div>
-        <div className="tile__sta" data-reveal style={{ "--d": 1 } as React.CSSProperties}>
-          <SheetToApp still />
-        </div>
-      </section>
+          <div className="container container--wide tile__visual tile__visual--pad" data-reveal>
+            <BookingDemo />
+          </div>
+        </section>
 
-      {/* Work: each project as the problem it solved. */}
+        {/* Build: our own platform in the browser, and the spreadsheet that became an app. */}
+        <section id="build" data-nav="/app-development" className="tile home-tile" aria-labelledby="build-title">
+          <div className="container container--wide tile__head" data-reveal>
+            <p className="tile__name">Build</p>
+            <h2 id="build-title" className="tile__title">
+              Stop running the business from spreadsheets.
+            </h2>
+            <div className="tile__aside">
+              <p className="tile__line">
+                Apps, portals and platforms. We run our own: <Link href="/work#fystay">{fystay.name}</Link>.
+              </p>
+              <div className="tile__ctas">
+                <Link href="/contact?topic=bespoke" className="btn btn--primary">
+                  Plan my app
+                </Link>
+                <Link href="/app-development" className="btn btn--secondary">
+                  See how it works
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="container container--wide build-stage" data-reveal>
+            <BrowserFrame
+              src={fystay.desktop}
+              alt={`The ${fystay.name} platform in a browser`}
+              host={fystay.host}
+              sizes="(min-width: 64rem) 720px, 100vw"
+              className="build-stage__browser"
+            />
+            <div className="build-stage__app">
+              <SheetToApp still />
+            </div>
+          </div>
+        </section>
+      </StageSwiper>
+
+      {/* Work: each project as the problem it solved, with the live site. Swipes on phones. */}
       <section id="work" className="tile home-tile" data-nav="/work" aria-labelledby="work-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Our work</p>
@@ -162,21 +179,30 @@ export default function HomePage() {
           </h2>
         </div>
         <div className="container container--wide" data-reveal>
-        <ul className="home-work" role="list">
-          {work.map((p) => (
-            <li key={p.slug}>
-              <Link href={`/work#${p.slug}`} className="home-work__link">
-                <Image src={p.logo} alt="" width={44} height={44} sizes="44px" className="home-work__logo" />
-                <span className="home-work__name">{p.name}</span>
-                <span className="home-work__problem">{p.challenge}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+          <ul className="home-work" role="list">
+            {work.map((p) => (
+              <li key={p.slug}>
+                <Link href={`/work#${p.slug}`} className="home-work__link">
+                  <Image
+                    src={p.desktop}
+                    alt={`The ${p.name} website`}
+                    sizes="(min-width: 64rem) 300px, 80vw"
+                    placeholder="blur"
+                    className="home-work__shot"
+                  />
+                  <span className="home-work__head">
+                    <Image src={p.logo} alt="" width={28} height={28} sizes="28px" className="home-work__logo" />
+                    <span className="home-work__name">{p.name}</span>
+                  </span>
+                  <span className="home-work__problem">{p.challenge}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      {/* Our approach. */}
+      {/* Our approach: a real sequence, so it keeps its numbers. */}
       <section id="process" data-nav="/about" className="tile home-tile" aria-labelledby="process-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">How we work</p>
@@ -192,38 +218,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Two ways to work with us: the subscription first. */}
+      {/* Two ways to pay, drawn rather than listed. */}
       <section className="tile home-tile" data-nav="/pricing" aria-labelledby="ways-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Ways to work with us</p>
           <h2 id="ways-title" className="tile__title">
             Keep it running, or buy it once.
           </h2>
+          <div className="tile__aside">
+            <p className="tile__more">
+              <Link href="/pricing#ways" className="arrow-link">
+                How each one works <ArrowRight />
+              </Link>
+            </p>
+          </div>
         </div>
-        <div className="container container--wide home-ways" data-reveal>
-          <article className="home-way">
-            <h3 className="home-way__name">Monthly subscription</h3>
-            <ul className="home-way__terms" role="list">
-              <li>The build cost spread across monthly payments</li>
-              <li>Hosting, maintenance, support and agreed improvements</li>
-              <li>12-month minimum term, then 30 days&apos; notice</li>
-              <li>Your domain and content stay yours. Buy it outright any time.</li>
-            </ul>
-            <Link href="/pricing#ways" className="arrow-link">
-              How the subscription works <ArrowRight />
-            </Link>
-          </article>
-          <article className="home-way">
-            <h3 className="home-way__name">Bespoke project</h3>
-            <ul className="home-way__terms" role="list">
-              <li>A one-off fee for the deliverables we agree</li>
-              <li>Hosting, maintenance and support billed separately</li>
-              <li>An optional development retainer</li>
-            </ul>
-            <Link href="/build" className="arrow-link">
-              Get my price <ArrowRight />
-            </Link>
-          </article>
+        <div className="container container--wide" data-reveal>
+          <PaymentTimeline />
+          <p className="home-terms">
+            A written quote before you commit · Nothing to pay until you approve the scope · 50% to start, 50%
+            once you&apos;re happy
+          </p>
         </div>
       </section>
 
@@ -243,10 +258,6 @@ export default function HomePage() {
             }))}
           />
         </div>
-        <p className="container container--wide home-terms" data-reveal>
-          A written quote before you commit · Nothing to pay until you approve the scope · 50% to start, 50% once
-          you&apos;re happy
-        </p>
       </section>
 
       <CtaBand

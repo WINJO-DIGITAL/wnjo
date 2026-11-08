@@ -24,7 +24,7 @@ export default async function ContactPage({
         eyebrow="Start a project"
         title={
           <>
-            Tell us what you <span className="serif-em">want to achieve.</span>
+            Tell us what you want to achieve.
           </>
         }
         lede="Your goal, the challenge, and a budget if you have one. It takes about a minute."

@@ -12,14 +12,14 @@ export const metadata = pageMetadata(
   "Why WINJO DIGITAL exists: bespoke websites clients are proud of, honest pricing, and apps that solve real problems.",
 );
 
-// Each principle as the thing we avoid, then what we do instead.
+// Each principle as a plain statement: what we do, in one sentence.
 const beliefs = [
-  ["Outcomes over output", "Forty pages nobody reads", "More enquiries and bookings"],
-  ["Bespoke over generic", "A theme with your logo on it", "Designed around your business"],
-  ["Clarity over friction", "\u201CCall us for a price\u201D", "Prices on the page"],
-  ["Premium, but approachable", "Jargon and long sales calls", "Plain English, quick answers"],
-  ["Purposeful technology", "Features for the sake of it", "Only what solves a problem"],
-  ["Practical delivery", "Everything at once, and late", "Launch focused, grow later"],
+  ["Outcomes first", "We judge the work by the enquiries, bookings and hours it is built to win back."],
+  ["Designed around your business", "Every site and system is shaped for the business it serves."],
+  ["Prices on the page", "You can see a price before you speak to us, and every quote is in writing."],
+  ["Plain English", "Quick answers and no jargon, from the first message to launch."],
+  ["Only what solves a problem", "Each feature has to earn its place in what we build."],
+  ["Launch focused, grow later", "We start with what matters most, then improve it once it is live."],
 ];
 
 const standards = [
@@ -74,7 +74,7 @@ export default function AboutPage() {
     <>
       <PageHero
         eyebrow={`About ${site.name}`}
-        title={<>A small studio with <span className="serif-em">exacting standards.</span></>}
+        title={<>A small studio with exacting standards.</>}
         lede={`${site.name} builds digital work businesses are proud to show their customers, and makes buying it straightforward.`}
       />
 
@@ -107,19 +107,12 @@ export default function AboutPage() {
 
       <section className="section section--ruled">
         <div className="container container--wide">
-          <SectionHead eyebrow="Principles" title={<>What <span className="serif-em">guides the work.</span></>} />
+          <SectionHead eyebrow="Principles" title={<>What guides the work.</>} />
           <ul role="list" className="beliefs">
-            {beliefs.map(([title, not, instead]) => (
+            {beliefs.map(([title, statement]) => (
               <li key={title} className="belief" data-reveal>
                 <h3 className="belief__title">{title}</h3>
-                <p className="belief__not">
-                  <span className="visually-hidden">Not: </span>
-                  {not}
-                </p>
-                <p className="belief__yes">
-                  <span className="visually-hidden">Instead: </span>
-                  {instead}
-                </p>
+                <p className="belief__yes">{statement}</p>
               </li>
             ))}
           </ul>
@@ -128,7 +121,7 @@ export default function AboutPage() {
 
       <section className="section inverse">
         <div className="container container--wide">
-          <SectionHead eyebrow="Engineering standards" title={<>The parts <span className="serif-em">you don&apos;t see.</span></>} split>
+          <SectionHead eyebrow="Engineering standards" title={<>The parts you don&apos;t see.</>} split>
             <p>Every project, large or small, is built to the same baseline.</p>
           </SectionHead>
           <div className="grid-2" style={{ rowGap: "var(--space-7)" }}>
@@ -145,7 +138,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <CtaBand tone="light" title={<>Let&apos;s build something <span className="serif-em">you&apos;re proud of.</span></>}>
+      <CtaBand tone="light" title={<>Let&apos;s build something you&apos;re proud of.</>}>
         <Link href="/build" className="btn btn--primary">
           <Stopwatch />
           Get my price

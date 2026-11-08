@@ -10,7 +10,7 @@ const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", ye
 export default function ResourcesPage() {
   return (
     <>
-      <PageHero eyebrow="Resources" title={<>Plain answers, <span className="serif-em">no jargon.</span></>} lede="Practical guides for getting a website for your business." />
+      <PageHero eyebrow="Resources" title={<>Plain answers, no jargon.</>} lede="Practical guides for getting a website for your business." />
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">
           <ul role="list" className="article-list">

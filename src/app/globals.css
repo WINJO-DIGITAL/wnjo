@@ -32,7 +32,7 @@
   --color-error-soft: #f7e4e1;
 
   /* Typography */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-serif: var(--font-playfair), ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
@@ -2239,17 +2239,15 @@ main {
   transition: object-position var(--scroll-dur, 6s) linear;
 }
 
-/* Reveal on scroll (only once Reveal has run; see components/interactive/Reveal). */
+/* Reveal on scroll (only once Reveal has run; see components/interactive/Reveal). Content is never hidden:
+   it is always readable (for screenshots, shared links and crawlers) and only its entrance moves. */
 [data-reveal] {
-  transition:
-    opacity 900ms var(--ease),
-    transform 900ms var(--ease);
+  transition: transform 900ms var(--ease);
   transition-delay: calc(var(--d, 0) * 90ms);
 }
 
 .js-reveal [data-reveal]:not(.is-in) {
-  opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(20px);
 }
 
 /*
@@ -3172,48 +3170,26 @@ ol.steps li::after {
 }
 
 .belief__title {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-ink-3);
-}
-
-.belief__yes {
-  order: 1;
+  margin: 0;
   font-family: var(--font-playfair), var(--font-serif);
   font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.015em;
   color: var(--color-ink);
 }
 
-.belief__not {
-  order: 2;
-  color: var(--color-ink-3);
-  text-decoration: line-through;
-  text-decoration-color: var(--home-orange);
-  text-decoration-thickness: 2px;
+.belief__yes {
+  margin: 0;
+  max-width: 40rem;
+  color: var(--color-ink-2);
 }
 
 @media (min-width: 56rem) {
   .belief {
-    grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) minmax(0, 17rem);
-    column-gap: var(--space-6);
+    grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+    column-gap: var(--space-7);
     align-items: baseline;
-  }
-  .belief__title {
-    grid-column: 1;
-    grid-row: 1;
-  }
-  .belief__yes {
-    grid-column: 2;
-    grid-row: 1;
-  }
-  .belief__not {
-    grid-column: 3;
-    grid-row: 1;
   }
 }
 
@@ -6742,7 +6718,7 @@ main #process ol.steps li::after {
   grid-template-columns: minmax(0, 1fr);
   height: 100%;
   text-align: left;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 
 .ss-view--desktop .ss-site {
@@ -9949,6 +9925,8 @@ body:has(.dash-header) .site-footer {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line-strong);
 }
 
 .home-way__name {
@@ -9984,42 +9962,6 @@ body:has(.dash-header) .site-footer {
   color: var(--color-inverse-ink-2);
 }
 
-.home-work {
-  list-style: none;
-  margin: var(--space-6) 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: var(--space-6);
-  text-align: left;
-}
-.home-work__link {
-  display: grid;
-  grid-template-columns: 44px 1fr;
-  column-gap: var(--space-3);
-  row-gap: var(--space-2);
-  align-items: center;
-  color: inherit;
-  text-decoration: none;
-}
-.home-work__logo {
-  border-radius: 10px;
-}
-.home-work__name {
-  font-weight: 600;
-}
-.home-work__problem {
-  grid-column: 1 / -1;
-  color: var(--color-ink-2);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-.home-work__link:hover .home-work__name,
-.home-work__link:focus-visible .home-work__name {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
 .home-way__terms {
   list-style: none;
   margin: 0;
@@ -10038,4 +9980,248 @@ body:has(.dash-header) .site-footer {
   text-align: left;
   font-size: 0.95rem;
   color: var(--color-ink-2);
+}
+
+/* ------------------------------------------------------------------
+   Grow: four example sites fanned out on phones (SiteFan).
+   ------------------------------------------------------------------ */
+.site-fan {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: var(--space-6) 0 clamp(3rem, 2rem + 4vw, 5rem);
+}
+.site-fan__item.ss {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: 0;
+  width: clamp(8.5rem, 5rem + 12vw, 15rem);
+  margin-inline: calc(clamp(1.6rem, 0.8rem + 3vw, 3.2rem) * -1);
+  transform-origin: 50% 120%;
+}
+.site-fan__item:nth-child(1) { transform: rotate(-9deg) translateY(6%); z-index: 1; }
+.site-fan__item:nth-child(2) { transform: rotate(-3deg); z-index: 2; }
+.site-fan__item:nth-child(3) { transform: rotate(3deg); z-index: 3; }
+.site-fan__item:nth-child(4) { transform: rotate(9deg) translateY(6%); z-index: 4; }
+.site-fan__phone.app-phone {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: clamp(0.25rem, 0.15rem + 0.3vw, 0.45rem);
+  border-radius: clamp(1.2rem, 0.8rem + 1.2vw, 2.4rem);
+}
+.site-fan__label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-fan__item { transition: transform 500ms var(--ease); }
+  .site-fan:hover .site-fan__item:nth-child(1) { transform: rotate(-12deg) translate(-8%, 8%); }
+  .site-fan:hover .site-fan__item:nth-child(4) { transform: rotate(12deg) translate(8%, 8%); }
+}
+
+/* ------------------------------------------------------------------
+   Build: our platform in a browser, with the app beside it.
+   ------------------------------------------------------------------ */
+.build-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: var(--space-6);
+  padding-top: var(--space-6);
+}
+.build-stage__browser {
+  width: 100%;
+  max-width: 52rem;
+  margin: 0;
+}
+.build-stage__app {
+  width: 100%;
+}
+@media (min-width: 64rem) {
+  .build-stage {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    align-items: center;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Our work: live screenshots in one strip; a swipe on phones.
+   ------------------------------------------------------------------ */
+.home-work {
+  list-style: none;
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+  text-align: left;
+}
+.home-work__link {
+  display: grid;
+  gap: var(--space-3);
+  color: inherit;
+  text-decoration: none;
+}
+.home-work__shot {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 10px;
+  border: 1px solid var(--color-line);
+}
+.home-work__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.home-work__logo {
+  border-radius: 7px;
+}
+.home-work__name {
+  font-weight: 600;
+}
+.home-work__problem {
+  color: var(--color-ink-2);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.home-work__link:hover .home-work__name,
+.home-work__link:focus-visible .home-work__name {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+@media (max-width: 63.99rem) {
+  .home-work {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: min(80%, 20rem);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: var(--space-3);
+  }
+  .home-work > li {
+    scroll-snap-align: start;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Payment timeline (PaymentTimeline): the two ways to pay on one month grid.
+   ------------------------------------------------------------------ */
+.paytl {
+  margin: var(--space-6) 0 0;
+  display: grid;
+  gap: var(--space-6);
+  text-align: left;
+}
+.paytl__row {
+  display: grid;
+  gap: var(--space-3);
+}
+.paytl__name {
+  margin: 0;
+  font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
+  font-weight: 500;
+}
+.paytl__track {
+  display: grid;
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+  align-items: end;
+  gap: clamp(3px, 0.3vw + 2px, 8px);
+  height: clamp(4.5rem, 3rem + 4vw, 7rem);
+  border-bottom: 1px solid var(--color-line-strong);
+}
+.paytl__bar {
+  display: block;
+  border-radius: 3px 3px 0 0;
+}
+.paytl__bar--lg { height: 100%; }
+.paytl__bar--md { height: 34%; }
+.paytl__bar--sm { height: 12%; }
+.paytl__bar--none { height: 0; }
+.paytl__bar--solid { background: var(--color-ink); }
+.paytl__bar--soft { background: var(--color-line-strong); }
+.paytl__note {
+  margin: 0;
+  max-width: 44rem;
+  color: var(--color-ink-2);
+}
+.paytl__axis {
+  display: flex;
+  justify-content: space-between;
+  width: calc(12 / 15 * 100%);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+.paytl__caption {
+  font-size: 0.85rem;
+  color: var(--color-ink-3);
+}
+
+/* ------------------------------------------------------------------
+   Grow, Simplify, Build (StageSwiper): stacked on wide screens; side by side with a
+   swipe and tabs on phones.
+   ------------------------------------------------------------------ */
+.stages__tabs {
+  display: none;
+}
+@media (max-width: 39.99rem) {
+  .stages__tabs {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--gutter);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .stages__tabs button {
+    min-height: 44px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-line-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-ink-2);
+    font: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  .stages__tabs button[aria-pressed="true"] {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-bg);
+  }
+  .stages__track {
+    display: flex;
+    align-items: flex-start;
+    overflow-y: hidden;
+    transition: height 300ms var(--ease);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .stages__track::-webkit-scrollbar {
+    display: none;
+  }
+  .stages__track > * {
+    flex: 0 0 100%;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+  .site-fan__item.ss {
+    width: 29vw;
+    margin-inline: -4.5vw;
+  }
 }

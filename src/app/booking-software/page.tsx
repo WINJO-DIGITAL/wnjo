@@ -37,7 +37,7 @@ export default function BookingSoftwarePage() {
           <div className="booking-hero__layout">
             <div className="booking-hero__copy">
               <h1 id="hero-title" className="tile__title rise" style={{ "--i": 1 } as React.CSSProperties}>
-                Booked in a minute. <span className="serif-em">In your app in a second.</span>
+                Booked in a minute. In your app in a second.
               </h1>
               <p className="tile__line rise" style={{ "--i": 2 } as React.CSSProperties}>
                 Simplify · Booking systems for any business.
@@ -66,7 +66,7 @@ export default function BookingSoftwarePage() {
       <section id="apps" className="tile inverse" aria-labelledby="apps-title">
         <div className="container container--wide" data-reveal>
           <h2 id="apps-title" className="tile__title">
-            Run the office. <span className="serif-em">Run the road.</span>
+            Run the office. Run the road.
           </h2>
           <p className="tile__line">Operator and driver apps. Real screens, example details.</p>
         </div>
@@ -84,7 +84,7 @@ export default function BookingSoftwarePage() {
         <div className="container container--wide" data-reveal>
           <p className="tile__name">Make it yours</p>
           <h2 id="studio-title" className="tile__title">
-            Your business. <span className="serif-em">Your booking app.</span>
+            Your business. Your booking app.
           </h2>
         </div>
         <div className="container container--wide booking-studio">
@@ -100,7 +100,7 @@ export default function BookingSoftwarePage() {
       <CtaBand
         title={
           <>
-            See it <span className="serif-em">working.</span>
+            See it working.
           </>
         }
         body="Live demo. No obligation."

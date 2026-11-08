@@ -46,7 +46,7 @@ export default function AppDevelopmentPage() {
         eyebrow="Build · Apps and software"
         title={
           <>
-            Apps, <span className="serif-em">built around how you work.</span>
+            Apps, built around how you work.
           </>
         }
         lede="Your spreadsheets and workarounds, turned into an app."
@@ -70,7 +70,7 @@ export default function AppDevelopmentPage() {
         <div className="container container--wide" data-reveal>
           <p className="tile__name">Build your app</p>
           <h2 id="build-title" className="tile__title">
-            Pick the parts. <span className="serif-em">Watch it come together.</span>
+            Pick the parts. Watch it come together.
           </h2>
         </div>
         <div className="container container--wide apps-tile__body">
@@ -82,7 +82,7 @@ export default function AppDevelopmentPage() {
         <div className="container container--wide" data-reveal>
           <p className="tile__name">From our work</p>
           <h2 id="examples-title" className="tile__title">
-            Apps we&apos;ve <span className="serif-em">already built.</span>
+            Apps we&apos;ve already built.
           </h2>
         </div>
         <div className="container container--wide apps-tile__body">
@@ -94,7 +94,7 @@ export default function AppDevelopmentPage() {
         <div className="container container--wide" data-reveal>
           <p className="tile__name">How it works</p>
           <h2 id="process-title" className="tile__title">
-            Scope first, <span className="serif-em">then build.</span>
+            Scope first, then build.
           </h2>
           <p className="tile__line">Nothing to pay until you approve the scope.</p>
         </div>
@@ -122,7 +122,7 @@ export default function AppDevelopmentPage() {
       <CtaBand
         title={
           <>
-            What would you <span className="serif-em">replace first?</span>
+            What would you replace first?
           </>
         }
         body="Tap one to start. We'll take it from there."

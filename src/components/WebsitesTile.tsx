@@ -16,6 +16,7 @@ export function WebsitesTile({
   name = "Websites",
   title = "Built to win customers.",
   line = "Designed around your business, built for phones first.",
+  visual,
 }: {
   id?: string;
   navLink?: string;
@@ -26,6 +27,8 @@ export function WebsitesTile({
   name?: string;
   title?: React.ReactNode;
   line?: string;
+  /** Replaces the interactive styler (the homepage shows the four sites as a fan). */
+  visual?: React.ReactNode;
 }) {
   const titleId = `${id ?? "websites"}-title`;
   const handoverDays =
@@ -94,7 +97,7 @@ export function WebsitesTile({
         data-reveal
         style={{ "--d": 1 } as React.CSSProperties}
       >
-        <SiteStyler />
+        {visual ?? <SiteStyler />}
       </div>
     </section>
   );

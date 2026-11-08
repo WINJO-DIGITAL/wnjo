@@ -15,7 +15,7 @@ export default async function NotSentPage({ searchParams }: { searchParams: Prom
   const { status } = await searchParams;
   const reason = (status && REASONS[status]) || "It didn't go through this time. Please try again shortly.";
   return (
-    <PageHero eyebrow="Message not sent" title={<>Your message <span className="serif-em">didn&apos;t send.</span></>} lede={reason}>
+    <PageHero eyebrow="Message not sent" title={<>Your message didn&apos;t send.</>} lede={reason}>
       <div className="btn-row">
         <Link href="/contact" className="btn btn--primary">Try again</Link>
         {contactPhoneHref && <a href={contactPhoneHref} className="btn btn--secondary">Call us</a>}

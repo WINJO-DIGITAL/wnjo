@@ -262,3 +262,25 @@ export function SiteStyler() {
     </div>
   );
 }
+
+/**
+ * The four example businesses side by side, each on its own phone and fanned out: one glance shows
+ * that every site is drawn for its business. The homepage uses this; the Websites page keeps the
+ * interactive styler.
+ */
+export function SiteFan() {
+  return (
+    <div className="site-fan" role="img" aria-label="Four example websites on phones: a café, a barber, an electrician and a physio, each designed differently.">
+      {SITES.map((site) => (
+        <div key={site.id} className="ss site-fan__item" data-site={site.id} aria-hidden="true">
+          <div className="app-phone site-fan__phone">
+            <div className="ss-view ss-view--mobile">
+              <Mobile site={site} />
+            </div>
+          </div>
+          <span className="site-fan__label">{site.kind}</span>
+        </div>
+      ))}
+    </div>
+  );
+}

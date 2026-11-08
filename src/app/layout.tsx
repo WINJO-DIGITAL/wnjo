@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Inter, Playfair_Display } from "next/font/google";
+import { Geist_Mono, Playfair_Display, Schibsted_Grotesk } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Reveal } from "@/components/interactive/Reveal";
@@ -8,7 +8,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { site, siteUrl } from "@/lib/site";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+// Body text: an editorial grotesk with more character than the usual safe sans.
+const sans = Schibsted_Grotesk({ subsets: ["latin"], variable: "--font-sans-face", display: "swap" });
 /** The one serif: headings, italic accents and statements. */
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -47,7 +48,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB" data-scroll-behavior="smooth" className={`${inter.variable} ${playfair.variable} ${mono.variable}`}>
+    <html lang="en-GB" data-scroll-behavior="smooth" className={`${sans.variable} ${playfair.variable} ${mono.variable}`}>
       <body>
         {/* Without JavaScript, controls that need it are hidden rather than left doing nothing. */}
         <noscript>
