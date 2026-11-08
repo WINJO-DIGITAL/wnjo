@@ -1450,15 +1450,32 @@ main {
   box-shadow: 0 6px 18px -10px rgb(46 36 29 / 0.45);
 }
 
+/*
+ * The closing call to action, set like the homepage sections (the build sheet): a hairline across the column,
+ * the headline and its line on the left, and the actions beside it on desktop, level with the headline's foot.
+ * No centred headline with two centred buttons.
+ */
 .cta-band {
   display: grid;
   gap: var(--space-6);
-  justify-items: center;
-  text-align: center;
+  justify-items: start;
+  text-align: left;
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-line-strong);
+}
+
+.inverse .cta-band {
+  border-top-color: var(--color-inverse-line);
+}
+
+/* A light band already sits under its section's rule; one hairline is enough. */
+.cta-band--light .cta-band {
+  padding-top: 0;
+  border-top: 0;
 }
 
 .cta-band :is(.h1, .lede) {
-  margin-inline: auto;
+  margin-inline: 0;
 }
 
 /* Room under the brush stroke before the line that follows. */
@@ -1467,7 +1484,33 @@ main {
 }
 
 .cta-band .btn-row {
-  justify-content: center;
+  justify-content: flex-start;
+}
+
+.cta-band .cta-band__visual {
+  justify-content: flex-start;
+}
+
+.cta-band .cta-logos {
+  justify-content: flex-start;
+}
+
+@media (min-width: 64rem) {
+  .cta-band {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: clamp(2rem, 1rem + 3vw, 5rem);
+    align-items: end;
+  }
+  .cta-band > .cta-band__visual {
+    grid-column: 1 / -1;
+  }
+  .cta-band > .stack {
+    grid-column: 1;
+  }
+  .cta-band > .btn-row {
+    grid-column: 2;
+    padding-bottom: 0.4em;
+  }
 }
 
 /* ---------- Forms ---------- */
