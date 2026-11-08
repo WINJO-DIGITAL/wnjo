@@ -36,13 +36,14 @@ Rules:
   the same way at launch.
 - Stripe webhook endpoints need these events: `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed`,
   `customer.subscription.updated`, `customer.subscription.deleted`. Test endpoint updated 8 November 2026 to
-  `https://winjodigital.co.uk/api/stripe/webhook`. The live endpoint still points at the old domain (see below).
+  `https://winjodigital.co.uk/api/stripe/webhook`; the live endpoint uses the same URL (see below).
 - `CALCOM_API_KEY` and `CALCOM_EVENT_TYPE_ID` (server only): when both are set, the calculator offers consultation
   booking (Stage 4). Until then it offers callbacks only.
 
-### Open issue: live Stripe webhook points at the old domain
+### Fixed: live Stripe webhook URL (8 November 2026)
 
-The live webhook endpoint (`we_1UZKdaFZtOV6mSdmHzzgDd3z`) is set to `https://www.wnjoweb.co.uk/api/stripe/webhook`.
-That domain now redirects, and Stripe does not follow redirects, so live deposit payments are not being marked paid on
-the site. Fix: change the endpoint URL to `https://winjodigital.co.uk/api/stripe/webhook` (owner approval needed).
-
+The live webhook endpoint (`we_1UZKdaFZtOV6mSdmHzzgDd3z`) pointed at the old domain, which now redirects; Stripe does
+not follow redirects. It was changed to `https://winjodigital.co.uk/api/stripe/webhook` with the owner's approval.
+Stripe held no live `checkout.session.completed` events in its 30-day history, so no live payment was missed. The
+endpoint answers directly (an unsigned request gets 400 bad_signature). Its events are still
+`checkout.session.completed` only; add the four subscription events when Stage 6 goes live.
