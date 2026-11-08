@@ -2,10 +2,22 @@ import { after, NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
 import { paymentMatches, stripeConfig, verifyStripeSignature } from "@/lib/stripe";
 import { recordEvent } from "@/lib/ai/event-store";
+import { notificationMailConfig, sendEmail } from "@/lib/mailer";
 import { kickWorker, processDueEvents } from "@/lib/ai/sweep";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/**
+ * Tells staff about a payment problem that needs a person, not just a retry. Only identifiers are sent (no customer
+ * details). Best effort: if email isn't configured or fails, the webhook still answers as before.
+ */
+async function alertStaff(subject: string, detail: string): Promise<void> {
+  const config = notificationMailConfig();
+  const to = process.env.ENQUIRY_TO_EMAIL?.trim();
+  if (!config || !to) return;
+  await sendEmail(config, { to, subject: `[WNJO payments] ${subject}`, text: detail }, "Payment alert").catch(() => {});
+}
 
 /**
  * Stripe calls this when a payment completes. The signature is checked before anything is read or
@@ -47,10 +59,18 @@ export async function POST(request: NextRequest) {
     .select("amount_pence, status")
     .eq("stripe_checkout_session_id", session.id)
     .maybeSingle();
-  if (expectedError) return NextResponse.json({ error: "retry" }, { status: 500 });
+  if (expectedError) {
+    await alertStaff("Payment lookup failed", `Checkout session ${session.id}. Stripe will retry this event.`);
+    return NextResponse.json({ error: "retry" }, { status: 500 });
+  }
   const row = expected as { amount_pence: number; status: string } | null;
   if (row && row.status !== "paid" && !paymentMatches(session, row.amount_pence)) {
     console.error("Stripe payment does not match the amount on record; not marked paid");
+    await alertStaff(
+      "Payment amount does not match the quote",
+      `Checkout session ${session.id} was paid, but the amount or currency differs from the deposit on record. ` +
+        `It has NOT been marked paid. Check it in Stripe and the admin area before acting.`,
+    );
     return NextResponse.json({ received: true, handled: false, reason: "amount_mismatch" });
   }
 
@@ -64,7 +84,10 @@ export async function POST(request: NextRequest) {
     .eq("stripe_checkout_session_id", session.id)
     .neq("status", "paid");
   // A database error asks Stripe to retry the event rather than losing the payment.
-  if (error) return NextResponse.json({ error: "retry" }, { status: 500 });
+  if (error) {
+    await alertStaff("Payment could not be recorded", `Checkout session ${session.id}. Stripe will retry this event.`);
+    return NextResponse.json({ error: "retry" }, { status: 500 });
+  }
 
   // Look the deposit up on every delivery, not just the first. If recording the event fails and Stripe retries,
   // the update above matches nothing, but this lookup still finds the paid deposit, so the event is recorded then.
