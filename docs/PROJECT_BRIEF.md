@@ -21,6 +21,8 @@ The website should act as a premium showroom and sales platform. Visitors should
 
 ## 2. Vision and Positioning
 
+> Superseded on 8 November 2026 by §18 (outcome-led positioning around Grow, Simplify and Build). Kept for history.
+
 ### Proposed positioning
 
 Bespoke digital experiences and practical software, built around the way your business works.
@@ -114,6 +116,8 @@ Make the two principal customer journeys immediately obvious:
 Booking-software visitors should not need to navigate through website packages to find the product.
 
 ## 6. Visual Identity and UX Direction
+
+> The current visual rules are in §18.4. They take precedence over this section where they differ.
 
 ### Design inspiration
 
@@ -592,3 +596,44 @@ npm run build && npm start
 - Set the production domain.
 - Have the privacy notice reviewed, and add the business's legal identity and contact details. Add terms of service and payment, cancellation and refund terms once those are decided.
 - Add screenshots of the driver and operator applications, and confirm their feature list.
+
+---
+
+## 18. Repositioning and redesign (8 November 2026)
+
+Confirmed by the owner on 8 November 2026 and live on `winjodigital.co.uk`. This section takes precedence over §2, §5 and §6 where they differ.
+
+### 18.1 Positioning
+- WINJO DIGITAL sells business outcomes through technology. Websites, booking systems and software are the means; the result for the business is the product.
+- Homepage hero, one sentence: "More enquiries, less admin, and software that fits."
+- Primary call to action: "Let's talk about your business". The header button stays "Get my price" (owner's choice).
+- Avoid generic agency phrases and unmeasured claims. Outcomes are stated as what the work is built to do, never as measured results, unless the owner publishes real figures.
+
+### 18.2 Service architecture
+- Grow: bespoke websites, landing pages and lead capture (`/websites`).
+- Simplify: booking systems and business automation (`/booking-software`).
+- Build: apps, portals, platforms and custom software (`/app-development`). FYStay, our own platform, is the proof.
+- URLs are unchanged for SEO; only the labels changed. Navigation: Work, Grow, Simplify, Build, Pricing, plus "Get my price".
+- The contact form's first step asks for a goal ("Win more enquiries", "Take bookings without the phone", and so on). Each maps to an existing enquiry topic, so stored records and enquiry emails keep the product name.
+
+### 18.3 Commercial model
+- Two pathways, subscription first:
+  - Monthly subscription: the build cost spread across monthly payments with hosting, maintenance, security updates, support and agreed improvements; 12-month minimum term from go-live, then month to month on 30 days' notice; the rest of the minimum term is due on early cancellation; buy the build outright at any time at the price in the quote (it reduces as payments are made); domain and content always the client's.
+  - Bespoke project: one-off fee, 50% to start and 50% before launch; hosting and care billed separately; optional development retainer.
+- Terms page updated to match (terms version `2026-11-08`). Not yet reviewed by a lawyer.
+- Open: subscription prices, and whether the Hosting / Care / Care Plus plans are renamed. Plan names live in both `src/lib/pricing.ts` and the Supabase pricing catalogue, so a rename must update both. All prices remain provisional (`PRICING_STATUS`).
+
+### 18.4 Visual rules
+- Core colours are fixed (sand, espresso, terracotta, sage). Do not change them.
+- Type: Playfair Display for headings, Schibsted Grotesk for body text, Geist Mono for small labels.
+- The italic terracotta accent appears once per site, in the homepage hero. Other headings are plain.
+- Sell by showing: each of Grow, Simplify and Build is a working demo (four example sites fanned out, the EV Exec booking flow, FYStay beside the spreadsheet-to-app). Copy stays to a headline and a line.
+- On phones, Grow, Simplify and Build swipe sideways with tabs; the work strip swipes too.
+- Hairlines instead of card borders. Numbered markers only for real sequences (the four steps).
+- Scroll reveals never hide content; only the entrance moves.
+- No coloured dots beside headings, and no family line (see CLAUDE.md).
+
+### 18.5 Domains
+- `winjodigital.co.uk` is the main domain; `www` redirects to it.
+- `wnjoweb.co.uk` and `www.wnjoweb.co.uk` redirect to it with a 308, keeping the path.
+

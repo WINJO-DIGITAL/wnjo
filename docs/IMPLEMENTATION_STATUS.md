@@ -245,3 +245,12 @@ Built in sub-steps, each tested before the next.
 - Isolation suite re-run against the live database after the order and invite migrations: 19 of 19 PASS.
 - `client_invites` (16) and `order_tools` (15) passing against the live database.
 - Full database suite re-run against the live database: all 13 suites pass, 142 checks, 0 failures (isolation 19, quotes 11, acceptance 12, store_quote 4, messages 16, approvals 16, files 9, notifications 11, project_columns 3, staff_projects 4, ai_access 6, client_invites 16, order_tools 15).
+
+## Repositioning and redesign — live (8 November 2026)
+- Outcome-led site around Grow, Simplify and Build: new homepage, navigation labels, work page (problem and solution per project), pricing pathways with a payment timeline, goal-led contact step, About principles as plain statements, and updated metadata and structured data. See PROJECT_BRIEF §18.
+- Visual changes: one hero accent only, Schibsted Grotesk body text, four-site fan, FYStay build stage, screenshot work strip, phone swiper for the three stages, reveal never hides content.
+- Terms: monthly subscription section added and approved (version `2026-11-08`).
+- Domains: `wnjoweb.co.uk` and `www` now 308-redirect to `winjodigital.co.uk`; they had been returning Vercel's 404.
+- Checked on production: all main pages return 200, no sideways scroll at phone width, homepage links all resolve, phone swiper works. Type check, lint and 223 tests pass.
+- Still open: subscription prices; plan names; legal review of the terms; prices are still provisional while Stripe is in live mode.
+
