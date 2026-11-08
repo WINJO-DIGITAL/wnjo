@@ -22,5 +22,6 @@ Rules:
 ## Domains
 
 - Main domain: `winjodigital.co.uk` (Vercel, verified). `www.winjodigital.co.uk` redirects to it with a 308.
+- Old domain: `wnjoweb.co.uk` and `www.wnjoweb.co.uk` are attached to the same Vercel project and redirect to `winjodigital.co.uk` with a 308, keeping the path (restored 8 November 2026; they had been returning Vercel's 404). Their DNS stays at IONOS, pointing at Vercel.
 - Resend sending domain: `winjodigital.co.uk` (eu-west-1), verified, sending enabled.
 - Customer correspondence goes through the website. The owner's email address is never published on the site.

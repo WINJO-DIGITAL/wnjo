@@ -5,11 +5,12 @@ import { site } from "@/lib/site";
 export const metadata = pageMetadata(
   "/terms",
   "Terms and conditions",
-  "The terms that apply to quotes, deposits, balances and work with WINJO DIGITAL.",
+  "The terms that apply to quotes, deposits, balances, monthly subscriptions and work with WINJO DIGITAL.",
 );
 
 /*
- * Confirmed by the owner on 7 November 2026 (quote terms version 2026-11-07, see lib/terms). Not reviewed by a
+ * Confirmed by the owner on 7 November 2026 (quote terms version 2026-11-07, see lib/terms). The monthly
+ * subscription section was drafted on 8 November 2026 (version 2026-11-08) and awaits the owner's approval. Not reviewed by a
  * lawyer; a short legal review is recommended before taking live payments. Bump QUOTE_TERMS_VERSION whenever the
  * payment, cancellation or refund wording here changes.
  */
@@ -34,9 +35,31 @@ export default function TermsPage() {
 
             <h2>Deposits and balances</h2>
             <p>
-              When you accept a quote, a deposit of 50% of the quoted price is payable. The remaining 50% is payable
+              For a bespoke project, when you accept a quote, a deposit of 50% of the quoted price is payable. The remaining 50% is payable
               once the site is ready for your final review, before it goes live, so you can see the finished work
               first. Payments are taken through Stripe. {site.name} is not VAT registered, so no VAT is charged.
+            </p>
+
+            <h2>Monthly subscriptions</h2>
+            <p>
+              If you choose a monthly subscription, the cost of building your website or system is spread across your
+              monthly payments, together with hosting, maintenance, security updates, support and any improvements your
+              plan includes. Your quote sets out the monthly price and exactly what it covers. Payments are taken monthly
+              in advance through Stripe.
+            </p>
+            <p>
+              The minimum term is 12 months from the date your website or system goes live. After that, the subscription
+              continues month to month, and either of us can end it with 30 days&apos; notice. If you end it during the
+              minimum term, the payments for the rest of the minimum term become due.
+            </p>
+            <p>
+              You can buy the build outright at any time. Your quote sets out the buy-out price, which reduces as you
+              make your monthly payments. Once it is paid, ownership passes to you as described under &ldquo;Your
+              website and files&rdquo;, and you can keep or cancel hosting and care.
+            </p>
+            <p>
+              Your domain and the content you supply are always yours. If a subscription ends without a buy-out, we hand
+              over your content and help you move your domain. The bespoke design and code remain ours.
             </p>
 
             <h2>Your content</h2>
@@ -66,7 +89,7 @@ export default function TermsPage() {
 
             <h2>Your website and files</h2>
             <p>
-              The design and build are ours until the final payment is made. We release the finished site, its files
+              On a bespoke project, the design and build are ours until the final payment is made. We release the finished site, its files
               and its source code once that payment has cleared. Copyright in the bespoke design passes to you on
               full payment. Until then, the site is hosted and shown to you for review only.
             </p>
