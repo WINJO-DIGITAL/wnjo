@@ -1,6 +1,6 @@
 import { after, NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
-import { paymentMatches, verifyStripeSignature } from "@/lib/stripe";
+import { paymentMatches, stripeConfig, verifyStripeSignature } from "@/lib/stripe";
 import { recordEvent } from "@/lib/ai/event-store";
 import { kickWorker, processDueEvents } from "@/lib/ai/sweep";
 
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
  * changed; an unsigned or replayed request is refused. Only a paid Checkout Session marks a deposit paid.
  */
 export async function POST(request: NextRequest) {
-  const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim() ?? "";
+  const secret = stripeConfig().webhookSecret ?? "";
   if (!secret) return NextResponse.json({ error: "not_configured" }, { status: 503 });
 
   const payload = await request.text();

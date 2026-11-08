@@ -20,6 +20,23 @@ export function stripeSecretKey(raw: string | undefined, mode: string | undefine
   return key.startsWith("sk_test_") ? key : null;
 }
 
+/**
+ * Test and live settings live side by side, so one setting (STRIPE_MODE=live) switches between them and can be
+ * switched back: test mode reads STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET; live mode reads STRIPE_SECRET_KEY_LIVE
+ * and STRIPE_WEBHOOK_SECRET_LIVE. Missing or mismatched values give nulls, so payments stop rather than misfire.
+ */
+export function stripeConfig(env: Record<string, string | undefined> = process.env): {
+  live: boolean;
+  secretKey: string | null;
+  webhookSecret: string | null;
+} {
+  const live = env.STRIPE_MODE?.trim().toLowerCase() === "live";
+  const mode = live ? "live" : "test";
+  const secretKey = stripeSecretKey(live ? env.STRIPE_SECRET_KEY_LIVE : env.STRIPE_SECRET_KEY, mode);
+  const webhookSecret = (live ? env.STRIPE_WEBHOOK_SECRET_LIVE : env.STRIPE_WEBHOOK_SECRET)?.trim() || null;
+  return { live, secretKey, webhookSecret };
+}
+
 /** Returns the key only if it is a test-mode secret key. Anything else is refused. */
 export function testSecretKey(raw: string | undefined): string | null {
   const key = raw?.trim();

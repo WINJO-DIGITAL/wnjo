@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { paymentMatches, stripeSecretKey, testSecretKey, verifyStripeSignature } from "@/lib/stripe";
+import { paymentMatches, stripeConfig, stripeSecretKey, testSecretKey, verifyStripeSignature } from "@/lib/stripe";
 
 const secret = "whsec_test_example";
 const payload = '{"id":"evt_1","type":"checkout.session.completed"}';
@@ -78,5 +78,31 @@ describe("stripeSecretKey", () => {
   it("refuses an empty key", () => {
     expect(stripeSecretKey("", "live")).toBeNull();
     expect(stripeSecretKey(undefined, undefined)).toBeNull();
+  });
+});
+
+describe("stripeConfig", () => {
+  const env = {
+    STRIPE_SECRET_KEY: "sk_test_t",
+    STRIPE_WEBHOOK_SECRET: "whsec_t",
+    STRIPE_SECRET_KEY_LIVE: "sk_live_l",
+    STRIPE_WEBHOOK_SECRET_LIVE: "whsec_l",
+  };
+
+  it("uses the test settings unless STRIPE_MODE is live", () => {
+    expect(stripeConfig(env)).toEqual({ live: false, secretKey: "sk_test_t", webhookSecret: "whsec_t" });
+  });
+
+  it("switches both the key and the webhook secret together in live mode", () => {
+    expect(stripeConfig({ ...env, STRIPE_MODE: "live" })).toEqual({ live: true, secretKey: "sk_live_l", webhookSecret: "whsec_l" });
+  });
+
+  it("stops payments rather than mixing modes when a live value is missing or wrong", () => {
+    expect(stripeConfig({ STRIPE_MODE: "live", STRIPE_SECRET_KEY: "sk_test_t", STRIPE_WEBHOOK_SECRET: "whsec_t" })).toEqual({
+      live: true,
+      secretKey: null,
+      webhookSecret: null,
+    });
+    expect(stripeConfig({ ...env, STRIPE_MODE: "live", STRIPE_SECRET_KEY_LIVE: "sk_test_x" }).secretKey).toBeNull();
   });
 });
