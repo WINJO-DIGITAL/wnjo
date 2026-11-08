@@ -1645,6 +1645,11 @@ main {
   color: var(--hx-ink);
 }
 
+/* "One business. / One site. / Built from scratch." – one sentence per line. */
+.hero-ed__line {
+  display: block;
+}
+
 .hero-ed__title .serif-em {
   display: block;
   margin-top: 0.02em;
@@ -1824,7 +1829,7 @@ main {
   }
   /* "that grow your business." is about 9.7 times the font size wide: kept inside its column. */
   .hero-ed--work .hero-ed__title {
-    font-size: min(4vw, 3.6rem);
+    font-size: min(4.6vw, 4.25rem);
   }
   /* Beside the copy the bar is narrower: the tabs get their own row, so names show in full. */
   .hero-ed--work .showcase__bar {
@@ -6464,6 +6469,73 @@ main #process ol.steps li::after {
 .tile__more {
   margin-top: var(--space-5);
   font-size: var(--text-sm);
+}
+
+/*
+ * The build sheet (homepage sections). WNJO builds each site from scratch, so each section opens like a page of a
+ * spec sheet: a hairline across the column, a plain numbered monospace label (the same counter the section heads
+ * use), the headline set left and large, and on desktop the one supporting line and the action in a narrower
+ * column beside it. The work itself, below, is the one focal point. No markers beside labels.
+ */
+.tile {
+  text-align: left;
+}
+
+.tile__name {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-line-strong);
+}
+
+.inverse .tile__name {
+  border-top-color: var(--color-inverse-line);
+}
+
+.tile__name::before {
+  counter-increment: section;
+  content: counter(section, decimal-leading-zero) " / ";
+}
+
+.tile .tile__title {
+  max-width: 14ch;
+  margin: var(--space-5) 0 0;
+}
+
+.tile .tile__line {
+  margin: var(--space-4) 0 0;
+}
+
+.tile .tile__ctas,
+.tile .trust-row,
+.tile .price-pair {
+  justify-content: flex-start;
+}
+
+.tile .price-pair > div:first-child {
+  padding-left: 0;
+}
+
+@media (min-width: 64rem) {
+  .tile__head {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: clamp(2rem, 1rem + 3vw, 5rem);
+    align-items: start;
+  }
+  .tile__head > .tile__name {
+    grid-column: 1 / -1;
+  }
+  .tile__head > .tile__title {
+    grid-column: 1;
+    max-width: 13ch;
+  }
+  /* Starts level with the headline's first line. */
+  .tile__aside {
+    grid-column: 2;
+    margin-top: calc(var(--space-5) + 0.6em);
+  }
+  .tile__aside > :first-child {
+    margin-top: 0;
+  }
 }
 
 /* Images settle into place as they arrive. */

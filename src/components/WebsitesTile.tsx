@@ -19,7 +19,10 @@ export function WebsitesTile({
   ctas?: boolean;
 }) {
   const titleId = `${id ?? "websites"}-title`;
-  const handoverDays = PACKAGES.essential.includes.find((l) => /handover/.test(l))?.match(/(\d+) days/)?.[1] ?? "30";
+  const handoverDays =
+    PACKAGES.essential.includes
+      .find((l) => /handover/.test(l))
+      ?.match(/(\d+) days/)?.[1] ?? "30";
   return (
     <section
       id={id}
@@ -27,47 +30,55 @@ export function WebsitesTile({
       className={`tile ${jost.variable} ${archivo.variable}`}
       aria-labelledby={titleId}
     >
-      <div className="container container--wide" data-reveal>
+      <div className="container container--wide tile__head" data-reveal>
         <p className="tile__name">Websites</p>
         <h2 id={titleId} className="tile__title">
           Built to win <span className="serif-em">customers.</span>
         </h2>
-        <p className="tile__line">Designed around your business, built for phones first.</p>
-        {/* Both prices in one place: the website, and the care that keeps it running. */}
-        <dl className="price-pair">
-          <div>
-            <dt>Website from</dt>
-            <dd>{formatGBP(PACKAGES.essential.from)}</dd>
-          </div>
-          <div>
-            <dt>Hosting &amp; care</dt>
-            <dd>
-              {formatGBP(CARE_PLANS.hosting.monthly)}
-              <span>/month</span>
-            </dd>
-          </div>
-        </dl>
-        {/* Reasons to trust the price, each one a published commitment rather than a claim. */}
-        <ul className="trust-row" role="list">
-          <li>Your written quote, instantly</li>
-          <li>50% to start, 50% once you&apos;re happy</li>
-          <li>{handoverDays} days of support after launch</li>
-        </ul>
-        {ctas ? (
-          <div className="tile__ctas">
-            <Link href="/pricing" className="btn btn--secondary">
-              See all prices
-            </Link>
-          </div>
-        ) : (
-          <p className="tile__more">
-            <Link href="/pricing" className="arrow-link">
-              See all prices <ArrowRight />
-            </Link>
+        <div className="tile__aside">
+          <p className="tile__line">
+            Designed around your business, built for phones first.
           </p>
-        )}
+          {/* Both prices in one place: the website, and the care that keeps it running. */}
+          <dl className="price-pair">
+            <div>
+              <dt>Website from</dt>
+              <dd>{formatGBP(PACKAGES.essential.from)}</dd>
+            </div>
+            <div>
+              <dt>Hosting &amp; care</dt>
+              <dd>
+                {formatGBP(CARE_PLANS.hosting.monthly)}
+                <span>/month</span>
+              </dd>
+            </div>
+          </dl>
+          {/* Reasons to trust the price, each one a published commitment rather than a claim. */}
+          <ul className="trust-row" role="list">
+            <li>Your written quote, instantly</li>
+            <li>50% to start, 50% once you&apos;re happy</li>
+            <li>{handoverDays} days of support after launch</li>
+          </ul>
+          {ctas ? (
+            <div className="tile__ctas">
+              <Link href="/pricing" className="btn btn--secondary">
+                See all prices
+              </Link>
+            </div>
+          ) : (
+            <p className="tile__more">
+              <Link href="/pricing" className="arrow-link">
+                See all prices <ArrowRight />
+              </Link>
+            </p>
+          )}
+        </div>
       </div>
-      <div className="container container--wide tile__visual" data-reveal style={{ "--d": 1 } as React.CSSProperties}>
+      <div
+        className="container container--wide tile__visual"
+        data-reveal
+        style={{ "--d": 1 } as React.CSSProperties}
+      >
         <SiteStyler />
       </div>
     </section>
