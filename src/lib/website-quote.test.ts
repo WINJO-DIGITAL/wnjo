@@ -14,7 +14,7 @@ const monthly = (plan: WebsiteAnswers["plan"], over: Partial<WebsiteAnswers> = {
 const oneOff = (over: Partial<WebsiteAnswers> = {}) => answers({ want: "oneOff", mode: "oneOff", pages: "4-5", care: "none", ...over });
 
 describe("monthly packages", () => {
-  it("prices Bronze at £99 a month with a £99 setup fee", () => {
+  it("prices Core at £99 a month with a £99 setup fee", () => {
     const q = websiteQuote(monthly("bronze"));
     expect(q.monthly).toBe(99);
     expect(q.setup).toBe(99);
@@ -22,21 +22,21 @@ describe("monthly packages", () => {
     expect(q.minimumTermTotal).toBe(99 + 99 * 12);
   });
 
-  it("prices Silver at £149 a month with a £99 setup fee", () => {
+  it("prices Plus at £149 a month with a £99 setup fee", () => {
     const q = websiteQuote(monthly("silver", { pages: "4-5" }));
     expect(q.monthly).toBe(149);
     expect(q.setup).toBe(99);
     expect(q.initialPayment).toBe(248);
   });
 
-  it("prices Gold at £199 a month with a £149 setup fee", () => {
+  it("prices Pro at £199 a month with a £149 setup fee", () => {
     const q = websiteQuote(monthly("gold", { pages: "6-10" }));
     expect(q.monthly).toBe(199);
     expect(q.setup).toBe(149);
     expect(q.initialPayment).toBe(348);
   });
 
-  it("marks Silver as the most popular package and only Silver", () => {
+  it("marks Plus as the most popular package and only Plus", () => {
     expect(Object.entries(WEBSITE_PLANS).filter(([, p]) => p.popular).map(([id]) => id)).toEqual(["silver"]);
   });
 
@@ -97,7 +97,7 @@ describe("add-ons", () => {
     expect(q.monthly).toBe(99 + 15 + 10 + 29);
   });
 
-  it("does not charge Gold for booking, blog or advanced forms, which it includes", () => {
+  it("does not charge Pro for booking, blog or advanced forms, which it includes", () => {
     const q = websiteQuote(monthly("gold", { pages: "6-10", addOns: ["booking", "blog", "advancedForms", "liveChat"] }));
     expect(q.monthly).toBe(199 + 10);
   });
@@ -160,7 +160,7 @@ describe("one-off website", () => {
 
   it("never applies subscription pricing to a one-off website", () => {
     const q = websiteQuote(oneOff({ plan: "gold" }));
-    expect(q.lines.some((l) => /Gold|Silver|Bronze/.test(l.label))).toBe(false);
+    expect(q.lines.some((l) => /Pro|Plus|Core/.test(l.label))).toBe(false);
     expect(q.setup).toBe(0);
   });
 });
@@ -194,7 +194,7 @@ describe("validation", () => {
   it("summarises the quote for email with the initial and monthly payments", () => {
     const a = monthly("silver", { pages: "6-10" });
     const text = formatWebsiteQuote(a, websiteQuote(a), formatGBP);
-    expect(text).toContain("Package: Silver (monthly)");
+    expect(text).toContain("Package: Plus (monthly)");
     expect(text).toContain("Initial payment: £298");
     expect(text).toContain("Monthly subscription: £199");
   });

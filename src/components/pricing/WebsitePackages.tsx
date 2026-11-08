@@ -35,7 +35,7 @@ export const CARD_POINTS: Record<WebsitePlanId, string[]> = {
   ],
 };
 
-/** Bronze, Silver (highlighted) and Gold. Every figure comes from lib/pricing. */
+/** Core, Plus (highlighted) and Pro. Every figure comes from lib/pricing. */
 export function PackageCards({ compact = false }: { compact?: boolean }) {
   return (
     <ul className={`pkg-cards${compact ? " pkg-cards--compact" : ""}`} role="list">

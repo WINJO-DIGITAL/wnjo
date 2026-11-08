@@ -213,8 +213,8 @@ export const SCOPED_FROM = {
 export const DAY_RATE = 450;
 
 /**
- * Monthly subscriptions for scoped work (Simplify and Build). Website subscriptions are the Bronze, Silver and
- * Gold packages below. Setup and term are confirmed in the written proposal.
+ * Monthly subscriptions for scoped work (Simplify and Build). Website subscriptions are the Core, Plus and
+ * Pro packages below. Setup and term are confirmed in the written proposal.
  */
 export const SUBSCRIPTIONS = {
   simplify: {
@@ -289,7 +289,7 @@ export type WebsitePageBand = keyof typeof WEBSITE_PAGE_BANDS;
 /** The three monthly website packages. `includedAddOns` are shown as included and never charged. */
 export const WEBSITE_PLANS = {
   bronze: {
-    name: "Bronze",
+    name: "Core",
     monthly: 99,
     setup: 99,
     pages: 3,
@@ -314,7 +314,7 @@ export const WEBSITE_PLANS = {
     includedAddOns: [] as AddOnId[],
   },
   silver: {
-    name: "Silver",
+    name: "Plus",
     monthly: 149,
     setup: 99,
     pages: 5,
@@ -324,7 +324,7 @@ export const WEBSITE_PLANS = {
     support: "Priority support",
     design: "More advanced bespoke design",
     includes: [
-      "Everything in Bronze",
+      "Everything in Core",
       "Up to 5 pages",
       "More advanced bespoke design",
       "Enhanced SEO foundations",
@@ -339,7 +339,7 @@ export const WEBSITE_PLANS = {
     includedAddOns: ["gallery", "testimonials", "whatsapp", "leadNotifications"] as AddOnId[],
   },
   gold: {
-    name: "Gold",
+    name: "Pro",
     monthly: 199,
     setup: 149,
     pages: 10,
@@ -349,7 +349,7 @@ export const WEBSITE_PLANS = {
     support: "Priority support",
     design: "Fully bespoke design",
     includes: [
-      "Everything in Silver",
+      "Everything in Plus",
       "Up to 10 pages",
       "Fully bespoke design",
       "Advanced animations",

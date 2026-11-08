@@ -84,7 +84,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing preview: the three monthly packages, Silver highlighted, the calculator as the next step. */}
+      {/* Pricing preview: the three monthly packages, Plus highlighted, the calculator as the next step. */}
       <section id="packages" className="tile home-tile" data-nav="/pricing" aria-labelledby="packages-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Website packages</p>

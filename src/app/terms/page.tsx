@@ -47,7 +47,7 @@ export default function TermsPage() {
 
             <h2>Monthly website packages</h2>
             <p>
-              A monthly website package (Bronze, Silver or Gold) has a one-off setup fee, then a monthly payment that
+              A monthly website package (Core, Plus or Pro) has a one-off setup fee, then a monthly payment that
               covers the design and build of your website, managed hosting, security updates, technical maintenance,
               support and any content updates your package includes. Your proposal sets out the package, the price and
               exactly what it covers. Payments are taken monthly in advance through Stripe.

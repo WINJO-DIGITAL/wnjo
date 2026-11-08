@@ -57,7 +57,7 @@ describe("Stripe Checkout", () => {
   const base = { id: "sub-1", reference: "WS-ABC123", email: "ada@example.com" };
   it("charges the monthly price as a subscription and setup plus extras once, with the first month", () => {
     const p = checkoutParams(
-      { ...base, kind: "subscription", packageCode: "silver", packageName: "Silver", setupPence: 9900, monthlyPence: 14900, oneOffPence: 19900 },
+      { ...base, kind: "subscription", packageCode: "silver", packageName: "Plus", setupPence: 9900, monthlyPence: 14900, oneOffPence: 19900 },
       { success: "https://x/done", cancel: "https://x/back" },
     );
     expect(p.get("mode")).toBe("subscription");
@@ -71,7 +71,7 @@ describe("Stripe Checkout", () => {
 
   it("leaves out the one-time line when there is no setup fee or extra", () => {
     const p = checkoutParams(
-      { ...base, kind: "subscription", packageCode: "bronze", packageName: "Bronze", setupPence: 0, monthlyPence: 9900, oneOffPence: 0 },
+      { ...base, kind: "subscription", packageCode: "bronze", packageName: "Core", setupPence: 0, monthlyPence: 9900, oneOffPence: 0 },
       { success: "s", cancel: "c" },
     );
     expect(p.has("line_items[1][price_data][unit_amount]")).toBe(false);
@@ -192,7 +192,7 @@ function setup(over: Record<string, unknown> = {}) {
         status: "offered",
         email: "ada@example.com",
         name: "Ada Lovelace",
-        package_name: "Silver",
+        package_name: "Plus",
         setup_pence: 9900,
         monthly_pence: 14900,
         one_off_pence: 0,

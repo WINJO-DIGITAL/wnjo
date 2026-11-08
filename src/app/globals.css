@@ -10312,8 +10312,8 @@ body:has(.dash-header) .site-footer {
 }
 
 /* ------------------------------------------------------------------
-   Website packages (components/pricing/WebsitePackages): Bronze, Silver
-   (highlighted) and Gold, the comparison table, the ownership promise
+   Website packages (components/pricing/WebsitePackages): Core, Plus
+   (highlighted) and Pro, the comparison table, the ownership promise
    and the one-off website. Colours come from the existing tokens.
    ------------------------------------------------------------------ */
 .pkg-cards {

@@ -22,7 +22,7 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "What's included in a monthly website package?",
     category: "pricing",
     short: "Hosting and support in",
-    a: `A bespoke website with hosting, an SSL certificate, security updates, technical maintenance and support, for one monthly price. Bronze is ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month for up to ${WEBSITE_PLANS.bronze.pages} pages, Silver ${formatGBP(WEBSITE_PLANS.silver.monthly)} for up to ${WEBSITE_PLANS.silver.pages}, and Gold ${formatGBP(WEBSITE_PLANS.gold.monthly)} for up to ${WEBSITE_PLANS.gold.pages}, each with a one-off setup fee. Silver and Gold also include monthly content updates.`,
+    a: `A bespoke website with hosting, an SSL certificate, security updates, technical maintenance and support, for one monthly price. Core is ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month for up to ${WEBSITE_PLANS.bronze.pages} pages, Plus ${formatGBP(WEBSITE_PLANS.silver.monthly)} for up to ${WEBSITE_PLANS.silver.pages}, and Pro ${formatGBP(WEBSITE_PLANS.gold.monthly)} for up to ${WEBSITE_PLANS.gold.pages}, each with a one-off setup fee. Plus and Pro also include monthly content updates.`,
   },
   {
     q: "Is a monthly website a template?",
@@ -82,7 +82,7 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "Can you add features to my site later?",
     category: "ongoing",
     short: "Yes",
-    a: "Yes. Add-on features have published prices on the pricing page. Larger improvements are quoted as separate work, or covered by the monthly content allowance in Silver and Gold, or the hours in Care Plus.",
+    a: "Yes. Add-on features have published prices on the pricing page. Larger improvements are quoted as separate work, or covered by the monthly content allowance in Plus and Pro, or the hours in Care Plus.",
   },
 ];
 
