@@ -211,7 +211,7 @@ function ConfiguratorInner({ params, inBrowser }: { params: ConfiguratorParams; 
     return (
       <div className={styles.done}>
         <div className="card card--raised stack" data-print-root style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
-          <p className="print-only">WINJO DIGITAL · www.wnjoweb.co.uk</p>
+          <p className="print-only">WINJO DIGITAL · winjodigital.co.uk</p>
           <p className="eyebrow">Brief received</p>
           <h2 className="h2" tabIndex={-1} ref={(el) => el?.focus()}>
             {state.quoteReference

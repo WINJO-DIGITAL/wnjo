@@ -3,7 +3,7 @@
 ## Overview
 - **Website:** Next.js 16 (App Router), React 19, TypeScript, deployed on Vercel. Styling is the site's own CSS (`src/app/globals.css`); Tailwind has not been adopted.
 - **Database and auth:** Supabase (PostgreSQL, Auth, Storage). Every table is protected by row-level security. Browser code uses the publishable key; the server uses the secret key for writes.
-- **Email:** Resend, sending from the verified `wnjoweb.co.uk` domain.
+- **Email:** Resend, sending from the verified `winjodigital.co.uk` domain.
 - **Payments:** Stripe. Not yet integrated.
 - **AI:** provider-neutral engine (`src/lib/ai/`). The Grok adapter is written but not connected (no key).
 - **Source control:** GitHub, `WNJOWEB/wnjo`. Work happens on `claude/gallant-albattani-rjj387`; `main` is what production builds from.

@@ -1,7 +1,7 @@
 # Deployment
 
 ## Environments
-- **Production:** builds from `main` on Vercel, serving `www.wnjoweb.co.uk` (the bare domain redirects to it).
+- **Production:** builds from `main` on Vercel, serving `winjodigital.co.uk` (the bare domain redirects to it).
 - **Preview:** builds every branch push. Use the branch alias `wnjo-git-claude-gallant-albattani-rjj387-wnjo.vercel.app`.
 
 ## Releasing

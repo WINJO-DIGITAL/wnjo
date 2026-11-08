@@ -4,7 +4,7 @@ import { notificationMailConfig, sendEmail } from "@/lib/mailer";
 import { MAX_EMAIL_ATTEMPTS, sendOutbox, type OutboxRow } from "@/lib/notify/outbox";
 
 /** Sends the queued customer emails now. Returns null when mail is not configured, so the caller can say so. */
-export async function sendDueNotifications(db: SupabaseClient, siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.wnjoweb.co.uk") {
+export async function sendDueNotifications(db: SupabaseClient, siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk") {
   const config = notificationMailConfig();
   if (!config) return null;
   const emails = new Map<string, string | null>();

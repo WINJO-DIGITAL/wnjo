@@ -62,7 +62,7 @@ export async function processDueEvents(db: SupabaseClient, limit = 20) {
  */
 export async function kickWorker(depth = 0): Promise<void> {
   const secret = process.env.CRON_SECRET?.trim();
-  const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.wnjoweb.co.uk";
+  const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
   if (!secret) return;
   try {
     await fetch(`${site.replace(/\/+$/, "")}/api/cron/tasks?depth=${depth}`, {

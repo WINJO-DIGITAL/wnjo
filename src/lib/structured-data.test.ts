@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import { businessSchema } from "@/lib/structured-data";
 
 describe("businessSchema", () => {
-  const [business, website] = businessSchema("https://www.wnjoweb.co.uk/");
+  const [business, website] = businessSchema("https://winjodigital.co.uk/");
 
   it("describes the business with the published starting prices", () => {
     expect(business["@type"]).toBe("ProfessionalService");
-    expect(business.url).toBe("https://www.wnjoweb.co.uk");
+    expect(business.url).toBe("https://winjodigital.co.uk");
     expect(business.priceRange).toBe("From £1,800");
     expect(business.makesOffer?.map((o) => o.priceSpecification.price)).toEqual([1800, 25]);
   });
@@ -21,6 +21,6 @@ describe("businessSchema", () => {
   });
 
   it("links the website to the business", () => {
-    expect(website.publisher).toEqual({ "@id": "https://www.wnjoweb.co.uk/#business" });
+    expect(website.publisher).toEqual({ "@id": "https://winjodigital.co.uk/#business" });
   });
 });

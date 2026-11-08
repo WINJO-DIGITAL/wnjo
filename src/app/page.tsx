@@ -21,7 +21,7 @@ export const metadata: Metadata = siteUrl()
 const evexec = projectBySlug("ev-exec")!;
 
 export default function HomePage() {
-  const schema = businessSchema(siteUrl() ?? "https://www.wnjoweb.co.uk");
+  const schema = businessSchema(siteUrl() ?? "https://winjodigital.co.uk");
   return (
     <>
       <script

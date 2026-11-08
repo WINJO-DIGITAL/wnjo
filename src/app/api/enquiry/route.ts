@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
         const config = notificationMailConfig();
         if (config) {
           const range = estimate(briefAnswers).range;
-          const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.wnjoweb.co.uk";
+          const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
           const email = quoteEmail({ name: fields.name, quoteReference, low: range.low, high: range.high, siteUrl: site });
           await sendEmail(config, { to: fields.email, subject: email.subject, text: email.text }, "Quote");
         }

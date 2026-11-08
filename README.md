@@ -2,7 +2,7 @@
 
 The website and agency platform for WNJO: a marketing site with an instant quote journey, customer accounts, an agency admin area, and a tested foundation for an AI-assisted delivery workflow.
 
-- **Live site:** https://www.wnjoweb.co.uk
+- **Live site:** https://winjodigital.co.uk
 - **Branch in development:** `claude/gallant-albattani-rjj387`. Production builds from `main`.
 - **Original product brief:** [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)
 

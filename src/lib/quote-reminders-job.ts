@@ -11,7 +11,7 @@ import { siteUrl } from "@/lib/site";
 export async function sendQuoteReminders(db: SupabaseClient, now: Date = new Date(), limit = 20) {
   const config = notificationMailConfig();
   if (!config) return { sent: 0, skipped: 0, reason: "mail not configured" as const };
-  const base = siteUrl() ?? "https://www.wnjoweb.co.uk";
+  const base = siteUrl() ?? "https://winjodigital.co.uk";
 
   const { data: due, error } = await db
     .from("quotes")

@@ -22,7 +22,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const article = articleBySlug(slug);
   if (!article) notFound();
-  const base = (siteUrl() ?? "https://www.wnjoweb.co.uk").replace(/\/+$/, "");
+  const base = (siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "");
   const schema = {
     "@context": "https://schema.org",
     "@type": "Article",

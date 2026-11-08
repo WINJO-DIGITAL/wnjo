@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { breadcrumbTrail } from "@/lib/breadcrumbs";
 import { articleLabels } from "@/lib/articles";
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.wnjoweb.co.uk").replace(/\/+$/, "");
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk").replace(/\/+$/, "");
 
 /**
  * Where you are, from Home, on every internal page. Also gives search engines the same trail as structured data.
