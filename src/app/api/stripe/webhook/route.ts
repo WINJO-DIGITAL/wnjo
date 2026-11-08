@@ -16,7 +16,7 @@ async function alertStaff(subject: string, detail: string): Promise<void> {
   const config = notificationMailConfig();
   const to = process.env.ENQUIRY_TO_EMAIL?.trim();
   if (!config || !to) return;
-  await sendEmail(config, { to, subject: `[WNJO payments] ${subject}`, text: detail }, "Payment alert").catch(() => {});
+  await sendEmail(config, { to, subject: `[WINJO DIGITAL payments] ${subject}`, text: detail }, "Payment alert").catch(() => {});
 }
 
 /**

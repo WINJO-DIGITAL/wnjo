@@ -21,7 +21,7 @@ import evexecLogo from "../../public/work/logos/ev-exec.png";
 import fystayLogo from "../../public/work/logos/fystay.png";
 
 /**
- * Portfolio entries. Every project here was designed and built by WNJO (confirmed
+ * Portfolio entries. Every project here was designed and built by WINJO DIGITAL (confirmed
  * by the owner). Descriptions state only what the live site itself shows: no invented
  * outcomes, metrics or testimonials (README §5, §15). Screenshots are of the live sites.
  */
@@ -36,7 +36,7 @@ export type Industry = (typeof INDUSTRIES)[number]["id"];
 export type Project = {
   slug: string;
   name: string;
-  /** "client" for work built for a business; "product" for platforms WNJO runs. */
+  /** "client" for work built for a business; "product" for platforms WINJO DIGITAL runs. */
   kind: "client" | "product";
   sector: string;
   /** The portfolio filter group: the kind of business, for visitors looking for work like theirs. */

@@ -9,7 +9,7 @@ import { pageMetadata } from "@/lib/metadata";
 export const metadata = pageMetadata(
   "/contact",
   "Start a project",
-  "Tell WNJO about your website or app project: what you need, your budget, your goals and your timeline.",
+  "Tell WINJO DIGITAL about your website or app project: what you need, your budget, your goals and your timeline.",
 );
 
 export default async function ContactPage({

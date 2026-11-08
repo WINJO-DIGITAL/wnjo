@@ -4,11 +4,11 @@
  * rather than invented. See README §15 "Open Decisions".
  */
 export const site = {
-  name: "WNJO",
-  shortName: "WNJO",
+  name: "WINJO DIGITAL",
+  shortName: "WINJO DIGITAL",
   tagline: "Bespoke websites, apps and booking software.",
   description:
-    "WNJO designs and builds bespoke websites, apps and booking software for businesses that want considered design, clear pricing and technology that fits how they work.",
+    "WINJO DIGITAL designs and builds bespoke websites, apps and booking software for businesses that want considered design, clear pricing and technology that fits how they work.",
   locale: "en_GB",
   themeColor: "#F2ECE2",
 } as const;

@@ -12,7 +12,7 @@ export const MAX_EMAIL_ATTEMPTS = 5;
 export function buildNotificationEmail(row: Pick<OutboxRow, "title" | "body" | "link">, siteUrl: string): { subject: string; text: string } {
   const base = siteUrl.replace(/\/+$/, "");
   const target = `${base}${row.link ?? "/account"}`;
-  const lines = [row.body.trim(), "", `Open your account: ${target}`, "", "WNJO"].filter((line, i, all) => !(line === "" && all[i - 1] === ""));
+  const lines = [row.body.trim(), "", `Open your account: ${target}`, "", "WINJO DIGITAL"].filter((line, i, all) => !(line === "" && all[i - 1] === ""));
   return { subject: row.title, text: lines.join("\n") };
 }
 

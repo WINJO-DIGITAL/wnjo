@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 export const metadata = pageMetadata(
   "/privacy",
   "Privacy notice",
-  "How WNJO handles the personal information you share through this website.",
+  "How WINJO DIGITAL handles the personal information you share through this website.",
 );
 
 /*

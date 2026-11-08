@@ -12,7 +12,7 @@ import { PortfolioFilter } from "@/components/interactive/PortfolioFilter";
 export const metadata = pageMetadata(
   "/work",
   "Our work",
-  "Websites and platforms designed and built by WNJO: EV Exec, Boonma, FYStay and RAENG Fitness.",
+  "Websites and platforms designed and built by WINJO DIGITAL: EV Exec, Boonma, FYStay and RAENG Fitness.",
 );
 
 export default function WorkPage() {

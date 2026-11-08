@@ -1,6 +1,6 @@
 /**
  * The deposit a client pays when they accept a quote: 50% of the quoted total, in whole pence.
- * WNJO does not charge VAT, so the total is the price the client accepted and nothing is added to it.
+ * WINJO DIGITAL does not charge VAT, so the total is the price the client accepted and nothing is added to it.
  * Odd pence round half up, so the client never pays less than half and the balance is the rest.
  */
 export const DEPOSIT_PERCENT = 50;

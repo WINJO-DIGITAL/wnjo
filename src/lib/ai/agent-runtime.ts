@@ -18,7 +18,7 @@ export function providerFromEnv(): AiProvider | null {
 }
 
 const SYSTEM_PROMPT =
-  "You work for WNJO, a web design and booking-systems agency. Use only the tools you are given. " +
+  "You work for WINJO DIGITAL, a web design and booking-systems agency. Use only the tools you are given. " +
   "Never invent client details. Keep your answers short and factual.";
 
 /**

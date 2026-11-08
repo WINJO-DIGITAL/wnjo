@@ -5,7 +5,7 @@ import { site } from "@/lib/site";
 export const metadata = pageMetadata(
   "/terms",
   "Terms and conditions",
-  "The terms that apply to quotes, deposits, balances and work with WNJO.",
+  "The terms that apply to quotes, deposits, balances and work with WINJO DIGITAL.",
 );
 
 /*

@@ -5,7 +5,7 @@ describe("quote email", () => {
   const email = quoteEmail({ name: "Sam Jones", quoteReference: "Q-0000AB12", low: 1800, high: 2150, siteUrl: "https://www.wnjoweb.co.uk/" });
 
   it("names the quote in the subject", () => {
-    expect(email.subject).toBe("Your WNJO quote Q-0000AB12");
+    expect(email.subject).toBe("Your WINJO DIGITAL quote Q-0000AB12");
   });
 
   it("gives the price range, the no-VAT note and how to accept", () => {

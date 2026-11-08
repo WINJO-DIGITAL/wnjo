@@ -1,5 +1,5 @@
 /**
- * Resources: practical articles for small businesses. Each one states only what WNJO actually does, as set out on the
+ * Resources: practical articles for small businesses. Each one states only what WINJO DIGITAL actually does, as set out on the
  * pricing page and in the terms. Add articles here; the index, article pages, breadcrumbs and sitemap pick them up.
  */
 export type Article = {
@@ -14,7 +14,7 @@ export type Article = {
 export const articles: Article[] = [
   {
     slug: "how-ordering-a-website-works",
-    title: "What happens when you order a website from WNJO",
+    title: "What happens when you order a website from WINJO DIGITAL",
     description: "Each step from first enquiry to launch: the written price, the 50% deposit, review, the final payment and support after launch.",
     published: "2026-11-07",
     sections: [
@@ -28,7 +28,7 @@ export const articles: Article[] = [
       {
         heading: "2. Accept the quote and pay the deposit",
         paragraphs: [
-          "When you accept, you pay a 50% deposit. Work starts once it has cleared. WNJO is not VAT registered, so no VAT is added.",
+          "When you accept, you pay a 50% deposit. Work starts once it has cleared. WINJO DIGITAL is not VAT registered, so no VAT is added.",
         ],
       },
       {

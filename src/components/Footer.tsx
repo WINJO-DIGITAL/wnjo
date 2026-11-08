@@ -8,13 +8,13 @@ export function Footer() {
       <div className="container container--wide">
         <div className="site-footer__grid">
           <div className="site-footer__brand">
-            <Link href="/" className="brand" aria-label="WNJO home">
+            <Link href="/" className="brand" aria-label="WINJO DIGITAL home">
               <Logo />
             </Link>
             <p>{site.tagline}</p>
             <p className="site-footer__place">Based in Thornton-Cleveleys, Lancashire.</p>
             {/* Contact without showing the details: a call button when the number is set, and the enquiry form for email. */}
-            <ul role="list" className="site-footer__contact" aria-label="Contact WNJO">
+            <ul role="list" className="site-footer__contact" aria-label="Contact WINJO DIGITAL">
               {contactPhoneHref && (
                 <li>
                   <a href={contactPhoneHref}>Call us</a>

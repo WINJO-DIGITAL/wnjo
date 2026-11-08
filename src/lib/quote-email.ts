@@ -4,7 +4,7 @@ export function quoteEmail(input: { name: string; quoteReference: string; low: n
   const first = input.name.trim().split(/\s+/)[0] || "there";
   const site = input.siteUrl.replace(/\/+$/, "");
   return {
-    subject: `Your WNJO quote ${input.quoteReference}`,
+    subject: `Your WINJO DIGITAL quote ${input.quoteReference}`,
     text: [
       `Hi ${first},`,
       "",
@@ -12,7 +12,7 @@ export function quoteEmail(input: { name: string; quoteReference: string; low: n
       "",
       `To see the full quote and accept it, sign in at ${site}/account with this email address.`,
       "",
-      "WNJO",
+      "WINJO DIGITAL",
     ].join("\n"),
   };
 }

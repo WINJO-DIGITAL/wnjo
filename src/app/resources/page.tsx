@@ -3,7 +3,7 @@ import { PageHero } from "@/components/Blocks";
 import { pageMetadata } from "@/lib/metadata";
 import { articles } from "@/lib/articles";
 
-export const metadata = pageMetadata("/resources", "Resources", "Practical guides for small businesses getting a website with WNJO.");
+export const metadata = pageMetadata("/resources", "Resources", "Practical guides for small businesses getting a website with WINJO DIGITAL.");
 
 const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" });
 

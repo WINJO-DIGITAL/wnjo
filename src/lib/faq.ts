@@ -32,7 +32,7 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "How do payments work?",
     category: "pricing",
     short: "Nothing until agreed",
-    a: "Your written quote sets out the price, any deposit and the payment schedule before you commit to anything. We never take payment for work that hasn't been scoped and agreed. WNJO is not VAT registered, so no VAT is added to our prices.",
+    a: "Your written quote sets out the price, any deposit and the payment schedule before you commit to anything. We never take payment for work that hasn't been scoped and agreed. WINJO DIGITAL is not VAT registered, so no VAT is added to our prices.",
   },
   {
     q: "Who owns the website?",

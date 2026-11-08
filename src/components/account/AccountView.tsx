@@ -24,7 +24,7 @@ const STAGE_NOTES: Record<Stage, string> = {
   designing: "Layouts are being drawn. You'll see them here before anything is built.",
   building: "Your site is being built, page by page.",
   reviewing: "Ready for you to look at. Tell us what you think, or approve it.",
-  live: "It's live. Thanks for choosing WNJO.",
+  live: "It's live. Thanks for choosing WINJO DIGITAL.",
 };
 
 /** What the customer does next, shown under the current stage. Kept to one sentence. */

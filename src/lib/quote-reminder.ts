@@ -6,7 +6,7 @@ export function reminderEmail(input: { name: string; quoteReference: string; sit
   const first = input.name.trim().split(/\s+/)[0] || "there";
   const site = input.siteUrl.replace(/\/+$/, "");
   return {
-    subject: `Your WNJO quote ${input.quoteReference} is still open`,
+    subject: `Your WINJO DIGITAL quote ${input.quoteReference} is still open`,
     text: [
       `Hi ${first},`,
       "",
@@ -16,7 +16,7 @@ export function reminderEmail(input: { name: string; quoteReference: string; sit
       "",
       "If you have questions, reply to this email and we'll help.",
       "",
-      "WNJO",
+      "WINJO DIGITAL",
     ].join("\n"),
   };
 }

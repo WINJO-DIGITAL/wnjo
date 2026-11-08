@@ -12,7 +12,7 @@ describe("reminderEmail", () => {
   const email = reminderEmail({ name: "Sam Jones", quoteReference: "Q-0000AB12", siteUrl: "https://www.wnjoweb.co.uk/" });
 
   it("restates the quote and how to accept it, with one greeting", () => {
-    expect(email.subject).toBe("Your WNJO quote Q-0000AB12 is still open");
+    expect(email.subject).toBe("Your WINJO DIGITAL quote Q-0000AB12 is still open");
     expect(email.text.startsWith("Hi Sam,")).toBe(true);
     expect(email.text).toContain("sign in at https://www.wnjoweb.co.uk/account");
   });

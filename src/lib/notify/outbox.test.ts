@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { buildNotificationEmail, sendOutbox, type OutboxRow } from "@/lib/notify/outbox";
 
-const row = (id: string, recipient = "u1", attempts = 0): OutboxRow => ({ id, recipient_user_id: recipient, title: "New message from WNJO", body: "Your homepage is ready to review.", link: "/account", email_attempts: attempts });
+const row = (id: string, recipient = "u1", attempts = 0): OutboxRow => ({ id, recipient_user_id: recipient, title: "New message from WINJO DIGITAL", body: "Your homepage is ready to review.", link: "/account", email_attempts: attempts });
 
 describe("buildNotificationEmail", () => {
   it("links to the account page on the site", () => {
     const email = buildNotificationEmail(row("n1"), "https://www.wnjoweb.co.uk/");
-    expect(email.subject).toBe("New message from WNJO");
+    expect(email.subject).toBe("New message from WINJO DIGITAL");
     expect(email.text).toContain("Open your account: https://www.wnjoweb.co.uk/account");
     expect(email.text.startsWith("Your homepage is ready to review.")).toBe(true);
   });

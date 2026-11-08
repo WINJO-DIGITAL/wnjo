@@ -109,7 +109,7 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
   return (
     <header className="dash-header" ref={barRef}>
       <div className="dash-header__inner">
-        <Link href="/" className="dash-brand" aria-label="WNJO home">
+        <Link href="/" className="dash-brand" aria-label="WINJO DIGITAL home">
           <Logo />
         </Link>
         <span className="dash-badge">{variant === "staff" ? "Staff" : "Client"}</span>

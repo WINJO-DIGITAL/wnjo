@@ -6,7 +6,7 @@ import { pageMetadata } from "@/lib/metadata";
 export const metadata = pageMetadata(
   "/faq",
   "Questions",
-  "Answers on timings, revisions, payments, ownership, support after launch and building apps with WNJO.",
+  "Answers on timings, revisions, payments, ownership, support after launch and building apps with WINJO DIGITAL.",
 );
 
 export default function FaqPage() {

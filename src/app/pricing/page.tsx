@@ -17,7 +17,7 @@ import { pageMetadata } from "@/lib/metadata";
 export const metadata = pageMetadata(
   "/pricing",
   "Pricing",
-  "Starting prices for WNJO websites and app development, and optional hosting and care plans.",
+  "Starting prices for WINJO DIGITAL websites and app development, and optional hosting and care plans.",
 );
 
 // Always flagged up front, whichever plan is chosen.

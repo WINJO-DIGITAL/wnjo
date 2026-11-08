@@ -120,7 +120,7 @@ function Thread({ client, conversation, userId }: { client: SupabaseClient; conv
         {messages?.map((m) => (
           <li key={m.id} className={m.sender_kind === "client" ? "acct-msg acct-msg--client" : "acct-msg"}>
             <p className="acct-meta">
-              {m.sender_kind === "client" ? "You" : m.sender_kind === "system" ? "WNJO update" : "WNJO"} · {when.format(new Date(m.created_at))}
+              {m.sender_kind === "client" ? "You" : m.sender_kind === "system" ? "WINJO DIGITAL update" : "WINJO DIGITAL"} · {when.format(new Date(m.created_at))}
             </p>
             <p>{m.body}</p>
           </li>

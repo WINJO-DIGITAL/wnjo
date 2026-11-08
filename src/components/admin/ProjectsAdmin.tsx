@@ -180,7 +180,7 @@ function Thread({ client, tenantId, userId, conversation }: { client: SupabaseCl
       <ol className="acct-messages" aria-label={`Messages: ${conversation.subject}`}>
         {messages.map((m) => (
           <li key={m.id} className={m.is_internal ? "acct-msg acct-msg--internal" : "acct-msg"}>
-            <p className="acct-meta">{m.is_internal ? "Internal note" : m.sender_kind === "client" ? "Client" : "WNJO"} · {when.format(new Date(m.created_at))}</p>
+            <p className="acct-meta">{m.is_internal ? "Internal note" : m.sender_kind === "client" ? "Client" : "WINJO DIGITAL"} · {when.format(new Date(m.created_at))}</p>
             <p>{m.body}</p>
           </li>
         ))}

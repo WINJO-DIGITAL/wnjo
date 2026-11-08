@@ -3,7 +3,7 @@ import { PageHero } from "@/components/Blocks";
 import { pageMetadata } from "@/lib/metadata";
 import { contactPhoneHref } from "@/lib/site";
 
-export const metadata = { ...pageMetadata("/contact/sent", "Message received", "Your message has reached WNJO."), robots: { index: false } };
+export const metadata = { ...pageMetadata("/contact/sent", "Message received", "Your message has reached WINJO DIGITAL."), robots: { index: false } };
 
 /** Where the plain contact form lands after a successful send. No reply time is promised. */
 export default async function SentPage({ searchParams }: { searchParams: Promise<{ ref?: string }> }) {

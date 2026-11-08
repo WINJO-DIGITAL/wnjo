@@ -355,7 +355,7 @@ function SiteHeader() {
           <Link
             href="/"
             className="brand"
-            aria-label="WNJO home"
+            aria-label="WINJO DIGITAL home"
             onMouseEnter={() => hoverItem(null)}
             onClick={closeIfSamePage}
             transitionTypes={NAV}

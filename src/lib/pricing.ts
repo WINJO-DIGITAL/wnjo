@@ -1,5 +1,5 @@
 /**
- * The single, authoritative source of WNJO pricing rules (README §7, §8, §13).
+ * The single, authoritative source of WINJO DIGITAL pricing rules (README §7, §8, §13).
  *
  * Both the browser (live estimate) and the server (enquiry validation) import this
  * module, so a price is never calculated in two places. Browser-side results are
@@ -13,7 +13,7 @@
 
 export const PRICING_STATUS: "provisional" | "confirmed" = "provisional";
 export const CURRENCY = "GBP";
-export const VAT_NOTE = "WNJO is not VAT registered, so no VAT is added to our prices.";
+export const VAT_NOTE = "WINJO DIGITAL is not VAT registered, so no VAT is added to our prices.";
 
 /* ------------------------------------------------------------------ */
 /* Option catalogue                                                    */

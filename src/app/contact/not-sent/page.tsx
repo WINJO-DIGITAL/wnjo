@@ -3,7 +3,7 @@ import { PageHero } from "@/components/Blocks";
 import { pageMetadata } from "@/lib/metadata";
 import { contactPhoneHref } from "@/lib/site";
 
-export const metadata = { ...pageMetadata("/contact/not-sent", "Message not sent", "Your message didn't reach WNJO."), robots: { index: false } };
+export const metadata = { ...pageMetadata("/contact/not-sent", "Message not sent", "Your message didn't reach WINJO DIGITAL."), robots: { index: false } };
 
 const REASONS: Record<string, string> = {
   "422": "Something was missing. Please give your name, a working email address and a message of at least ten characters.",
