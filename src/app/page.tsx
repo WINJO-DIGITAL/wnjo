@@ -70,10 +70,6 @@ export default function HomePage() {
                 Explore our work
               </Link>
             </div>
-            <p className="hero-from rise" style={{ "--i": 4 } as React.CSSProperties}>
-              Monthly websites from {formatGBP(WEBSITE_PLANS.bronze.monthly)}. Bespoke websites from{" "}
-              {formatGBP(ONE_OFF_WEBSITE.from)}.
-            </p>
           </div>
         </div>
         <div
