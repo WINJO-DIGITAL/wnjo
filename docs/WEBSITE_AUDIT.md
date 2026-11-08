@@ -138,3 +138,15 @@ rate limits for sign-in emails.
 Not testable from the build environment (left for last): live response headers and protected-route answers on the
 live domain, a real enquiry and quote email arriving, the deposit payment in Stripe test mode as a signed-in client,
 the admin screens as staff, and Google's Rich Results Test.
+
+## Redesign: the build sheet (8 November 2026)
+
+Direction: WNJO builds each site from scratch, so the site reads like a craftsman's spec sheet rather than a
+template. Sections open on a hairline with a plain numbered monospace label (the existing section counter), headlines
+are set left and large, and on desktop the one supporting line and the action sit in a narrower column beside the
+headline. Existing tokens, fonts and assets only; no new colours, fonts or dependencies.
+
+- Homepage hero headline: "One business. One site. Built from scratch." **Owner to confirm "Built from scratch"**
+  (requested in the redesign brief; not yet confirmed in writing).
+- Homepage sections, the closing band on every page, and inner-page section heads use the build-sheet layout.
+- About: the principles are a ruled ledger instead of a grid of identical cards.
