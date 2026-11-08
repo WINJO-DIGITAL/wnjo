@@ -1,8 +1,8 @@
 import Image from "next/image";
 
 /**
- * The WINJO DIGITAL logo: the W mark and wordmark as one vector file (public/brand/winjo-digital-logo.svg).
- * It is an SVG, so it stays sharp at every size and is served as is.
+ * The WINJO DIGITAL logo: the W mark and wordmark as one vector file (public/brand/winjo-digital-logo.svg), traced
+ * from the supplied artwork. It is an SVG, so it stays sharp at every size and is served as is.
  */
 export function Logo({ preload = false }: { preload?: boolean }) {
   return (
