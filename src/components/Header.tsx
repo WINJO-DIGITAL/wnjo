@@ -8,6 +8,7 @@ import { AccountMenu } from "./account/AccountMenu";
 import { DashboardHeader } from "./dashboard/DashboardHeader";
 import { Stopwatch } from "./Icons";
 import { Logo } from "./Logo";
+import { ScrollProgress } from "./ScrollProgress";
 
 const isActive = (pathname: string, href: string) => pathname === href || pathname.startsWith(`${href}/`);
 const isCurrent = (pathname: string, item: NavItem) =>
@@ -489,6 +490,7 @@ function SiteHeader() {
             </div>
           </div>
         </div>
+        <ScrollProgress />
       </header>
 
       {/* Blurs the page behind the desktop flyout. Outside <header> so Safari sizes it to the viewport. */}

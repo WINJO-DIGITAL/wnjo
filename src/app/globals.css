@@ -10292,3 +10292,21 @@ body:has(.dash-header) .site-footer {
   font-family: var(--font-serif);
   font-size: clamp(1.2rem, 1rem + 0.6vw, 1.5rem);
 }
+
+/* Reading progress: a line on the header's bottom edge that fills left to right as the page is scrolled
+   (components/ScrollProgress). Terracotta accent; hidden on a page that doesn't scroll. */
+.scroll-progress {
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 3px;
+  background: var(--color-accent);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left center;
+  pointer-events: none;
+}
+.scroll-progress[data-active="false"] {
+  display: none;
+}
+.site-header[data-open="true"] .scroll-progress {
+  opacity: 0;
+}
