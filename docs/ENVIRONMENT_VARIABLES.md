@@ -8,7 +8,7 @@ Never commit real values. Set them in Vercel (Project → Settings → Environme
 | `NEXT_PUBLIC_SUPABASE_URL` | public | Supabase project URL | Set in Vercel (production and preview) |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | public | Browser key, protected by row-level security | Set in Vercel (production and preview) |
 | `SUPABASE_SERVICE_ROLE_KEY` | server only, sensitive | Writes enquiries, quotes and other server records | Set in Vercel (production and preview). |
-| `RESEND_API_KEY` | server only, sensitive | Sends enquiry email | Needs replacing: the key in Vercel belongs to the old `wnjoweb.co.uk` setup, and the current Resend account has no keys (checked 8 Nov 2026). Create a send-only key restricted to `winjodigital.co.uk` and save it in Vercel. |
+| `RESEND_API_KEY` | server only, sensitive | Sends enquiry email | Set in Vercel (production and preview) to a send-only key restricted to `winjodigital.co.uk`, created 8 Nov 2026. |
 | `CRON_SECRET` | server only, sensitive | Bearer token Vercel Cron sends to `/api/cron/briefing`; requests without it are refused | Set in Vercel (production and preview), generated 7 Nov 2026. |
 | `ENQUIRY_TO_EMAIL` | server only, sensitive | Where enquiries are delivered (never shown on the website) | Set to the owner's inbox |
 | `ENQUIRY_FROM_EMAIL` | server only | Sender address (domain must be verified in Resend) | Set to `WINJO DIGITAL <enquiries@winjodigital.co.uk>` (8 Nov 2026). `winjodigital.co.uk` is verified in Resend. |
