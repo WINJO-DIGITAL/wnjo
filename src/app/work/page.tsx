@@ -12,7 +12,7 @@ import { PortfolioFilter } from "@/components/interactive/PortfolioFilter";
 export const metadata = pageMetadata(
   "/work",
   "Our work",
-  "Websites and platforms designed and built by WINJO DIGITAL: EV Exec, Boonma, FYStay and RAENG Fitness.",
+  "Business problems solved with bespoke websites, booking systems and software: EV Exec, Boonma, RAENG Fitness and our own platform, FYStay.",
 );
 
 export default function WorkPage() {
@@ -21,8 +21,8 @@ export default function WorkPage() {
     <>
       <PageHero
         eyebrow="Our work"
-        title={<>Case <span className="serif-em">studies.</span></>}
-        lede="Four live projects: three client websites and our own platform, shown as they are today on desktop and phone."
+        title={<>Problems solved, <span className="serif-em">in production.</span></>}
+        lede="Three client businesses and our own platform: the problem each one had, and what we built to solve it."
       />
 
       <section className="section--tight" style={{ paddingTop: 0 }}>
@@ -87,6 +87,14 @@ export default function WorkPage() {
                   </div>
                   <dl className="case">
                     <div>
+                      <dt>The problem</dt>
+                      <dd>{p.challenge}</dd>
+                    </div>
+                    <div>
+                      <dt>The solution</dt>
+                      <dd>{p.solution}</dd>
+                    </div>
+                    <div>
                       <dt>What we built</dt>
                       <dd>
                         <ul role="list" className="checks">
@@ -117,7 +125,7 @@ export default function WorkPage() {
           </ul>
         }
         title={<>Your business <span className="serif-em">could be next.</span></>}
-        body="Tell us what you need. We reply with honest advice, a clear price and a plan."
+        body="Tell us what's getting in the way. We reply with honest advice, a clear price and a plan."
       >
         <Link href="/build" className="btn btn--primary">
           <Stopwatch />

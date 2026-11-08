@@ -24,10 +24,10 @@ export default async function ContactPage({
         eyebrow="Start a project"
         title={
           <>
-            Tell us <span className="serif-em">what you need.</span>
+            Tell us what you <span className="serif-em">want to achieve.</span>
           </>
         }
-        lede="A few quick choices and a sentence about your goals. It takes about a minute."
+        lede="Your goal, the challenge, and a budget if you have one. It takes about a minute."
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">

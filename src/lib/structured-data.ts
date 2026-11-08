@@ -20,7 +20,17 @@ export function businessSchema(baseUrl: string) {
       address: { "@type": "PostalAddress", addressLocality: "Thornton-Cleveleys", addressRegion: "Lancashire", addressCountry: "GB" },
       areaServed: { "@type": "Country", name: "United Kingdom" },
       priceRange: `From £${PACKAGES.essential.from.toLocaleString("en-GB")}`,
+      knowsAbout: [
+        "Bespoke web development",
+        "Web design",
+        "Custom software development",
+        "Business automation",
+        "Booking system development",
+        "Digital solutions for businesses",
+      ],
       makesOffer: [
+        { "@type": "Offer", name: "Booking system development" },
+        { "@type": "Offer", name: "Custom software and app development" },
         {
           "@type": "Offer",
           name: "Website design and build",

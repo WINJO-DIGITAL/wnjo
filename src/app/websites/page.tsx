@@ -8,15 +8,15 @@ import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata(
   "/websites",
-  "Bespoke websites",
-  "Bespoke websites designed to bring in enquiries and bookings, with clear starting prices and optional hosting and care.",
+  "Bespoke web design and development",
+  "Bespoke web design and development for businesses: websites built to bring in enquiries and bookings, with clear starting prices, a monthly subscription option, and hosting and care.",
 );
 
 export default function WebsitesPage() {
   return (
     <>
       <PageHero
-        eyebrow="Websites"
+        eyebrow="Grow · Websites"
         title={
           <>
             Bespoke websites, <span className="serif-em">priced in the open.</span>

@@ -14,8 +14,8 @@ export const viewport: Viewport = { themeColor: "#E3EAE8" };
 
 export const metadata = pageMetadata(
   "/booking-software",
-  "Booking software for your business",
-  "Booking software that takes bookings while you’re busy working, with payments, your branding and an operator app. Proven at EV Exec.",
+  "Booking system development",
+  "Booking systems and business automation that take bookings while you’re busy working, with payments, your branding and an operator app. Proven at EV Exec.",
 );
 
 const evexec = projectBySlug("ev-exec")!;
@@ -40,7 +40,7 @@ export default function BookingSoftwarePage() {
                 Booked in a minute. <span className="serif-em">In your app in a second.</span>
               </h1>
               <p className="tile__line rise" style={{ "--i": 2 } as React.CSSProperties}>
-                Booking apps for any business.
+                Simplify · Booking systems for any business.
               </p>
             </div>
             <div className="booking-hero__visual rise" style={{ "--i": 3 } as React.CSSProperties}>

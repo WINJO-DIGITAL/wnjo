@@ -19,8 +19,8 @@ export const viewport: Viewport = { themeColor: "#E8EADE" };
 
 export const metadata = pageMetadata(
   "/app-development",
-  "App development",
-  "Bespoke web and mobile apps, customer portals, internal tools and integrations, scoped carefully and built around the way your business operates.",
+  "Custom software and app development",
+  "Custom software development for businesses: web and mobile apps, customer portals, SaaS platforms, internal tools, integrations and business automation, built around the way you operate.",
 );
 
 const clips: ClipItem[] = [
@@ -43,7 +43,7 @@ export default function AppDevelopmentPage() {
   return (
     <>
       <PageHero
-        eyebrow="App development"
+        eyebrow="Build · Apps and software"
         title={
           <>
             Apps, <span className="serif-em">built around how you work.</span>

@@ -8,7 +8,13 @@ describe("businessSchema", () => {
     expect(business["@type"]).toBe("ProfessionalService");
     expect(business.url).toBe("https://winjodigital.co.uk");
     expect(business.priceRange).toBe("From £1,800");
-    expect(business.makesOffer?.map((o) => o.priceSpecification.price)).toEqual([1800, 25]);
+    const offers = business.makesOffer ?? [];
+    expect(offers.flatMap((o) => (o.priceSpecification ? [o.priceSpecification.price] : []))).toEqual([1800, 25]);
+    // Services without a published price are listed by name only.
+    expect(offers.filter((o) => !o.priceSpecification).map((o) => o.name)).toEqual([
+      "Booking system development",
+      "Custom software and app development",
+    ]);
   });
 
   it("gives only the town, not a street address or phone number", () => {

@@ -6,9 +6,9 @@
 export const site = {
   name: "WINJO DIGITAL",
   shortName: "WINJO DIGITAL",
-  tagline: "Bespoke websites, apps and booking software.",
+  tagline: "More enquiries, less admin, and software that fits.",
   description:
-    "WINJO DIGITAL designs and builds bespoke websites, apps and booking software for businesses that want considered design, clear pricing and technology that fits how they work.",
+    "WINJO DIGITAL designs and builds bespoke websites, booking systems, business automation and custom software that help businesses win more enquiries, cut repetitive admin and run on technology that fits.",
   locale: "en_GB",
   themeColor: "#F2ECE2",
 } as const;
@@ -49,7 +49,6 @@ export const primaryNav: NavItem[] = [
   {
     href: "/work",
     label: "Work",
-    mobileOnly: true,
     menu: {
       primary: [
         { href: "/work", label: "All work" },
@@ -73,11 +72,11 @@ export const primaryNav: NavItem[] = [
   },
   {
     href: "/websites",
-    label: "Websites",
+    label: "Grow",
     also: ["/build"],
     menu: {
       primary: [
-        { href: "/websites", label: "Explore websites" },
+        { href: "/websites", label: "Websites that win customers" },
         { href: "/build", label: "Get my price" },
         { href: "/pricing", label: "Packages & prices" },
         { href: "/pricing#care", label: "Hosting & care" },
@@ -103,10 +102,10 @@ export const primaryNav: NavItem[] = [
   },
   {
     href: "/booking-software",
-    label: "Booking software",
+    label: "Simplify",
     menu: {
       primary: [
-        { href: "/booking-software", label: "Explore booking software" },
+        { href: "/booking-software", label: "Booking systems" },
         { href: "/contact?topic=booking-software", label: "Request a demo" },
       ],
       groups: [
@@ -123,10 +122,10 @@ export const primaryNav: NavItem[] = [
   },
   {
     href: "/app-development",
-    label: "App development",
+    label: "Build",
     menu: {
       primary: [
-        { href: "/app-development", label: "Explore app development" },
+        { href: "/app-development", label: "Apps and bespoke software" },
         { href: "/contact?topic=bespoke", label: "Plan my app" },
       ],
       groups: [
@@ -148,20 +147,20 @@ export const primaryNav: NavItem[] = [
 
 export const footerNav: { title: string; links: NavLink[] }[] = [
   {
-    title: "Websites",
+    title: "Solutions",
     links: [
-      { href: "/websites", label: "Websites" },
-      { href: "/pricing", label: "Pricing" },
-      { href: "/build", label: "Get my price" },
-      { href: "/pricing#care", label: "Hosting & care" },
+      { href: "/websites", label: "Grow: websites" },
+      { href: "/booking-software", label: "Simplify: booking systems" },
+      { href: "/app-development", label: "Build: apps and software" },
+      { href: "/work", label: "Our work" },
     ],
   },
   {
-    title: "Apps & software",
+    title: "Pricing",
     links: [
-      { href: "/app-development", label: "App development" },
-      { href: "/booking-software", label: "Booking software" },
-      { href: "/work", label: "Our work" },
+      { href: "/pricing", label: "Ways to work with us" },
+      { href: "/build", label: "Get my price" },
+      { href: "/pricing#care", label: "Hosting & care" },
     ],
   },
   {
