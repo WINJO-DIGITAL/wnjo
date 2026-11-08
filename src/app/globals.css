@@ -9926,8 +9926,7 @@ body:has(.dash-header) .site-footer {
 }
 
 /* ------------------------------------------------------------------
-   Homepage: plain, editorial sections. No decorative flow diagrams,
-   tick marks or repeated labels; one serif accent (the hero) only.
+   Homepage: clean, visual sections. One serif accent (the hero) only.
    ------------------------------------------------------------------ */
 
 .home-tile .tile__name::before {
@@ -9936,94 +9935,6 @@ body:has(.dash-header) .site-footer {
 
 .home-tile {
   padding-bottom: clamp(4rem, 2.5rem + 4vw, 7rem);
-}
-
-.home-plain {
-  list-style: none;
-  margin: var(--space-6) 0 0;
-  padding: 0;
-  max-width: 40rem;
-  display: grid;
-  gap: var(--space-4);
-  text-align: left;
-  font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.25rem);
-  line-height: 1.5;
-  color: var(--color-ink-2);
-}
-
-.home-plain--large {
-  max-width: 48rem;
-  font-family: var(--font-serif);
-  font-size: clamp(1.4rem, 1rem + 1.2vw, 2rem);
-  line-height: 1.25;
-  color: inherit;
-}
-
-.home-groups {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: var(--space-7) var(--space-6);
-  margin-top: var(--space-6);
-  text-align: left;
-}
-
-.home-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.home-group__goal {
-  margin: 0;
-  font-size: clamp(1.3rem, 1.1rem + 0.6vw, 1.6rem);
-  font-weight: 500;
-}
-
-.home-group__line {
-  margin: 0;
-  color: var(--color-ink-2);
-}
-
-.home-group__items {
-  margin: 0;
-  font-size: 0.95rem;
-  color: var(--color-ink-3);
-}
-
-.home-solutions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-  gap: var(--space-7) var(--space-6);
-  margin-top: var(--space-6);
-  text-align: left;
-}
-
-.home-solution {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.home-solution__meta {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-ink-3);
-}
-
-.home-solution__title {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: clamp(1.4rem, 1.1rem + 0.8vw, 1.8rem);
-  line-height: 1.2;
-}
-
-.home-solution__text {
-  margin: 0;
-  color: var(--color-ink-2);
 }
 
 .home-ways {
@@ -10049,16 +9960,4 @@ body:has(.dash-header) .site-footer {
 .home-way__text {
   margin: 0;
   color: var(--color-ink-2);
-}
-
-.home-trust {
-  margin-top: var(--space-7);
-  text-align: left;
-  display: grid;
-  gap: var(--space-2);
-  color: var(--color-ink-2);
-}
-
-.home-trust p {
-  margin: 0;
 }

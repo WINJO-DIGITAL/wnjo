@@ -12,11 +12,20 @@ export function WebsitesTile({
   id,
   navLink,
   ctas = false,
+  compact = false,
+  name = "Websites",
+  title = "Built to win customers.",
+  line = "Designed around your business, built for phones first.",
 }: {
   id?: string;
   navLink?: string;
   /** Show the price button beside the prices link (the homepage; the Websites page has them in its hero). */
   ctas?: boolean;
+  /** Homepage version: just the headline, one line and the live demo, with no prices or trust row. */
+  compact?: boolean;
+  name?: string;
+  title?: React.ReactNode;
+  line?: string;
 }) {
   const titleId = `${id ?? "websites"}-title`;
   const handoverDays =
@@ -27,18 +36,17 @@ export function WebsitesTile({
     <section
       id={id}
       data-nav={navLink}
-      className={`tile ${jost.variable} ${archivo.variable}`}
+      className={`tile${compact ? " home-tile" : ""} ${jost.variable} ${archivo.variable}`}
       aria-labelledby={titleId}
     >
       <div className="container container--wide tile__head" data-reveal>
-        <p className="tile__name">Websites</p>
+        <p className="tile__name">{name}</p>
         <h2 id={titleId} className="tile__title">
-          Built to win <span className="serif-em">customers.</span>
+          {title}
         </h2>
         <div className="tile__aside">
-          <p className="tile__line">
-            Designed around your business, built for phones first.
-          </p>
+          <p className="tile__line">{line}</p>
+          {!compact && (<>
           {/* Both prices in one place: the website, and the care that keeps it running. */}
           <dl className="price-pair">
             <div>
@@ -59,7 +67,14 @@ export function WebsitesTile({
             <li>50% to start, 50% once you&apos;re happy</li>
             <li>{handoverDays} days of support after launch</li>
           </ul>
-          {ctas ? (
+          </>)}
+          {compact ? (
+            <p className="tile__more">
+              <Link href="/websites" className="arrow-link">
+                See websites <ArrowRight />
+              </Link>
+            </p>
+          ) : ctas ? (
             <div className="tile__ctas">
               <Link href="/pricing" className="btn btn--secondary">
                 See all prices

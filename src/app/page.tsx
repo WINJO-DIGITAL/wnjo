@@ -6,6 +6,7 @@ import { BookingDemo } from "@/components/interactive/BookingDemo";
 import { SheetToApp } from "@/components/interactive/SheetToApp";
 import { HeroShowcase } from "@/components/interactive/HeroShowcase";
 import { WebStages } from "@/components/WebStages";
+import { WebsitesTile } from "@/components/WebsitesTile";
 import { jost } from "@/lib/fonts";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
@@ -19,47 +20,6 @@ export const metadata: Metadata = siteUrl()
 
 const evexec = projectBySlug("ev-exec")!;
 
-/** What we solve, phrased as the thing a business owner would say. */
-const PROBLEMS = [
-  "Enquiries sit unanswered in an inbox.",
-  "Bookings are taken by phone, one at a time.",
-  "The same admin gets repeated every week.",
-  "The website looks fine but doesn't turn visitors into customers.",
-];
-
-/** The outcomes the work is designed to reach. Intentions, not measured results. */
-const OUTCOMES = [
-  "Turn visitors into enquiries.",
-  "Let customers book without calling.",
-  "Take repetitive admin off your desk.",
-  "Make your business look as capable as it is.",
-];
-
-/** Services grouped by the goal a business has, not by the technology used. */
-const SERVICE_GROUPS = [
-  {
-    goal: "Grow your business",
-    line: "Get found, get enquiries, get customers who trust you.",
-    items: "Websites, landing pages, lead generation and online presence",
-    href: "/websites",
-    cta: "See websites",
-  },
-  {
-    goal: "Simplify your operations",
-    line: "Less admin, fewer missed bookings, clearer day-to-day running.",
-    items: "Booking systems, workflow automation, customer management and dashboards",
-    href: "/booking-software",
-    cta: "See booking software",
-  },
-  {
-    goal: "Build something bespoke",
-    line: "Software shaped around a problem that no off-the-shelf tool solves.",
-    items: "Custom software, web apps, client portals, integrations and SaaS products",
-    href: "/app-development",
-    cta: "See app development",
-  },
-];
-
 export default function HomePage() {
   const schema = businessSchema(siteUrl() ?? "https://winjodigital.co.uk");
   return (
@@ -69,7 +29,7 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      {/* 1. Hero: the outcome in one line, with our real work straight beneath it. */}
+      {/* Hero: the outcome in one line, with our real work straight beneath it. */}
       <section
         className="hero-ed hero-ed--work"
         data-nav="/work"
@@ -93,7 +53,7 @@ export default function HomePage() {
               <Link href="/contact?topic=other" className="btn btn--primary">
                 Let&apos;s solve your business problem
               </Link>
-              <Link href="#work" className="btn btn--secondary">
+              <Link href="/work" className="btn btn--secondary">
                 Explore our work
               </Link>
             </div>
@@ -107,78 +67,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. What we do. */}
-      <section className="tile home-tile" data-nav="/" aria-labelledby="what-title">
-        <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">What we do</p>
-          <h2 id="what-title" className="tile__title">
-            Every project starts with a problem.
-          </h2>
-          <div className="tile__aside">
-            <p className="tile__line">
-              We find what&apos;s costing you customers and hours, then build the digital solution that fixes it.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Grow: the live site that restyles itself for four businesses. */}
+      <WebsitesTile
+        id="web-design"
+        navLink="/websites"
+        compact
+        name="Grow your business"
+        title="A website that brings in enquiries."
+        line="Designed around your business, built for phones first."
+      />
 
-      {/* 3. Business problems we solve. */}
-      <section className="tile home-tile" data-nav="/" aria-labelledby="problems-title">
-        <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Problems we solve</p>
-          <h2 id="problems-title" className="tile__title">
-            Where businesses lose time and customers.
-          </h2>
-        </div>
-        <div className="container container--wide" data-reveal>
-          <ul className="home-plain" role="list">
-            {PROBLEMS.map((problem) => (
-              <li key={problem}>{problem}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* 4. Outcomes we help businesses achieve. */}
-      <section className="tile inverse home-tile" data-nav="/" aria-labelledby="outcomes-title">
-        <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Outcomes</p>
-          <h2 id="outcomes-title" className="tile__title">
-            What changes when it works.
-          </h2>
-        </div>
-        <div className="container container--wide" data-reveal>
-          <ul className="home-plain home-plain--large" role="list">
-            {OUTCOMES.map((outcome) => (
-              <li key={outcome}>{outcome}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* 5. Services organised around business goals. */}
-      <section className="tile home-tile" data-nav="/" aria-labelledby="services-title">
-        <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Services</p>
-          <h2 id="services-title" className="tile__title">
-            Start with the goal, not the tool.
-          </h2>
-        </div>
-        <div className="container container--wide home-groups" data-reveal>
-          {SERVICE_GROUPS.map((group) => (
-            <article key={group.goal} className="home-group">
-              <h3 className="home-group__goal">{group.goal}</h3>
-              <p className="home-group__line">{group.line}</p>
-              <p className="home-group__items">{group.items}.</p>
-              <Link href={group.href} className="arrow-link">
-                {group.cta} <ArrowRight />
-              </Link>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* Proof of the two most common builds, shown working. */}
+      {/* Simplify: a customer books, the office is pinged. */}
       <section
         id="booking"
         data-nav="/booking-software"
@@ -191,7 +90,7 @@ export default function HomePage() {
             Bookings that run without a phone call.
           </h2>
           <div className="tile__aside">
-            <p className="tile__line">Get bookings while you&apos;re busy working. Proven every day at {evexec.name}.</p>
+            <p className="tile__line">Proven every day at {evexec.name}.</p>
             <p className="tile__more">
               <Link href="/booking-software#make-it-yours" className="arrow-link">
                 Try the booking demo <ArrowRight />
@@ -204,6 +103,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Bespoke: the spreadsheet becomes an app. */}
       <section id="apps" data-nav="/app-development" className="tile home-tile" aria-labelledby="apps-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Build something bespoke</p>
@@ -226,79 +126,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Selected work, explained as solutions. */}
-      <section id="work" className="tile home-tile" data-nav="/work" aria-labelledby="work-title">
-        <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Our work</p>
-          <h2 id="work-title" className="tile__title">
-            Problems solved, in production.
-          </h2>
-        </div>
-        <div className="container container--wide home-solutions" data-reveal>
-          {heroProjects.map((project) => (
-            <article key={project.slug} className="home-solution">
-              <p className="home-solution__meta">
-                {project.name} · {project.location}
-              </p>
-              <h3 className="home-solution__title">{project.summary}</h3>
-              <p className="home-solution__text">{project.challenge}</p>
-              <Link href="/work" className="arrow-link">
-                See the project <ArrowRight />
-              </Link>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* 7. Our approach. */}
-      <section id="process" data-nav="/about" className="tile home-tile" aria-labelledby="process-title">
-        <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">How we work</p>
-          <h2 id="process-title" className="tile__title">
-            Four steps. No surprises.
-          </h2>
-          <div className="tile__aside">
-            <p className="tile__line">Nothing to pay until you approve the scope.</p>
-          </div>
-        </div>
-        <div className="container container--wide apps-tile__body">
-          <WebStages />
-        </div>
-      </section>
-
-      {/* 8. Two ways to work with us. */}
-      <section className="tile home-tile" data-nav="/pricing" aria-labelledby="ways-title">
-        <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Ways to work with us</p>
-          <h2 id="ways-title" className="tile__title">
-            Keep it running, or build it once.
-          </h2>
-        </div>
-        <div className="container container--wide home-ways" data-reveal>
-          <article className="home-way">
-            <h3 className="home-way__name">Digital solution subscription</h3>
-            <p className="home-way__text">
-              A monthly payment for a solution that stays live and keeps improving. Hosting, maintenance and
-              support are included. The minimum term is agreed in writing before you start.
-            </p>
-            <Link href="/pricing" className="arrow-link">
-              See the plans <ArrowRight />
-            </Link>
-          </article>
-          <article className="home-way">
-            <h3 className="home-way__name">Bespoke project</h3>
-            <p className="home-way__text">
-              A one-off fee for the deliverables we agree together. Hosting, maintenance and support are billed
-              separately, and an ongoing care retainer is optional. The scope is confirmed before any binding price.
-            </p>
-            <Link href="/contact?topic=bespoke" className="arrow-link">
-              Plan my project <ArrowRight />
-            </Link>
-          </article>
-        </div>
-      </section>
-
-      {/* 9. Trust: the owners in their own words, and the commitments we publish. */}
+      {/* Proof: the owners, in their own words. */}
       <section className="owner-quotes" aria-label="From the owners">
         <div className="container container--wide">
           <OwnerQuotes
@@ -314,14 +142,53 @@ export default function HomePage() {
             }))}
           />
         </div>
-        <div className="container container--wide home-trust" data-reveal>
-          <p>A written quote before you commit.</p>
-          <p>Nothing to pay until you approve the scope.</p>
-          <p>50% to start, 50% once you&apos;re happy.</p>
+      </section>
+
+      {/* How it works, shown as four steps. */}
+      <section id="process" data-nav="/about" className="tile home-tile" aria-labelledby="process-title">
+        <div className="container container--wide tile__head" data-reveal>
+          <p className="tile__name">How we work</p>
+          <h2 id="process-title" className="tile__title">
+            Four steps. No surprises.
+          </h2>
+          <div className="tile__aside">
+            <p className="tile__line">
+              We find what&apos;s costing you customers and hours, then build the digital solution that fixes it.
+              Nothing to pay until you approve the scope.
+            </p>
+          </div>
+        </div>
+        <div className="container container--wide apps-tile__body">
+          <WebStages />
         </div>
       </section>
 
-      {/* 10. Closing call to action. */}
+      {/* Two ways to work with us. */}
+      <section className="tile home-tile" data-nav="/pricing" aria-labelledby="ways-title">
+        <div className="container container--wide tile__head" data-reveal>
+          <p className="tile__name">Ways to work with us</p>
+          <h2 id="ways-title" className="tile__title">
+            Keep it running, or build it once.
+          </h2>
+        </div>
+        <div className="container container--wide home-ways" data-reveal>
+          <article className="home-way">
+            <h3 className="home-way__name">Digital solution subscription</h3>
+            <p className="home-way__text">Monthly. Hosting, maintenance, support and improvements included.</p>
+            <Link href="/pricing" className="arrow-link">
+              See the plans <ArrowRight />
+            </Link>
+          </article>
+          <article className="home-way">
+            <h3 className="home-way__name">Bespoke project</h3>
+            <p className="home-way__text">A one-off fee for what we agree. Care and support optional.</p>
+            <Link href="/contact?topic=bespoke" className="arrow-link">
+              Plan my project <ArrowRight />
+            </Link>
+          </article>
+        </div>
+      </section>
+
       <CtaBand
         title={<>Let&apos;s solve your business problem.</>}
         body={<>Tell us what&apos;s getting in the way. We&apos;ll tell you honestly how we&apos;d fix it.</>}
