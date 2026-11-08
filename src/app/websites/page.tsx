@@ -9,7 +9,7 @@ import { pageMetadata } from "@/lib/metadata";
 export const metadata = pageMetadata(
   "/websites",
   "Bespoke websites",
-  "Bespoke website design and development with clear packages, transparent starting prices and optional hosting and care plans.",
+  "Bespoke websites designed to bring in enquiries and bookings, with clear starting prices and optional hosting and care.",
 );
 
 export default function WebsitesPage() {

@@ -14,9 +14,9 @@ export const metadata = pageMetadata(
 
 // Each principle as the thing we avoid, then what we do instead.
 const beliefs = [
+  ["Outcomes over output", "Forty pages nobody reads", "More enquiries and bookings"],
   ["Bespoke over generic", "A theme with your logo on it", "Designed around your business"],
   ["Clarity over friction", "\u201CCall us for a price\u201D", "Prices on the page"],
-  ["Outcomes over output", "Forty pages nobody reads", "More enquiries and bookings"],
   ["Premium, but approachable", "Jargon and long sales calls", "Plain English, quick answers"],
   ["Purposeful technology", "Features for the sake of it", "Only what solves a problem"],
   ["Practical delivery", "Everything at once, and late", "Launch focused, grow later"],
@@ -57,7 +57,7 @@ function StandardDemo({ kind }: { kind: (typeof standards)[number][2] }) {
           <rect x="5" y="10.5" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.6" />
           <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" strokeWidth="1.6" />
         </svg>
-        <span className="std__pill">Price checked on the server</span>
+        <span className="std__pill">Your quote can’t be changed in the browser</span>
       </span>
     );
   return (

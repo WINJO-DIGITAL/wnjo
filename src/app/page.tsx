@@ -212,7 +212,7 @@ export default function HomePage() {
             Bookings that run <span className="serif-em">without a phone call.</span>
           </h2>
           <div className="tile__aside">
-            <p className="tile__line">Proven every day at {evexec.name}.</p>
+            <p className="tile__line">Get bookings while you’re busy working. Proven every day at {evexec.name}.</p>
             <p className="tile__more">
               <Link href="/booking-software#make-it-yours" className="arrow-link">
                 Try the booking demo <ArrowRight />
@@ -229,7 +229,7 @@ export default function HomePage() {
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Build something bespoke</p>
           <h2 id="apps-title" className="tile__title">
-            Built around <span className="serif-em">how you work.</span>
+            Stop running the business <span className="serif-em">from spreadsheets.</span>
           </h2>
           <div className="tile__aside">
             <div className="tile__ctas">
@@ -369,7 +369,7 @@ export default function HomePage() {
             Let&apos;s solve your <span className="serif-em">business problem.</span>
           </>
         }
-        body={<>Tell us what you want to achieve. We&apos;ll tell you honestly how we&apos;d do it.</>}
+        body={<>Tell us what&apos;s getting in the way. We&apos;ll tell you honestly how we&apos;d fix it.</>}
       >
         <Link href="/contact?topic=other" className="btn btn--primary">
           Let&apos;s solve your business problem

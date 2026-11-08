@@ -36,7 +36,7 @@ type Fields = {
 type FieldKey = keyof FieldErrors;
 
 const STEPS: { title: string; short: string; fields: FieldKey[] }[] = [
-  { title: "What can we help with?", short: "Project", fields: ["topic", "message"] },
+  { title: "What's getting in the way?", short: "Project", fields: ["topic", "message"] },
   { title: "Any budget or timing in mind? (optional)", short: "Budget", fields: ["budget", "timeline"] },
   { title: "Where should we reply?", short: "Details", fields: ["name", "email"] },
   { title: "Ready to send?", short: "Review", fields: [] },
@@ -55,7 +55,7 @@ const stroke = {
 /** What each option means, a line icon, and example goals visitors can tap to add. */
 const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]; askSite?: boolean }> = {
   website: {
-    note: "A bespoke site for your business",
+    note: "A site that brings in enquiries",
     icon: (
       <>
         <rect x="3" y="4.5" width="18" height="15" rx="2.5" {...stroke} />
@@ -65,7 +65,7 @@ const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]
     examples: ["More enquiries from local customers", "Take bookings online", "Look as good as we are"],
   },
   redesign: {
-    note: "Refresh or rebuild an existing site",
+    note: "A site that works harder for you",
     icon: (
       <>
         <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" {...stroke} />
@@ -76,7 +76,7 @@ const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]
     askSite: true,
   },
   bespoke: {
-    note: "Web and mobile apps, portals and tools",
+    note: "Software that fits how you work",
     icon: (
       <>
         <rect x="3.75" y="3.75" width="6.75" height="6.75" rx="1.5" {...stroke} />
@@ -88,7 +88,7 @@ const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]
     examples: ["Replace our spreadsheets", "Give customers their own app", "Automate a manual process"],
   },
   "booking-software": {
-    note: "See the booking system in action",
+    note: "Take bookings without the phone",
     icon: (
       <>
         <rect x="3.75" y="5.25" width="16.5" height="15" rx="2.5" {...stroke} />
@@ -98,7 +98,7 @@ const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]
     examples: ["Let customers book online", "Manage drivers and jobs in one place", "Send confirmations automatically"],
   },
   care: {
-    note: "Look after a site you already have",
+    note: "Keep your current site running well",
     icon: (
       <path d="M12 3.75 4.5 6.75v5.25c0 4.1 3.1 7.4 7.5 8.25 4.4-.85 7.5-4.15 7.5-8.25V6.75L12 3.75Z" {...stroke} />
     ),
@@ -106,7 +106,7 @@ const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]
     askSite: true,
   },
   other: {
-    note: "Tell us what you have in mind",
+    note: "Tell us the problem, in your own words",
     icon: (
       <>
         <circle cx="6" cy="12" r="1.25" fill="currentColor" />
@@ -515,7 +515,7 @@ function EnquiryForm({
           <>
             <OptionCards
               name="topic"
-              legend="Project type"
+              legend="What would help most?"
               choices={TOPIC_CHOICES}
               value={fields.topic}
               onChange={(v) => set("topic", v)}

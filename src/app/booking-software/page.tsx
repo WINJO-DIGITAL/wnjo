@@ -15,7 +15,7 @@ export const viewport: Viewport = { themeColor: "#E3EAE8" };
 export const metadata = pageMetadata(
   "/booking-software",
   "Booking software for your business",
-  "Booking apps for any business, with payments, your branding and an operator app. Proven at EV Exec.",
+  "Booking software that takes bookings while you’re busy working, with payments, your branding and an operator app. Proven at EV Exec.",
 );
 
 const evexec = projectBySlug("ev-exec")!;
