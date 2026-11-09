@@ -34,4 +34,12 @@ describe("nextStepFor", () => {
   it("needs nothing from the customer while building", () => {
     expect(nextStepFor({ stage: "building", route: "package", proposalSent: false }).action).toBe(false);
   });
+  it("says plainly what is happening before a proposal exists", () => {
+    expect(nextStepFor({ stage: "reviewing", route: "package", proposalSent: false }).title).toBe("We're reviewing your brief");
+    expect(nextStepFor({ stage: "brief_received", route: "package", proposalSent: false }).title).toBe("We have your brief");
+    expect(nextStepFor({ stage: "proposal", route: "proposal", proposalSent: false }).title).toBe("Your proposal is being prepared");
+  });
+  it("points a package payment at the emailed link", () => {
+    expect(nextStepFor({ stage: "awaiting_payment", route: "package", proposalSent: false }).body).toContain("emailed you");
+  });
 });

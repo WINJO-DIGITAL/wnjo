@@ -11660,3 +11660,16 @@ body:has(.dash-header) .site-footer {
     padding-top: 24px;
   }
 }
+/* On a phone the notifications panel spans the screen with the same 16px gutters as the page. */
+@media (max-width: 899px) {
+  .bell {
+    position: static;
+  }
+  .bell__panel {
+    position: fixed;
+    top: 76px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}

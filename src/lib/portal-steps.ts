@@ -54,7 +54,7 @@ export function nextStepFor(input: { stage: Stage; route: Route; proposalSent: b
     case "awaiting_payment":
       return route === "proposal"
         ? { title: "Pay your deposit", body: "Then we start your build.", action: true, tab: "overview", cta: "Pay now" }
-        : { title: "Complete your payment", body: "Use the secure link we emailed you.", action: true, tab: null, cta: null };
+        : { title: "Complete your payment", body: "We emailed you a secure payment link. Check your inbox.", action: true, tab: null, cta: null };
     case "preview":
       return { title: "Your preview is ready", body: "Look it over and tell us what to change.", action: true, tab: "changes", cta: "Review preview" };
     case "live":
@@ -67,10 +67,14 @@ export function nextStepFor(input: { stage: Stage; route: Route; proposalSent: b
       return { title: "Making your changes", body: "Nothing needed from you.", action: false, tab: null, cta: null };
     case "approval":
       return { title: "Final checks", body: "Our team is checking before launch.", action: false, tab: null, cta: null };
+    case "brief_received":
+      return { title: "We have your brief", body: "Nothing needed from you.", action: false, tab: null, cta: null };
+    case "reviewing":
+      return { title: "We're reviewing your brief", body: "Nothing needed from you.", action: false, tab: null, cta: null };
+    case "proposal":
+      return { title: "Your proposal is being prepared", body: "Nothing needed from you.", action: false, tab: null, cta: null };
     case "specification":
     case "building":
       return { title: "We're building your website", body: "Nothing needed from you.", action: false, tab: null, cta: null };
-    default:
-      return { title: "We're on it", body: "Nothing needed from you.", action: false, tab: null, cta: null };
   }
 }
