@@ -56,12 +56,15 @@ export default function HomePage() {
               <span className="hero-ed__line">Bespoke websites</span>{" "}
               <span className="serif-em">from £99 a month.</span>
             </h1>
-            <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
+            <p className="eyebrow hero-ed__place rise" style={{ "--i": 2 } as React.CSSProperties}>
+              Based in Lancashire, working across the UK.
+            </p>
+            <p className="lede rise" style={{ "--i": 3 } as React.CSSProperties}>
               Built around your business. Hosting and support included. You own the website once your plan ends, or pay £999 up front.
             </p>
             <div
               className="btn-row rise"
-              style={{ "--i": 3 } as React.CSSProperties}
+              style={{ "--i": 4 } as React.CSSProperties}
             >
               <Link href="/build" className="btn btn--primary">
                 Build my website

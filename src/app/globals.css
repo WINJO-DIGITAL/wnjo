@@ -1737,6 +1737,12 @@ button.arrow-link {
   white-space: nowrap;
 }
 
+/* Where we are: a small label under the heading, in the same style as the other labels on the site. */
+.hero-ed__place {
+  margin: var(--space-3) 0 0;
+  color: var(--color-ink-2);
+}
+
 .hero-ed .lede {
   max-width: 31rem;
   font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
