@@ -64,7 +64,7 @@ export function WebsitesTile({
           <ul className="trust-row" role="list">
             <li>See your price as you build your quote</li>
             <li>Hosting and support included monthly</li>
-            <li>Yours after {OWNERSHIP.ownershipAfterPayments} payments</li>
+            <li>You own the website after {OWNERSHIP.ownershipAfterPayments} payments</li>
           </ul>
           </>)}
           {compact ? (

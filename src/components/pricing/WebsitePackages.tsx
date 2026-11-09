@@ -55,7 +55,7 @@ export function PackageCards({ compact = false }: { compact?: boolean }) {
               {(compact ? CARD_POINTS[id].slice(0, 4) : CARD_POINTS[id]).map((p) => (
                 <li key={p}>{p}</li>
               ))}
-              <li>Yours after {OWNERSHIP.ownershipAfterPayments} payments</li>
+              <li>You own the website after {OWNERSHIP.ownershipAfterPayments} payments</li>
             </ul>
             <Link
               href={`/build?plan=${id}`}
