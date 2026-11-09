@@ -11403,7 +11403,7 @@ body:has(.dash-header) .site-footer {
 }
 .steps4 {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.7fr);
   gap: 6px;
   margin: 0;
   padding: 0;
@@ -11427,6 +11427,7 @@ body:has(.dash-header) .site-footer {
 .steps4__label {
   font-size: 13px;
   line-height: 1.25;
+  white-space: nowrap;
   color: var(--color-ink-3);
 }
 .steps4 .is-done .steps4__label,
@@ -11836,4 +11837,11 @@ body:has(.dash-header) .site-footer {
   font-size: 14px;
   font-weight: 600;
   color: var(--color-ink);
+}
+
+/* All four step labels sit on one line, so their baselines match on a phone. */
+@media (max-width: 899px) {
+  .steps4__label {
+    font-size: 12px;
+  }
 }
