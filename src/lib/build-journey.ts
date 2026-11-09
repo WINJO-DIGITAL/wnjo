@@ -9,15 +9,15 @@
  */
 
 export const STAGES = {
-  brief_received: { label: "Brief received", customer: "We have your brief." },
-  reviewing: { label: "Reviewing", customer: "We're reviewing your brief." },
+  brief_received: { label: "Brief submitted", customer: "We have your brief." },
+  reviewing: { label: "Under review", customer: "We're reviewing your brief." },
   proposal: { label: "Proposal", customer: "Your proposal is being prepared." },
   awaiting_payment: { label: "Payment", customer: "Ready for your first payment." },
-  specification: { label: "Planning", customer: "We're planning your website." },
-  building: { label: "Building", customer: "Your website is being built." },
-  preview: { label: "Preview", customer: "Your private preview is ready." },
-  changes: { label: "Changes", customer: "We're making your changes." },
-  approval: { label: "Final checks", customer: "Final checks before launch." },
+  specification: { label: "AI processing", customer: "We're turning your brief into a website plan." },
+  building: { label: "Website generation", customer: "Your website is being generated." },
+  preview: { label: "Awaiting customer review", customer: "Your private preview is ready for you to review." },
+  changes: { label: "Changes requested", customer: "We're making the changes you asked for." },
+  approval: { label: "Awaiting Winjo approval", customer: "Our team is checking the website before launch." },
   live: { label: "Live", customer: "Your website is live." },
   on_hold: { label: "On hold", customer: "Paused. We'll be in touch." },
   closed: { label: "Closed", customer: "This brief is closed." },
