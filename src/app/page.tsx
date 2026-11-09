@@ -60,7 +60,7 @@ export default function HomePage() {
               Based in Lancashire, working across the UK.
             </p>
             <p className="lede rise" style={{ "--i": 3 } as React.CSSProperties}>
-              Built around your business. Hosting, support included and own your website once your plan ends.
+              Built around your business. Hosting and support included. You own the website once your plan ends, or pay £999 up front.
             </p>
             <div
               className="btn-row rise"
