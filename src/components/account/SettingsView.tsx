@@ -31,14 +31,15 @@ export function SettingsView() {
       <div className="dash-page__head">
         <Link href="/account" className="linkbtn">← Back to your websites</Link>
         <h1 className="dash-title">Settings</h1>
-        <p className="dash-lede">Signed in as {session.user.email}</p>
+        <p className="settings__account">
+          {session.user.email}
+          <span aria-hidden="true"> · </span>
+          <button type="button" className="linkbtn" onClick={() => client.auth.signOut()}>
+            Sign out
+          </button>
+        </p>
       </div>
       <NotificationPreferences client={client} userId={session.user.id} />
-      <div>
-        <button type="button" className="btn btn--secondary" onClick={() => client.auth.signOut()}>
-          Sign out
-        </button>
-      </div>
     </div>
   );
 }

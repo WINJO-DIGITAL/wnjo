@@ -81,11 +81,17 @@ function Plans({ client }: { client: SupabaseClient }) {
   if (rows === null) return <p className="lede">Loading…</p>;
   if (rows.length === 0) return <p className="lede">No plans yet.</p>;
 
+  // What the customer pays each month across plans that are running.
+  const monthly = rows.filter((r) => r.kind === "subscription" && (r.status === "active" || r.status === "past_due")).reduce((sum, r) => sum + r.monthly_pence, 0);
+
   return (
-    <div className="billing-list">
-      {rows.map((r) => (
-        <Plan key={r.id} client={client} row={r} />
-      ))}
+    <div className="billing">
+      {monthly > 0 && <p className="billing__total">{formatPence(monthly)} <span>a month</span></p>}
+      <div className="billing-list">
+        {rows.map((r) => (
+          <Plan key={r.id} client={client} row={r} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -95,6 +101,7 @@ function Plan({ client, row }: { client: SupabaseClient; row: Subscription }) {
   const [error, setError] = useState<string | null>(null);
   const isMonthly = row.kind === "subscription";
   const manageable = row.status === "active" || row.status === "past_due";
+  const progress = isMonthly && row.ownership_after_payments > 0 ? Math.min(100, Math.round((row.payments_count / row.ownership_after_payments) * 100)) : null;
 
   const openBilling = async () => {
     setBusy(true);
@@ -118,29 +125,37 @@ function Plan({ client, row }: { client: SupabaseClient; row: Subscription }) {
   };
 
   return (
-    <article className="acct-order billing-plan">
-      <p className="build-card__meta">{row.reference}</p>
-      <h2 className="build-card__title">{row.package_name}</h2>
-      <p className="next-step__title">
-        {isMonthly ? `${formatPence(row.monthly_pence)} a month` : `${formatPence(row.one_off_pence)} once`}
-      </p>
-      <p className="build-card__meta">{STATUS[row.status] ?? row.status}</p>
-      {isMonthly && !row.ownership_eligible_at && (
-        <p>
-          You&apos;ll own the website once you&apos;ve made {row.ownership_after_payments} payments. {row.payments_count} so far.
-        </p>
-      )}
-      {isMonthly && row.ownership_eligible_at && (
-        <p>Ownership is available to you now. Message us whenever you&apos;d like to talk it through.</p>
-      )}
-      {manageable && (
-        <div className="btn-row">
-          <button type="button" className="btn btn--secondary" disabled={busy} onClick={() => void openBilling()}>
-            {busy ? "Opening…" : "Manage billing"}
-          </button>
+    <article className="billing-row">
+      <div className="billing-row__main">
+        <p className="billing-row__ref">{row.reference}</p>
+        <h2 className="billing-row__name">{row.package_name}</h2>
+        <p className="billing-row__status">{STATUS[row.status] ?? row.status}</p>
+      </div>
+      <p className="billing-row__price">{isMonthly ? `${formatPence(row.monthly_pence)} a month` : `${formatPence(row.one_off_pence)} once`}</p>
+      {progress !== null && !row.ownership_eligible_at && (
+        <div className="billing-row__progress">
+          <div
+            className="meter"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={row.ownership_after_payments}
+            aria-valuenow={row.payments_count}
+            aria-label={`${row.payments_count} of ${row.ownership_after_payments} payments`}
+          >
+            <span style={{ width: `${progress}%` }} />
+          </div>
+          <p>{row.payments_count} of {row.ownership_after_payments} payments</p>
         </div>
       )}
-      {error && <p className="field-error" role="alert">{error}</p>}
+      {isMonthly && row.ownership_eligible_at && (
+        <p className="billing-row__note">Ownership is available to you now. Message us whenever you&apos;d like to talk it through.</p>
+      )}
+      {manageable && (
+        <button type="button" className="billing-row__link" disabled={busy} onClick={() => void openBilling()}>
+          {busy ? "Opening…" : "Manage billing"} <span aria-hidden="true">→</span>
+        </button>
+      )}
+      {error && <p className="billing-row__error" role="alert">{error}</p>}
     </article>
   );
 }

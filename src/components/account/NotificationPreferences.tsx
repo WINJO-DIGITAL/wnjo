@@ -51,29 +51,32 @@ export function NotificationPreferences({ client, userId }: { client: SupabaseCl
   };
 
   return (
-    <section className="settings-card" aria-labelledby="notif-prefs-title">
-      <h2 id="notif-prefs-title" className="settings-card__title">What to tell me about</h2>
+    <section className="settings" aria-labelledby="notif-prefs-title">
+      <h2 id="notif-prefs-title" className="settings__title">What to tell me about</h2>
       {error && <p role="alert">{error}</p>}
       {loaded && !tenantId && <p className="build-card__meta">Choices appear once your account is linked to a website.</p>}
       {tenantId && (
-        <ul className="settings-list">
+        <div className="settings-grid" role="group" aria-label="Notification choices">
+          <span aria-hidden="true" />
+          <span className="settings-grid__head">On the site</span>
+          <span className="settings-grid__head">By email</span>
           {KINDS.map((k) => {
             const p = pref(k.id);
             return (
-              <li key={k.id}>
-                <span>{k.label}</span>
-                <span className="settings-list__switches">
-                  <label>
-                    <input type="checkbox" checked={p.in_app} onChange={(e) => setPref(k.id, "in_app", e.target.checked)} /> On the site
-                  </label>
-                  <label>
-                    <input type="checkbox" checked={isOn(p.email)} onChange={(e) => setPref(k.id, "email", e.target.checked)} /> By email
-                  </label>
-                </span>
-              </li>
+              <div key={k.id} className="settings-grid__row">
+                <span className="settings-grid__label">{k.label}</span>
+                <label className="switch">
+                  <input type="checkbox" role="switch" checked={p.in_app} onChange={(e) => setPref(k.id, "in_app", e.target.checked)} aria-label={`${k.label}, on the site`} />
+                  <span className="switch__track" aria-hidden="true" />
+                </label>
+                <label className="switch">
+                  <input type="checkbox" role="switch" checked={isOn(p.email)} onChange={(e) => setPref(k.id, "email", e.target.checked)} aria-label={`${k.label}, by email`} />
+                  <span className="switch__track" aria-hidden="true" />
+                </label>
+              </div>
             );
           })}
-        </ul>
+        </div>
       )}
     </section>
   );
