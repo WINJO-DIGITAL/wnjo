@@ -62,7 +62,8 @@ export default function PrivacyPage() {
             <h2>How long we keep it</h2>
             <p>
               We keep enquiry correspondence for as long as needed to deal with your enquiry and any work that follows,
-              and then delete it unless we have a legal reason to retain it.
+              and then delete it unless we have a legal reason to retain it. A website brief you start but don&apos;t send
+              is saved on our servers for up to 30 days, and is deleted when you send it or when the 30 days end.
             </p>
 
             <h2>Your rights</h2>

@@ -130,6 +130,9 @@ function Plan({ client, row }: { client: SupabaseClient; row: Subscription }) {
           You&apos;ll own the website once you&apos;ve made {row.ownership_after_payments} payments. {row.payments_count} so far.
         </p>
       )}
+      {isMonthly && row.ownership_eligible_at && (
+        <p>Ownership is available to you now. Message us whenever you&apos;d like to talk it through.</p>
+      )}
       {manageable && (
         <div className="btn-row">
           <button type="button" className="btn btn--secondary" disabled={busy} onClick={() => void openBilling()}>
