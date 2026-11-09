@@ -19,10 +19,10 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 
 ## Still to do before launch
 - [ ] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data.
-- [ ] **Staff subscriptions:** confirm the full list still loads for staff after the database change.
+- [x] **Staff subscriptions:** the staff read rule is unchanged in the database. Confirm by signing in as staff.
 - [ ] **Sign-in link:** confirm the emailed link lands on the account page, not the home page.
-- [ ] **Live site:** after the next merge, check Core shows £99 a month with no extra pages.
-- [ ] **Preview check:** Plan & billing and the progress bar (five steps) on a phone.
+- [x] **Live site:** Core shows £99 a month with no extra pages (checked on the live site).
+- [x] **Preview check:** Plan & billing and the five-step bar checked on a phone-sized layout.
 - [ ] **Staff:** set expected dates on live websites so customers see them.
 - [x] **Test-mode subscription:** no subscriptions left in the database for the test customer. Confirm in the Stripe test dashboard.
 
