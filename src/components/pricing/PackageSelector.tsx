@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CARD_POINTS } from "./WebsitePackages";
 import { WEBSITE_PLANS, formatGBP, type WebsitePlanId } from "@/lib/pricing";
 
@@ -14,6 +13,10 @@ const PLAN_ORDER: WebsitePlanId[] = ["bronze", "silver", "gold"];
 export function PackageSelector() {
   const [selected, setSelected] = useState<WebsitePlanId | null>(null);
   const chosen = selected ? WEBSITE_PLANS[selected] : null;
+  // The sticky bar at the bottom of the screen shows "Build my website" for the chosen package.
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("wnjo:plan", { detail: selected }));
+  }, [selected]);
   return (
     <div className="pkg-selector">
       <ul className="pkg-cards pkg-cards--compact" role="list">
@@ -50,9 +53,6 @@ export function PackageSelector() {
       {chosen && selected && (
         <p className="pkg-selector__next" role="status">
           <span>{chosen.name} selected.</span>
-          <Link href={`/build?plan=${selected}`} className="btn btn--primary">
-            Build my website
-          </Link>
         </p>
       )}
     </div>

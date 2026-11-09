@@ -17,6 +17,14 @@ const HIDDEN_ON = ["/contact", "/build", "/account", "/admin"];
 export function StickyCta() {
   const pathname = usePathname();
   const [show, setShow] = useState(false);
+  // The package chosen on the homepage, if any, so the bar can carry it into the form.
+  const [plan, setPlan] = useState<string | null>(null);
+
+  useEffect(() => {
+    const onPlan = (e: Event) => setPlan((e as CustomEvent<string | null>).detail ?? null);
+    window.addEventListener("wnjo:plan", onPlan);
+    return () => window.removeEventListener("wnjo:plan", onPlan);
+  }, []);
 
   useEffect(() => {
     if (HIDDEN_ON.includes(pathname)) return;
@@ -93,7 +101,7 @@ export function StickyCta() {
 
   return (
     <aside className="sticky-cta" aria-label="Get started" data-show={show} inert={!show}>
-      <Link href="/build" className="btn btn--primary">
+      <Link href={plan ? `/build?plan=${encodeURIComponent(plan)}` : "/build"} className="btn btn--primary">
         Build my website
       </Link>
       {contactPhoneHref ? (
