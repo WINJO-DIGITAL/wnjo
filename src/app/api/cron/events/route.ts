@@ -4,9 +4,12 @@ import { after } from "next/server";
 import { kickWorker, processDueEvents, processQueuedTasks } from "@/lib/ai/sweep";
 import { sendDueNotifications } from "@/lib/notify/send-due";
 import { sendQuoteReminders } from "@/lib/quote-reminders-job";
+import { providerFromEnv } from "@/lib/ai/agent-runtime";
+import { runAutoDrafts } from "@/lib/ai/website-auto";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 300;
 
 /**
  * Daily sweep: processes business events not yet handled (or failed and due a retry), runs queued tasks such as
@@ -27,7 +30,9 @@ export async function GET(request: NextRequest) {
     if (tasks.hasMore) after(() => kickWorker(1));
     const notifications = await sendDueNotifications(db);
     const reminders = await sendQuoteReminders(db);
-    return NextResponse.json({ events, tasks, notifications, reminders });
+    // Any paid website still without its first AI draft (the key was missing, or a call failed) is picked up here.
+    const drafts = await runAutoDrafts(db, providerFromEnv());
+    return NextResponse.json({ events, tasks, notifications, reminders, drafts });
   } catch {
     console.error("Event sweep failed");
     return NextResponse.json({ error: "failed" }, { status: 500 });

@@ -33,3 +33,19 @@ export function previewReadyAgainEmail(args: { name: string; reference: string; 
     ].join("\n"),
   };
 }
+
+export function previewReadyEmail(args: { name: string; reference: string; accountUrl: string }): { subject: string; text: string } {
+  return {
+    subject: `Your website preview is ready [${args.reference}]`,
+    text: [
+      `Hi ${first(args.name)},`,
+      "",
+      "Your website preview is ready. Sign in to your account to look through it, ask for changes, or approve it:",
+      args.accountUrl,
+      "",
+      "Sign in with this email address.",
+      "",
+      "WINJO DIGITAL",
+    ].join("\n"),
+  };
+}

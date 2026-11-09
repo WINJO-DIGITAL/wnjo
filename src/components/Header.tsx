@@ -598,6 +598,8 @@ function SiteHeader() {
 /** The client and staff dashboards get their own top bar; every other page gets the site header. */
 export function Header() {
   const pathname = usePathname();
+  // A private preview shows the customer's website, not ours.
+  if (pathname.startsWith("/preview/")) return null;
   if (pathname === "/admin" || pathname.startsWith("/admin/")) return <DashboardHeader variant="staff" />;
   if (pathname === "/account" || pathname.startsWith("/account/")) return <DashboardHeader variant="customer" />;
   return <SiteHeader />;

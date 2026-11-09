@@ -24,7 +24,13 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [ ] **Staff:** set expected dates on live websites so customers see them.
 - [ ] **Test-mode subscription:** cancel the leftover Stripe test subscription (customer nitisatsirisom@hotmail.co.uk).
 
+## Grok switch-on (last step before launch)
+- [ ] Apply migration `20261109190000_website_ai_plans_and_previews.sql` in the Supabase SQL Editor.
+- [ ] Set `XAI_API_KEY`, `XAI_MODEL`, `XAI_INPUT_PENCE_PER_MILLION_TOKENS` and `XAI_OUTPUT_PENCE_PER_MILLION_TOKENS` in Vercel (optional: `AI_MAX_PENCE_PER_BRIEF`, default 300).
+- [ ] Run one test website end to end: pay in test mode, check the plan and preview appear in Admin, view the draft, release it, and open it from the customer account.
+- [ ] Check the model's reply shape against the live service. The code was only tested against a fake.
+
 ## Decisions needed from the owner
-- [ ] **Privacy note:** the 30-day retention of unfinished drafts. Owner to choose the wording.
-- [ ] **Ownership line when due:** the sentence shown once ownership is due. Currently hidden, with no replacement.
-- [ ] **Ending care:** message only (current), or customers can also cancel in Stripe's billing page.
+- [x] Privacy note: the 30-day retention of unsent briefs is on the privacy page.
+- [x] Ownership line when due: "Ownership is available to you now. Message us whenever you'd like to talk it through."
+- [x] Ending care: message only.

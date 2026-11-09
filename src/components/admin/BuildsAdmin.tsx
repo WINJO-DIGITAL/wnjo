@@ -236,6 +236,8 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
 
           <ExpectedDate key={`${row.id}:${row.expected_by ?? ""}`} row={row} busy={busy} act={act} />
 
+          <AiPanel client={client} row={row} revisions={revisions} call={call} onChanged={onChanged} />
+
           <RevisionsPanel revisions={revisions} busy={busy} act={act} />
 
           {row.route === "proposal" && (
@@ -592,6 +594,122 @@ function ExpectedDate({ row, busy, act }: { row: BriefRow; busy: boolean; act: (
           </button>
         )}
       </div>
+    </div>
+  );
+}
+
+type AiPlanRow = { id: string; version: number; cost_pence: number; model: string; created_at: string };
+type AiPreviewRow = { id: string; version: number; status: "draft" | "released" | "withdrawn"; change_note: string; cost_pence: number; model: string; created_at: string };
+
+const pence = (n: number) => `£${(n / 100).toFixed(2)}`;
+
+/**
+ * The AI steps for one website: Grok drafts a plan from the brief, then the words for each page, and a person releases
+ * the result to the customer. Nothing the AI writes reaches the customer, changes the price or goes live without staff.
+ */
+function AiPanel({ client, row, revisions, call, onChanged }: { client: SupabaseClient; row: BriefRow; revisions: RevisionRow[]; call: Call; onChanged: () => void }) {
+  const [plans, setPlans] = useState<AiPlanRow[]>([]);
+  const [previews, setPreviews] = useState<AiPreviewRow[]>([]);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [change, setChange] = useState("");
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    void Promise.all([
+      client.from("website_plans").select("id, version, cost_pence, model, created_at").eq("brief_id", row.id).order("version", { ascending: false }),
+      client.from("website_previews").select("id, version, status, change_note, cost_pence, model, created_at").eq("brief_id", row.id).order("version", { ascending: false }),
+    ]).then(([p, v]) => {
+      if (cancelled) return;
+      setPlans((p.data as AiPlanRow[]) ?? []);
+      setPreviews((v.data as AiPreviewRow[]) ?? []);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [client, row.id, tick]);
+
+  const run = async (key: string, payload: Record<string, unknown>, done: string) => {
+    setBusy(key);
+    setMessage(null);
+    const r = await call(payload, "/api/admin/ai/website");
+    setBusy(null);
+    setMessage({ ok: r.ok, text: r.ok ? done : String(r.json.error ?? "That didn't work.") });
+    if (r.ok) {
+      setTick((t) => t + 1);
+      onChanged();
+    }
+    return r;
+  };
+
+  const openPreview = async (previewId: string) => {
+    const r = await call({ action: "link", previewId }, "/api/admin/ai/website");
+    if (r.ok && typeof r.json.url === "string") window.open(r.json.url, "_blank", "noopener,noreferrer");
+    else setMessage({ ok: false, text: "The preview couldn't be opened." });
+  };
+
+  const openChanges = revisions.filter((r) => r.status === "open" || r.status === "in_progress");
+  const paid = ["specification", "building", "preview", "changes", "approval"].includes(row.stage);
+  const latestPlan = plans[0];
+
+  return (
+    <div>
+      <p className="admin-label">AI website</p>
+      {!paid ? (
+        <p className="acct-meta">Starts once the customer has paid.</p>
+      ) : (
+        <div className="stack" style={{ "--stack": "var(--space-3)" } as React.CSSProperties}>
+          <div className="admin-actions">
+            <button type="button" className="btn btn--secondary" disabled={busy !== null} onClick={() => void run("plan", { action: "plan", briefId: row.id }, "Plan drafted.")}>
+              {busy === "plan" ? "Planning…" : latestPlan ? "Make a new plan" : "Make the plan"}
+            </button>
+            <button type="button" className="btn btn--secondary" disabled={busy !== null || !latestPlan} onClick={() => void run("preview", { action: "preview", briefId: row.id, change: change || undefined }, "Preview drafted.")}>
+              {busy === "preview" ? "Writing pages…" : "Write the preview"}
+            </button>
+          </div>
+          {openChanges.length > 0 && (
+            <label className="acct-label">
+              Apply a customer change
+              <select className="acct-input" value={change} onChange={(e) => setChange(e.target.value)}>
+                <option value="">None</option>
+                {openChanges.map((r) => (
+                  <option key={r.id} value={r.request}>{`Change ${r.number}: ${r.request.slice(0, 60)}`}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          {latestPlan && <p className="acct-meta">Plan {latestPlan.version} · {pence(latestPlan.cost_pence)} · {latestPlan.model}</p>}
+          {previews.length > 0 && (
+            <ul className="build-revisions" role="list">
+              {previews.map((p) => (
+                <li key={p.id}>
+                  <p className="build-revision__head">
+                    <strong>Preview {p.version}</strong>
+                    <span className="build-revision__status">{p.status === "released" ? "With the customer" : p.status === "draft" ? "Draft" : "Withdrawn"}</span>
+                    <span className="acct-meta">{pence(p.cost_pence)}</span>
+                  </p>
+                  {p.change_note && <p className="acct-meta">Change: {p.change_note}</p>}
+                  <div className="admin-actions">
+                    <button type="button" className="linkbtn" onClick={() => void openPreview(p.id)}>View</button>
+                    {p.status !== "released" && p.status !== "withdrawn" && (
+                      <button type="button" className="btn btn--secondary" disabled={busy !== null} onClick={() => void run(`release-${p.id}`, { action: "release", previewId: p.id }, "Released to the customer.")}>
+                        Release to the customer
+                      </button>
+                    )}
+                    {p.status === "released" && (
+                      <button type="button" className="btn btn--secondary" disabled={busy !== null} onClick={() => void run(`withdraw-${p.id}`, { action: "withdraw", previewId: p.id }, "Taken back.")}>
+                        Withdraw
+                      </button>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      {message && <p role={message.ok ? "status" : "alert"} className={message.ok ? "acct-meta" : "field-error"}>{message.text}</p>}
     </div>
   );
 }

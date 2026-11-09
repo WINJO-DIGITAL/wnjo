@@ -126,6 +126,7 @@ function BuildCard({
   const next = nextStepFor({ stage: brief.stage, route: brief.route, proposalSent: Boolean(proposal) });
   const showPay = brief.route === "proposal" && brief.stage === "awaiting_payment" && accepted;
   const canChange = ["preview", "changes", "approval", "live"].includes(brief.stage) || revisions.length > 0;
+  const showPreview = ["preview", "changes", "approval"].includes(brief.stage);
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "progress", label: "Progress" },
@@ -199,6 +200,7 @@ function BuildCard({
       </div>
 
       <div role="tabpanel" id={`panel-${brief.id}-${tab}`} aria-labelledby={`tab-${brief.id}-${tab}`} className="tabs__panel">
+        {showPreview && tab !== "progress" && <PreviewLink client={client} briefId={brief.id} />}
         {tab === "overview" && (
           <>
             {proposal && <ProposalCard client={client} proposal={proposal} onChanged={onChanged} />}
@@ -233,6 +235,38 @@ function BuildCard({
         {tab === "changes" && <FeedbackCard client={client} briefId={brief.id} stage={brief.stage} revisions={revisions} onChanged={onChanged} />}
       </div>
     </article>
+  );
+}
+
+/** Opens the customer's private preview in a new tab. The address comes from the server, only for the website's owner. */
+function PreviewLink({ client, briefId }: { client: SupabaseClient; briefId: string }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const open = async () => {
+    setBusy(true);
+    setError(null);
+    const { data } = await client.auth.getSession();
+    const token = data.session?.access_token;
+    const res = token
+      ? await fetch("/api/briefs/preview", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ briefId }) }).catch(() => null)
+      : null;
+    const json = (await res?.json().catch(() => null)) as { url?: string } | null;
+    setBusy(false);
+    if (res?.ok && json?.url) {
+      window.open(json.url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    setError("Your preview isn't ready to view yet. We'll let you know.");
+  };
+
+  return (
+    <div className="btn-row">
+      <button type="button" className="btn btn--primary" disabled={busy} onClick={() => void open()}>
+        {busy ? "Opening…" : "View your preview"}
+      </button>
+      {error && <p className="field-error" role="alert">{error}</p>}
+    </div>
   );
 }
 

@@ -60,10 +60,15 @@ export class XaiProvider implements AiProvider {
           content: m.role === "tool" ? `Tool result (${m.toolName ?? "tool"}): ${m.content}` : m.content,
         })),
       ],
-      tools: input.tools.map((t) => ({
-        type: "function",
-        function: { name: t.name, description: t.description, parameters: { type: "object", properties: {} } },
-      })),
+      // An empty tools list is left out: chat APIs commonly refuse one.
+      ...(input.tools.length > 0
+        ? {
+            tools: input.tools.map((t) => ({
+              type: "function",
+              function: { name: t.name, description: t.description, parameters: { type: "object", properties: {} } },
+            })),
+          }
+        : {}),
     };
 
     let res: Response;

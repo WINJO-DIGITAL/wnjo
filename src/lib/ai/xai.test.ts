@@ -40,6 +40,16 @@ describe("xAI provider", () => {
     expect(body.tools[0].function.name).toBe("read_project");
   });
 
+  it("leaves the tools list out of a request that has none", async () => {
+    let body: Record<string, unknown> = {};
+    const provider = new XaiProvider(config, async (_url, init) => {
+      body = JSON.parse(String(init.body));
+      return ok({ choices: [{ message: { content: "{}" } }], usage: { prompt_tokens: 1, completion_tokens: 1 } });
+    });
+    await provider.complete({ system: "sys", messages: [{ role: "user", content: "Task" }], tools: [] });
+    expect("tools" in body).toBe(false);
+  });
+
   it("returns a tool call with parsed arguments", async () => {
     const provider = new XaiProvider(config, async () =>
       ok({ choices: [{ message: { tool_calls: [{ function: { name: "read_project", arguments: '{"id":"p1"}' } }] } }], usage: {} }),

@@ -4,6 +4,8 @@ import { paymentMatches, stripeConfig, verifyStripeSignature } from "@/lib/strip
 import { recordEvent } from "@/lib/ai/event-store";
 import { notificationMailConfig, sendEmail } from "@/lib/mailer";
 import { kickWorker, processDueEvents } from "@/lib/ai/sweep";
+import { providerFromEnv } from "@/lib/ai/agent-runtime";
+import { runAutoDrafts } from "@/lib/ai/website-auto";
 import { handleWebsiteSubscriptionEvent } from "@/lib/website-subscription-events";
 
 /** Events that can belong to a website subscription or one-off website payment. */
@@ -23,6 +25,7 @@ async function emailCustomer(to: string, message: { subject: string; text: strin
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 300;
 
 /**
  * Tells staff about a payment problem that needs a person, not just a retry. Only identifiers are sent (no customer
@@ -57,7 +60,18 @@ export async function POST(request: NextRequest) {
     if (!db) return NextResponse.json({ error: "not_configured" }, { status: 503 });
     const outcome = await handleWebsiteSubscriptionEvent(db, raw, { emailCustomer, alertStaff });
     if (outcome === "retry") return NextResponse.json({ error: "retry" }, { status: 500 });
-    if (outcome === "handled") return NextResponse.json({ received: true, handled: true });
+    if (outcome === "handled") {
+      // A paid website gets its first AI draft straight away, after Stripe has its answer. Drafts only: a person
+      // releases a preview to the customer. With no Grok key this does nothing, and staff start the steps by hand.
+      after(async () => {
+        try {
+          await runAutoDrafts(db, providerFromEnv());
+        } catch {
+          console.error("Automatic AI draft after a website payment failed");
+        }
+      });
+      return NextResponse.json({ received: true, handled: true });
+    }
   }
 
   const event = raw as {
