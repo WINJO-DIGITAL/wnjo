@@ -299,6 +299,9 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         <Link href="/build" className="deck__btn">
           <span className="deck__btn-text">
             <span className="deck__btn-main">Build my website</span>
+            <span className="deck__btn-sub">
+              Like {current.name}? In 2 minutes.
+            </span>
           </span>
         </Link>
       </div>

@@ -54,13 +54,17 @@ export default function HomePage() {
               style={{ "--i": 1 } as React.CSSProperties}
             >
               <span className="hero-ed__line">Bespoke websites</span>{" "}
-              <span className="serif-em">from £99 a month.</span>
+              <span className="serif-em">
+                from £99 a month
+                <br />
+                or £999 outright.
+              </span>
             </h1>
             <p className="eyebrow hero-ed__place rise" style={{ "--i": 2 } as React.CSSProperties}>
               Based in Lancashire, working across the UK.
             </p>
             <p className="lede rise" style={{ "--i": 3 } as React.CSSProperties}>
-              Hosting and support included. You own your website once your plan ends, or get a bespoke build from £999.
+              Hosting and support included with monthly plans. No long-term lock-in. Your website, your business, your ownership.
             </p>
             <div
               className="btn-row rise"
