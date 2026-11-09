@@ -175,6 +175,7 @@ function StaffOverview({ client }: { client: SupabaseClient }) {
   if (error) return <p role="alert">The overview couldn&apos;t be loaded.</p>;
   if (!stats) return <p className="lede">Loading…</p>;
   return (
+    <>
     <div className="dash-stats">
       {stats.map((s) => (
         <a key={s.label} href={s.href} className="dash-stat">
@@ -184,6 +185,56 @@ function StaffOverview({ client }: { client: SupabaseClient }) {
         </a>
       ))}
     </div>
+    <NeedsYou client={client} />
+    </>
+  );
+}
+
+type Need = { label: string; count: number; href: string };
+
+/** What is waiting on a person right now, each linking to where it is dealt with. Only things with something to do are shown. */
+function NeedsYou({ client }: { client: SupabaseClient }) {
+  const [needs, setNeeds] = useState<Need[] | null>(null);
+  useEffect(() => {
+    const head = { count: "exact" as const, head: true };
+    Promise.all([
+      client.from("website_previews").select("id", head).eq("status", "draft"),
+      client.from("build_revisions").select("id", head).in("status", ["open", "in_progress"]),
+      client.from("website_proposals").select("id", head).eq("status", "pending_approval"),
+      client.from("website_proposals").select("id", head).eq("status", "approved"),
+      client.from("website_briefs").select("id", head).in("stage", ["brief_received", "reviewing"]),
+      client.from("quotes").select("id", head).eq("status", "sent"),
+    ]).then(([previews, changes, toApprove, toSend, briefs, quotes]) => {
+      const all: Need[] = [
+        { label: "Previews to release", count: previews.count ?? 0, href: "#builds" },
+        { label: "Customer changes to make", count: changes.count ?? 0, href: "#builds" },
+        { label: "Proposals to approve", count: toApprove.count ?? 0, href: "#builds" },
+        { label: "Proposals to send", count: toSend.count ?? 0, href: "#builds" },
+        { label: "Briefs to review", count: briefs.count ?? 0, href: "#builds" },
+        { label: "Quotes waiting", count: quotes.count ?? 0, href: "#quotes" },
+      ];
+      setNeeds(all.filter((n) => n.count > 0));
+    });
+  }, [client]);
+  if (needs === null) return null;
+  return (
+    <section className="needs" aria-labelledby="needs-title">
+      <h2 id="needs-title" className="needs__title">Needs you now</h2>
+      {needs.length === 0 ? (
+        <p className="build-card__meta">Nothing needs you right now.</p>
+      ) : (
+        <ul className="needs__list">
+          {needs.map((n) => (
+            <li key={n.label}>
+              <a href={n.href}>
+                <span>{n.label}</span>
+                <span className="needs__count">{n.count} <span aria-hidden="true">→</span></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
