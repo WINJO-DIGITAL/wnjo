@@ -88,7 +88,7 @@ export function QuotesPanel({ client }: { client: SupabaseClient }) {
 
   return (
     <section id="quotes" className="acct-quotes" aria-labelledby="acct-quotes-title">
-      <h2 id="acct-quotes-title" className="h2">
+      <h2 id="acct-quotes-title" className="acct-section-title">
         Your quotes
       </h2>
       {quotes.map((quote) => {

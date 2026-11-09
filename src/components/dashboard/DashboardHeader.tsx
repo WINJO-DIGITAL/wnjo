@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AccountMenu } from "@/components/account/AccountMenu";
+import { NotificationsBell } from "@/components/account/NotificationsBell";
 import { Logo } from "@/components/Logo";
 
 type DashItem = { label: string; hint: string; href: string };
@@ -114,9 +115,10 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
         <Link href="/" className="dash-brand" aria-label="WINJO DIGITAL home">
           <Logo />
         </Link>
-        <span className="dash-badge">{variant === "staff" ? "Staff" : "Client"}</span>
+        {variant === "staff" && <span className="dash-badge">Staff</span>}
 
-        <nav className="dash-nav" aria-label={variant === "staff" ? "Staff dashboard" : "Your dashboard"}>
+        {variant === "staff" && (
+        <nav className="dash-nav" aria-label="Staff dashboard">
           {groups.map((group, i) => (
             <div key={group.label} className="dash-nav__group">
               <button
@@ -142,10 +144,12 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
             </div>
           ))}
         </nav>
+        )}
 
         <div className="dash-header__end">
+          {variant === "customer" && <NotificationsBell />}
           <AccountMenu />
-          <button
+          {variant === "staff" && <button
             type="button"
             className="dash-mobile-toggle"
             aria-expanded={mobileOpen}
@@ -153,11 +157,11 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
             onClick={() => setMobileOpen((v) => !v)}
           >
             Menu
-          </button>
+          </button>}
         </div>
       </div>
 
-      {mobileOpen && (
+      {variant === "staff" && mobileOpen && (
         <div id="dash-mobile-menu" className="dash-mobile">
           {groups.map((group) => (
             <div key={group.label} className="dash-mobile__group">

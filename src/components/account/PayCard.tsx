@@ -53,7 +53,7 @@ export function PayCard({
 
   return (
     <div className="build-offer build-pay">
-      <p className="eyebrow">{deposit ? "Your deposit" : "Your first payment"}</p>
+      <p className="build-card__meta">{deposit ? "Your deposit" : "Your first payment"}</p>
       <p className="build-offer__total">
         <strong>{formatPence(payNow.pence)}</strong>
       </p>

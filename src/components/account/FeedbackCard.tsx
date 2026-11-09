@@ -75,7 +75,7 @@ export function FeedbackCard({
 
   return (
     <div className="build-offer build-feedback">
-      <p className="eyebrow">Your feedback</p>
+      <p className="build-card__meta">Your feedback</p>
 
       {approved && <Confirmation title="Preview approved. We'll run our final checks and be in touch." />}
 

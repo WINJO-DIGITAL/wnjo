@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PORTAL_STEPS, nextStepFor, portalStepIndex } from "@/lib/portal-steps";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { STAGES, progressIndex, stagePath, type ProposalLine, type ProposalStatus, type Route, type Stage } from "@/lib/build-journey";
 import type { RevisionRow } from "@/lib/build-revisions";
@@ -115,8 +116,19 @@ function BuildCard({
     if (s === "brief_received") return brief.created_at;
     return [...events].reverse().find((e) => e.detail.to === s)?.created_at ?? null;
   };
-  const style = brief.brief.style ? STYLES[brief.brief.style] : null;
   const offPath = !path.includes(brief.stage);
+  const style = brief.brief.style ? STYLES[brief.brief.style] : null;
+  const [tab, setTab] = useState<"overview" | "progress" | "changes">("overview");
+  const [allSteps, setAllSteps] = useState(false);
+  const step = portalStepIndex(brief.stage, lastOnPath);
+  const next = nextStepFor({ stage: brief.stage, route: brief.route, proposalSent: Boolean(proposal) });
+  const showPay = brief.route === "proposal" && brief.stage === "awaiting_payment" && accepted;
+  const canChange = ["preview", "changes", "approval", "live"].includes(brief.stage) || revisions.length > 0;
+  const tabs = [
+    { id: "overview", label: "Overview" },
+    { id: "progress", label: "Progress" },
+    ...(canChange ? [{ id: "changes", label: "Changes" }] : []),
+  ] as const;
 
   return (
     <article className="acct-order build-card" aria-labelledby={`build-${brief.id}`}>
@@ -129,36 +141,88 @@ function BuildCard({
           </span>
         )}
         <div>
-          <p className="eyebrow">
-            {brief.figures.package ?? "Website"} · {brief.reference}
-          </p>
-          <h2 id={`build-${brief.id}`} className="h2">
+          <h2 id={`build-${brief.id}`} className="build-card__title">
             {brief.business_name || "Your website"}
           </h2>
+          <p className="build-card__sub">
+            {brief.figures.package ?? "Website"} · {brief.reference}
+          </p>
         </div>
       </div>
-      <p className="build-card__now">
-        {proposal ? "Your proposal is ready to review." : offPath ? STAGES[brief.stage].customer : STAGES[path[here]].customer}
-      </p>
-      <ol className="build-timeline" role="list" aria-label="Progress">
-        {path.map((s, i) => {
-          const at = i <= here ? reached(s) : null;
-          return (
-            <li key={s} className={i < here ? "is-done" : i === here ? "is-current" : undefined} aria-current={i === here ? "step" : undefined}>
-              <span className="build-timeline__label">{STAGES[s].label}</span>
-              {at && <span className="build-timeline__date">{day.format(new Date(at))}</span>}
-            </li>
-          );
-        })}
+
+      <div className={`next-step${next.action ? " next-step--action" : ""}`}>
+        <div>
+          <p className="next-step__label">Next step</p>
+          <p className="next-step__title">{next.title}</p>
+          <p className="next-step__body">{next.body}</p>
+        </div>
+        {next.action && next.tab && next.cta && (
+          <button type="button" className="btn btn--primary" onClick={() => setTab(next.tab as "overview" | "changes")}>
+            {next.cta}
+          </button>
+        )}
+      </div>
+
+      <ol className="steps4" aria-label={`Progress: ${step >= PORTAL_STEPS.length ? "complete" : `step ${step + 1} of ${PORTAL_STEPS.length}`}`}>
+        {PORTAL_STEPS.map((s, i) => (
+          <li key={s.id} className={i < step ? "is-done" : i === step ? "is-current" : undefined} aria-current={i === step ? "step" : undefined}>
+            <span className="steps4__bar" />
+            <span className="steps4__label">{s.label}</span>
+          </li>
+        ))}
       </ol>
-      {brief.brief.goals.length > 0 && (
-        <p className="acct-meta">Built for: {brief.brief.goals.map((g) => GOALS[g]?.label).filter(Boolean).join(", ")}</p>
-      )}
-      {proposal && <ProposalCard client={client} proposal={proposal} onChanged={onChanged} />}
-      {brief.route === "proposal" && brief.stage === "awaiting_payment" && accepted && (
-        <PayCard client={client} briefId={brief.id} payNow={proposalPayNowFor(brief.figures.mode === "oneOff" ? "oneOff" : "monthly", accepted)} />
-      )}
-      <FeedbackCard client={client} briefId={brief.id} stage={brief.stage} revisions={revisions} onChanged={onChanged} />
+
+      <div className="tabs" role="tablist" aria-label="Website sections">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            id={`tab-${brief.id}-${t.id}`}
+            aria-selected={tab === t.id}
+            aria-controls={`panel-${brief.id}-${t.id}`}
+            className="tabs__tab"
+            onClick={() => setTab(t.id as "overview" | "progress" | "changes")}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div role="tabpanel" id={`panel-${brief.id}-${tab}`} aria-labelledby={`tab-${brief.id}-${tab}`} className="tabs__panel">
+        {tab === "overview" && (
+          <>
+            {proposal && <ProposalCard client={client} proposal={proposal} onChanged={onChanged} />}
+            {showPay && <PayCard client={client} briefId={brief.id} payNow={proposalPayNowFor(brief.figures.mode === "oneOff" ? "oneOff" : "monthly", accepted)} />}
+            {!proposal && !showPay && brief.brief.goals.length > 0 && (
+              <p className="build-card__meta">Built for {brief.brief.goals.map((g) => GOALS[g]?.label).filter(Boolean).join(", ")}</p>
+            )}
+            {!proposal && !showPay && brief.brief.goals.length === 0 && <p className="build-card__meta">Nothing to do here right now.</p>}
+          </>
+        )}
+        {tab === "progress" && (
+          <>
+            <p className="build-card__meta">{offPath ? STAGES[brief.stage].customer : STAGES[path[here]].customer}</p>
+            <button type="button" className="linkbtn" aria-expanded={allSteps} onClick={() => setAllSteps((v) => !v)}>
+              {allSteps ? "Hide all steps" : "See all steps"}
+            </button>
+            {allSteps && (
+              <ol className="build-timeline" role="list" aria-label="All steps">
+                {path.map((s, i) => {
+                  const at = i <= here ? reached(s) : null;
+                  return (
+                    <li key={s} className={i < here ? "is-done" : i === here ? "is-current" : undefined} aria-current={i === here ? "step" : undefined}>
+                      <span className="build-timeline__label">{STAGES[s].label}</span>
+                      {at && <span className="build-timeline__date">{day.format(new Date(at))}</span>}
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+          </>
+        )}
+        {tab === "changes" && <FeedbackCard client={client} briefId={brief.id} stage={brief.stage} revisions={revisions} onChanged={onChanged} />}
+      </div>
     </article>
   );
 }
@@ -204,7 +268,7 @@ function ProposalCard({ client, proposal, onChanged }: { client: SupabaseClient;
   const first = proposal.setup_pence + proposal.one_off_pence;
   return (
     <div className="build-offer">
-      <p className="eyebrow">Your proposal · {proposal.reference}</p>
+      <p className="build-card__meta">Proposal {proposal.reference}</p>
       {proposal.summary && <p>{proposal.summary}</p>}
       <ul className="build-lines" role="list">
         {proposal.lines.map((l, i) => (

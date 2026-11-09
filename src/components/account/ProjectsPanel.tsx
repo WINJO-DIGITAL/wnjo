@@ -44,7 +44,7 @@ export function ProjectsPanel({ client, userId }: { client: SupabaseClient; user
 
   return (
     <section id="projects" className="acct-quotes" aria-labelledby="acct-projects-title">
-      <h2 id="acct-projects-title" className="h2">Your projects</h2>
+      <h2 id="acct-projects-title" className="acct-section-title">Messages and files</h2>
       {projects.map((project, index) => (
         <article key={project.id} className="acct-order" aria-labelledby={`project-${project.id}`}>
           <p className="eyebrow">{project.customer_status}</p>

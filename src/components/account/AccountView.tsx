@@ -7,7 +7,6 @@ import { QuotesPanel } from "./QuotesPanel";
 import { BuildsPanel } from "./BuildsPanel";
 import { ProjectsPanel } from "./ProjectsPanel";
 import { Confirmation } from "./Confirmation";
-import { NotificationsPanel } from "./NotificationsPanel";
 
 export const STAGES = [
   { id: "brief_received", label: "Brief received", short: "Brief" },
@@ -199,7 +198,6 @@ export function AccountView() {
     return (
       <div className="dash-signin">
         <div className="dash-page__head">
-          <p className="dash-eyebrow">Client dashboard</p>
           <h1 className="dash-title">Follow your website.</h1>
           <p className="dash-lede">Sign in with the email you ordered with. We&apos;ll email you a link.</p>
         </div>
@@ -251,28 +249,28 @@ export function AccountView() {
   return (
     <div className="acct">
       <div className="dash-page__head">
-        <p className="dash-eyebrow">Client dashboard</p>
-        <h1 className="dash-title">Your website</h1>
+        <h1 className="dash-title">Your websites</h1>
       </div>
 
       {loadError && <p role="alert">We couldn&apos;t load your orders. Please refresh the page.</p>}
       {depositNotice && <Confirmation title={depositNotice} />}
 
       {orders && orders.length === 0 && !hasBuilds && (
-        <p className="lede">
-          No orders are linked to this email yet. If you&apos;ve just ordered, we&apos;ll link it shortly.
-        </p>
+        <div className="acct-empty">
+          <p className="acct-empty__title">Nothing here yet</p>
+          <p className="acct-empty__body">Orders appear here as soon as they&apos;re linked to {session.user.email}.</p>
+          <a href="/build" className="btn btn--primary">Build my website</a>
+        </div>
       )}
 
       {client && <BuildsPanel client={client} onFound={setHasBuilds} />}
-      {client && <NotificationsPanel client={client} userId={session.user.id} />}
       {client && <ProjectsPanel client={client} userId={session.user.id} />}
       {client && <QuotesPanel client={client} />}
 
       <div id="progress" className="dash-anchor" />
       {orders?.map((order) => (
         <article key={order.id} className="acct-order" aria-labelledby={`order-${order.id}`}>
-          <p className="eyebrow">{order.project_type}</p>
+          <p className="build-card__sub">{order.project_type}</p>
           <h2 id={`order-${order.id}`} className="h2">
             {order.business_name}
           </h2>

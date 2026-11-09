@@ -88,7 +88,12 @@ export function AccountMenu({ signedOutLink = false }: { signedOutLink?: boolean
           <p className="account-menu__who">{email}</p>
           {!isStaff && (
             <Link href="/account" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
-              Your orders and quotes
+              Your websites
+            </Link>
+          )}
+          {!isStaff && (
+            <Link href="/account/settings" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
+              Settings
             </Link>
           )}
           {isStaff && (
