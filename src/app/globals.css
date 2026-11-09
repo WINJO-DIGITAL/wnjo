@@ -12061,3 +12061,15 @@ body:has(.dash-header) .site-footer {
   gap: 16px;
   align-content: start;
 }
+
+/* Phone: wide admin tables keep their columns readable and scroll sideways instead of squashing words. */
+@media (max-width: 899px) {
+  .admin .admin-table:not(.admin-table--list) {
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin .admin-table:not(.admin-table--list) th,
+  .admin .admin-table:not(.admin-table--list) td {
+    padding-right: 20px;
+    white-space: nowrap;
+  }
+}
