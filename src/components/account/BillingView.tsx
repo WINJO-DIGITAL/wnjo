@@ -66,9 +66,7 @@ function Plans({ client }: { client: SupabaseClient }) {
   useEffect(() => {
     let cancelled = false;
     client
-      .from("website_subscriptions")
-      .select("id, reference, enquiry_reference, kind, status, package_name, monthly_pence, one_off_pence, payments_count, ownership_after_payments, ownership_eligible_at")
-      .order("created_at", { ascending: false })
+      .rpc("my_subscriptions")
       .then(({ data, error: err }) => {
         if (cancelled) return;
         setError(Boolean(err));
