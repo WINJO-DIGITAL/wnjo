@@ -11251,3 +11251,28 @@ body:has(.dash-header) .site-footer {
 .hero-from {
   font-family: var(--font-price);
 }
+
+/* Hero: "Explore our work" is a text link, so the main action ("Build my website") is the only button. */
+.hero-ed__textlink {
+  align-self: center;
+  padding-block: var(--space-2);
+  font-weight: 500;
+  color: var(--hx-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  transition: opacity var(--duration-fast) var(--ease);
+}
+.hero-ed__textlink:hover,
+.hero-ed__textlink:active {
+  opacity: 0.7;
+}
+.hero-ed__textlink:focus-visible {
+  outline: 2px solid var(--hx-ink);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+/* The main button shows a press state too, so a tap is visibly acknowledged. */
+.hero-ed .btn--primary:active {
+  opacity: 0.85;
+}

@@ -69,7 +69,7 @@ export default function HomePage() {
               <Link href="/build" className="btn btn--primary">
                 Build my website
               </Link>
-              <Link href="/work" className="btn btn--secondary">
+              <Link href="/work" className="hero-ed__textlink">
                 Explore our work
               </Link>
             </div>
