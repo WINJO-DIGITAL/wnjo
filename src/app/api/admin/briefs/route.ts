@@ -122,6 +122,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
+  if (body.action === "expected") {
+    const raw = body.date;
+    const date = raw === null || raw === "" ? null : typeof raw === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : undefined;
+    if (date === undefined) return fail(422, "Choose a valid date.");
+    const { error } = await db.from("website_briefs").update({ expected_by: date }).eq("id", brief.id);
+    if (error) return fail(500, "The date couldn't be saved.");
+    await logEvent(db, staff, brief.id, "expected", { to: date });
+    return NextResponse.json({ ok: true });
+  }
+
   if (body.action === "note") {
     const text = note(body.text);
     if (!text) return fail(422, "Write a note first.");

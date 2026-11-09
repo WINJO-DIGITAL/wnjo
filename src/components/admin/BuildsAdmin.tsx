@@ -30,6 +30,7 @@ type BriefRow = {
   version: number;
   brief: WebsiteBrief;
   figures: { package?: string; mode?: string; monthly?: number; setup?: number; oneOffTotal?: number; requiresQuote?: boolean; quoteReasons?: string[] };
+  expected_by: string | null;
   created_at: string;
 };
 type EventRow = { id: string; kind: string; detail: Record<string, unknown>; actor_type: string; actor_email: string | null; created_at: string };
@@ -66,7 +67,7 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   const load = useCallback(() => {
     client
       .from("website_briefs")
-      .select("id, reference, name, business_name, email, route, stage, version, brief, figures, created_at")
+      .select("id, reference, name, business_name, email, route, stage, version, brief, figures, expected_by, created_at")
       .order("created_at", { ascending: false })
       .limit(200)
       .then(({ data, error: err }) => {
@@ -236,6 +237,8 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
           </div>
 
           <StageControl row={row} path={path} busy={busy} onMove={(stage, note) => act({ action: "stage", stage, note }, `Moved to ${STAGES[stage].label}.`)} />
+
+          <ExpectedDate key={`${row.id}:${row.expected_by ?? ""}`} row={row} busy={busy} act={act} />
 
           <RevisionsPanel revisions={revisions} busy={busy} act={act} />
 
@@ -432,6 +435,8 @@ const DETAIL_TEXT = (e: EventRow): string => {
       return "Customer approved the preview";
     case "note":
       return String(d.text ?? "");
+    case "expected":
+      return d.to ? `Expected by ${String(d.to)}` : "Expected date cleared";
     default:
       return e.kind;
   }
@@ -568,6 +573,29 @@ function ProposalPanel({ proposals, busy, act }: { proposals: Proposal[]; busy: 
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+/** The date the customer is shown as "Expected by". Staff set it or clear it; each change is recorded in the history. */
+function ExpectedDate({ row, busy, act }: { row: BriefRow; busy: boolean; act: (p: Record<string, unknown>, done: string) => Promise<boolean> }) {
+  const [value, setValue] = useState(row.expected_by ?? "");
+  return (
+    <div>
+      <p className="admin-label">Expected by</p>
+      <p className="acct-meta">Shown to the customer on their website until it is live.</p>
+      <div className="admin-actions">
+        <label htmlFor={`expected-${row.id}`} className="visually-hidden">Expected by</label>
+        <input id={`expected-${row.id}`} type="date" className="acct-input" value={value} onChange={(e) => setValue(e.target.value)} />
+        <button type="button" className="btn btn--secondary" disabled={busy || value === (row.expected_by ?? "")} onClick={() => void act({ action: "expected", date: value || null }, value ? "Expected date saved." : "Expected date cleared.")}>
+          Save date
+        </button>
+        {row.expected_by && (
+          <button type="button" className="linkbtn" disabled={busy} onClick={() => { setValue(""); void act({ action: "expected", date: null }, "Expected date cleared."); }}>
+            Clear
+          </button>
+        )}
+      </div>
     </div>
   );
 }

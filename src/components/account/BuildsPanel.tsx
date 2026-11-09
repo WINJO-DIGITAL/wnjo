@@ -19,6 +19,7 @@ type Brief = {
   stage: Stage;
   brief: WebsiteBrief;
   figures: { package?: string; mode?: string };
+  expected_by: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -36,6 +37,7 @@ type Proposal = {
 };
 
 const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
+const expectedFormat = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long" });
 const money = (pence: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(pence / 100);
 
 /**
@@ -52,7 +54,7 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
   useEffect(() => {
     let cancelled = false;
     void Promise.all([
-      client.from("website_briefs").select("id, reference, business_name, route, stage, brief, figures, created_at, updated_at").order("created_at", { ascending: false }),
+      client.from("website_briefs").select("id, reference, business_name, route, stage, brief, figures, expected_by, created_at, updated_at").order("created_at", { ascending: false }),
       client.from("website_brief_events").select("brief_id, kind, detail, created_at").order("created_at"),
       client.from("website_proposals").select("id, brief_id, reference, status, summary, lines, setup_pence, monthly_pence, one_off_pence").order("created_at", { ascending: false }),
       client.from("build_revisions").select("id, brief_id, number, status, request, response, created_at, resolved_at").order("number"),
@@ -155,6 +157,9 @@ function BuildCard({
           <p className="next-step__label">Next step</p>
           <p className="next-step__title">{next.title}</p>
           <p className="next-step__body">{next.body}</p>
+          {brief.expected_by && next.action === false && brief.stage !== "live" && brief.stage !== "closed" && (
+            <p className="next-step__when">Expected by {expectedFormat.format(new Date(`${brief.expected_by}T12:00:00`))}</p>
+          )}
         </div>
         {next.action && next.tab && next.cta && (
           <button type="button" className="btn btn--primary" onClick={() => setTab(next.tab as "overview" | "changes")}>
