@@ -782,7 +782,7 @@ function Inner({
                       ? "Sending…"
                       : chosenIntent === "callback"
                         ? "Request my callback"
-                        : "Send my brief"}
+                        : "Get my proposal"}
                 </button>
                 {chosenIntent === "pay" && payNow ? (
                   <>
