@@ -13,6 +13,7 @@ import {
   newOfferToken,
   newSubscriptionReference,
   offerFromQuote,
+  proposalOverrides,
   type OfferOverrides,
 } from "@/lib/website-subscriptions";
 
@@ -71,7 +72,27 @@ export async function POST(request: NextRequest) {
 
     const quote = websiteQuote(answers);
     const o = (body.overrides ?? {}) as Record<string, unknown>;
-    const overrides: OfferOverrides = { setup: pounds(o.setup), monthly: pounds(o.monthly), oneOff: pounds(o.oneOff) };
+    let overrides: OfferOverrides = { setup: pounds(o.setup), monthly: pounds(o.monthly), oneOff: pounds(o.oneOff) };
+    // A bespoke brief is charged only from its accepted proposal: the figures the customer agreed, never the form's.
+    const { data: tracked } = await db
+      .from("website_briefs")
+      .select("id, route")
+      .eq("reference", reference)
+      .eq("tenant_id", tenantId)
+      .maybeSingle();
+    if ((tracked as { route?: string } | null)?.route === "proposal") {
+      const { data: accepted } = await db
+        .from("website_proposals")
+        .select("setup_pence, monthly_pence, one_off_pence")
+        .eq("brief_id", (tracked as { id: string }).id)
+        .eq("status", "accepted")
+        .order("decided_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const agreed = accepted as { setup_pence: number; monthly_pence: number; one_off_pence: number } | null;
+      if (!agreed) return NextResponse.json({ error: "proposal_not_accepted" }, { status: 409 });
+      overrides = proposalOverrides(quote.mode, agreed);
+    }
     const amounts = offerFromQuote(answers, quote, overrides);
     const { token, hash } = newOfferToken();
     const subReference = newSubscriptionReference();

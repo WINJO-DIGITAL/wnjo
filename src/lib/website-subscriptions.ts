@@ -72,6 +72,20 @@ export function offerFromQuote(answers: WebsiteAnswers, quote: WebsiteQuote, ove
   };
 }
 
+/**
+ * The offer figures for an accepted bespoke proposal, in pounds. A monthly proposal keeps its setup, monthly and
+ * one-off amounts; a one-off proposal takes the deposit share of its total now, as the terms set out.
+ */
+export function proposalOverrides(
+  mode: "monthly" | "oneOff",
+  agreed: { setup_pence: number; monthly_pence: number; one_off_pence: number },
+): OfferOverrides {
+  if (mode === "monthly") {
+    return { setup: agreed.setup_pence / 100, monthly: agreed.monthly_pence / 100, oneOff: agreed.one_off_pence / 100 };
+  }
+  return { oneOff: Math.round(agreed.one_off_pence * ONE_OFF_DEPOSIT_SHARE) / 100 };
+}
+
 /** What the customer pays first: setup + one-off extras + the first month, or the one-off amount. */
 export function firstPaymentPence(offer: Pick<OfferAmounts, "kind" | "setupPence" | "monthlyPence" | "oneOffPence">): number {
   return offer.kind === "subscription" ? offer.setupPence + offer.oneOffPence + offer.monthlyPence : offer.oneOffPence;

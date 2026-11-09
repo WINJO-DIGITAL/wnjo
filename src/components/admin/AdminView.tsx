@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { ProjectsAdmin } from "./ProjectsAdmin";
 import { AiStatus } from "./AiStatus";
 import { SubscriptionsAdmin } from "./SubscriptionsAdmin";
+import { BuildsAdmin } from "./BuildsAdmin";
 import { Confirmation } from "@/components/account/Confirmation";
 import { sendQueuedEmails } from "@/lib/notify-client";
 
@@ -35,12 +36,13 @@ const approvalStatus: Record<string, string> = {
 const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-type Tab = "overview" | "enquiries" | "quotes" | "subscriptions" | "orders" | "approvals" | "projects" | "ai";
+type Tab = "overview" | "enquiries" | "builds" | "quotes" | "subscriptions" | "orders" | "approvals" | "projects" | "ai";
 
-const TABS: Tab[] = ["overview", "enquiries", "quotes", "subscriptions", "orders", "approvals", "projects", "ai"];
+const TABS: Tab[] = ["overview", "enquiries", "builds", "quotes", "subscriptions", "orders", "approvals", "projects", "ai"];
 const TAB_INFO: Record<Tab, { group: string; title: string }> = {
   overview: { group: "Overview", title: "Today" },
   enquiries: { group: "Sales", title: "Enquiries" },
+  builds: { group: "Sales", title: "Website builds" },
   quotes: { group: "Sales", title: "Quotes" },
   subscriptions: { group: "Sales", title: "Website subscriptions" },
   orders: { group: "Delivery", title: "Orders" },
@@ -122,6 +124,7 @@ export function AdminView() {
       {tab === "overview" && <StaffOverview client={client} />}
       {tab === "enquiries" && <EnquiriesTable client={client} />}
       {tab === "quotes" && <QuotesTable client={client} />}
+      {tab === "builds" && <BuildsAdmin client={client} />}
       {tab === "subscriptions" && <SubscriptionsAdmin client={client} />}
       {tab === "orders" && (
         <>

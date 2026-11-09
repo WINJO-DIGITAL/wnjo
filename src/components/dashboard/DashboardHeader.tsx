@@ -45,6 +45,7 @@ const STAFF: DashGroup[] = [
     items: [
       { label: "Enquiries", hint: "New leads from the site", href: "/admin#enquiries" },
       { label: "Quotes", hint: "Sent, accepted and declined", href: "/admin#quotes" },
+      { label: "Website builds", hint: "Briefs, approvals and proposals", href: "/admin#builds" },
       { label: "Subscriptions", hint: "Monthly websites, payments and ownership", href: "/admin#subscriptions" },
     ],
   },

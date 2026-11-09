@@ -4,6 +4,7 @@ import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { QuotesPanel } from "./QuotesPanel";
+import { BuildsPanel } from "./BuildsPanel";
 import { ProjectsPanel } from "./ProjectsPanel";
 import { Confirmation } from "./Confirmation";
 import { NotificationsPanel } from "./NotificationsPanel";
@@ -118,6 +119,7 @@ export function AccountView() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const [hasBuilds, setHasBuilds] = useState(false);
   // Set once from the Stripe return address (?deposit= or ?balance= with paid or cancelled); read before first paint.
   const [depositNotice] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
@@ -256,12 +258,13 @@ export function AccountView() {
       {loadError && <p role="alert">We couldn&apos;t load your orders. Please refresh the page.</p>}
       {depositNotice && <Confirmation title={depositNotice} />}
 
-      {orders && orders.length === 0 && (
+      {orders && orders.length === 0 && !hasBuilds && (
         <p className="lede">
           No orders are linked to this email yet. If you&apos;ve just ordered, we&apos;ll link it shortly.
         </p>
       )}
 
+      {client && <BuildsPanel client={client} onFound={setHasBuilds} />}
       {client && <NotificationsPanel client={client} userId={session.user.id} />}
       {client && <ProjectsPanel client={client} userId={session.user.id} />}
       {client && <QuotesPanel client={client} />}

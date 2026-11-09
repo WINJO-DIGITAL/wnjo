@@ -661,3 +661,26 @@ branch only; the live site keeps the earlier prices until the redrafted terms ha
 - Before launch: legal review of the terms (version 2026-11-08.2); apply a catalogue migration for Hosting £49 and the
   retired packages; set `LEGAL_REVIEW_PENDING` to false.
 
+
+### 18.7 Build my website journey (phases 1 to 3, 9 November 2026)
+
+What exists now:
+
+- **Brief intake (`/build`).** Ten steps: package, goals, named pages, features, a visual starting look, content and
+  uploads, business details, review, send. Uploads go to the private `brief-files` bucket under the browser's draft
+  folder; the server keeps only files it finds there. Each brief is stored in `website_briefs`, with append-only
+  `website_brief_versions` and `website_brief_events`.
+- **Routes.** Standard monthly packages go straight to payment. One-off websites over £1,000
+  (`PROPOSAL_THRESHOLD` in `src/lib/build-journey.ts`) and anything needing a custom quote go through a proposal.
+- **Stages.** Brief received, reviewing, (proposal), payment, planning, building, preview, changes, final checks,
+  live. Staff move briefs in Admin, Website builds; customers see the timeline in their account.
+- **Four approvals.** Quality (any staff), pricing, contract and publication (owner or admin only). Each decision is
+  recorded with the person, role and time in `build_approvals`, which can't be edited. The database refuses to mark a
+  brief live unless the latest decision on all four is "approved".
+- **Bespoke proposals.** Staff draft, submit, an owner or admin approves the price (logged as a pricing approval),
+  then it is sent. The customer accepts or declines in their account. The payment link for a bespoke brief is
+  created only from the accepted proposal's figures; the admin form's figures are ignored.
+
+Not built yet (later phases): AI clarification questions, the AI specification, AI site generation, private previews,
+change requests on a preview, and the care plan move after 12 payments. Stages from "planning" onwards are set by
+staff by hand until then.

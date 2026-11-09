@@ -313,3 +313,15 @@ describe("subscription webhooks", () => {
     expect(await handleWebsiteSubscriptionEvent(db, { type: "invoice.paid", data: { object: { id: "in_x", subscription: "someone_else" } } }, deps)).toBe("ignored");
   });
 });
+
+describe("accepted proposal figures", () => {
+  it("keeps a monthly proposal's amounts and takes the deposit share of a one-off proposal", async () => {
+    const { proposalOverrides } = await import("./website-subscriptions");
+    expect(proposalOverrides("monthly", { setup_pence: 14900, monthly_pence: 24900, one_off_pence: 19900 })).toEqual({
+      setup: 149,
+      monthly: 249,
+      oneOff: 199,
+    });
+    expect(proposalOverrides("oneOff", { setup_pence: 0, monthly_pence: 0, one_off_pence: 250001 })).toEqual({ oneOff: 1250.01 });
+  });
+});
