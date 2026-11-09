@@ -10423,6 +10423,25 @@ body:has(.dash-header) .site-footer {
 .inverse .pkg-card__points li {
   border-top-color: var(--color-inverse-line);
 }
+/* A small tick before each included item, in the card's ink colour. */
+.pkg-card__points li {
+  position: relative;
+  padding-left: 1.5em;
+}
+.pkg-card__points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(var(--space-2) + 0.12em);
+  width: 0.95em;
+  height: 0.95em;
+  background-color: var(--color-ink);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.inverse .pkg-card__points li::before {
+  background-color: var(--color-inverse-ink);
+}
 .pkg-card__cta {
   margin-top: auto;
   justify-content: center;
