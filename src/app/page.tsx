@@ -57,7 +57,7 @@ export default function HomePage() {
               <span className="serif-em">from £99 a month.</span>
             </h1>
             <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
-              Built around your business. Hosting and support included. You own the website once your plan ends, or a bespoke build from £999.
+              Built around your business. Hosting and support included. You own the website once your plan ends, or pay £999 up front.
             </p>
             <div
               className="btn-row rise"
