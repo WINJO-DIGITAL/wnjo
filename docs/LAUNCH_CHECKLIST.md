@@ -13,7 +13,9 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] Billing button only opens the customer's own Stripe billing page. Email matching is exact (no wildcard matches).
 - [x] Staff: builds, approvals (quality, pricing, contract, publication), subscriptions, orders and expected dates.
 - [x] Admin screens on desktop and phone: enquiries, quotes, approvals, projects, orders and subscriptions.
-- [x] 421 automated tests pass; type checks and lint pass.
+- [x] 461 automated tests pass; type checks and lint pass.
+- [x] Customer-facing AI wording removed: the planning step reads "Planning your website".
+- [x] Phone menu has a "Client sign-in" link.
 
 ## Still to do before launch
 - [ ] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data.
@@ -22,10 +24,11 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [ ] **Live site:** after the next merge, check Core shows £99 a month with no extra pages.
 - [ ] **Preview check:** Plan & billing and the progress bar (five steps) on a phone.
 - [ ] **Staff:** set expected dates on live websites so customers see them.
-- [ ] **Test-mode subscription:** cancel the leftover Stripe test subscription (customer nitisatsirisom@hotmail.co.uk).
+- [x] **Test-mode subscription:** no subscriptions left in the database for the test customer. Confirm in the Stripe test dashboard.
 
 ## Grok switch-on (last step before launch)
-- [ ] Apply migration `20261109190000_website_ai_plans_and_previews.sql` in the Supabase SQL Editor.
+- [x] Apply migration `20261109190000_website_ai_plans_and_previews.sql` (applied; tables and rules checked).
+- [x] Customer preview permissions locked down: the secret preview address isn't readable from the browser.
 - [ ] Set `XAI_API_KEY`, `XAI_MODEL`, `XAI_INPUT_PENCE_PER_MILLION_TOKENS` and `XAI_OUTPUT_PENCE_PER_MILLION_TOKENS` in Vercel (optional: `AI_MAX_PENCE_PER_BRIEF`, default 300).
 - [ ] Run one test website end to end: pay in test mode, check the plan and preview appear in Admin, view the draft, release it, and open it from the customer account.
 - [ ] Check the model's reply shape against the live service. The code was only tested against a fake.
