@@ -97,44 +97,40 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   return (
     <div className="stack" style={{ "--stack": "var(--space-6)", minWidth: 0 } as React.CSSProperties}>
       <div className="table-wrap" role="region" aria-label="Website briefs" tabIndex={0}>
-      <table className="admin-table">
+      <table className="admin-table admin-table--list">
         <thead>
           <tr>
-            <th scope="col">Brief</th>
-            <th scope="col">Customer</th>
-            <th scope="col">Price</th>
-            <th scope="col">Route</th>
+            <th scope="col">Website</th>
+            <th scope="col">Plan</th>
             <th scope="col">Stage</th>
-            <th scope="col"><span className="visually-hidden">Open</span></th>
+            <th scope="col" className="admin-table__end">Received</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id} aria-selected={r.id === selected}>
+            <tr key={r.id} aria-selected={r.id === selected} className="admin-table__row" onClick={() => setSelected(r.id === selected ? null : r.id)}>
               <td>
-                <strong>{r.reference}</strong>
-                <br />
-                <span className="acct-meta">{when.format(new Date(r.created_at))}</span>
+                <button
+                  type="button"
+                  className="admin-table__open"
+                  aria-expanded={r.id === selected}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelected(r.id === selected ? null : r.id);
+                  }}
+                >
+                  {r.business_name || r.name}
+                </button>
+                <span className="admin-table__sub">{r.reference}</span>
               </td>
               <td>
-                {r.business_name || r.name}
-                <br />
-                <span className="acct-meta">{r.email}</span>
-              </td>
-              <td>
-                {r.figures.package}
-                <br />
-                <span className="acct-meta">
+                {r.route === "proposal" ? "Bespoke" : r.figures.package}
+                <span className="admin-table__sub">
                   {r.figures.mode === "monthly" ? `${pounds(r.figures.monthly)} a month` : pounds(r.figures.oneOffTotal)}
                 </span>
               </td>
-              <td>{r.route === "proposal" ? "Bespoke proposal" : "Package"}</td>
               <td>{STAGES[r.stage].label}</td>
-              <td>
-                <button type="button" className="arrow-link" onClick={() => setSelected(r.id === selected ? null : r.id)}>
-                  {r.id === selected ? "Close" : "Open"}
-                </button>
-              </td>
+              <td className="admin-table__end">{when.format(new Date(r.created_at))}</td>
             </tr>
           ))}
         </tbody>
