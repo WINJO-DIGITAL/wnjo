@@ -650,8 +650,8 @@ branch only; the live site keeps the earlier prices until the redrafted terms ha
 (`LEGAL_REVIEW_PENDING` in `src/lib/pricing.ts` shows a "draft terms" notice until then).
 
 - Monthly packages (12-month minimum term; ownership of the agreed deliverables after 12 successful payments):
-  Bronze £99/month + £99 setup (3 pages); Silver £149/month + £99 setup (5 pages, most popular); Gold £199/month +
-  £149 setup (10 pages). Inclusions, page allowances and content-update hours are in `WEBSITE_PLANS`.
+  Bronze £99/month + £99 setup (3 pages); Silver £149/month + £149 setup (5 pages, most popular); Gold £199/month +
+  £199 setup (10 pages). Inclusions, page allowances and content-update hours are in `WEBSITE_PLANS`.
 - One-off bespoke website from £999 (5 pages), owned on full payment. Extra pages £10/month (monthly) or £75 (one-off).
 - Hosting £49, Care £95, Care Plus £220 a month, for one-off websites only; monthly packages already include hosting.
 - Add-ons with monthly and one-off prices in `ADD_ONS`; a package's included add-ons are never charged.

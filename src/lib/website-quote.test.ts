@@ -22,18 +22,18 @@ describe("monthly packages", () => {
     expect(q.minimumTermTotal).toBe(99 + 99 * 12);
   });
 
-  it("prices Plus at £149 a month with a £99 setup fee", () => {
+  it("prices Plus at £149 a month with a £149 setup fee", () => {
     const q = websiteQuote(monthly("silver", { pages: "4-5" }));
     expect(q.monthly).toBe(149);
-    expect(q.setup).toBe(99);
-    expect(q.initialPayment).toBe(248);
+    expect(q.setup).toBe(149);
+    expect(q.initialPayment).toBe(298);
   });
 
-  it("prices Pro at £199 a month with a £149 setup fee", () => {
+  it("prices Pro at £199 a month with a £199 setup fee", () => {
     const q = websiteQuote(monthly("gold", { pages: "6-10" }));
     expect(q.monthly).toBe(199);
-    expect(q.setup).toBe(149);
-    expect(q.initialPayment).toBe(348);
+    expect(q.setup).toBe(199);
+    expect(q.initialPayment).toBe(398);
   });
 
   it("marks Plus as the most popular package and only Plus", () => {
@@ -48,7 +48,7 @@ describe("monthly packages", () => {
 
   it("uses the 12-month minimum term from the ownership settings", () => {
     const q = websiteQuote(monthly("gold", { pages: "6-10" }));
-    expect(q.minimumTermTotal).toBe(149 + 199 * OWNERSHIP.minimumTermMonths);
+    expect(q.minimumTermTotal).toBe(199 + 199 * OWNERSHIP.minimumTermMonths);
   });
 });
 
@@ -195,7 +195,7 @@ describe("validation", () => {
     const a = monthly("silver", { pages: "6-10" });
     const text = formatWebsiteQuote(a, websiteQuote(a), formatGBP);
     expect(text).toContain("Package: Plus (monthly)");
-    expect(text).toContain("Initial payment: £298");
+    expect(text).toContain("Initial payment: £348");
     expect(text).toContain("Monthly subscription: £199");
   });
 });

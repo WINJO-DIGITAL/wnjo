@@ -27,8 +27,8 @@ describe("offers", () => {
   it("turns a monthly quote into setup, monthly and one-off amounts in pence", () => {
     const a = monthly({ addOns: ["localSeo", "booking"] });
     const offer = offerFromQuote(a, websiteQuote(a));
-    expect(offer).toMatchObject({ kind: "subscription", packageCode: "silver", setupPence: 9900, monthlyPence: 16400, oneOffPence: 19900 });
-    expect(firstPaymentPence(offer)).toBe(9900 + 16400 + 19900);
+    expect(offer).toMatchObject({ kind: "subscription", packageCode: "silver", setupPence: 14900, monthlyPence: 16400, oneOffPence: 19900 });
+    expect(firstPaymentPence(offer)).toBe(14900 + 16400 + 19900);
   });
 
   it("uses staff overrides to match the written proposal", () => {

@@ -316,7 +316,7 @@ export const WEBSITE_PLANS = {
   silver: {
     name: "Plus",
     monthly: 149,
-    setup: 99,
+    setup: 149,
     pages: 5,
     popular: true,
     summary: "For businesses wanting a more comprehensive website that generates enquiries.",
@@ -341,7 +341,7 @@ export const WEBSITE_PLANS = {
   gold: {
     name: "Pro",
     monthly: 199,
-    setup: 149,
+    setup: 199,
     pages: 10,
     popular: false,
     summary: "For growing businesses requiring a more advanced website.",
