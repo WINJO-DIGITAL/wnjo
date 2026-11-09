@@ -299,10 +299,9 @@ function PlanCard({ client, subscription }: { client: SupabaseClient; subscripti
         {isMonthly ? ` · ${formatPence(subscription.monthly_pence)} a month` : ` · ${formatPence(subscription.one_off_pence)} once`}
       </p>
       <p className="build-card__meta">{SUBSCRIPTION_STATUS[subscription.status] ?? subscription.status}</p>
-      {isMonthly && (
+      {isMonthly && !subscription.ownership_eligible_at && (
         <p>
-          Payments: {subscription.payments_count} of {subscription.ownership_after_payments}
-          {subscription.ownership_eligible_at ? " · Ownership is due" : ""}
+          You&apos;ll own the website once you&apos;ve made {subscription.ownership_after_payments} payments. {subscription.payments_count} so far.
         </p>
       )}
       {manageable && (
