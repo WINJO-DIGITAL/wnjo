@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ADD_ONS, CARE_PLANS, EXTRA_PAGE, ONE_OFF_WEBSITE, OWNERSHIP, WEBSITE_PLANS, formatGBP } from "./pricing";
 import {
   DEFAULT_WEBSITE_ANSWERS,
+  bandForPlan,
   formatWebsiteQuote,
   parseWebsiteAnswers,
   websiteQuote,
@@ -197,5 +198,19 @@ describe("validation", () => {
     expect(text).toContain("Package: Plus (monthly)");
     expect(text).toContain("Initial payment: £348");
     expect(text).toContain("Monthly subscription: £199");
+  });
+});
+
+describe("the starting page band", () => {
+  it("matches each monthly package, so no package adds pages it doesn't include", () => {
+    expect(bandForPlan("bronze")).toBe("1-3");
+    expect(bandForPlan("silver")).toBe("4-5");
+    expect(bandForPlan("gold")).toBe("6-10");
+    for (const plan of ["bronze", "silver", "gold"] as const) {
+      expect(websiteQuote(monthly(plan, { pages: bandForPlan(plan) })).extraPages).toBe(0);
+    }
+  });
+  it("keeps the Core package at £99 a month when it starts on its own band", () => {
+    expect(websiteQuote(monthly("bronze", { pages: "1-3" })).monthly).toBe(99);
   });
 });

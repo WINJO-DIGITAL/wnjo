@@ -127,6 +127,16 @@ export type WebsiteQuote = {
 
 const ADD_ON_ORDER = Object.keys(ADD_ONS) as AddOnId[];
 
+/**
+ * The page band that matches a monthly package's included pages (Core 1 to 3, Plus 4 to 5, Pro 6 to 10). A new
+ * calculator starts on this band, so a package never shows pages it doesn't include.
+ */
+export function bandForPlan(plan: WebsitePlanId): WebsitePageBand {
+  const included = WEBSITE_PLANS[plan].pages;
+  const band = (Object.keys(WEBSITE_PAGE_BANDS) as WebsitePageBand[]).find((b) => WEBSITE_PAGE_BANDS[b].max === included);
+  return band ?? "4-5";
+}
+
 export function websiteQuote(answers: WebsiteAnswers): WebsiteQuote {
   const monthlyMode = answers.mode === "monthly";
   const plan = WEBSITE_PLANS[answers.plan];

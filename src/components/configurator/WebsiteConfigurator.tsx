@@ -34,6 +34,7 @@ import {
   DEFAULT_WEBSITE_ANSWERS,
   ROUTED_WANTS,
   WANTS,
+  bandForPlan,
   YES_NO,
   parseWebsiteAnswers,
   websiteQuote,
@@ -130,6 +131,7 @@ function initialState(params: WebsiteConfiguratorParams, withSaved: boolean): Sa
     Object.assign(answers, { mode: "oneOff", want: "oneOff", care: params.care as CarePlan });
   }
   if (params.pages && params.pages in WEBSITE_PAGE_BANDS) answers.pages = params.pages as WebsitePageBand;
+  else if (params.plan && params.plan in WEBSITE_PLANS) answers.pages = bandForPlan(params.plan as WebsitePlanId);
   const business = params.business?.trim().slice(0, DETAIL_LIMITS.industry);
   const details = business && !saved.details.industry ? { ...saved.details, industry: business } : saved.details;
   return { answers, details, brief: saved.brief, draftId };
@@ -520,7 +522,7 @@ function Inner({
                         const p = WEBSITE_PLANS[id];
                         return (
                           <label key={id} className={styles.choice}>
-                            <input type="radio" name="plan" checked={answers.plan === id} onChange={() => set("plan", id)} />
+                            <input type="radio" name="plan" checked={answers.plan === id} onChange={() => setAnswers((a) => ({ ...a, plan: id, pages: bandForPlan(id) }))} />
                             <span className={styles.choiceBody}>
                               <span className={styles.choiceLabel}>
                                 {p.name}
