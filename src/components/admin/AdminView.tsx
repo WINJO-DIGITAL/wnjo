@@ -603,21 +603,24 @@ function OrdersTable({
   if (rows === null) return <p className="lede">Loading…</p>;
   if (rows.length === 0) return <Empty text="No orders yet." />;
   return (
-    <table className="admin-table">
-      <thead><tr><th scope="col">Created</th><th scope="col">Business</th><th scope="col">Project</th><th scope="col">Stage</th><th scope="col"><span className="sr-only">Open</span></th></tr></thead>
+    <table className="admin-table admin-table--list">
+      <thead><tr><th scope="col">Created</th><th scope="col">Business</th><th scope="col">Project</th><th scope="col">Stage</th><th scope="col" className="admin-table__end"><span className="sr-only">Open</span></th></tr></thead>
       <tbody>
         {rows.map((r) => (
-          <tr key={r.id} aria-selected={selectedId === r.id}>
+          <tr key={r.id} aria-selected={selectedId === r.id} className="admin-table__row" onClick={() => onSelect(r.id)}>
             <td>{when.format(new Date(r.created_at))}</td>
             <td>{r.business_name}</td>
             <td>{r.project_type}</td>
             <td>{ORDER_STAGES.find((s) => s.id === r.stage)?.label ?? r.stage}</td>
-            <td>
+            <td className="admin-table__end">
               <button
                 type="button"
                 className="btn btn--secondary"
                 aria-pressed={selectedId === r.id}
-                onClick={() => onSelect(r.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect(r.id);
+                }}
               >
                 {selectedId === r.id ? "Open" : "Manage"}
               </button>
