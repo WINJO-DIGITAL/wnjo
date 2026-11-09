@@ -95,6 +95,11 @@ export function AccountMenu({ signedOutLink = false }: { signedOutLink?: boolean
             </Link>
           )}
           {roleKnown && !isStaff && (
+            <Link href="/account/billing" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
+              Plan &amp; billing
+            </Link>
+          )}
+          {roleKnown && !isStaff && (
             <Link href="/account/settings" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
               Settings
             </Link>

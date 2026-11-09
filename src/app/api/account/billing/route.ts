@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Opens Stripe's billing page for the signed-in customer's own subscription (card, receipts). The customer is found by
+ * Opens Stripe's billing page for one of the signed-in customer's own subscriptions (card, receipts). The customer is found by
  * their sign-in email, never from the request, so one customer can't open another's billing.
  */
 export async function POST(request: NextRequest) {
@@ -24,14 +24,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  const { data } = await db
+  const body = ((await request.json().catch(() => null)) ?? {}) as { reference?: unknown };
+  const reference = typeof body.reference === "string" && /^WS-[A-Z0-9]{6}$/.test(body.reference) ? body.reference : null;
+  let query = db
     .from("website_subscriptions")
     .select("stripe_customer_id")
     .ilike("email", customer.email)
-    .not("stripe_customer_id", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .not("stripe_customer_id", "is", null);
+  if (reference) query = query.eq("reference", reference);
+  const { data } = await query.order("created_at", { ascending: false }).limit(1).maybeSingle();
   const stripeCustomer = (data as { stripe_customer_id: string | null } | null)?.stripe_customer_id;
   if (!stripeCustomer) return NextResponse.json({ error: "not_found" }, { status: 404 });
 

@@ -25,6 +25,7 @@ const CUSTOMER: DashGroup[] = [
     items: [
       { label: "Your quotes", hint: "Accept or decline", href: "/account#quotes" },
       { label: "Deposit", hint: "Pay or check your deposit", href: "/account#quotes" },
+      { label: "Plan & billing", hint: "Your plan, payments and billing page", href: "/account/billing" },
     ],
   },
   {

@@ -6,7 +6,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { STAGES, progressIndex, stagePath, type ProposalLine, type ProposalStatus, type Route, type Stage } from "@/lib/build-journey";
 import type { RevisionRow } from "@/lib/build-revisions";
 import { proposalPayNowFor } from "@/lib/pay-now";
-import { formatPence } from "@/lib/pricing";
 import { GOALS, STYLES, type WebsiteBrief } from "@/lib/website-brief";
 import { Confirmation } from "./Confirmation";
 import { FeedbackCard } from "./FeedbackCard";
@@ -25,20 +24,6 @@ type Brief = {
   updated_at: string;
 };
 type StageEvent = { brief_id: string; kind: string; detail: { to?: Stage }; created_at: string };
-type Subscription = {
-  id: string;
-  reference: string;
-  enquiry_reference: string | null;
-  kind: "subscription" | "one_off";
-  status: string;
-  package_name: string;
-  monthly_pence: number;
-  one_off_pence: number;
-  setup_pence: number;
-  payments_count: number;
-  ownership_after_payments: number;
-  ownership_eligible_at: string | null;
-};
 type Proposal = {
   id: string;
   brief_id: string;
@@ -64,7 +49,6 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
   const [events, setEvents] = useState<StageEvent[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [revisions, setRevisions] = useState<RevisionRow[]>([]);
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
@@ -74,15 +58,13 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
       client.from("website_brief_events").select("brief_id, kind, detail, created_at").order("created_at"),
       client.from("website_proposals").select("id, brief_id, reference, status, summary, lines, setup_pence, monthly_pence, one_off_pence").order("created_at", { ascending: false }),
       client.from("build_revisions").select("id, brief_id, number, status, request, response, created_at, resolved_at").order("number"),
-      client.from("website_subscriptions").select("id, reference, enquiry_reference, kind, status, package_name, monthly_pence, one_off_pence, setup_pence, payments_count, ownership_after_payments, ownership_eligible_at").order("created_at", { ascending: false }),
-    ]).then(([b, e, p, r, s]) => {
+    ]).then(([b, e, p, r]) => {
       if (cancelled) return;
       const list = (b.data as Brief[]) ?? [];
       setBriefs(list);
       setEvents((e.data as StageEvent[]) ?? []);
       setProposals((p.data as Proposal[]) ?? []);
       setRevisions((r.data as RevisionRow[]) ?? []);
-      setSubscriptions((s.data as Subscription[]) ?? []);
       onFound?.(list.length > 0);
     });
     return () => {
@@ -105,7 +87,6 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
           proposal={proposals.find((p) => p.brief_id === b.id && p.status === "sent") ?? null}
           accepted={proposals.find((p) => p.brief_id === b.id && p.status === "accepted") ?? null}
           revisions={revisions.filter((r) => r.brief_id === b.id)}
-          subscription={subscriptions.find((x) => x.enquiry_reference === b.reference) ?? null}
           onChanged={() => setRefresh((r) => r + 1)}
         />
       ))}
@@ -120,7 +101,6 @@ function BuildCard({
   proposal,
   accepted,
   revisions,
-  subscription,
   onChanged,
 }: {
   client: SupabaseClient;
@@ -129,7 +109,6 @@ function BuildCard({
   proposal: Proposal | null;
   accepted: Proposal | null;
   revisions: RevisionRow[];
-  subscription: Subscription | null;
   onChanged: () => void;
 }) {
   const path = stagePath(brief.route);
@@ -230,7 +209,6 @@ function BuildCard({
             {!proposal && !showPay && brief.brief.goals.length === 0 && <p className="build-card__meta">Nothing to do here right now.</p>}
           </>
         )}
-        {tab === "overview" && subscription && <PlanCard client={client} subscription={subscription} />}
         {tab === "progress" && (
           <>
             <p className="build-card__meta">{offPath ? STAGES[brief.stage].customer : STAGES[path[here]].customer}</p>
@@ -255,64 +233,6 @@ function BuildCard({
         {tab === "changes" && <FeedbackCard client={client} briefId={brief.id} stage={brief.stage} revisions={revisions} onChanged={onChanged} />}
       </div>
     </article>
-  );
-}
-
-const SUBSCRIPTION_STATUS: Record<string, string> = {
-  offered: "Waiting for payment",
-  active: "Active",
-  past_due: "Payment overdue",
-  cancelled: "Ended",
-  paid: "Paid in full",
-  expired: "Expired",
-};
-
-/** The customer's plan: what they pay, how far they are towards owning the website, and their billing page. */
-function PlanCard({ client, subscription }: { client: SupabaseClient; subscription: Subscription }) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const isMonthly = subscription.kind === "subscription";
-  const manageable = subscription.status === "active" || subscription.status === "past_due";
-
-  const openBilling = async () => {
-    setBusy(true);
-    setError(null);
-    const { data } = await client.auth.getSession();
-    const token = data.session?.access_token;
-    const res = token
-      ? await fetch("/api/account/billing", { method: "POST", headers: { Authorization: `Bearer ${token}` } }).catch(() => null)
-      : null;
-    const json = (await res?.json().catch(() => null)) as { url?: string } | null;
-    if (res?.ok && json?.url) {
-      window.location.assign(json.url);
-      return;
-    }
-    setBusy(false);
-    setError("We couldn't open your billing page. Please try again, or reply to our email.");
-  };
-
-  return (
-    <div className="build-offer plan-card">
-      <p className="build-card__meta">Your plan · {subscription.reference}</p>
-      <p className="plan-card__title">
-        {subscription.package_name}
-        {isMonthly ? ` · ${formatPence(subscription.monthly_pence)} a month` : ` · ${formatPence(subscription.one_off_pence)} once`}
-      </p>
-      <p className="build-card__meta">{SUBSCRIPTION_STATUS[subscription.status] ?? subscription.status}</p>
-      {isMonthly && !subscription.ownership_eligible_at && (
-        <p>
-          You&apos;ll own the website once you&apos;ve made {subscription.ownership_after_payments} payments. {subscription.payments_count} so far.
-        </p>
-      )}
-      {manageable && (
-        <div className="btn-row">
-          <button type="button" className="btn btn--secondary" disabled={busy} onClick={() => void openBilling()}>
-            {busy ? "Opening…" : "Manage billing"}
-          </button>
-        </div>
-      )}
-      {error && <p className="field-error" role="alert">{error}</p>}
-    </div>
   );
 }
 
