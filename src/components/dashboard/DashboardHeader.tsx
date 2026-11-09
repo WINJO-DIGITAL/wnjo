@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { AccountMenu } from "@/components/account/AccountMenu";
 import { NotificationsBell } from "@/components/account/NotificationsBell";
 import { Logo } from "@/components/Logo";
+import { supabase } from "@/lib/supabase";
 
 type DashItem = { label: string; hint: string; href: string };
 type DashGroup = { label: string; items: DashItem[] };
@@ -81,6 +82,14 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
   const [openGroup, setOpenGroup] = useState<number | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const barRef = useRef<HTMLElement>(null);
+  const [hash, setHash] = useState("");
+  useEffect(() => {
+    const read = () => setHash(window.location.hash);
+    read();
+    window.addEventListener("hashchange", read);
+    return () => window.removeEventListener("hashchange", read);
+  }, []);
+  const isHere = (href: string) => href.includes("#") && href.slice(href.indexOf("#")) === (hash || "#overview") && href.startsWith("/admin");
 
   useEffect(() => {
     if (openGroup === null && !mobileOpen) return;
@@ -115,8 +124,6 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
         <Link href="/" className="dash-brand" aria-label="WINJO DIGITAL home">
           <Logo />
         </Link>
-        {variant === "staff" && <span className="dash-badge">Staff</span>}
-
         {variant === "staff" && (
         <nav className="dash-nav" aria-label="Staff dashboard">
           {groups.map((group, i) => (
@@ -134,7 +141,7 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
               {openGroup === i && (
                 <div id={`dash-menu-${i}`} className="dash-menu">
                   {group.items.map((item) => (
-                    <a key={item.label} href={item.href} className="dash-menu__item" onClick={close}>
+                    <a key={item.label} href={item.href} className="dash-menu__item" aria-current={variant === "staff" && isHere(item.href) ? "page" : undefined} onClick={close}>
                       <span className="dash-menu__label">{item.label}</span>
                       <span className="dash-menu__hint">{item.hint}</span>
                     </a>
@@ -148,7 +155,7 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
 
         <div className="dash-header__end">
           {variant === "customer" && <NotificationsBell />}
-          <AccountMenu />
+          <div className={variant === "staff" ? "dash-header__account" : undefined}><AccountMenu /></div>
           {variant === "staff" && <button
             type="button"
             className="dash-mobile-toggle"
@@ -156,25 +163,28 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
             aria-controls="dash-mobile-menu"
             onClick={() => setMobileOpen((v) => !v)}
           >
-            Menu
+            <span className="dash-mobile-toggle__bars" aria-hidden="true" />
+            <span className="visually-hidden">Menu</span>
           </button>}
         </div>
       </div>
 
       {variant === "staff" && mobileOpen && (
-        <div id="dash-mobile-menu" className="dash-mobile">
+        <nav id="dash-mobile-menu" className="dash-mobile" aria-label="Staff dashboard">
           {groups.map((group) => (
             <div key={group.label} className="dash-mobile__group">
               <p className="dash-mobile__title">{group.label}</p>
               {group.items.map((item) => (
-                <a key={item.label} href={item.href} className="dash-menu__item" onClick={close}>
-                  <span className="dash-menu__label">{item.label}</span>
-                  <span className="dash-menu__hint">{item.hint}</span>
+                <a key={item.label} href={item.href} className="dash-mobile__item" aria-current={isHere(item.href) ? "page" : undefined} onClick={close}>
+                  {item.label}
                 </a>
               ))}
             </div>
           ))}
-        </div>
+          <button type="button" className="dash-mobile__signout" onClick={() => { close(); void supabase()?.auth.signOut(); }}>
+            Sign out
+          </button>
+        </nav>
       )}
     </header>
   );

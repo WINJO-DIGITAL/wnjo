@@ -13,6 +13,7 @@ export function AccountMenu({ signedOutLink = false }: { signedOutLink?: boolean
   const client = supabase();
   const [session, setSession] = useState<Session | null>(null);
   const [isStaff, setIsStaff] = useState(false);
+  const [roleKnown, setRoleKnown] = useState(false);
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -33,7 +34,9 @@ export function AccountMenu({ signedOutLink = false }: { signedOutLink?: boolean
       .select("role")
       .eq("user_id", session.user.id)
       .then(({ data }) => {
-        if (!cancelled) setIsStaff(Boolean(data && data.length > 0));
+        if (cancelled) return;
+        setIsStaff(Boolean(data && data.length > 0));
+        setRoleKnown(true);
       });
     return () => {
       cancelled = true;
@@ -86,17 +89,17 @@ export function AccountMenu({ signedOutLink = false }: { signedOutLink?: boolean
       {open && (
         <div className="account-menu__panel" role="menu">
           <p className="account-menu__who">{email}</p>
-          {!isStaff && (
+          {roleKnown && !isStaff && (
             <Link href="/account" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
               Your websites
             </Link>
           )}
-          {!isStaff && (
+          {roleKnown && !isStaff && (
             <Link href="/account/settings" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
               Settings
             </Link>
           )}
-          {isStaff && (
+          {roleKnown && isStaff && (
             <Link href="/admin" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
               Staff admin
             </Link>

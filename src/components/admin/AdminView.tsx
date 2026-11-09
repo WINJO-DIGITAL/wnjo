@@ -83,22 +83,24 @@ export function AdminView() {
     return () => data.subscription.unsubscribe();
   }, [client]);
 
+  const userId = session?.user.id;
   useEffect(() => {
-    if (!client || !session) return;
+    if (!client || !userId) return;
     let cancelled = false;
-    client
-      .from("tenant_members")
-      .select("tenant_id, role")
-      .eq("user_id", session.user.id)
-      .then(({ data }) => {
-        if (cancelled) return;
-        const first = (data as Membership[] | null)?.[0];
-        setMembership(first ?? null);
-      });
+    // An empty answer can come back before the sign-in has settled, so ask once more before saying "no access".
+    const look = async (attempt: number) => {
+      const { data } = await client.from("tenant_members").select("tenant_id, role").eq("user_id", userId);
+      if (cancelled) return;
+      const first = (data as Membership[] | null)?.[0];
+      if (first) setMembership(first);
+      else if (attempt === 0) setTimeout(() => void look(1), 700);
+      else setMembership(null);
+    };
+    void look(0);
     return () => {
       cancelled = true;
     };
-  }, [client, session]);
+  }, [client, userId]);
 
   if (!client) return <p className="lede">The admin area isn&apos;t switched on yet.</p>;
   if (session === undefined) return <p className="lede">Checking your access…</p>;
@@ -106,7 +108,7 @@ export function AdminView() {
   if (membership === "loading") return <p className="lede">Checking your access…</p>;
   if (!membership) {
     return (
-      <div>
+      <div className="admin-noaccess">
         <p className="lede">You don&apos;t have access to the agency admin.</p>
         <button type="button" className="btn btn--secondary" onClick={() => client.auth.signOut()}>
           Sign out
@@ -118,7 +120,6 @@ export function AdminView() {
   return (
     <div className="admin">
       <div className="dash-page__head">
-        <p className="dash-eyebrow">{TAB_INFO[tab].group}</p>
         <h1 className="dash-title">{TAB_INFO[tab].title}</h1>
       </div>
       {tab === "overview" && <StaffOverview client={client} />}
