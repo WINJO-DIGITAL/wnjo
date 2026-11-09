@@ -26,14 +26,17 @@ export async function POST(request: NextRequest) {
 
   const body = ((await request.json().catch(() => null)) ?? {}) as { reference?: unknown };
   const reference = typeof body.reference === "string" && /^WS-[A-Z0-9]{6}$/.test(body.reference) ? body.reference : null;
+  // ilike treats "_" and "%" as wildcards, so match the email exactly in code instead.
   let query = db
     .from("website_subscriptions")
-    .select("stripe_customer_id")
-    .ilike("email", customer.email)
+    .select("stripe_customer_id, email, reference, created_at")
     .not("stripe_customer_id", "is", null);
   if (reference) query = query.eq("reference", reference);
-  const { data } = await query.order("created_at", { ascending: false }).limit(1).maybeSingle();
-  const stripeCustomer = (data as { stripe_customer_id: string | null } | null)?.stripe_customer_id;
+  const { data: rows } = await query.order("created_at", { ascending: false }).limit(200);
+  const mine = ((rows ?? []) as { stripe_customer_id: string | null; email: string }[]).filter(
+    (row) => row.email.trim().toLowerCase() === customer.email.trim().toLowerCase(),
+  );
+  const stripeCustomer = mine[0]?.stripe_customer_id ?? null;
   if (!stripeCustomer) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
   try {
