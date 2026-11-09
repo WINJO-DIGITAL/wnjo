@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  staffStageLabel,
   APPROVALS,
   APPROVAL_ORDER,
   PROPOSAL_STATUSES,
-  STAGES,
   approvalState,
   stagePath,
   type ApprovalKind,
@@ -129,7 +129,7 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
                   {r.figures.mode === "monthly" ? `${pounds(r.figures.monthly)} a month` : pounds(r.figures.oneOffTotal)}
                 </span>
               </td>
-              <td>{STAGES[r.stage].label}</td>
+              <td>{staffStageLabel(r.stage)}</td>
               <td className="admin-table__end">{when.format(new Date(r.created_at))}</td>
             </tr>
           ))}
@@ -232,7 +232,7 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
             </dl>
           </div>
 
-          <StageControl row={row} path={path} busy={busy} onMove={(stage, note) => act({ action: "stage", stage, note }, `Moved to ${STAGES[stage].label}.`)} />
+          <StageControl row={row} path={path} busy={busy} onMove={(stage, note) => act({ action: "stage", stage, note }, `Moved to ${staffStageLabel(stage)}.`)} />
 
           <ExpectedDate key={`${row.id}:${row.expected_by ?? ""}`} row={row} busy={busy} act={act} />
 
@@ -287,7 +287,7 @@ function StageControl({ row, path, busy, onMove }: { row: BriefRow; path: Stage[
       <ol className="build-path" role="list">
         {path.map((s, i) => (
           <li key={s} className={i < here ? "is-done" : i === here ? "is-current" : undefined}>
-            {STAGES[s].label}
+            {staffStageLabel(s)}
           </li>
         ))}
       </ol>
@@ -295,7 +295,7 @@ function StageControl({ row, path, busy, onMove }: { row: BriefRow; path: Stage[
         <label htmlFor={`stage-${row.id}`} className="visually-hidden">Move to stage</label>
         <select id={`stage-${row.id}`} className="acct-input" value={target} onChange={(e) => setTarget(e.target.value as Stage)}>
           {[...path, "on_hold" as Stage, "closed" as Stage].map((s) => (
-            <option key={s} value={s}>{STAGES[s].label}</option>
+            <option key={s} value={s}>{staffStageLabel(s)}</option>
           ))}
         </select>
         <input className="acct-input" placeholder="Note (optional)" value={note} maxLength={500} onChange={(e) => setNote(e.target.value)} aria-label="Stage note" />
@@ -422,7 +422,7 @@ const DETAIL_TEXT = (e: EventRow): string => {
     case "created":
       return "Brief sent";
     case "stage":
-      return `Stage: ${STAGES[d.from as Stage]?.label ?? d.from} → ${STAGES[d.to as Stage]?.label ?? d.to}${d.note ? ` · ${d.note}` : ""}`;
+      return `Stage: ${staffStageLabel(d.from as Stage)} → ${staffStageLabel(d.to as Stage)}${d.note ? ` · ${d.note}` : ""}`;
     case "approval":
       return `${APPROVALS[d.kind as ApprovalKind]?.label ?? d.kind} ${d.decision}${d.note ? ` · ${d.note}` : ""}`;
     case "proposal":

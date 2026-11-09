@@ -13,7 +13,8 @@ export const STAGES = {
   reviewing: { label: "Under review", customer: "We're reviewing your brief." },
   proposal: { label: "Proposal", customer: "Your proposal is being prepared." },
   awaiting_payment: { label: "Payment", customer: "Ready for your first payment." },
-  specification: { label: "Planning your website", customer: "We're putting your plan together." },
+  // Customers never see the AI step by name. Staff see the plain description so they know what the step is.
+  specification: { label: "Planning your website", staffLabel: "AI processing", customer: "We're putting your plan together." },
   building: { label: "Website generation", customer: "Your website is being generated." },
   preview: { label: "Awaiting customer review", customer: "Your private preview is ready for you to review." },
   changes: { label: "Changes requested", customer: "We're making the changes you asked for." },
@@ -23,6 +24,12 @@ export const STAGES = {
   closed: { label: "Closed", customer: "This brief is closed." },
 } as const;
 export type Stage = keyof typeof STAGES;
+
+/** The stage name for staff screens. Most stages read the same for staff and customers. */
+export function staffStageLabel(stage: Stage): string {
+  const entry = STAGES[stage] as { label: string; staffLabel?: string };
+  return entry.staffLabel ?? entry.label;
+}
 
 export type Route = "package" | "proposal";
 
