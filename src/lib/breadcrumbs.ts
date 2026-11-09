@@ -1,7 +1,7 @@
 /** Names for each public page, used for breadcrumbs. Pages not listed (and the dashboards) get no breadcrumb. */
 const LABELS: Record<string, string> = {
   "/websites": "Websites",
-  "/build": "Get my price",
+  "/build": "Build my website",
   "/booking-software": "Booking software",
   "/app-development": "App development",
   "/work": "Our work",

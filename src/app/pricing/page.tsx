@@ -39,7 +39,7 @@ export default function PricingPage() {
         <div className="btn-row">
           <Link href="/build" className="btn btn--primary">
             <Stopwatch />
-            Build my quote
+            Build my website
           </Link>
           <Link href="#compare" className="btn btn--secondary">
             Compare packages
@@ -182,7 +182,7 @@ export default function PricingPage() {
       >
         <Link href="/build" className="btn btn--primary">
           <Stopwatch />
-          Build my quote
+          Build my website
         </Link>
         <Link href="/contact?topic=website" className="btn btn--secondary">
           Talk to us

@@ -42,5 +42,6 @@ export const LIMITS_PER_ROUTE = {
   enquiry: { max: 5, windowSeconds: 10 * 60 },
   checkout: { max: 10, windowSeconds: 10 * 60 },
   uploadUrl: { max: 40, windowSeconds: 10 * 60 },
+  briefUpload: { max: 20, windowSeconds: 10 * 60 },
   notify: { max: 30, windowSeconds: 10 * 60 },
 } as const;

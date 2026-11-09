@@ -129,7 +129,7 @@ export default function WorkPage() {
       >
         <Link href="/build" className="btn btn--primary">
           <Stopwatch />
-          Get my price
+          Build my website
         </Link>
         <Link href="/contact" className="btn btn--secondary">
           Talk to us

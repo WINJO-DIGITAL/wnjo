@@ -435,7 +435,7 @@ function SiteHeader() {
           <div className="header-cta" onMouseEnter={() => hoverItem(null)}>
             <AccountMenu signedOutLink />
             <Link href="/build" className="btn btn--primary btn--sm" onClick={closeIfSamePage} transitionTypes={NAV}>
-              Get my price
+              Build my website
             </Link>
           </div>
 
@@ -556,7 +556,7 @@ function SiteHeader() {
             style={{ "--i": primaryNav.length } as React.CSSProperties}
           >
             <Stopwatch />
-            Get my price
+            Build my website
           </Link>
           {contactPhoneHref && (
             <a

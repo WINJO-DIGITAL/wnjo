@@ -22,7 +22,7 @@ export function StickyCta() {
   useEffect(() => {
     if (HIDDEN_ON.includes(pathname)) return;
     if (pathname === "/") {
-      // Homepage: the bar takes over once the hero (which ends with the top "Get my price" button) has scrolled away,
+      // Homepage: the bar takes over once the hero (which ends with the top "Build my website" button) has scrolled away,
       // on every screen size, and steps aside only over the footer.
       let topVisible = true;
       let footerVisible = false;
@@ -96,7 +96,7 @@ export function StickyCta() {
     <aside className="sticky-cta" aria-label="Get started" data-show={show} inert={!show}>
       <Link href="/build" className="btn btn--primary">
         <Stopwatch />
-        Get my price
+        Build my website
       </Link>
       {contactPhoneHref ? (
         <a href={contactPhoneHref} className="btn btn--secondary">

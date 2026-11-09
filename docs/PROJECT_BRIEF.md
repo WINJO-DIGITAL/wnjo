@@ -606,14 +606,14 @@ Confirmed by the owner on 8 November 2026 and live on `winjodigital.co.uk`. This
 ### 18.1 Positioning
 - WINJO DIGITAL sells business outcomes through technology. Websites, booking systems and software are the means; the result for the business is the product.
 - Homepage hero, one sentence: "More enquiries, less admin, and software that fits."
-- Primary call to action: "Let's talk about your business". The header button stays "Get my price" (owner's choice).
+- Primary call to action: "Let's talk about your business". The header button is "Build my website" (owner's choice, 9 November 2026); "Call us" stays.
 - Avoid generic agency phrases and unmeasured claims. Outcomes are stated as what the work is built to do, never as measured results, unless the owner publishes real figures.
 
 ### 18.2 Service architecture
 - Grow: bespoke websites, landing pages and lead capture (`/websites`).
 - Simplify: booking systems and business automation (`/booking-software`).
 - Build: apps, portals, platforms and custom software (`/app-development`). FYStay, our own platform, is the proof.
-- URLs are unchanged for SEO; only the labels changed. Navigation: Work, Grow, Simplify, Build, Pricing, plus "Get my price".
+- URLs are unchanged for SEO; only the labels changed. Navigation: Work, Grow, Simplify, Build, Pricing, plus "Build my website".
 - The contact form's first step asks for a goal ("Win more enquiries", "Take bookings without the phone", and so on). Each maps to an existing enquiry topic, so stored records and enquiry emails keep the product name.
 
 ### 18.3 Commercial model

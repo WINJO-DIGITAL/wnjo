@@ -577,6 +577,17 @@ main {
   border-color: currentColor;
 }
 
+/* The same link style on a button (Edit, Change package): no browser button chrome. */
+button.arrow-link {
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: none;
+  padding: 0 0 2px;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
 .arrow-link svg {
   transition: transform var(--duration) var(--ease);
 }
@@ -9852,7 +9863,7 @@ body:has(.dash-header) .site-footer {
   .hero-ssr-wide { display: block; }
 }
 
-/* Phone menu: Call us sits just under Get my price. */
+/* Phone menu: Call us sits just under Build my website. */
 .mm-cta + .mm-cta { margin-top: var(--space-3); }
 
 /* Booking demo: each step is a button that moves the replay to it. */
@@ -10722,4 +10733,259 @@ body:has(.dash-header) .site-footer {
   gap: var(--space-3) var(--space-4);
   margin: var(--space-5) 0 0;
   font-size: 1.05rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Website brief steps (Build my website)                              */
+/* ------------------------------------------------------------------ */
+.brief-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.brief-chip {
+  padding: 0.5rem 0.95rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease),
+    border-color var(--duration-fast) var(--ease),
+    color var(--duration-fast) var(--ease);
+}
+.brief-chip:hover {
+  border-color: var(--color-ink-3);
+}
+.brief-chip[aria-pressed="true"] {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-inverse-ink);
+}
+.brief-chip:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+.brief-add {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  max-width: 28rem;
+}
+.brief-add .input {
+  flex: 1;
+  min-width: 0;
+}
+.brief-count {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}
+.brief-count--over {
+  color: var(--color-accent);
+}
+
+.brief-styles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: var(--space-3);
+}
+.brief-style {
+  display: grid;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+.brief-style__preview {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  aspect-ratio: 4 / 3;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition:
+    box-shadow var(--duration-fast) var(--ease),
+    transform var(--duration) var(--ease);
+}
+.brief-style:hover .brief-style__preview {
+  transform: translateY(-2px);
+}
+.brief-style:has(input:checked) .brief-style__preview {
+  box-shadow:
+    0 0 0 2px var(--color-bg),
+    0 0 0 4px var(--color-ink);
+}
+.brief-style:has(input:focus-visible) .brief-style__preview {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 4px;
+}
+.brief-style__nav {
+  height: 3px;
+  width: 40%;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+.brief-style__type {
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-top: 0.2rem;
+}
+.brief-style__type--serif {
+  font-family: var(--font-serif);
+}
+.brief-style__type--sans {
+  font-family: var(--font-sans);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+.brief-style__line {
+  height: 3px;
+  width: 80%;
+  border-radius: 2px;
+  opacity: 0.35;
+}
+.brief-style__line--short {
+  width: 55%;
+}
+.brief-style__btn {
+  width: 38%;
+  height: 0.7rem;
+  border-radius: var(--radius-pill);
+  margin-top: 0.15rem;
+}
+.brief-style__label {
+  font-size: var(--text-sm);
+  font-weight: 550;
+}
+.brief-style__clear {
+  margin-top: var(--space-3);
+}
+.brief-style__clear:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.brief-drop {
+  display: grid;
+  gap: var(--space-1);
+  place-items: center;
+  padding: var(--space-6) var(--space-4);
+  border: 1.5px dashed var(--color-line-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease);
+}
+.brief-drop:hover,
+.brief-drop:has(input:focus-visible) {
+  border-color: var(--color-ink);
+}
+.brief-drop:has(input:disabled) {
+  cursor: default;
+  opacity: 0.7;
+}
+.brief-drop__title {
+  font-weight: 550;
+}
+.brief-drop__hint {
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}
+.brief-files {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--color-line);
+}
+.brief-files li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-line);
+  font-size: var(--text-sm);
+}
+.brief-files__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.brief-files__size {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}
+.brief-files__remove {
+  border: 0;
+  background: none;
+  padding: 0.25rem 0;
+  color: var(--color-ink-2);
+  font: inherit;
+  font-size: var(--text-xs);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.brief-errors {
+  list-style: none;
+  padding: 0;
+  margin-top: var(--space-2);
+}
+
+.brief-summary {
+  margin: 0;
+  border-top: 1px solid var(--color-line);
+}
+.brief-summary > div {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr auto;
+  gap: var(--space-3);
+  align-items: baseline;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-line);
+}
+.brief-summary dt {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+.brief-summary dd {
+  margin: 0;
+  font-size: var(--text-sm);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.brief-summary__style {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.brief-swatch {
+  display: inline-flex;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  border: 1px solid var(--color-line-strong);
+}
+.brief-swatch span {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+@media (max-width: 34rem) {
+  .brief-summary > div {
+    grid-template-columns: 1fr auto;
+  }
+  .brief-summary dd {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 }

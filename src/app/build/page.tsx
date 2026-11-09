@@ -8,8 +8,8 @@ import { ONE_OFF_WEBSITE, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
 export const metadata = pageMetadata(
   "/build",
-  "Get your website price",
-  `Build your website quote in a few steps: monthly websites from ${formatGBP(WEBSITE_PLANS.bronze.monthly)} or a one-off bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}, with your first payment and monthly price shown as you go.`,
+  "Build my website",
+  `Build your website brief and see your price in a few steps: monthly websites from ${formatGBP(WEBSITE_PLANS.bronze.monthly)} or a one-off bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}, with your first payment and monthly price shown as you go.`,
 );
 
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
@@ -32,9 +32,9 @@ export default async function BuildPage({
   return (
     <>
       <PageHero
-        eyebrow="Website quote"
-        title={<>Get your website price.</>}
-        lede={`Monthly websites from ${formatGBP(WEBSITE_PLANS.bronze.monthly)}, or bespoke from ${formatGBP(ONE_OFF_WEBSITE.from)}. See your first payment and monthly price as you choose. Nothing is charged.`}
+        eyebrow="Build my website"
+        title={<>Build your website.</>}
+        lede={`From ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month or ${formatGBP(ONE_OFF_WEBSITE.from)} up front. Your price updates as you go. Nothing is charged.`}
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">

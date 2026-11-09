@@ -64,7 +64,7 @@ export default function HomePage() {
               style={{ "--i": 3 } as React.CSSProperties}
             >
               <Link href="/build" className="btn btn--primary">
-                Get my website price
+                Build my website
               </Link>
               <Link href="/work" className="btn btn--secondary">
                 Explore our work
@@ -291,7 +291,7 @@ export default function HomePage() {
         body={<>Tell us what&apos;s getting in the way. We&apos;ll tell you honestly how we&apos;d fix it.</>}
       >
         <Link href="/build" className="btn btn--primary">
-          Get my website price
+          Build my website
         </Link>
         <Link href="/contact" className="btn btn--secondary">
           Let&apos;s talk about your business

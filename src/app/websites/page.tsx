@@ -27,7 +27,7 @@ export default function WebsitesPage() {
         <div className="btn-row">
           <Link href="/build" className="btn btn--primary">
             <Stopwatch />
-            Get my price
+            Build my website
           </Link>
           <Link href="/pricing" className="btn btn--secondary">
             See all prices
@@ -83,7 +83,7 @@ export default function WebsitesPage() {
       >
         <Link href="/build" className="btn btn--primary">
           <Stopwatch />
-          Get my price
+          Build my website
         </Link>
         <Link href="/contact?topic=website" className="btn btn--secondary">
           Talk to us

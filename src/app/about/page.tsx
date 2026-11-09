@@ -36,7 +36,7 @@ function StandardDemo({ kind }: { kind: (typeof standards)[number][2] }) {
       <span className="std std--a11y">
         <kbd>Tab</kbd>
         <span className="std__arrow" />
-        <span className="std__btn">Get my price</span>
+        <span className="std__btn">Build my website</span>
       </span>
     );
   if (kind === "fast")
@@ -141,7 +141,7 @@ export default function AboutPage() {
       <CtaBand tone="light" title={<>Let&apos;s build something you&apos;re proud of.</>}>
         <Link href="/build" className="btn btn--primary">
           <Stopwatch />
-          Get my price
+          Build my website
         </Link>
         <Link href="/contact" className="btn btn--secondary">
           Talk to us

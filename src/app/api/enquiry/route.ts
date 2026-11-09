@@ -14,6 +14,9 @@ import { INTENTS, cleanDetails, formatDetails, validateDetails, type Intent } fr
 import { customerAcknowledgement, ownerSubject } from "@/lib/website-emails";
 import { ROUTED_WANTS, formatWebsiteQuote, parseWebsiteAnswers, websiteQuote } from "@/lib/website-quote";
 import { formatGBP } from "@/lib/pricing";
+import { confirmBriefFiles, createBrief } from "@/lib/brief-store";
+import { WNJO_TENANT_ID } from "@/lib/enquiry-store";
+import { DRAFT_ID_RE, cleanBrief, formatBrief as formatWebsiteBrief, validateBrief } from "@/lib/website-brief";
 
 export const runtime = "nodejs";
 
@@ -193,6 +196,16 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
   if (Object.keys(fieldErrors).length) {
     return NextResponse.json({ error: "Please check the highlighted fields.", fields: fieldErrors }, { status: 422 });
   }
+  // The brief (goals, pages, design, files). Older pages without it still send a quote.
+  const draftId = typeof body.draftId === "string" && DRAFT_ID_RE.test(body.draftId) ? body.draftId : null;
+  const hasBrief = body.brief !== undefined && body.brief !== null;
+  let brief = cleanBrief(body.brief, draftId ?? undefined);
+  if (hasBrief) {
+    const briefErrors = validateBrief(brief);
+    if (Object.keys(briefErrors).length) {
+      return NextResponse.json({ error: "Please complete your brief.", brief: briefErrors }, { status: 422 });
+    }
+  }
 
   const config = mailConfig();
   const storeOn = enquiryStoreConfigured();
@@ -222,7 +235,10 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
     formatDetails(details),
     "",
     formatWebsiteQuote(answers, quote, formatGBP),
-  ].join("\n");
+  ];
+  const db = serviceClient();
+  if (hasBrief && db && draftId) brief = await confirmBriefFiles(db, draftId, brief);
+  if (hasBrief) text.push("", formatWebsiteBrief(brief));
 
   const saved = storeOn
     ? await saveEnquiry({
@@ -233,7 +249,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
         company: details.businessName,
         topic: intent === "callback" ? "Callback request" : "Website quote",
         subject,
-        body: text,
+        body: text.join("\n"),
         answers: {
           type: "website",
           version: 1,
@@ -252,11 +268,27 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
         },
       })
     : false;
-  const sent = config ? await sendEnquiryEmail(config, { subject, text, replyTo: details.email }) : false;
+  const sent = config ? await sendEnquiryEmail(config, { subject, text: text.join("\n"), replyTo: details.email }) : false;
 
   if (!saved && !sent) {
     return NextResponse.json({ error: "We couldn't send your quote just now. Please try again shortly." }, { status: 502 });
   }
+
+  // The tracked brief: what the customer follows in their account and staff approve stage by stage.
+  const created =
+    hasBrief && saved && db
+      ? await createBrief(db, {
+          tenantId: WNJO_TENANT_ID,
+          reference,
+          email: details.email,
+          name: details.name,
+          businessName: details.businessName,
+          draftId,
+          brief,
+          answers,
+          quote,
+        })
+      : null;
 
   // The customer's copy. A failure here doesn't undo the enquiry: we already have it.
   const customerConfig = notificationMailConfig();
@@ -266,6 +298,6 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
     await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Quote acknowledgement");
   }
 
-  return NextResponse.json({ ok: true, reference });
+  return NextResponse.json({ ok: true, reference, route: created?.route ?? null, tracked: Boolean(created) });
 }
 

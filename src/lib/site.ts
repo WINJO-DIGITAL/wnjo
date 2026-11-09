@@ -77,7 +77,7 @@ export const primaryNav: NavItem[] = [
     menu: {
       primary: [
         { href: "/websites", label: "Websites that win customers" },
-        { href: "/build", label: "Get my price" },
+        { href: "/build", label: "Build my website" },
         { href: "/pricing", label: "Packages & prices" },
         { href: "/pricing#care", label: "Hosting & care" },
       ],
@@ -93,7 +93,7 @@ export const primaryNav: NavItem[] = [
         {
           title: "Get started",
           links: [
-            { href: "/build", label: "Get my price" },
+            { href: "/build", label: "Build my website" },
             { href: "/contact?topic=website", label: "Talk to us" },
           ],
         },
@@ -159,7 +159,7 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
     title: "Pricing",
     links: [
       { href: "/pricing", label: "Ways to work with us" },
-      { href: "/build", label: "Get my price" },
+      { href: "/build", label: "Build my website" },
       { href: "/pricing#care", label: "Hosting & care" },
     ],
   },

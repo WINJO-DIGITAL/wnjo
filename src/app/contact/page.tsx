@@ -62,7 +62,7 @@ export default async function ContactPage({
                 </p>
                 <p className="mt-4">
                   <Link href="/build" className="arrow-link">
-                    Get my price <ArrowRight />
+                    Build my website <ArrowRight />
                   </Link>
                 </p>
               </div>

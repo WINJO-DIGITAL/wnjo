@@ -61,7 +61,7 @@ export function PackageCards({ compact = false }: { compact?: boolean }) {
               href={`/build?plan=${id}`}
               className={`btn ${plan.popular ? "btn--primary" : "btn--secondary"} pkg-card__cta`}
             >
-              Build my quote
+              Build my website
             </Link>
           </li>
         );

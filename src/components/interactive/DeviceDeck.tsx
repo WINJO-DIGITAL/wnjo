@@ -300,7 +300,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         <Link href="/build" className="deck__btn">
           <Stopwatch size={20} />
           <span className="deck__btn-text">
-            <span className="deck__btn-main">Get my price</span>
+            <span className="deck__btn-main">Build my website</span>
             <span className="deck__btn-sub">
               Like {current.name}? In 2 minutes.
             </span>

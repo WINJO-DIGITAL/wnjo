@@ -51,7 +51,7 @@ export function PackageSelector() {
         <p className="pkg-selector__next" role="status">
           <span>{chosen.name} selected.</span>
           <Link href={`/build?plan=${selected}`} className="btn btn--primary">
-            Build my quote
+            Build my website
           </Link>
         </p>
       )}

@@ -42,7 +42,10 @@ import {
   type WebsiteAnswers,
   type WebsiteQuote,
 } from "@/lib/website-quote";
+import { routeFor } from "@/lib/build-journey";
+import { cleanBrief, validateBrief, EMPTY_BRIEF, DRAFT_ID_RE, type BriefErrors, type WebsiteBrief } from "@/lib/website-brief";
 import { ArrowLeft, ArrowRight } from "../Icons";
+import { BriefSummary, DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "./BriefSteps";
 import { useEnquirySubmit } from "../useEnquirySubmit";
 import styles from "./Configurator.module.css";
 
@@ -51,12 +54,14 @@ const STORAGE_KEY = "wnjo.website-quote.v1";
 const STEPS = [
   { id: "want", label: "Start", title: "What would you like?" },
   { id: "package", label: "Package", title: "Choose your package." },
-  { id: "pages", label: "Pages", title: "How many pages?" },
-  { id: "features", label: "Features", title: "What should your website do?" },
-  { id: "content", label: "Content", title: "Design and content." },
+  { id: "goals", label: "Goals", title: "What should it achieve?" },
+  { id: "pages", label: "Pages", title: "Which pages?" },
+  { id: "features", label: "Features", title: "What should it do?" },
+  { id: "design", label: "Design", title: "How should it look?" },
+  { id: "content", label: "Content", title: "Your content." },
   { id: "details", label: "Business", title: "About your business." },
-  { id: "summary", label: "Quote", title: "Your quote." },
-  { id: "next", label: "Next step", title: "How would you like to continue?" },
+  { id: "summary", label: "Review", title: "Your website brief." },
+  { id: "next", label: "Send", title: "How would you like to continue?" },
 ] as const;
 type StepId = (typeof STEPS)[number]["id"];
 const stepIndexOf = (id: StepId) => STEPS.findIndex((s) => s.id === id);
@@ -77,15 +82,18 @@ const CONTENT_QUESTIONS: { key: keyof ContentAnswers; legend: string }[] = [
 /** Choices carried in the link: ?plan=silver from a package card, ?type=oneOff, ?care=hosting, ?business=Café. */
 export type WebsiteConfiguratorParams = { plan?: string; type?: string; care?: string; pages?: string; business?: string };
 
-type Saved = { answers: WebsiteAnswers; details: WebsiteDetails };
+type Saved = { answers: WebsiteAnswers; details: WebsiteDetails; brief: WebsiteBrief; draftId: string | null };
 
 function loadSaved(): Saved | null {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const data = JSON.parse(raw) as { answers?: unknown; details?: unknown };
+    const data = JSON.parse(raw) as { answers?: unknown; details?: unknown; brief?: unknown; draftId?: unknown };
     const answers = parseWebsiteAnswers(data.answers);
-    return answers ? { answers, details: cleanDetails(data.details) } : null;
+    const draftId = typeof data.draftId === "string" && DRAFT_ID_RE.test(data.draftId) ? data.draftId : null;
+    return answers
+      ? { answers, details: cleanDetails(data.details), brief: data.brief ? cleanBrief(data.brief, draftId ?? undefined) : EMPTY_BRIEF, draftId }
+      : null;
   } catch {
     return null;
   }
@@ -101,7 +109,14 @@ function store(saved: Saved | null) {
 }
 
 function initialState(params: WebsiteConfiguratorParams, withSaved: boolean): Saved {
-  const saved = (withSaved ? loadSaved() : null) ?? { answers: DEFAULT_WEBSITE_ANSWERS, details: EMPTY_DETAILS };
+  const saved = (withSaved ? loadSaved() : null) ?? {
+    answers: DEFAULT_WEBSITE_ANSWERS,
+    details: EMPTY_DETAILS,
+    brief: EMPTY_BRIEF,
+    draftId: null,
+  };
+  // A random folder for this browser's uploads, kept with the saved draft. Only made in the browser.
+  const draftId = saved.draftId ?? (withSaved && typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : null);
   const answers = { ...saved.answers };
   if (params.plan && params.plan in WEBSITE_PLANS) {
     Object.assign(answers, { plan: params.plan as WebsitePlanId, mode: "monthly", want: "monthly" });
@@ -113,7 +128,7 @@ function initialState(params: WebsiteConfiguratorParams, withSaved: boolean): Sa
   if (params.pages && params.pages in WEBSITE_PAGE_BANDS) answers.pages = params.pages as WebsitePageBand;
   const business = params.business?.trim().slice(0, DETAIL_LIMITS.industry);
   const details = business && !saved.details.industry ? { ...saved.details, industry: business } : saved.details;
-  return { answers, details };
+  return { answers, details, brief: saved.brief, draftId };
 }
 
 const noopSubscribe = () => () => {};
@@ -152,6 +167,9 @@ function Inner({
   const [init] = useState(() => initialState(params, inBrowser));
   const [answers, setAnswers] = useState<WebsiteAnswers>(init.answers);
   const [details, setDetails] = useState<WebsiteDetails>(init.details);
+  const [brief, setBrief] = useState<WebsiteBrief>(init.brief);
+  const [briefErrors, setBriefErrors] = useState<BriefErrors>({});
+  const draftId = init.draftId;
   const [detailErrors, setDetailErrors] = useState<DetailErrors>({});
   const [intent, setIntent] = useState<Intent>("quote");
   const [honeypot, setHoneypot] = useState("");
@@ -164,6 +182,7 @@ function Inner({
   const firstRender = useRef(true);
 
   const quote = useMemo(() => websiteQuote(answers), [answers]);
+  const route = routeFor(quote);
   const step = STEPS[stepIndex];
   const routed = ROUTED_WANTS[answers.want];
   const monthly = answers.mode === "monthly";
@@ -172,8 +191,8 @@ function Inner({
 
   useEffect(() => {
     if (!inBrowser) return;
-    store(state.status === "success" ? null : { answers, details });
-  }, [answers, details, state.status, inBrowser]);
+    store(state.status === "success" ? null : { answers, details, brief, draftId });
+  }, [answers, details, brief, draftId, state.status, inBrowser]);
 
   useEffect(() => {
     if (firstRender.current) {
@@ -193,6 +212,11 @@ function Inner({
     if (detailErrors[key]) setDetailErrors((e) => ({ ...e, [key]: undefined }));
   };
 
+  const updateBrief: BriefChange = (patch) => {
+    setBrief((b) => ({ ...b, ...(typeof patch === "function" ? patch(b) : patch) }));
+    setBriefErrors({});
+  };
+
   const goTo = (index: number) => {
     setStepIndex(index);
     setFurthest((f) => Math.max(f, index));
@@ -206,6 +230,14 @@ function Inner({
     set("addOns", answers.addOns.includes(id) ? answers.addOns.filter((x) => x !== id) : [...answers.addOns, id]);
 
   const next = () => {
+    if (step.id === "goals" || step.id === "pages") {
+      const errors = validateBrief(brief);
+      const relevant = step.id === "goals" ? { goals: errors.goals } : { pages: errors.pages };
+      if (relevant.goals || relevant.pages) {
+        setBriefErrors(relevant);
+        return;
+      }
+    }
     if (step.id === "details") {
       const errors = validateDetails(cleanDetails(details), "quote");
       setDetailErrors(errors);
@@ -223,7 +255,13 @@ function Inner({
       if (!(intent === "callback" && Object.keys(errors).length === 1 && errors.phone)) goToId("details");
       return;
     }
-    const result = await submit({ kind: "website", intent, answers, details: cleaned, website: honeypot, startedAt });
+    const missing = validateBrief(brief);
+    if (missing.goals || missing.pages) {
+      setBriefErrors(missing);
+      goToId(missing.goals ? "goals" : "pages");
+      return;
+    }
+    const result = await submit({ kind: "website", intent, answers, details: cleaned, brief, draftId, website: honeypot, startedAt });
     // A server-side check of the business details sends the visitor back to that step, with the messages shown.
     if (result?.status === "error" && result.fields && Object.keys(result.fields).length) {
       setDetailErrors(result.fields as DetailErrors);
@@ -235,9 +273,9 @@ function Inner({
     return (
       <div className={styles.done}>
         <div className="card card--raised stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
-          <p className="eyebrow">{intent === "callback" ? "Callback requested" : "Quote received"}</p>
+          <p className="eyebrow">{intent === "callback" ? "Callback requested" : "Brief received"}</p>
           <h2 className="h2" tabIndex={-1} ref={(el) => el?.focus()}>
-            Thank you, {details.name.trim().split(/\s+/)[0]}. Your quote is with us.
+            Thank you, {details.name.trim().split(/\s+/)[0]}. Your brief is with us.
           </h2>
           <p className="muted">
             Your reference is <strong>{state.reference}</strong>. A copy is on its way to <strong>{details.email}</strong>.{" "}
@@ -246,8 +284,18 @@ function Inner({
               : "We'll reply within one working day with a written proposal."}{" "}
             Nothing is charged until you accept it.
           </p>
+          {state.tracked && (
+            <p className="muted">
+              Follow its progress in your account: sign in with <strong>{details.email}</strong>.
+            </p>
+          )}
           <QuoteBreakdown quote={quote} />
           <div className="btn-row">
+            {state.tracked && (
+              <Link href="/account" className="btn btn--primary">
+                Track my website
+              </Link>
+            )}
             <Link href="/work" className="btn btn--secondary">
               See our work
             </Link>
@@ -383,30 +431,40 @@ function Inner({
               </>
             )}
 
+            {step.id === "goals" && <GoalsField brief={brief} onChange={updateBrief} error={briefErrors.goals} />}
+
             {step.id === "pages" && (
-              <ChoiceGroup
-                legend="Number of pages"
-                name="pages"
-                hint={`${monthly ? plan.name : ONE_OFF_WEBSITE.name} includes up to ${quote.pagesIncluded} pages. Extra pages are ${monthly ? `${formatGBP(EXTRA_PAGE.monthly)} a month` : formatGBP(EXTRA_PAGE.oneOff)} each.`}
-                options={Object.fromEntries(
-                  (Object.keys(WEBSITE_PAGE_BANDS) as WebsitePageBand[]).map((band) => {
-                    const max = WEBSITE_PAGE_BANDS[band].max;
-                    const extra = max === null ? null : Math.max(0, max - quote.pagesIncluded);
-                    const hint =
-                      max === null
-                        ? "Custom quote"
-                        : extra === 0
-                          ? "Included"
-                          : monthly
-                            ? `+${formatGBP(extra! * EXTRA_PAGE.monthly)} a month (${extra} extra)`
-                            : `+${formatGBP(extra! * EXTRA_PAGE.oneOff)} (${extra} extra)`;
-                    return [band, { label: WEBSITE_PAGE_BANDS[band].label, hint }];
-                  }),
-                ) as Record<WebsitePageBand, { label: string; hint: string }>}
-                value={answers.pages}
-                onChange={(v) => set("pages", v)}
-                columns={2}
-              />
+              <>
+                <ChoiceGroup
+                  legend="Number of pages"
+                  name="pages"
+                  hint={`${monthly ? plan.name : ONE_OFF_WEBSITE.name} includes up to ${quote.pagesIncluded} pages. Extra pages are ${monthly ? `${formatGBP(EXTRA_PAGE.monthly)} a month` : formatGBP(EXTRA_PAGE.oneOff)} each.`}
+                  options={Object.fromEntries(
+                    (Object.keys(WEBSITE_PAGE_BANDS) as WebsitePageBand[]).map((band) => {
+                      const max = WEBSITE_PAGE_BANDS[band].max;
+                      const extra = max === null ? null : Math.max(0, max - quote.pagesIncluded);
+                      const hint =
+                        max === null
+                          ? "Custom quote"
+                          : extra === 0
+                            ? "Included"
+                            : monthly
+                              ? `+${formatGBP(extra! * EXTRA_PAGE.monthly)} a month (${extra} extra)`
+                              : `+${formatGBP(extra! * EXTRA_PAGE.oneOff)} (${extra} extra)`;
+                      return [band, { label: WEBSITE_PAGE_BANDS[band].label, hint }];
+                    }),
+                  ) as Record<WebsitePageBand, { label: string; hint: string }>}
+                  value={answers.pages}
+                  onChange={(v) => set("pages", v)}
+                  columns={2}
+                />
+                <PagesField
+                  brief={brief}
+                  onChange={updateBrief}
+                  error={briefErrors.pages}
+                  bandMax={WEBSITE_PAGE_BANDS[answers.pages].max}
+                />
+              </>
             )}
 
             {step.id === "features" && (
@@ -462,8 +520,11 @@ function Inner({
                     columns={2}
                   />
                 )}
+                <FunctionalityField brief={brief} onChange={updateBrief} />
               </>
             )}
+
+            {step.id === "design" && <DesignFields brief={brief} onChange={updateBrief} />}
 
             {step.id === "content" && (
               <>
@@ -499,6 +560,7 @@ function Inner({
                     ))}
                   </ul>
                 )}
+                <FilesField brief={brief} onChange={updateBrief} draftId={draftId} />
               </>
             )}
 
@@ -523,6 +585,15 @@ function Inner({
 
             {step.id === "summary" && (
               <>
+                <BriefSummary brief={brief} onEdit={goToId} />
+                {route === "proposal" && (
+                  <p className="notice notice--compact">
+                    <span>
+                      <strong>Bespoke brief.</strong> We&apos;ll send you a written proposal to approve before anything
+                      is charged.
+                    </span>
+                  </p>
+                )}
                 <QuoteBreakdown quote={quote} onEdit={goToId} />
                 <p className="fine">
                   This is an estimate. Final pricing is confirmed in a written proposal before you commit. {VAT_NOTE}
@@ -569,7 +640,7 @@ function Inner({
                     ? "Sending…"
                     : intent === "callback"
                       ? "Request my callback"
-                      : "Send my quote"}
+                      : "Send my brief"}
                 </button>
                 <p className="fine">
                   Nothing is charged now. We reply within one working day, and your price is confirmed in a written

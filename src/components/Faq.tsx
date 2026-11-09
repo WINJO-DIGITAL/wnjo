@@ -82,7 +82,7 @@ export function Faq() {
             Talk to us
           </Link>
           <Link href="/build" className="btn btn--secondary">
-            Get my price
+            Build my website
           </Link>
         </div>
       </aside>
