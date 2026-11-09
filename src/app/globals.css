@@ -12006,3 +12006,14 @@ body:has(.dash-header) .site-footer {
   width: 9rem;
   min-height: 40px;
 }
+
+/* Customer plan: what they pay and how far they are towards owning the website. */
+.plan-card {
+  gap: 8px;
+}
+.plan-card__title {
+  margin: 0;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 22px;
+  font-weight: 600;
+}
