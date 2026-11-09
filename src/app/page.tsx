@@ -57,7 +57,7 @@ export default function HomePage() {
               <span className="serif-em">from £99 a month.</span>
             </h1>
             <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
-              Built around your business. Hosting and support included, yours after 12 payments, or £999 up front.
+              Built around your business. Hosting and support included. You own the website once your plan ends, or pay £999 up front.
             </p>
             <div
               className="btn-row rise"
@@ -89,7 +89,7 @@ export default function HomePage() {
           </h2>
           <div className="tile__aside">
             <p className="tile__line">
-              Hosting, maintenance and support included. Yours after {OWNERSHIP.ownershipAfterPayments} payments.
+              Hosting, maintenance and support included. You own the website once your plan ends.
             </p>
             <p className="tile__more">
               <Link href="/pricing#compare" className="arrow-link">
