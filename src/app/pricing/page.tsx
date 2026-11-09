@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { CtaBand, PageHero, PricingNotice, SectionHead } from "@/components/Blocks";
-import { Stopwatch } from "@/components/Icons";
 import { HostingPicker, PlanFlow } from "@/components/interactive/PlanFlow";
 import {
   AddOnsTable,
@@ -38,7 +37,6 @@ export default function PricingPage() {
       >
         <div className="btn-row">
           <Link href="/build" className="btn btn--primary">
-            <Stopwatch />
             Build my website
           </Link>
           <Link href="#compare" className="btn btn--secondary">
@@ -181,7 +179,6 @@ export default function PricingPage() {
         body="Choose a package, add what you need, and see your first payment and monthly price as you go."
       >
         <Link href="/build" className="btn btn--primary">
-          <Stopwatch />
           Build my website
         </Link>
         <Link href="/contact?topic=website" className="btn btn--secondary">

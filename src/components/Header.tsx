@@ -6,7 +6,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { primaryNav, type NavItem, type NavLink, type NavMenu, contactPhoneHref } from "@/lib/site";
 import { AccountMenu } from "./account/AccountMenu";
 import { DashboardHeader } from "./dashboard/DashboardHeader";
-import { Stopwatch } from "./Icons";
 import { Logo } from "./Logo";
 import { ScrollProgress } from "./ScrollProgress";
 
@@ -555,7 +554,6 @@ function SiteHeader() {
             transitionTypes={NAV}
             style={{ "--i": primaryNav.length } as React.CSSProperties}
           >
-            <Stopwatch />
             Build my website
           </Link>
           {contactPhoneHref && (

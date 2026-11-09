@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Stopwatch } from "./Icons";
 import { contactPhoneHref } from "@/lib/site";
 
 /** Pages that already are the next step, so the bar would only get in the way. */
@@ -95,7 +94,6 @@ export function StickyCta() {
   return (
     <aside className="sticky-cta" aria-label="Get started" data-show={show} inert={!show}>
       <Link href="/build" className="btn btn--primary">
-        <Stopwatch />
         Build my website
       </Link>
       {contactPhoneHref ? (

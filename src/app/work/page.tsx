@@ -4,7 +4,7 @@ import { CtaBand, PageHero } from "@/components/Blocks";
 import { PhoneFrame } from "@/components/Devices";
 import { ScrollShot } from "@/components/interactive/ScrollShot";
 import { Tilt } from "@/components/interactive/Tilt";
-import { ArrowRight, Stopwatch } from "@/components/Icons";
+import { ArrowRight } from "@/components/Icons";
 import { pageMetadata } from "@/lib/metadata";
 import { INDUSTRIES, projects, type Industry } from "@/lib/projects";
 import { PortfolioFilter } from "@/components/interactive/PortfolioFilter";
@@ -128,7 +128,6 @@ export default function WorkPage() {
         body="Tell us what's getting in the way. We reply with honest advice, a clear price and a plan."
       >
         <Link href="/build" className="btn btn--primary">
-          <Stopwatch />
           Build my website
         </Link>
         <Link href="/contact" className="btn btn--secondary">

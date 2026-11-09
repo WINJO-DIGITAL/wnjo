@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { CtaBand, PageHero, SectionHead } from "@/components/Blocks";
 import { BrowserFrame } from "@/components/Devices";
-import { Stopwatch } from "@/components/Icons";
 import { WebsitesTile } from "@/components/WebsitesTile";
 import { projects } from "@/lib/projects";
 import { pageMetadata } from "@/lib/metadata";
@@ -26,7 +25,6 @@ export default function WebsitesPage() {
       >
         <div className="btn-row">
           <Link href="/build" className="btn btn--primary">
-            <Stopwatch />
             Build my website
           </Link>
           <Link href="/pricing" className="btn btn--secondary">
@@ -82,7 +80,6 @@ export default function WebsitesPage() {
         body="Nine quick steps to an instant estimate you can send us."
       >
         <Link href="/build" className="btn btn--primary">
-          <Stopwatch />
           Build my website
         </Link>
         <Link href="/contact?topic=website" className="btn btn--secondary">
