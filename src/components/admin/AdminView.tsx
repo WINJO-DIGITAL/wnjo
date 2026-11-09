@@ -421,7 +421,7 @@ function QuotesTable({ client }: { client: SupabaseClient }) {
               <tr key={r.id}>
                 <td>{when.format(new Date(r.created_at))}</td>
                 <td>{r.reference}</td>
-                <td>{r.status}</td>
+                <td className="admin-cap">{r.status}</td>
                 <td>{latest ? `${money.format(latest.range_low_pence / 100)} to ${money.format(latest.range_high_pence / 100)}` : "-"}</td>
                 <td>{r.expires_at ? when.format(new Date(r.expires_at)) : "-"}</td>
                 <td>
