@@ -640,3 +640,20 @@
   border: 1px solid var(--color-line);
   padding: var(--space-2) var(--space-3);
 }
+
+/* Paying straight from the quote: the amount, then the agreement. */
+.pay {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised, var(--color-bg));
+}
+.payAmount {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-3xl, 2.5rem);
+  line-height: 1.1;
+  color: var(--color-ink);
+}

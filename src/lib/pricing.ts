@@ -581,6 +581,13 @@ export function estimate(answers: Answers): Estimate {
 const gbp = new Intl.NumberFormat("en-GB", { style: "currency", currency: CURRENCY, maximumFractionDigits: 0 });
 export const formatGBP = (n: number) => gbp.format(n);
 
+/**
+ * An amount in pence, shown exactly: whole pounds without decimals, anything else with pence. Used wherever the
+ * amount a customer is about to be charged is shown, so a £499.50 deposit never reads as "£500".
+ */
+const gbpExact = new Intl.NumberFormat("en-GB", { style: "currency", currency: CURRENCY, minimumFractionDigits: 2, maximumFractionDigits: 2 });
+export const formatPence = (pence: number) => (pence % 100 === 0 ? gbp.format(pence / 100) : gbpExact.format(pence / 100));
+
 /* ------------------------------------------------------------------ */
 /* Validation of untrusted answers (used by the API route)            */
 /* ------------------------------------------------------------------ */

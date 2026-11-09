@@ -8,6 +8,7 @@ import {
   welcomeEmail,
   type SubscriptionEmailFacts,
 } from "./website-emails";
+import { advanceAfterPayment } from "./brief-payment";
 import { firstPaymentPence, ownershipDue, statusFromStripe } from "./website-subscriptions";
 
 /**
@@ -43,10 +44,11 @@ type Row = {
   minimum_term_months: number;
   ownership_after_payments: number;
   ownership_eligible_at: string | null;
+  enquiry_reference?: string | null;
 };
 
 const COLUMNS =
-  "id, tenant_id, reference, kind, status, email, name, package_name, setup_pence, monthly_pence, one_off_pence, minimum_term_months, ownership_after_payments, ownership_eligible_at";
+  "id, tenant_id, reference, kind, status, email, name, package_name, setup_pence, monthly_pence, one_off_pence, minimum_term_months, ownership_after_payments, ownership_eligible_at, enquiry_reference";
 
 type StripeObject = Record<string, unknown>;
 type StripeEvent = { type?: string; livemode?: boolean; data?: { object?: StripeObject } };
@@ -183,6 +185,7 @@ export async function handleWebsiteSubscriptionEvent(
       if (error) return "retry";
       if (Array.isArray(data) && data.length > 0) {
         await deps.emailCustomer(row.email, welcomeEmail(facts(row)));
+        await advanceAfterPayment(db, row.tenant_id, row.enquiry_reference);
         await deps.alertStaff(
           `New ${row.package_name} subscription`,
           `${row.reference}: ${row.name} subscribed. First payment ${amount / 100} GBP, then ${row.monthly_pence / 100} GBP a month.`,
@@ -202,6 +205,7 @@ export async function handleWebsiteSubscriptionEvent(
     if (counts === "error") return "retry";
     if (recorded) {
       await deps.emailCustomer(row.email, oneOffPaidEmail(facts(row)));
+      await advanceAfterPayment(db, row.tenant_id, row.enquiry_reference);
       await deps.alertStaff(`One-off website payment received`, `${row.reference}: ${row.name} paid ${amount / 100} GBP.`);
     }
     return "handled";

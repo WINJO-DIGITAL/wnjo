@@ -34,6 +34,7 @@ export const EMPTY_DETAILS: WebsiteDetails = {
 
 /** What the customer chose to do with their quote (step 8). */
 export const INTENTS = {
+  pay: { label: "Pay and start", hint: "Pay securely with Stripe and we start your website." },
   quote: { label: "Send my quote", hint: "We review it and reply with a written proposal." },
   callback: { label: "Request a callback", hint: "We call you to talk it through. Needs a phone number." },
   consultation: { label: "Book a consultation", hint: "Pick a time for a video or phone call." },

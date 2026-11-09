@@ -124,7 +124,7 @@ type Tables = Record<string, Record<string, unknown>[]>;
 function fakeDb(tables: Tables): SupabaseClient {
   class Query {
     private filters: [string, string, unknown][] = [];
-    private op: "select" | "update" | "upsert" = "select";
+    private op: "select" | "update" | "upsert" | "insert" = "select";
     private payload: Record<string, unknown> = {};
     private conflict = "";
     private returning = false;
@@ -135,6 +135,11 @@ function fakeDb(tables: Tables): SupabaseClient {
     }
     update(p: Record<string, unknown>) {
       this.op = "update";
+      this.payload = p;
+      return this;
+    }
+    insert(p: Record<string, unknown>) {
+      this.op = "insert";
       this.payload = p;
       return this;
     }
@@ -159,6 +164,10 @@ function fakeDb(tables: Tables): SupabaseClient {
     }
     private run(): { data: unknown; error: null } {
       if (this.op === "select") return { data: this.rows(), error: null };
+      if (this.op === "insert") {
+        (tables[this.table] ??= []).push({ id: `i${(tables[this.table] ?? []).length + 1}`, ...this.payload });
+        return { data: null, error: null };
+      }
       if (this.op === "update") {
         const hit = this.rows();
         hit.forEach((r) => Object.assign(r, this.payload));
@@ -305,6 +314,48 @@ describe("subscription webhooks", () => {
     expect(row.status).toBe("paid");
     expect(tables.website_subscription_payments).toHaveLength(1);
     expect(deps.emailCustomer).toHaveBeenCalledTimes(1);
+  });
+
+  describe("moving the customer's build on after the first payment", () => {
+    const withBrief = (over: Record<string, unknown> = {}, brief: Record<string, unknown> = {}) => {
+      const s = setup({ enquiry_reference: "WNJO-ABC123", ...over });
+      s.tables.website_briefs = [{ id: "b1", tenant_id: "t1", reference: "WNJO-ABC123", route: "package", stage: "awaiting_payment", ...brief }];
+      s.tables.website_brief_events = [];
+      return s;
+    };
+
+    it("a paid subscription moves its build on to the plan and records why", async () => {
+      const { db, deps, tables } = withBrief();
+      expect(await handleWebsiteSubscriptionEvent(db, completed(24800), deps)).toBe("handled");
+      expect(tables.website_briefs[0].stage).toBe("specification");
+      expect(tables.website_brief_events).toHaveLength(1);
+      expect(tables.website_brief_events[0]).toMatchObject({ kind: "stage", actor_type: "system", detail: { from: "awaiting_payment", to: "specification", note: "Payment received." } });
+    });
+
+    it("a paid one-off deposit does the same", async () => {
+      const { db, deps, tables } = withBrief({ kind: "one_off", monthly_pence: 0, setup_pence: 0, one_off_pence: 49950 }, { route: "proposal" });
+      const paid = { type: "checkout.session.completed", data: { object: { id: "cs_2", payment_status: "paid", amount_total: 49950, currency: "gbp", payment_intent: "pi_1", metadata: { website_subscription_id: "sub-1" } } } };
+      await handleWebsiteSubscriptionEvent(db, paid, deps);
+      expect(tables.website_briefs[0].stage).toBe("specification");
+    });
+
+    it("a repeated event doesn't move it again, and a payment that doesn't match the offer moves nothing", async () => {
+      const { db, deps, tables } = withBrief();
+      await handleWebsiteSubscriptionEvent(db, completed(24800), deps);
+      await handleWebsiteSubscriptionEvent(db, completed(24800), deps);
+      expect(tables.website_brief_events).toHaveLength(1);
+      const wrong = withBrief();
+      await handleWebsiteSubscriptionEvent(wrong.db, completed(100), wrong.deps);
+      expect(wrong.tables.website_briefs[0].stage).toBe("awaiting_payment");
+    });
+
+    it("leaves a build alone that has already moved past payment, or has no brief at all", async () => {
+      const later = withBrief({}, { stage: "building" });
+      await handleWebsiteSubscriptionEvent(later.db, completed(24800), later.deps);
+      expect(later.tables.website_briefs[0].stage).toBe("building");
+      const plain = setup();
+      expect(await handleWebsiteSubscriptionEvent(plain.db, completed(24800), plain.deps)).toBe("handled");
+    });
   });
 
   it("ignores events that aren't for a website subscription, so deposits still work", async () => {

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LegalDraftNotice } from "@/components/pricing/WebsitePackages";
 import { SubscribeActions } from "@/components/SubscribeActions";
-import { formatGBP } from "@/lib/pricing";
+import { formatPence } from "@/lib/pricing";
 import { serviceClient } from "@/lib/quote-store";
 import { OFFER_TOKEN_RE, firstPaymentPence, hashOfferToken } from "@/lib/website-subscriptions";
 
@@ -26,7 +26,7 @@ type Row = {
   cancel_at_period_end: boolean;
 };
 
-const gbp = (p: number) => formatGBP(p / 100);
+const gbp = (p: number) => formatPence(p);
 const date = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
 /** Loads the offer for a link, and whether an unpaid offer has expired. */

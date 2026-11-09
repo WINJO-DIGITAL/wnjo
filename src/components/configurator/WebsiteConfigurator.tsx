@@ -13,6 +13,7 @@ import {
   WEBSITE_PAGE_BANDS,
   WEBSITE_PLANS,
   formatGBP,
+  formatPence,
   type AddOnId,
   type CarePlan,
   type WebsitePageBand,
@@ -43,6 +44,7 @@ import {
   type WebsiteQuote,
 } from "@/lib/website-quote";
 import { routeFor } from "@/lib/build-journey";
+import { payNowFor } from "@/lib/pay-now";
 import { draftHasProgress } from "@/lib/brief-draft";
 import { loadBriefDraft, saveBriefDraft } from "@/lib/brief-draft-client";
 import { cleanBrief, validateBrief, EMPTY_BRIEF, DRAFT_ID_RE, type BriefErrors, type WebsiteBrief } from "@/lib/website-brief";
@@ -176,7 +178,9 @@ function Inner({
   const [resume, setResume] = useState<"restored" | "missing" | null>(null);
   const [copied, setCopied] = useState<"idle" | "copied" | "failed">("idle");
   const [detailErrors, setDetailErrors] = useState<DetailErrors>({});
-  const [intent, setIntent] = useState<Intent>("quote");
+  // Paying online is the default next step whenever the quote can be paid for straight away.
+  const [intent, setIntent] = useState<Intent>("pay");
+  const [agree, setAgree] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [stepIndex, setStepIndex] = useState(0);
   const [furthest, setFurthest] = useState(0);
@@ -188,6 +192,9 @@ function Inner({
 
   const quote = useMemo(() => websiteQuote(answers), [answers]);
   const route = routeFor(quote);
+  // What the customer pays now, or null when the build needs a written proposal first (bespoke builds over £1,000).
+  const payNow = payNowFor(route, quote);
+  const chosenIntent: Intent = intent === "pay" && !payNow ? "quote" : intent;
   const step = STEPS[stepIndex];
   const routed = ROUTED_WANTS[answers.want];
   const monthly = answers.mode === "monthly";
@@ -244,6 +251,12 @@ function Inner({
     }
   };
 
+  // Straight to Stripe once the server has saved the brief and set the payment up.
+  const payUrl = state.status === "success" ? state.pay?.url : undefined;
+  useEffect(() => {
+    if (payUrl) window.location.assign(payUrl);
+  }, [payUrl]);
+
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false;
@@ -299,10 +312,11 @@ function Inner({
   const onSend = async (event: React.FormEvent) => {
     event.preventDefault();
     const cleaned = cleanDetails(details);
-    const errors = validateDetails(cleaned, intent);
+    if (chosenIntent === "pay" && !agree) return;
+    const errors = validateDetails(cleaned, chosenIntent);
     if (Object.keys(errors).length) {
       setDetailErrors(errors);
-      if (!(intent === "callback" && Object.keys(errors).length === 1 && errors.phone)) goToId("details");
+      if (!(chosenIntent === "callback" && Object.keys(errors).length === 1 && errors.phone)) goToId("details");
       return;
     }
     const missing = validateBrief(brief);
@@ -311,7 +325,17 @@ function Inner({
       goToId(missing.goals ? "goals" : "pages");
       return;
     }
-    const result = await submit({ kind: "website", intent, answers, details: cleaned, brief, draftId, website: honeypot, startedAt });
+    const result = await submit({
+      kind: "website",
+      intent: chosenIntent,
+      agree: chosenIntent === "pay" ? agree : undefined,
+      answers,
+      details: cleaned,
+      brief,
+      draftId,
+      website: honeypot,
+      startedAt,
+    });
     // A server-side check of the business details sends the visitor back to that step, with the messages shown.
     if (result?.status === "error" && result.fields && Object.keys(result.fields).length) {
       setDetailErrors(result.fields as DetailErrors);
@@ -319,21 +343,44 @@ function Inner({
     }
   };
 
+  if (state.status === "success" && state.pay?.url) {
+    return (
+      <div className={styles.done}>
+        <div className="card card--raised stack" style={{ "--stack": "var(--space-4)" } as React.CSSProperties}>
+          <p className="eyebrow">Secure payment</p>
+          <h2 className="h2" tabIndex={-1} ref={(el) => el?.focus()}>
+            Taking you to our secure payment page.
+          </h2>
+          <p className="muted">
+            Your brief is saved. If nothing happens, <a href={state.pay.url}>continue to payment</a>.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (state.status === "success") {
     return (
       <div className={styles.done}>
         <div className="card card--raised stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
-          <p className="eyebrow">{intent === "callback" ? "Callback requested" : "Brief received"}</p>
+          <p className="eyebrow">{chosenIntent === "callback" ? "Callback requested" : "Brief received"}</p>
           <h2 className="h2" tabIndex={-1} ref={(el) => el?.focus()}>
             Thank you, {details.name.trim().split(/\s+/)[0]}. Your brief is with us.
           </h2>
-          <p className="muted">
-            Your reference is <strong>{state.reference}</strong>. A copy is on its way to <strong>{details.email}</strong>.{" "}
-            {intent === "callback"
-              ? `We'll call you on ${details.phone} within one working day.`
-              : "We'll reply within one working day with a written proposal."}{" "}
-            Nothing is charged until you accept it.
-          </p>
+          {state.paymentStarted ? (
+            <p className="muted">
+              Your reference is <strong>{state.reference}</strong>. We couldn&apos;t open the payment page just now, so we&apos;ve
+              emailed <strong>{details.email}</strong> a private link to finish paying. Nothing has been charged yet.
+            </p>
+          ) : (
+            <p className="muted">
+              Your reference is <strong>{state.reference}</strong>. A copy is on its way to <strong>{details.email}</strong>.{" "}
+              {chosenIntent === "callback"
+                ? `We'll call you on ${details.phone} within one working day.`
+                : "We'll reply within one working day with a written proposal."}{" "}
+              Nothing is charged until you accept it.
+            </p>
+          )}
           {state.tracked && (
             <p className="muted">
               Follow its progress in your account: sign in with <strong>{details.email}</strong>.
@@ -685,22 +732,28 @@ function Inner({
 
             {step.id === "next" && (
               <form id="quote-send" onSubmit={onSend} noValidate className="form">
-                <ChoiceGroup<Intent>
-                  legend="Next step"
-                  name="intent"
-                  options={
-                    (calendarEnabled
-                      ? INTENTS
-                      : { quote: INTENTS.quote, callback: INTENTS.callback }) as Record<Intent, { label: string; hint?: string }>
-                  }
-                  value={intent}
-                  onChange={(v) => setIntent(v as Intent)}
-                />
-                {!calendarEnabled && (
-                  <p className="fine">Online consultation booking is coming soon. For now, ask for a callback and we&apos;ll arrange a time.</p>
-                )}
-                {intent === "callback" && (
-                  <Field id="callback-phone" label="Phone number for the callback" type="tel" value={details.phone} error={detailErrors.phone} onChange={(v) => setDetail("phone", v)} autoComplete="tel" />
+                {chosenIntent === "pay" && payNow ? (
+                  <PayPanel quote={quote} payNow={payNow} agree={agree} onAgree={setAgree} />
+                ) : (
+                  <>
+                    <ChoiceGroup<Exclude<Intent, "pay">>
+                      legend="Next step"
+                      name="intent"
+                      options={
+                        (calendarEnabled
+                          ? { quote: INTENTS.quote, callback: INTENTS.callback, consultation: INTENTS.consultation }
+                          : { quote: INTENTS.quote, callback: INTENTS.callback }) as Record<Exclude<Intent, "pay">, { label: string; hint?: string }>
+                      }
+                      value={chosenIntent === "pay" ? "quote" : chosenIntent}
+                      onChange={(v) => setIntent(v)}
+                    />
+                    {!calendarEnabled && (
+                      <p className="fine">Online consultation booking is coming soon. For now, ask for a callback and we&apos;ll arrange a time.</p>
+                    )}
+                    {chosenIntent === "callback" && (
+                      <Field id="callback-phone" label="Phone number for the callback" type="tel" value={details.phone} error={detailErrors.phone} onChange={(v) => setDetail("phone", v)} autoComplete="tel" />
+                    )}
+                  </>
                 )}
                 <div className="visually-hidden" aria-hidden="true">
                   <label htmlFor="cfg-website">Leave this field empty</label>
@@ -716,17 +769,49 @@ function Inner({
                     {state.message} <Link href="/contact">Send us a message instead</Link>.
                   </p>
                 )}
-                <button type="submit" className="btn btn--primary" disabled={state.status === "submitting"}>
-                  {state.status === "submitting"
-                    ? "Sending…"
-                    : intent === "callback"
-                      ? "Request my callback"
-                      : "Send my brief"}
+                <button
+                  type="submit"
+                  className="btn btn--primary"
+                  disabled={state.status === "submitting" || (chosenIntent === "pay" && !agree)}
+                >
+                  {chosenIntent === "pay" && payNow
+                    ? state.status === "submitting"
+                      ? "Opening secure payment…"
+                      : `Pay ${formatPence(payNow.pence)} securely`
+                    : state.status === "submitting"
+                      ? "Sending…"
+                      : chosenIntent === "callback"
+                        ? "Request my callback"
+                        : "Send my brief"}
                 </button>
-                <p className="fine">
-                  Nothing is charged now. We reply within one working day, and your price is confirmed in a written
-                  proposal.
-                </p>
+                {chosenIntent === "pay" && payNow ? (
+                  <>
+                    <p className="fine">Payment is handled by Stripe. Your card details never reach our servers.</p>
+                    <p className="fine">
+                      Prefer to talk first?{" "}
+                      <button type="button" className={styles.linkBtn} onClick={() => setIntent("callback")}>
+                        Ask for a callback instead
+                      </button>
+                      .
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="fine">
+                      Nothing is charged now. We reply within one working day, and your price is confirmed in a written
+                      proposal.
+                    </p>
+                    {payNow && (
+                      <p className="fine">
+                        Ready to start?{" "}
+                        <button type="button" className={styles.linkBtn} onClick={() => setIntent("pay")}>
+                          Pay online instead
+                        </button>
+                        .
+                      </p>
+                    )}
+                  </>
+                )}
               </form>
             )}
           </div>
@@ -953,6 +1038,42 @@ function QuoteBreakdown({ quote, onEdit }: { quote: WebsiteQuote; onEdit?: (step
           </button>
         </p>
       )}
+    </div>
+  );
+}
+
+/** What the customer is about to pay, and the agreement they must tick first. */
+function PayPanel({
+  quote,
+  payNow,
+  agree,
+  onAgree,
+}: {
+  quote: WebsiteQuote;
+  payNow: { kind: "first_payment" | "deposit"; pence: number };
+  agree: boolean;
+  onAgree: (value: boolean) => void;
+}) {
+  const monthly = quote.mode === "monthly";
+  return (
+    <div className={styles.pay}>
+      <p className="eyebrow">{payNow.kind === "deposit" ? "Deposit" : "First payment"}</p>
+      <p className={styles.payAmount}>{formatPence(payNow.pence)}</p>
+      <p className="muted">
+        {monthly
+          ? `Your setup fee and first month. Then ${formatGBP(quote.monthly)} a month, with a ${OWNERSHIP.minimumTermMonths}-month minimum term.`
+          : `A 50% deposit on your ${formatGBP(quote.oneOffTotal)} website, as set out in our terms.`}
+      </p>
+      <label className="sub-agree">
+        <input type="checkbox" checked={agree} onChange={(e) => onAgree(e.target.checked)} />
+        <span>
+          I agree to the{" "}
+          <Link href="/terms" target="_blank">
+            terms
+          </Link>
+          {monthly ? ` and the ${OWNERSHIP.minimumTermMonths}-month minimum term` : ""}.
+        </span>
+      </label>
     </div>
   );
 }

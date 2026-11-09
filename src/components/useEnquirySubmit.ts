@@ -6,7 +6,17 @@ import type { FieldErrors } from "@/lib/enquiry";
 export type SubmitState =
   | { status: "idle" }
   | { status: "submitting" }
-  | { status: "success"; reference?: string; quoteReference?: string; route?: "package" | "proposal" | null; tracked?: boolean }
+  | {
+      status: "success";
+      reference?: string;
+      quoteReference?: string;
+      route?: "package" | "proposal" | null;
+      tracked?: boolean;
+      /** Where to send the customer to pay, when they chose to pay straight from their quote. */
+      pay?: { url: string } | null;
+      /** A payment was set up (even if the Stripe page couldn't be opened, so a link was emailed). */
+      paymentStarted?: boolean;
+    }
   | { status: "not_configured"; message: string }
   | { status: "error"; message: string; fields?: FieldErrors };
 
@@ -38,6 +48,8 @@ export function useEnquirySubmit() {
         quoteReference?: string;
         route?: "package" | "proposal" | null;
         tracked?: boolean;
+        pay?: { url?: unknown } | null;
+        paymentStarted?: boolean;
         fields?: FieldErrors;
       };
       if (res.ok) return settle({
@@ -46,6 +58,8 @@ export function useEnquirySubmit() {
           quoteReference: data.quoteReference,
           route: data.route,
           tracked: data.tracked,
+          pay: data.pay && typeof data.pay.url === "string" ? { url: data.pay.url } : null,
+          paymentStarted: data.paymentStarted === true,
         });
       if (data.code === "not_configured") {
         return settle({ status: "not_configured", message: data.error ?? "Online enquiries aren't connected yet." });

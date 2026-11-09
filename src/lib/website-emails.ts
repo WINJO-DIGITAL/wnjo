@@ -2,7 +2,7 @@
  * Emails for website quotes. Plain text, so nothing a visitor typed is ever rendered as HTML. Each one states the
  * first payment and the ongoing payment separately, and says that the final price is confirmed in writing.
  */
-import { LEGAL_REVIEW_PENDING, OWNERSHIP, formatGBP } from "./pricing";
+import { LEGAL_REVIEW_PENDING, OWNERSHIP, formatGBP, formatPence } from "./pricing";
 import type { Intent, WebsiteDetails } from "./website-enquiry";
 import type { WebsiteQuote } from "./website-quote";
 
@@ -67,7 +67,7 @@ export function ownerSubject(details: WebsiteDetails, quote: WebsiteQuote, inten
     quote.mode === "monthly"
       ? `${quote.packageName} ${formatGBP(quote.monthly)}/month`
       : `One-off ${quote.hasFromPrices ? "from " : ""}${formatGBP(quote.oneOffTotal)}`;
-  const kind = intent === "callback" ? "Callback request" : "Website quote";
+  const kind = intent === "callback" ? "Callback request" : intent === "pay" ? "Website order (paying now)" : "Website quote";
   return `${kind} from ${details.businessName || details.name}: ${what} [${reference}]`.replace(/\s+/g, " ").slice(0, 200);
 }
 
@@ -88,8 +88,38 @@ export type SubscriptionEmailFacts = {
   minimumTermMonths: number;
 };
 
-const gbpPence = (p: number) => formatGBP(p / 100);
+const gbpPence = (p: number) => formatPence(p);
 const sign = ["", "WINJO DIGITAL"];
+
+/**
+ * Sent when a customer starts paying straight from their quote, so the link is in their inbox if they close the
+ * Stripe page before finishing. If they pay straight away they also get the welcome or receipt email, which says so.
+ */
+export function payLinkEmail(f: SubscriptionEmailFacts, link: string): { subject: string; text: string } {
+  const lines =
+    f.kind === "subscription"
+      ? [
+          `Package: ${f.packageName}`,
+          `First payment: ${gbpPence(f.setupPence + f.oneOffPence + f.monthlyPence)} (setup${f.oneOffPence ? ", one-off extras" : ""} and your first month)`,
+          `Then: ${gbpPence(f.monthlyPence)} a month, ${f.minimumTermMonths}-month minimum term`,
+        ]
+      : [`${f.packageName}`, `Deposit: ${gbpPence(f.oneOffPence)}`];
+  return {
+    subject: `Finish starting your website [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      "Thank you for building your website with us. If you haven't finished paying, this private link takes you back to your secure payment:",
+      link,
+      "",
+      ...lines,
+      "",
+      "If you have already paid, you don't need to do anything: we'll be in touch within one working day to start your website.",
+      "The link works for 30 days. Please don't share it.",
+      ...sign,
+    ].join("\n"),
+  };
+}
 
 /** The private payment link, sent once the written proposal is agreed. */
 export function offerEmail(f: SubscriptionEmailFacts, link: string): { subject: string; text: string } {

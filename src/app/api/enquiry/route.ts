@@ -11,7 +11,9 @@ import { rateLimited } from "@/lib/rate-limit";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { serviceClient } from "@/lib/quote-store";
 import { INTENTS, cleanDetails, formatDetails, validateDetails, type Intent } from "@/lib/website-enquiry";
-import { customerAcknowledgement, ownerSubject } from "@/lib/website-emails";
+import { customerAcknowledgement, ownerSubject, payLinkEmail } from "@/lib/website-emails";
+import { startQuotePayment } from "@/lib/pay-from-quote";
+import { OWNERSHIP } from "@/lib/pricing";
 import { ROUTED_WANTS, formatWebsiteQuote, parseWebsiteAnswers, websiteQuote } from "@/lib/website-quote";
 import { formatGBP } from "@/lib/pricing";
 import { confirmBriefFiles, createBrief } from "@/lib/brief-store";
@@ -187,6 +189,10 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
       { status: 422 },
     );
   }
+  // Paying straight from the quote needs the customer's agreement to the terms first, checked here as well as in the form.
+  if (intent === "pay" && body.agree !== true) {
+    return NextResponse.json({ error: "Please agree to the terms before you pay." }, { status: 422 });
+  }
   const answers = parseWebsiteAnswers(body.answers);
   if (!answers || ROUTED_WANTS[answers.want]) {
     return NextResponse.json({ error: "Some of your choices were missing. Please review your quote." }, { status: 422 });
@@ -290,14 +296,59 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
         })
       : null;
 
+  // Paying straight from the quote: a standard package, or a one-off at or under the proposal threshold. A bespoke
+  // build never pays here; it goes through a written proposal first. If anything fails, the brief is still saved.
+  const payment =
+    intent === "pay" && created && db
+      ? await startQuotePayment(db, {
+          origin: new URL(request.url).origin,
+          tenantId: WNJO_TENANT_ID,
+          reference,
+          route: created.route,
+          email: details.email,
+          name: details.name,
+          businessName: details.businessName || null,
+          answers,
+          quote,
+        })
+      : null;
+
   // The customer's copy. A failure here doesn't undo the enquiry: we already have it.
   const customerConfig = notificationMailConfig();
   if (customerConfig) {
     const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
-    const ack = customerAcknowledgement({ reference, details, quote, intent, siteUrl: site });
-    await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Quote acknowledgement");
+    if (payment) {
+      // Their private payment link, in case they close the Stripe page before finishing.
+      const { amounts, reference: offerReference, token } = payment.offer;
+      const message = payLinkEmail(
+        {
+          reference: offerReference,
+          name: details.name,
+          packageName: amounts.packageName,
+          kind: amounts.kind,
+          setupPence: amounts.setupPence,
+          monthlyPence: amounts.monthlyPence,
+          oneOffPence: amounts.oneOffPence,
+          ownershipAfterPayments: OWNERSHIP.ownershipAfterPayments,
+          minimumTermMonths: OWNERSHIP.minimumTermMonths,
+        },
+        `${new URL(request.url).origin}/subscribe/${token}`,
+      );
+      await sendEmail(customerConfig, { to: details.email, subject: message.subject, text: message.text }, "Payment link");
+    } else {
+      const ack = customerAcknowledgement({ reference, details, quote, intent: intent === "pay" ? "quote" : intent, siteUrl: site });
+      await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Quote acknowledgement");
+    }
   }
 
-  return NextResponse.json({ ok: true, reference, route: created?.route ?? null, tracked: Boolean(created) });
+  return NextResponse.json({
+    ok: true,
+    reference,
+    route: created?.route ?? null,
+    tracked: Boolean(created),
+    // Where to send the customer to pay, or null when they should wait for an email instead.
+    pay: payment?.url ? { url: payment.url } : null,
+    paymentStarted: Boolean(payment),
+  });
 }
 

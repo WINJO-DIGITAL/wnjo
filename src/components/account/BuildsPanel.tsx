@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { STAGES, progressIndex, stagePath, type ProposalLine, type ProposalStatus, type Route, type Stage } from "@/lib/build-journey";
 import type { RevisionRow } from "@/lib/build-revisions";
+import { proposalPayNowFor } from "@/lib/pay-now";
 import { GOALS, STYLES, type WebsiteBrief } from "@/lib/website-brief";
 import { Confirmation } from "./Confirmation";
 import { FeedbackCard } from "./FeedbackCard";
+import { PayCard } from "./PayCard";
 
 type Brief = {
   id: string;
@@ -15,7 +17,7 @@ type Brief = {
   route: Route;
   stage: Stage;
   brief: WebsiteBrief;
-  figures: { package?: string };
+  figures: { package?: string; mode?: string };
   created_at: string;
   updated_at: string;
 };
@@ -80,6 +82,7 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
           brief={b}
           events={events.filter((e) => e.brief_id === b.id)}
           proposal={proposals.find((p) => p.brief_id === b.id && p.status === "sent") ?? null}
+          accepted={proposals.find((p) => p.brief_id === b.id && p.status === "accepted") ?? null}
           revisions={revisions.filter((r) => r.brief_id === b.id)}
           onChanged={() => setRefresh((r) => r + 1)}
         />
@@ -93,6 +96,7 @@ function BuildCard({
   brief,
   events,
   proposal,
+  accepted,
   revisions,
   onChanged,
 }: {
@@ -100,6 +104,7 @@ function BuildCard({
   brief: Brief;
   events: StageEvent[];
   proposal: Proposal | null;
+  accepted: Proposal | null;
   revisions: RevisionRow[];
   onChanged: () => void;
 }) {
@@ -150,6 +155,9 @@ function BuildCard({
         <p className="acct-meta">Built for: {brief.brief.goals.map((g) => GOALS[g]?.label).filter(Boolean).join(", ")}</p>
       )}
       {proposal && <ProposalCard client={client} proposal={proposal} onChanged={onChanged} />}
+      {brief.route === "proposal" && brief.stage === "awaiting_payment" && accepted && (
+        <PayCard client={client} briefId={brief.id} payNow={proposalPayNowFor(brief.figures.mode === "oneOff" ? "oneOff" : "monthly", accepted)} />
+      )}
       <FeedbackCard client={client} briefId={brief.id} stage={brief.stage} revisions={revisions} onChanged={onChanged} />
     </article>
   );

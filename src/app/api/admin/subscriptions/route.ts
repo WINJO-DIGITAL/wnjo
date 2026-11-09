@@ -4,15 +4,11 @@ import { userIdFromRequest } from "@/lib/files/server";
 import { notificationMailConfig, sendEmail } from "@/lib/mailer";
 import { OWNERSHIP } from "@/lib/pricing";
 import { stripeConfig, STRIPE_API } from "@/lib/stripe";
-import { QUOTE_TERMS_VERSION } from "@/lib/terms";
 import { offerEmail } from "@/lib/website-emails";
+import { createOffer } from "@/lib/website-offers";
 import { parseWebsiteAnswers, websiteQuote } from "@/lib/website-quote";
 import {
-  OFFER_TTL_DAYS,
   changeMonthlyPrice,
-  newOfferToken,
-  newSubscriptionReference,
-  offerFromQuote,
   proposalOverrides,
   type OfferOverrides,
 } from "@/lib/website-subscriptions";
@@ -93,38 +89,19 @@ export async function POST(request: NextRequest) {
       if (!agreed) return NextResponse.json({ error: "proposal_not_accepted" }, { status: 409 });
       overrides = proposalOverrides(quote.mode, agreed);
     }
-    const amounts = offerFromQuote(answers, quote, overrides);
-    const { token, hash } = newOfferToken();
-    const subReference = newSubscriptionReference();
-    const { data: row, error } = await db
-      .from("website_subscriptions")
-      .insert({
-        tenant_id: tenantId,
-        reference: subReference,
-        kind: amounts.kind,
-        email: e.email,
-        name: e.name,
-        business_name: e.company,
-        enquiry_reference: reference,
-        package_code: amounts.packageCode,
-        package_name: amounts.packageName,
-        setup_pence: amounts.setupPence,
-        monthly_pence: amounts.monthlyPence,
-        one_off_pence: amounts.oneOffPence,
-        quote_snapshot: { answers, lines: quote.lines, overrides },
-        terms_version: QUOTE_TERMS_VERSION,
-        minimum_term_months: OWNERSHIP.minimumTermMonths,
-        ownership_after_payments: OWNERSHIP.ownershipAfterPayments,
-        offer_token_hash: hash,
-        offer_expires_at: new Date(Date.now() + OFFER_TTL_DAYS * 86_400_000).toISOString(),
-        created_by: userId,
-      })
-      .select("id, reference")
-      .single();
-    if (error || !row) {
-      console.error(`Could not create website subscription offer: ${error?.code ?? "unknown"}`);
-      return NextResponse.json({ error: "failed" }, { status: 500 });
-    }
+    const created = await createOffer(db, {
+      tenantId,
+      enquiryReference: reference,
+      email: e.email,
+      name: e.name,
+      businessName: e.company,
+      answers,
+      quote,
+      overrides,
+      createdBy: userId,
+    });
+    if (!created) return NextResponse.json({ error: "failed" }, { status: 500 });
+    const { token, amounts, reference: subReference } = created;
     // The link is shown once here and emailed if asked; only its hash is stored.
     const link = `${new URL(request.url).origin}/subscribe/${token}`;
     let emailed = false;
@@ -148,7 +125,7 @@ export async function POST(request: NextRequest) {
         emailed = await sendEmail(config, { to: e.email, subject: message.subject, text: message.text }, "Payment link");
       }
     }
-    return NextResponse.json({ id: (row as { id: string }).id, reference: subReference, link, emailed });
+    return NextResponse.json({ id: created.id, reference: subReference, link, emailed });
   }
 
   if (body.action === "change_price" || body.action === "cancel") {

@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { OWNERSHIP } from "./pricing";
+import { ONE_OFF_DEPOSIT_SHARE } from "./pay-now";
 import { STRIPE_API } from "./stripe";
 import type { WebsiteAnswers, WebsiteQuote } from "./website-quote";
 
@@ -13,6 +14,8 @@ import type { WebsiteAnswers, WebsiteQuote } from "./website-quote";
  * - Nothing is charged twice: Checkout is created from the amounts on the offer row, and each paid invoice is recorded
  *   once (website_subscription_payments.stripe_reference is unique).
  */
+
+export { ONE_OFF_DEPOSIT_SHARE, payNowFor } from "./pay-now";
 
 export const OFFER_TTL_DAYS = 30;
 
@@ -48,8 +51,6 @@ export type OfferOverrides = { setup?: number; monthly?: number; oneOff?: number
 const pence = (pounds: number) => Math.round(pounds * 100);
 const validPounds = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= 100_000;
 
-/** The deposit share for a one-off website, from the terms ("Deposits and balances"). */
-export const ONE_OFF_DEPOSIT_SHARE = 0.5;
 
 export function offerFromQuote(answers: WebsiteAnswers, quote: WebsiteQuote, overrides: OfferOverrides = {}): OfferAmounts {
   if (quote.mode === "monthly") {
