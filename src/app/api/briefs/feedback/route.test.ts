@@ -7,7 +7,7 @@ type Write = { table: string; op: "insert" | "update"; payload: unknown };
 let writes: Write[] = [];
 let user: Record<string, unknown> | null = null;
 let brief: Record<string, unknown> | null = null;
-let unfinished: { id: string }[] = [];
+let unfinished: { id: string; status: string }[] = [];
 let insertError: { code: string } | null = null;
 let limited = false;
 const sent: { subject: string; text: string }[] = [];
@@ -76,7 +76,7 @@ describe("customer asks for changes", () => {
 
   it("can add more while the build is already in changes, without moving the stage", async () => {
     brief = { ...brief!, stage: "changes" };
-    unfinished = [{ id: "r1" }];
+    unfinished = [{ id: "r1", status: "open" }];
     expect((await post({ action: "request_changes", text: "And change the heading." })).status).toBe(200);
     expect(writesTo("website_briefs")).toEqual([]);
   });
@@ -95,9 +95,19 @@ describe("customer asks for changes", () => {
     expect(writesTo("build_revisions")).toEqual([]);
   });
 
+  it("stops after the included rounds of changes, even when they are finished", async () => {
+    brief = { ...brief!, stage: "changes" };
+    unfinished = [
+      { id: "r1", status: "done" },
+      { id: "r2", status: "done" },
+    ];
+    expect((await post({ action: "request_changes", text: "A third round, please." })).status).toBe(409);
+    expect(writesTo("build_revisions")).toEqual([]);
+  });
+
   it("stops a pile-up of unanswered requests", async () => {
     brief = { ...brief!, stage: "changes" };
-    unfinished = Array.from({ length: 5 }, (_, i) => ({ id: `r${i}` }));
+    unfinished = Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, status: "open" }));
     expect((await post({ action: "request_changes", text: "One more thing please." })).status).toBe(409);
   });
 
@@ -123,7 +133,7 @@ describe("customer approves the preview", () => {
   });
 
   it("is refused while changes are outstanding, and outside the preview stage", async () => {
-    unfinished = [{ id: "r1" }];
+    unfinished = [{ id: "r1", status: "open" }];
     expect((await post({ action: "approve_preview" })).status).toBe(409);
     unfinished = [];
     for (const stage of ["changes", "building", "approval", "live"]) {

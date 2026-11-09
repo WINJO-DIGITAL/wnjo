@@ -33,6 +33,8 @@ describe("requestBlocker", () => {
   });
   it("stops a pile-up of unanswered requests", () => {
     expect(requestBlocker("changes", REVISION_LIMITS.openAtOnce)).toMatch(/still working/);
+    expect(requestBlocker("preview", 0, REVISION_ROUNDS_INCLUDED - 1)).toBeNull();
+    expect(requestBlocker("preview", 0, REVISION_ROUNDS_INCLUDED)).toMatch(/Contact us/);
   });
 });
 
@@ -79,7 +81,7 @@ describe("stageAfterResolve", () => {
 });
 
 describe("rounds included", () => {
-  it("is an undefined placeholder: nothing is capped until the owner sets it", () => {
-    expect(REVISION_ROUNDS_INCLUDED).toBeNull();
+  it("is two rounds for every package, counted from requests the customer has sent", () => {
+    expect(REVISION_ROUNDS_INCLUDED).toBe(2);
   });
 });

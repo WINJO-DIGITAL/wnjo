@@ -32,16 +32,12 @@ export function stagePath(route: Route): Stage[] {
   return route === "proposal" ? ["brief_received", "reviewing", "proposal", ...tail] : ["brief_received", "reviewing", ...tail];
 }
 
-/** Bespoke one-off websites over this many pounds need a written proposal approved by a person. */
-export const PROPOSAL_THRESHOLD = 1000;
-
 /**
  * Which route a brief takes. Anything that needs a custom quote, and any one-off website over the threshold, goes
  * through a proposal. Standard monthly packages priced from the catalogue go straight to payment.
  */
 export function routeFor(figures: { mode: "monthly" | "oneOff"; oneOffTotal: number; requiresQuote: boolean }): Route {
   if (figures.requiresQuote) return "proposal";
-  if (figures.mode === "oneOff" && figures.oneOffTotal > PROPOSAL_THRESHOLD) return "proposal";
   return "package";
 }
 

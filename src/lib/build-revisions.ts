@@ -23,11 +23,8 @@ export const REVISION_LIMITS = {
   openAtOnce: 5,
 } as const;
 
-/**
- * PLACEHOLDER. How many rounds of changes each package includes isn't defined in the project yet, so nothing here
- * caps or charges for revisions. Set a number once the package inclusions are agreed (see the brief: "Revisions").
- */
-export const REVISION_ROUNDS_INCLUDED: number | null = null;
+/** Rounds of changes included with every website. A round is one request from the customer. */
+export const REVISION_ROUNDS_INCLUDED = 2;
 
 /** What a revision looks like when the customer or staff screens read it. */
 export type RevisionRow = {
@@ -53,8 +50,9 @@ export function cleanRevisionText(input: unknown): { ok: true; text: string } | 
 }
 
 /** Whether a customer can ask for changes now. Returns the reason they can't, or null. */
-export function requestBlocker(stage: Stage, unfinished: number): string | null {
+export function requestBlocker(stage: Stage, unfinished: number, roundsUsed = 0): string | null {
   if (stage !== "preview" && stage !== "changes") return "You can ask for changes once your preview is ready.";
+  if (roundsUsed >= REVISION_ROUNDS_INCLUDED) return "You've used the changes included with your website. Contact us if you'd like more.";
   if (unfinished >= REVISION_LIMITS.openAtOnce) return "We're still working on your earlier changes. Please wait until some are done.";
   return null;
 }

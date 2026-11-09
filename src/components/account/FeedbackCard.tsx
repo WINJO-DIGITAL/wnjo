@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Stage } from "@/lib/build-journey";
-import { REVISION_LIMITS, REVISION_STATUSES, isUnfinished, type RevisionRow } from "@/lib/build-revisions";
+import { REVISION_LIMITS, REVISION_ROUNDS_INCLUDED, REVISION_STATUSES, isUnfinished, type RevisionRow } from "@/lib/build-revisions";
 import { Confirmation } from "./Confirmation";
 
 const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
@@ -34,6 +34,7 @@ export function FeedbackCard({
 
   const canAsk = stage === "preview" || stage === "changes";
   const unfinished = revisions.filter((r) => isUnfinished(r.status)).length;
+  const roundsLeft = Math.max(0, REVISION_ROUNDS_INCLUDED - revisions.length);
   if (!canAsk && revisions.length === 0 && !approved) return null;
 
   const send = async (payload: Record<string, unknown>) => {
@@ -85,6 +86,11 @@ export function FeedbackCard({
             {stage === "preview"
               ? "Look through your preview. Ask for changes, or approve it to send it for our final checks."
               : "We're making the changes you asked for. You can add more below."}
+          </p>
+          <p className="build-card__meta">
+            {roundsLeft > 0
+              ? `${roundsLeft} of ${REVISION_ROUNDS_INCLUDED} ${roundsLeft === 1 ? "round" : "rounds"} of changes left`
+              : "You've used your included changes. Contact us if you'd like more."}
           </p>
           <label htmlFor={`feedback-${briefId}`} className="acct-label">
             What would you like changed?

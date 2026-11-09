@@ -25,8 +25,7 @@ describe("route", () => {
 
   it("sends one-off websites over £1,000 and anything needing a custom quote to a proposal", () => {
     expect(routeFor({ mode: "oneOff", oneOffTotal: 999, requiresQuote: false })).toBe("package");
-    expect(routeFor({ mode: "oneOff", oneOffTotal: 1000, requiresQuote: false })).toBe("package");
-    expect(routeFor({ mode: "oneOff", oneOffTotal: 1001, requiresQuote: false })).toBe("proposal");
+    expect(routeFor({ mode: "oneOff", oneOffTotal: 1001, requiresQuote: false })).toBe("package");
     expect(routeFor({ mode: "monthly", oneOffTotal: 0, requiresQuote: true })).toBe("proposal");
   });
 

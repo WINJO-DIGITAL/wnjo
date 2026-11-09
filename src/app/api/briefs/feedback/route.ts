@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Stage } from "@/lib/build-journey";
-import { approveBlocker, cleanRevisionText, requestBlocker } from "@/lib/build-revisions";
+import { approveBlocker, cleanRevisionText, isUnfinished, requestBlocker, type RevisionStatus } from "@/lib/build-revisions";
 import { mailConfig, sendEnquiryEmail } from "@/lib/mailer";
 import { serviceClient } from "@/lib/quote-store";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
@@ -48,8 +48,10 @@ export async function POST(request: NextRequest) {
   // Someone else's website looks exactly like a missing one.
   if (!brief || brief.email.toLowerCase() !== customer.email) return fail(404, "not_found");
 
-  const { data: open } = await db.from("build_revisions").select("id").eq("brief_id", brief.id).in("status", ["open", "in_progress"]);
-  const unfinished = ((open ?? []) as unknown[]).length;
+  const { data: open } = await db.from("build_revisions").select("id, status").eq("brief_id", brief.id);
+  const rows = (open ?? []) as { id: string; status: RevisionStatus }[];
+  const unfinished = rows.filter((r) => isUnfinished(r.status)).length;
+  const roundsUsed = rows.length;
 
   const actor = { tenant_id: brief.tenant_id, brief_id: brief.id, actor_type: "customer", actor_user: customer.userId, actor_email: customer.email };
   const config = mailConfig();
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest) {
   };
 
   if (action === "request_changes") {
-    const blocked = requestBlocker(brief.stage, unfinished);
+    const blocked = requestBlocker(brief.stage, unfinished, roundsUsed);
     if (blocked) return fail(409, blocked);
     const text = cleanRevisionText(body.text);
     if (!text.ok) return fail(422, text.reason);
