@@ -89,5 +89,10 @@ export async function createBrief(db: SupabaseClient, input: NewBrief): Promise<
     }),
   ]);
   if (v.error || e.error) console.error("Brief history save failed");
+  // The brief is sent, so the saved draft has done its job. Best effort: expired drafts are cleared anyway.
+  if (input.draftId) {
+    const { error: draftError } = await db.from("website_brief_drafts").delete().eq("draft_id", input.draftId);
+    if (draftError) console.error("Draft cleanup failed");
+  }
   return { id, route };
 }

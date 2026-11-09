@@ -26,6 +26,7 @@ export default async function BuildPage({
     care: first(query.care),
     pages: first(query.pages),
     business: first(query.business),
+    draft: first(query.draft),
   };
   // Consultation booking appears only once a real calendar is connected (Cal.com); until then, callbacks.
   const calendarEnabled = Boolean(process.env.CALCOM_API_KEY?.trim() && process.env.CALCOM_EVENT_TYPE_ID?.trim());

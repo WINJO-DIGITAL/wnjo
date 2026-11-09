@@ -43,6 +43,8 @@ import {
   type WebsiteQuote,
 } from "@/lib/website-quote";
 import { routeFor } from "@/lib/build-journey";
+import { draftHasProgress } from "@/lib/brief-draft";
+import { loadBriefDraft, saveBriefDraft } from "@/lib/brief-draft-client";
 import { cleanBrief, validateBrief, EMPTY_BRIEF, DRAFT_ID_RE, type BriefErrors, type WebsiteBrief } from "@/lib/website-brief";
 import { ArrowLeft, ArrowRight } from "../Icons";
 import { BriefSummary, DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "./BriefSteps";
@@ -80,7 +82,7 @@ const CONTENT_QUESTIONS: { key: keyof ContentAnswers; legend: string }[] = [
 ];
 
 /** Choices carried in the link: ?plan=silver from a package card, ?type=oneOff, ?care=hosting, ?business=Café. */
-export type WebsiteConfiguratorParams = { plan?: string; type?: string; care?: string; pages?: string; business?: string };
+export type WebsiteConfiguratorParams = { plan?: string; type?: string; care?: string; pages?: string; business?: string; draft?: string };
 
 type Saved = { answers: WebsiteAnswers; details: WebsiteDetails; brief: WebsiteBrief; draftId: string | null };
 
@@ -169,7 +171,10 @@ function Inner({
   const [details, setDetails] = useState<WebsiteDetails>(init.details);
   const [brief, setBrief] = useState<WebsiteBrief>(init.brief);
   const [briefErrors, setBriefErrors] = useState<BriefErrors>({});
-  const draftId = init.draftId;
+  const [draftId, setDraftId] = useState(init.draftId);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "offline">("idle");
+  const [resume, setResume] = useState<"restored" | "missing" | null>(null);
+  const [copied, setCopied] = useState<"idle" | "copied" | "failed">("idle");
   const [detailErrors, setDetailErrors] = useState<DetailErrors>({});
   const [intent, setIntent] = useState<Intent>("quote");
   const [honeypot, setHoneypot] = useState("");
@@ -193,6 +198,51 @@ function Inner({
     if (!inBrowser) return;
     store(state.status === "success" ? null : { answers, details, brief, draftId });
   }, [answers, details, brief, draftId, state.status, inBrowser]);
+
+  // Come back from a "continue later" link: the saved draft replaces what is on screen and the form resumes on its step.
+  const resumeId = params.draft;
+  useEffect(() => {
+    if (!inBrowser || !resumeId || !DRAFT_ID_RE.test(resumeId)) return;
+    let cancelled = false;
+    void loadBriefDraft(resumeId).then((d) => {
+      if (cancelled) return;
+      if (!d) {
+        setResume("missing");
+        return;
+      }
+      const at = Math.min(d.step, STEPS.length - 1);
+      setAnswers(d.answers);
+      setDetails(d.details);
+      setBrief(d.brief);
+      setDraftId(resumeId);
+      setStepIndex(at);
+      setFurthest(at);
+      setResume("restored");
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [resumeId, inBrowser]);
+
+  // Save progress online a moment after the customer stops typing, once there is something worth keeping.
+  const hasProgress = draftHasProgress({ details, brief, step: stepIndex });
+  useEffect(() => {
+    if (!inBrowser || !draftId || !hasProgress || state.status === "success") return;
+    const timer = setTimeout(() => {
+      setSaveState("saving");
+      void saveBriefDraft(draftId, { answers, details, brief, step: stepIndex }).then((ok) => setSaveState(ok ? "saved" : "offline"));
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [answers, details, brief, stepIndex, draftId, hasProgress, state.status, inBrowser]);
+
+  const copyResumeLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/build?draft=${draftId}`);
+      setCopied("copied");
+    } catch {
+      setCopied("failed");
+    }
+  };
 
   useEffect(() => {
     if (firstRender.current) {
@@ -339,6 +389,37 @@ function Inner({
             ))}
           </ol>
         </nav>
+
+        {resume && (
+          <p className={styles.draftNote} role="status">
+            {resume === "restored"
+              ? "Welcome back. Your answers are restored."
+              : "That link has expired or isn't valid, so you're starting a new brief."}
+          </p>
+        )}
+        {hasProgress && draftId && (
+          <div className={styles.draftNote} role="status" aria-live="polite">
+            {saveState === "saving" && <span>Saving…</span>}
+            {saveState === "offline" && <span>Saved on this device only.</span>}
+            {saveState === "saved" && (
+              <>
+                <span>Progress saved.</span>{" "}
+                <button type="button" className={styles.linkBtn} onClick={copyResumeLink}>
+                  {copied === "copied" ? "Link copied" : "Copy a link to continue later"}
+                </button>
+                {copied === "failed" && (
+                  <input
+                    className={styles.draftLink}
+                    readOnly
+                    aria-label="Link to continue later"
+                    value={`${window.location.origin}/build?draft=${draftId}`}
+                    onFocus={(e) => e.currentTarget.select()}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        )}
 
         <section className={styles.panel} aria-labelledby="step-title">
           <h2 id="step-title" className="h2" ref={headingRef} tabIndex={-1}>

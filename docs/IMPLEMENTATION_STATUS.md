@@ -254,3 +254,11 @@ Built in sub-steps, each tested before the next.
 - Checked on production: all main pages return 200, no sideways scroll at phone width, homepage links all resolve, phone swiper works. Type check, lint and 223 tests pass.
 - Still open: subscription prices; plan names; legal review of the terms; prices are still provisional while Stripe is in live mode.
 
+
+## Build journey: server-side draft saving (Phase 1) — built, tested; migration needs applying
+
+- Migration `20261109120000_website_brief_drafts.sql`: table `website_brief_drafts` (draft id, payload, expires after 30 days). Row-level security on with no policies, so only the server (service role) can read or write it. **Not yet applied to the production database.** Until it is, saving online answers "not configured" and the form says "Saved on this device only", as before.
+- `PUT/GET /api/brief/draft`: saves and reloads a draft. The draft id is a random UUID made in the customer's browser and acts like a magic link: anyone holding the link can read the draft. Answers are cleaned and size-capped (60 KB) on the way in and out; requests are limited to 120 per 10 minutes per connection; responses are never cached. Expired drafts read as "not found" and are cleared out now and then.
+- Form: saves about 1.5 seconds after the customer stops typing, once they have moved on or typed something. Shows "Progress saved." with a "Copy a link to continue later" button. `/build?draft=<id>` restores the answers and resumes on the saved step on any device. A sent brief deletes its draft.
+- Tests: `src/lib/brief-draft.test.ts` and `src/app/api/brief/draft/route.test.ts` (24 checks). Walked through in a browser on phone and desktop with a stubbed draft API: save, copy link, resume on another browser, unknown link, offline message, no sideways scroll.
+- Not done: no database-level SQL test for the new table; the privacy page doesn't yet say in-progress answers are kept for up to 30 days.
