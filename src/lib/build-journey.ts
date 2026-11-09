@@ -13,7 +13,7 @@ export const STAGES = {
   reviewing: { label: "Under review", customer: "We're reviewing your brief." },
   proposal: { label: "Proposal", customer: "Your proposal is being prepared." },
   awaiting_payment: { label: "Payment", customer: "Ready for your first payment." },
-  specification: { label: "AI processing", customer: "We're turning your brief into a website plan." },
+  specification: { label: "Planning your website", customer: "We're putting your plan together." },
   building: { label: "Website generation", customer: "Your website is being generated." },
   preview: { label: "Awaiting customer review", customer: "Your private preview is ready for you to review." },
   changes: { label: "Changes requested", customer: "We're making the changes you asked for." },
