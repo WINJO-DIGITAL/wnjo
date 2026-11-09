@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import { nextStepFor, portalStepIndex, PORTAL_STEPS } from "./portal-steps";
 
 describe("portalStepIndex", () => {
-  it("groups the twelve stages into four steps", () => {
+  it("groups the twelve stages into five steps", () => {
     expect(portalStepIndex("brief_received")).toBe(0);
     expect(portalStepIndex("proposal")).toBe(0);
     expect(portalStepIndex("awaiting_payment")).toBe(1);
     expect(portalStepIndex("building")).toBe(2);
     expect(portalStepIndex("preview")).toBe(3);
-    expect(portalStepIndex("approval")).toBe(3);
+    expect(portalStepIndex("approval")).toBe(4);
   });
   it("is complete once live", () => {
     expect(portalStepIndex("live")).toBe(PORTAL_STEPS.length);

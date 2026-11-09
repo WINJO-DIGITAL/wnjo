@@ -1,5 +1,5 @@
 /**
- * The customer portal shows a website's progress as four plain steps, with the full twelve-stage path one tap away.
+ * The customer portal shows a website's progress as five plain steps, with the full twelve-stage path one tap away.
  * Pure, so the mapping and the "what do I do next" wording are tested.
  */
 import type { Route, Stage } from "./build-journey";
@@ -8,7 +8,8 @@ export const PORTAL_STEPS = [
   { id: "brief", label: "Brief" },
   { id: "payment", label: "Payment" },
   { id: "build", label: "Build" },
-  { id: "launch", label: "Review and launch" },
+  { id: "review", label: "Review" },
+  { id: "launch", label: "Launch" },
 ] as const;
 
 const STEP_OF: Partial<Record<Stage, number>> = {
@@ -20,11 +21,11 @@ const STEP_OF: Partial<Record<Stage, number>> = {
   building: 2,
   preview: 3,
   changes: 3,
-  approval: 3,
+  approval: 4,
 };
 
 /**
- * Which of the four steps a website is on (0 to 3), or 4 once it is live. A website that is on hold or closed keeps
+ * Which of the five steps a website is on (0 to 4), or 5 once it is live. A website that is on hold or closed keeps
  * the step it had reached, passed in as `lastOnPath`.
  */
 export function portalStepIndex(stage: Stage, lastOnPath?: Stage | null): number {
