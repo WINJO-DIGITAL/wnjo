@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { contactPhoneHref } from "@/lib/site";
+import { WEBSITE_PLANS, type WebsitePlanId } from "@/lib/pricing";
 
 /** Pages that already are the next step, so the bar would only get in the way. */
 const HIDDEN_ON = ["/contact", "/build", "/account", "/admin"];
@@ -99,10 +100,13 @@ export function StickyCta() {
 
   if (HIDDEN_ON.includes(pathname)) return null;
 
+  // Once a package is chosen on the homepage, the button names it so the customer can see their choice registered.
+  const chosenName = plan && plan in WEBSITE_PLANS ? WEBSITE_PLANS[plan as WebsitePlanId].name : null;
+
   return (
     <aside className="sticky-cta" aria-label="Get started" data-show={show} inert={!show}>
       <Link href={plan ? `/build?plan=${encodeURIComponent(plan)}` : "/build"} className="btn btn--primary">
-        Build my website
+        {chosenName ? `Continue with ${chosenName}` : "Build my website"}
       </Link>
       {contactPhoneHref ? (
         <a href={contactPhoneHref} className="btn btn--secondary">
