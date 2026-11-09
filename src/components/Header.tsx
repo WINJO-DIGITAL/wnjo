@@ -565,6 +565,15 @@ function SiteHeader() {
               Call us
             </a>
           )}
+          <Link
+            href="/account"
+            className="btn btn--secondary mm-cta"
+            onClick={closeIfSamePage}
+            transitionTypes={NAV}
+            style={{ "--i": primaryNav.length + 2 } as React.CSSProperties}
+          >
+            Client sign-in
+          </Link>
         </nav>
 
         <div className="mm-pane mm-pane--sub" inert={sub === null} aria-hidden={sub === null}>
