@@ -172,6 +172,10 @@ function BuildCard({
         ))}
       </ol>
 
+      <p className="build-card__ask">
+        <a href={`/contact?brief=${encodeURIComponent(`About my website ${brief.reference}: `)}`}>Message us about this website</a>
+      </p>
+
       <div className="tabs" role="tablist" aria-label="Website sections">
         {tabs.map((t) => (
           <button

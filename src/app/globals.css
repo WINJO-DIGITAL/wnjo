@@ -11814,3 +11814,20 @@ body:has(.dash-header) .site-footer {
     overflow-x: auto;
   }
 }
+.build-card__ask {
+  margin: -8px 0 0;
+  font-size: 14px;
+}
+.build-card__ask a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.build-card__ask a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
