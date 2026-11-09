@@ -17,7 +17,8 @@ import {
   type Stage,
 } from "@/lib/build-journey";
 import { notificationMailConfig, sendEmail } from "@/lib/mailer";
-import { proposalReadyEmail } from "@/lib/build-emails";
+import { previewReadyAgainEmail, proposalReadyEmail } from "@/lib/build-emails";
+import { revisionTransition, stageAfterResolve, type RevisionStatus } from "@/lib/build-revisions";
 import { serviceClient } from "@/lib/quote-store";
 import { staffFromRequest, type Staff } from "@/lib/staff-auth";
 
@@ -65,6 +66,8 @@ async function logEvent(db: SupabaseClient, staff: Staff, briefId: string, kind:
  * - file_link: a one-minute download link for a file attached to the brief.
  * - proposal_save: create or edit a draft proposal.
  * - proposal: submit, approve, reject, send or withdraw a proposal.
+ * - revision: start, finish or decline a change the customer asked for. A decline needs a reason the customer can
+ *   read. When the last open change is finished the build goes back to the customer's review and they are emailed.
  */
 export async function POST(request: NextRequest) {
   const db = serviceClient();
@@ -234,6 +237,51 @@ export async function POST(request: NextRequest) {
       }
     }
     return NextResponse.json({ ok: true });
+  }
+
+  if (body.action === "revision") {
+    const id = typeof body.revisionId === "string" && UUID.test(body.revisionId) ? body.revisionId : null;
+    const op = body.op === "start" || body.op === "done" || body.op === "decline" ? body.op : null;
+    if (!id || !op) return fail(422, "invalid");
+    const { data: found } = await db.from("build_revisions").select("id, number, status").eq("id", id).eq("brief_id", brief.id).maybeSingle();
+    const revision = found as { id: string; number: number; status: RevisionStatus } | null;
+    if (!revision) return fail(404, "not_found");
+
+    const text = note(body.note);
+    const step = revisionTransition(revision.status, op, text);
+    if (!step.ok) return fail(step.kind === "note" ? 422 : 409, step.reason);
+
+    const finished = step.to === "done" || step.to === "declined";
+    const update: Record<string, unknown> = { status: step.to };
+    if (text) update.response = text;
+    if (finished) Object.assign(update, { resolved_at: new Date().toISOString(), resolved_by: staff.userId });
+    const { data: changed, error } = await db.from("build_revisions").update(update).eq("id", revision.id).eq("status", revision.status).select("id");
+    if (error || !changed?.length) return fail(409, "This change was updated in the meantime. Refresh and try again.");
+    await logEvent(db, staff, brief.id, "revision", {
+      action: op === "start" ? "started" : step.to,
+      number: revision.number,
+      note: text,
+    });
+
+    let stage: Stage = brief.stage;
+    if (finished) {
+      const { data: left } = await db.from("build_revisions").select("id").eq("brief_id", brief.id).in("status", ["open", "in_progress"]);
+      const back = stageAfterResolve(brief.stage, ((left ?? []) as unknown[]).length);
+      if (back) {
+        const { error: moveError } = await db.from("website_briefs").update({ stage: back }).eq("id", brief.id).eq("stage", brief.stage);
+        if (!moveError) {
+          stage = back;
+          await logEvent(db, staff, brief.id, "stage", { from: brief.stage, to: back, note: "All the requested changes are finished." });
+          const config = notificationMailConfig();
+          if (config) {
+            const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
+            const email = previewReadyAgainEmail({ name: brief.name, reference: brief.reference, accountUrl: `${site.replace(/\/+$/, "")}/account` });
+            await sendEmail(config, { to: brief.email, subject: email.subject, text: email.text }, "Changes ready");
+          }
+        }
+      }
+    }
+    return NextResponse.json({ ok: true, stage });
   }
 
   return fail(422, "Unknown action.");

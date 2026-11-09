@@ -16,6 +16,7 @@ import {
   type Route,
   type Stage,
 } from "@/lib/build-journey";
+import { REVISION_STATUSES, isUnfinished, type RevisionRow } from "@/lib/build-revisions";
 import { GOALS, STYLES, type WebsiteBrief } from "@/lib/website-brief";
 
 type BriefRow = {
@@ -147,6 +148,7 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
   const [events, setEvents] = useState<EventRow[]>([]);
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [revisions, setRevisions] = useState<RevisionRow[]>([]);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -155,10 +157,12 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
       client.from("website_brief_events").select("id, kind, detail, actor_type, actor_email, created_at").eq("brief_id", row.id).order("created_at", { ascending: false }),
       client.from("build_approvals").select("id, kind, decision, note, decided_by_email, decided_by_role, proposal_id, created_at").eq("brief_id", row.id).order("created_at", { ascending: false }),
       client.from("website_proposals").select("id, reference, status, source, summary, lines, setup_pence, monthly_pence, one_off_pence, customer_note, created_at").eq("brief_id", row.id).order("created_at", { ascending: false }),
-    ]).then(([e, a, p]) => {
+      client.from("build_revisions").select("id, brief_id, number, status, request, response, created_at, resolved_at").eq("brief_id", row.id).order("number", { ascending: false }),
+    ]).then(([e, a, p, r]) => {
       setEvents((e.data as EventRow[]) ?? []);
       setApprovals((a.data as Approval[]) ?? []);
       setProposals((p.data as Proposal[]) ?? []);
+      setRevisions((r.data as RevisionRow[]) ?? []);
     });
   }, [client, row.id]);
   useEffect(load, [load]);
@@ -232,6 +236,8 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
           </div>
 
           <StageControl row={row} path={path} busy={busy} onMove={(stage, note) => act({ action: "stage", stage, note }, `Moved to ${STAGES[stage].label}.`)} />
+
+          <RevisionsPanel revisions={revisions} busy={busy} act={act} />
 
           {row.route === "proposal" && (
             <ProposalPanel key={proposals.map((p) => `${p.id}:${p.status}`).join()} proposals={proposals} busy={busy} act={act} />
@@ -357,6 +363,58 @@ function ApprovalsPanel({
   );
 }
 
+/** The changes the customer asked for on their preview: what they said, and where each one has got to. */
+function RevisionsPanel({ revisions, busy, act }: { revisions: RevisionRow[]; busy: boolean; act: (p: Record<string, unknown>, done: string) => Promise<boolean> }) {
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  if (revisions.length === 0) return null;
+  const waiting = revisions.filter((r) => isUnfinished(r.status)).length;
+  const answer = async (r: RevisionRow, op: "start" | "done" | "decline", done: string) => {
+    const ok = await act({ action: "revision", revisionId: r.id, op, note: notes[r.id] ?? "" }, done);
+    if (ok) setNotes((n) => ({ ...n, [r.id]: "" }));
+  };
+  return (
+    <div>
+      <p className="admin-label">Customer changes{waiting > 0 ? ` · ${waiting} to do` : ""}</p>
+      <ol className="build-revisions" role="list">
+        {revisions.map((r) => (
+          <li key={r.id}>
+            <p className="build-revision__head">
+              <strong>Change {r.number}</strong>
+              <span className={`build-revision__status is-${r.status}`}>{REVISION_STATUSES[r.status]}</span>
+              <span className="acct-meta">{when.format(new Date(r.created_at))}</span>
+            </p>
+            <p className="build-revision__text">{r.request}</p>
+            {r.response && <p className="acct-meta">Our reply: {r.response}</p>}
+            {isUnfinished(r.status) && (
+              <div className="build-row">
+                <input
+                  className="acct-input"
+                  placeholder="Reply to the customer (needed to decline)"
+                  value={notes[r.id] ?? ""}
+                  maxLength={2000}
+                  onChange={(e) => setNotes((n) => ({ ...n, [r.id]: e.target.value }))}
+                  aria-label={`Reply to change ${r.number}`}
+                />
+                {r.status === "open" && (
+                  <button type="button" className="btn btn--secondary" disabled={busy} onClick={() => void answer(r, "start", `Change ${r.number} started.`)}>
+                    Start
+                  </button>
+                )}
+                <button type="button" className="btn btn--secondary" disabled={busy} onClick={() => void answer(r, "done", `Change ${r.number} marked done.`)}>
+                  Mark done
+                </button>
+                <button type="button" className="btn btn--secondary" disabled={busy || !(notes[r.id] ?? "").trim()} onClick={() => void answer(r, "decline", `Change ${r.number} declined.`)}>
+                  Decline
+                </button>
+              </div>
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 const DETAIL_TEXT = (e: EventRow): string => {
   const d = e.detail;
   switch (e.kind) {
@@ -368,6 +426,10 @@ const DETAIL_TEXT = (e: EventRow): string => {
       return `${APPROVALS[d.kind as ApprovalKind]?.label ?? d.kind} ${d.decision}${d.note ? ` · ${d.note}` : ""}`;
     case "proposal":
       return `Proposal ${d.reference ?? ""} ${d.action}${d.note ? ` · ${d.note}` : ""}`;
+    case "revision":
+      return `Change ${d.number} ${d.action}${d.note ? ` · ${d.note}` : ""}`;
+    case "preview":
+      return "Customer approved the preview";
     case "note":
       return String(d.text ?? "");
     default:

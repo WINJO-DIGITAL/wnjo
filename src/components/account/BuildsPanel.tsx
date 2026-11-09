@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { STAGES, progressIndex, stagePath, type ProposalLine, type ProposalStatus, type Route, type Stage } from "@/lib/build-journey";
+import type { RevisionRow } from "@/lib/build-revisions";
 import { GOALS, STYLES, type WebsiteBrief } from "@/lib/website-brief";
 import { Confirmation } from "./Confirmation";
+import { FeedbackCard } from "./FeedbackCard";
 
 type Brief = {
   id: string;
@@ -41,6 +43,7 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
   const [briefs, setBriefs] = useState<Brief[] | null>(null);
   const [events, setEvents] = useState<StageEvent[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [revisions, setRevisions] = useState<RevisionRow[]>([]);
   const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
@@ -49,12 +52,14 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
       client.from("website_briefs").select("id, reference, business_name, route, stage, brief, figures, created_at, updated_at").order("created_at", { ascending: false }),
       client.from("website_brief_events").select("brief_id, kind, detail, created_at").order("created_at"),
       client.from("website_proposals").select("id, brief_id, reference, status, summary, lines, setup_pence, monthly_pence, one_off_pence").order("created_at", { ascending: false }),
-    ]).then(([b, e, p]) => {
+      client.from("build_revisions").select("id, brief_id, number, status, request, response, created_at, resolved_at").order("number"),
+    ]).then(([b, e, p, r]) => {
       if (cancelled) return;
       const list = (b.data as Brief[]) ?? [];
       setBriefs(list);
       setEvents((e.data as StageEvent[]) ?? []);
       setProposals((p.data as Proposal[]) ?? []);
+      setRevisions((r.data as RevisionRow[]) ?? []);
       onFound?.(list.length > 0);
     });
     return () => {
@@ -75,6 +80,7 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
           brief={b}
           events={events.filter((e) => e.brief_id === b.id)}
           proposal={proposals.find((p) => p.brief_id === b.id && p.status === "sent") ?? null}
+          revisions={revisions.filter((r) => r.brief_id === b.id)}
           onChanged={() => setRefresh((r) => r + 1)}
         />
       ))}
@@ -87,12 +93,14 @@ function BuildCard({
   brief,
   events,
   proposal,
+  revisions,
   onChanged,
 }: {
   client: SupabaseClient;
   brief: Brief;
   events: StageEvent[];
   proposal: Proposal | null;
+  revisions: RevisionRow[];
   onChanged: () => void;
 }) {
   const path = stagePath(brief.route);
@@ -142,6 +150,7 @@ function BuildCard({
         <p className="acct-meta">Built for: {brief.brief.goals.map((g) => GOALS[g]?.label).filter(Boolean).join(", ")}</p>
       )}
       {proposal && <ProposalCard client={client} proposal={proposal} onChanged={onChanged} />}
+      <FeedbackCard client={client} briefId={brief.id} stage={brief.stage} revisions={revisions} onChanged={onChanged} />
     </article>
   );
 }

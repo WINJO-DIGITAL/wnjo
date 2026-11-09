@@ -44,5 +44,6 @@ export const LIMITS_PER_ROUTE = {
   uploadUrl: { max: 40, windowSeconds: 10 * 60 },
   briefUpload: { max: 20, windowSeconds: 10 * 60 },
   briefDraft: { max: 120, windowSeconds: 10 * 60 },
+  briefFeedback: { max: 20, windowSeconds: 10 * 60 },
   notify: { max: 30, windowSeconds: 10 * 60 },
 } as const;

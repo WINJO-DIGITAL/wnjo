@@ -17,3 +17,19 @@ export function proposalReadyEmail(args: { name: string; reference: string; acco
     ].join("\n"),
   };
 }
+
+export function previewReadyAgainEmail(args: { name: string; reference: string; accountUrl: string }): { subject: string; text: string } {
+  return {
+    subject: `Your changes are ready to review [${args.reference}]`,
+    text: [
+      `Hi ${first(args.name)},`,
+      "",
+      "We've finished the changes you asked for. Sign in to your account to look through your website and approve it, or ask for anything else:",
+      args.accountUrl,
+      "",
+      "Sign in with this email address.",
+      "",
+      "WINJO DIGITAL",
+    ].join("\n"),
+  };
+}

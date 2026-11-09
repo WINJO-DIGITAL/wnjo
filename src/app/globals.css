@@ -11290,3 +11290,52 @@ body:has(.dash-header) .site-footer {
 .hero-ed .btn--primary:active {
   opacity: 0.85;
 }
+
+/* Change requests on a build: the customer's feedback card and the staff list share one look. */
+.build-feedback {
+  gap: var(--space-3);
+}
+.build-feedback__confirm {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+}
+.build-revisions {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+.build-revisions li {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-line);
+  font-size: var(--text-sm);
+}
+.build-revision__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+}
+.build-revision__status {
+  padding: 0.1rem 0.55rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}
+.build-revision__status.is-done {
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+.build-revision__text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.build-revision__reply {
+  margin: 0;
+  color: var(--color-ink-2);
+}
