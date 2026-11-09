@@ -9863,6 +9863,16 @@ body:has(.dash-header) .site-footer {
 .article-card a:hover { text-decoration: underline; }
 
 /* Hero showcase before loading: the phone deck on phones; wider screens hold the space for the laptop showcase. */
+/* Phones in the homepage hero sit straight on the page: no panel colour, shadow or border behind them. */
+@media (max-width: 39.99rem) {
+  .hero-ed--work .deck__panel {
+    background: transparent;
+    box-shadow: none;
+  }
+  .hero-ed--work .deck__panel::after {
+    box-shadow: none;
+  }
+}
 .hero-ssr-wide { display: none; }
 @media (min-width: 40rem) {
   .hero-ssr-phone { display: none; }
