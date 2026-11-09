@@ -34,7 +34,10 @@
   /* Typography */
   --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-serif: var(--font-playfair), ui-serif, Georgia, "Times New Roman", serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* Labels and small caps use the body face (it reads less like a developer tool). The monospace face is kept for
+     prices and figures only, through --font-price. */
+  --font-mono: var(--font-sans);
+  --font-price: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --text-xs: 0.8125rem; /* 13 */
   --text-sm: 0.9375rem; /* 15 */
@@ -11239,4 +11242,12 @@ body:has(.dash-header) .site-footer {
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   color: var(--color-ink-2);
+}
+
+/* Prices and figures keep the monospace face, so the numbers still line up. */
+.plan__price span,
+.price-pair dt,
+.price-pair dd span,
+.hero-from {
+  font-family: var(--font-price);
 }
