@@ -11979,3 +11979,30 @@ body:has(.dash-header) .site-footer {
     white-space: nowrap;
   }
 }
+/* Staff subscriptions: the payment link form opens on request, so the screen starts with the figures and the list. */
+.admin-sub-open {
+  display: flex;
+  justify-content: flex-start;
+}
+.admin .admin-sub-form {
+  padding: 28px;
+  border: 1px solid rgb(36 25 15 / 0.08);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: none;
+}
+.admin .admin-table--subs td:first-child,
+.admin .admin-table--subs th:first-child {
+  white-space: nowrap;
+}
+.admin .admin-table--subs td:nth-child(2) {
+  min-width: 15rem;
+  overflow-wrap: anywhere;
+}
+.admin .admin-table--subs td:last-child {
+  min-width: 13rem;
+}
+.admin .admin-table--subs td:last-child input {
+  width: 9rem;
+  min-height: 40px;
+}

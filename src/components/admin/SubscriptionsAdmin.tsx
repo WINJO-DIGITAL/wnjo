@@ -87,7 +87,7 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
       {rows.length === 0 ? (
         <p className="lede">No website subscriptions yet.</p>
       ) : (
-        <table className="admin-table">
+        <table className="admin-table admin-table--subs">
           <thead>
             <tr>
               <th scope="col">Reference</th><th scope="col">Customer</th><th scope="col">Package</th><th scope="col">Status</th>
@@ -125,6 +125,18 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
 type Call = (payload: Record<string, unknown>) => Promise<{ ok: boolean; json: Record<string, unknown> }>;
 
 function CreateLink({ call, onCreated }: { call: Call; onCreated: () => void }) {
+  const [open, setOpen] = useState(false);
+  if (!open) {
+    return (
+      <div className="admin-sub-open">
+        <button type="button" className="btn btn--secondary" onClick={() => setOpen(true)}>Create a payment link</button>
+      </div>
+    );
+  }
+  return <CreateLinkForm call={call} onCreated={onCreated} />;
+}
+
+function CreateLinkForm({ call, onCreated }: { call: Call; onCreated: () => void }) {
   const [reference, setReference] = useState("");
   const [setup, setSetup] = useState("");
   const [monthly, setMonthly] = useState("");
