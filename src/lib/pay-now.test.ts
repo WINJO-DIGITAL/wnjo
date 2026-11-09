@@ -138,3 +138,17 @@ describe("proposalPayNowFor: the figure on the Pay button is the figure the serv
     expect(proposalPayNowFor("monthly", { setup_pence: 19900, monthly_pence: 29900, one_off_pence: 10000 })).toEqual({ kind: "first_payment", pence: 59800 });
   });
 });
+
+describe("every payment is in pounds", () => {
+  it("turns off automatic conversion on every Stripe checkout", async () => {
+    const { checkoutParams } = await import("./website-subscriptions");
+    const urls = { success: "https://x/ok", cancel: "https://x/no" };
+    const base = { id: "o1", reference: "WS-ABC123", email: "a@b.co", packageName: "Plus", packageCode: "silver" as const, setupPence: 14900, monthlyPence: 14900, oneOffPence: 0 };
+    const sub = checkoutParams({ ...base, kind: "subscription" }, urls);
+    const one = checkoutParams({ ...base, kind: "one_off", packageCode: "one_off", setupPence: 0, monthlyPence: 0, oneOffPence: 49950 }, urls);
+    expect(sub.get("adaptive_pricing[enabled]")).toBe("false");
+    expect(one.get("adaptive_pricing[enabled]")).toBe("false");
+    expect(sub.get("line_items[0][price_data][currency]")).toBe("gbp");
+    expect(one.get("line_items[0][price_data][currency]")).toBe("gbp");
+  });
+});

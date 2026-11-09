@@ -98,6 +98,8 @@ export async function createDepositCheckout(args: {
 }): Promise<{ id: string; url: string }> {
   const body = new URLSearchParams({
     mode: "payment",
+    // Every payment is in pounds: no automatic conversion into the customer's own currency.
+    "adaptive_pricing[enabled]": "false",
     customer_email: args.customerEmail,
     client_reference_id: args.depositId,
     "metadata[deposit_id]": args.depositId,

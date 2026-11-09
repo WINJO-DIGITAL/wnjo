@@ -105,6 +105,8 @@ export function checkoutParams(
     success_url: urls.success,
     cancel_url: urls.cancel,
     locale: "en-GB",
+    // Every payment is in pounds: no automatic conversion into the customer's own currency.
+    "adaptive_pricing[enabled]": "false",
   });
   if (offer.kind === "subscription") {
     p.set("mode", "subscription");
