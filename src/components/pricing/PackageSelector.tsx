@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CARD_POINTS } from "./WebsitePackages";
-import { OWNERSHIP, WEBSITE_PLANS, formatGBP, type WebsitePlanId } from "@/lib/pricing";
+import { WEBSITE_PLANS, formatGBP, type WebsitePlanId } from "@/lib/pricing";
 
 const PLAN_ORDER: WebsitePlanId[] = ["bronze", "silver", "gold"];
 
@@ -36,7 +36,7 @@ export function PackageSelector() {
                 {CARD_POINTS[id].slice(0, 4).map((p) => (
                   <li key={p}>{p}</li>
                 ))}
-                <li>You own the website after {OWNERSHIP.ownershipAfterPayments} payments</li>
+                <li>You own the website once your plan ends</li>
               </ul>
               <button
                 type="button"

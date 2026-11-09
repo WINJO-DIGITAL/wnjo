@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "@/components/Icons";
 import { SiteStyler } from "@/components/interactive/SiteStyler";
 import { archivo, jost } from "@/lib/fonts";
-import { ONE_OFF_WEBSITE, OWNERSHIP, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { ONE_OFF_WEBSITE, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
 /**
  * Websites, sold by showing: the headline, both prices in one row, and the example site
@@ -64,7 +64,7 @@ export function WebsitesTile({
           <ul className="trust-row" role="list">
             <li>See your price as you build your quote</li>
             <li>Hosting and support included monthly</li>
-            <li>You own the website after {OWNERSHIP.ownershipAfterPayments} payments</li>
+            <li>You own the website once your plan ends</li>
           </ul>
           </>)}
           {compact ? (
