@@ -296,7 +296,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
             onClick={() => goTo(k)}
           >
             <Image src={p.logo} alt="" width={36} height={36} sizes="36px" />
-            <span>{p.name}</span>
+            <span className="deck__pill-name">{p.name}</span>
           </button>
         ))}
       </div>
@@ -313,7 +313,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
           <li>No Minimum Term</li>
           <li>24/7 Support</li>
         </ul>
-        <p className="deck__lead">You focus on your business. We&apos;ll take care of your website.</p>
       </div>
     </div>
   );

@@ -13696,3 +13696,36 @@ body:has(.pv) .site-footer {
     padding-top: 1.5rem;
   }
 }
+
+/* Phones: the client chips show their logos only. The names stay for screen readers. */
+@media (max-width: 39.99rem) {
+  .deck__pill {
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .deck__pill img {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+  .deck__pill .deck__pill-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .deck__rail .deck__pill[aria-pressed="true"] {
+    width: 54px;
+    height: 54px;
+  }
+  .deck__rail .deck__pill[aria-pressed="true"] img {
+    width: 36px;
+    height: 36px;
+  }
+}
