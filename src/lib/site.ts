@@ -49,35 +49,18 @@ export const primaryNav: NavItem[] = [
   {
     href: "/managed-websites",
     label: "Managed websites",
-    also: ["/build"],
+    also: ["/build", "/winjo-refresh"],
     menu: {
       primary: [
         { href: "/managed-websites", label: "How it works" },
         { href: "/pricing", label: "Plans and pricing" },
         { href: "/winjo-refresh", label: "Winjo Refresh" },
-        { href: "/build", label: "Get started" },
+        { href: "/faq", label: "Questions" },
       ],
-      groups: [
-        {
-          title: "Plans",
-          links: [
-            { href: "/pricing#core", label: "Core" },
-            { href: "/pricing#pro", label: "Pro" },
-            { href: "/pricing#plus", label: "Plus" },
-          ],
-        },
-        {
-          title: "Good to know",
-          links: [
-            { href: "/pricing#how-it-works", label: "What happens if you leave" },
-            { href: "/faq", label: "Questions" },
-          ],
-        },
-      ],
+      groups: [],
     },
   },
   { href: "/pricing", label: "Pricing" },
-  { href: "/winjo-refresh", label: "Winjo Refresh" },
   {
     href: "/work",
     label: "Our work",
@@ -89,17 +72,7 @@ export const primaryNav: NavItem[] = [
         { href: "/work#raeng-fitness", label: "RAENG Fitness" },
         { href: "/work#fystay", label: "FYStay" },
       ],
-      groups: [
-        {
-          title: "Visit the live sites",
-          links: [
-            { href: "https://www.evexec.co.uk", label: "evexec.co.uk", external: true },
-            { href: "https://boonma.vercel.app", label: "boonma.vercel.app", external: true },
-            { href: "https://raengfitness.co.uk", label: "raengfitness.co.uk", external: true },
-            { href: "https://www.fystay.co.uk", label: "fystay.co.uk", external: true },
-          ],
-        },
-      ],
+      groups: [],
     },
   },
   { href: "/about", label: "About" },
