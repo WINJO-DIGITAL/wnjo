@@ -101,17 +101,22 @@ export default function TermsPage() {
 
             <h2>Cancellation</h2>
             <p>
-              You have the right to cancel within 14 days of the day your contract starts (the day you accept your quote
-              or subscribe), without giving a reason. To cancel, tell us by email or in writing using the details on our
-              contact page. If you want us to start work straight away, you can ask us to do so when you accept. If you
-              then cancel within the 14 days, you pay for the work we have done up to that point, in proportion to the
-              service already provided, and we refund anything else you have paid.
+              You can cancel your contract with us within 14 days of the day it is made (the day you accept your quote,
+              or the day you first agree to a subscription). You do not need to give a reason. To cancel, tell us in
+              writing or by email, using the details on our contact page. We will refund everything you have paid within
+              14 days of hearing from you.
             </p>
             <p>
-              After the 14-day period, you can end a monthly subscription as set out in its written agreement. Where the
-              new UK subscription contract rules apply to your contract, they give you additional rights, including
-              clear information before you subscribe and easy cancellation. Nothing in these terms affects your statutory
-              rights under the Consumer Rights Act 2015.
+              If you ask us to start work during those 14 days, you must make that request clearly, at the time you accept.
+              If you then cancel, you pay only for the work we have done up to that point, in proportion to the total
+              price, and we refund the rest. If you did not ask us to start, or if we did not give you this cancellation
+              information before you agreed, you pay nothing for work done in the 14 days.
+            </p>
+            <p>
+              After the 14-day period, a monthly subscription can be ended as set out in its written agreement. The UK
+              subscription contract rules are expected to apply to subscriptions from 1 January 2027. Where they apply,
+              they give you further rights, including clear information before you subscribe and easy cancellation.
+              Nothing in these terms affects your statutory rights under the Consumer Rights Act 2015.
             </p>
 
             <h2>Your website and files</h2>
