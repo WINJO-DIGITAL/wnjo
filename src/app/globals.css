@@ -4597,6 +4597,10 @@ main :is(h1, h2) .serif-em {
 }
 
 /* Where the italic sits on its own line, the stroke runs under the words, not the column. */
+main .hero-ed__title .serif-em {
+  background-size: 86% 0.12em;
+}
+
 main :is(.hero-ed__title, .booking-hero .tile__title) .serif-em {
   width: fit-content;
   margin-bottom: -0.1em; /* its room for the stroke, given back so nothing below moves */
@@ -8342,8 +8346,8 @@ ol.bs {
   opacity: var(--o, 1);
   pointer-events: none;
   transition:
-    transform 0.65s var(--ease),
-    opacity 0.5s;
+    transform 0.8s var(--ease),
+    opacity 0.6s ease;
 }
 .deck__stage.is-dragging .deck__card {
   transition: none;
@@ -8596,7 +8600,8 @@ ol.bs {
 /* Phones: every part above and below the stage is tighter, so the hero device gets the height. */
 @media (max-width: 39.99rem) {
   .deck {
-    --deck-fixed: 446px;
+    --u: 0.6px;
+    --deck-fixed: 494px;
   }
   .deck__rail {
     height: 50px;
