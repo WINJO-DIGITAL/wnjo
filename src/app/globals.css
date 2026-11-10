@@ -13610,3 +13610,20 @@ body:has(.pv) .site-footer {
 .deck__btn {
   gap: 2px;
 }
+
+/* Three points under the button, each with a tick. */
+.deck__bullets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font: 500 min(13px, 3.4vw) / 1.2 var(--font-sans);
+  color: var(--color-ink);
+}
+.deck__bullets li::before {
+  content: "\2713  ";
+  color: var(--color-accent);
+}
