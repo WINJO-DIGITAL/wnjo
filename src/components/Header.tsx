@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { primaryNav, type NavItem, type NavLink, type NavMenu, contactPhoneHref } from "@/lib/site";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { mobileNav, primaryNav, type NavItem, type NavLink, type NavMenu, contactPhoneHref } from "@/lib/site";
 import { AccountMenu } from "./account/AccountMenu";
 import { DashboardHeader } from "./dashboard/DashboardHeader";
 import { Logo } from "./Logo";
@@ -339,7 +339,8 @@ function SiteHeader() {
   };
 
   const flyoutItem = lastFlyout !== null ? primaryNav[lastFlyout] : null;
-  const subItem = lastSub !== null ? primaryNav[lastSub] : null;
+  const mobileItems = mobileNav.flatMap((section) => section.items);
+  const subItem = lastSub !== null ? mobileItems[lastSub] : null;
 
   return (
     <>
@@ -514,42 +515,56 @@ function SiteHeader() {
           data-back={backFrom !== null || undefined}
         >
           <ul role="list">
-            {primaryNav.map((item, i) => (
-              <li key={item.href} style={{ "--i": i } as React.CSSProperties}>
-                {item.menu ? (
-                  <button
-                    type="button"
-                    className="mm-link"
-                    onClick={() => openSub(i)}
-                    aria-label={`${item.label}: more`}
-                    data-current={
-                      (backFrom === null ? isCurrent(pathname, item) || spy === item.href : backFrom === i) || undefined
-                    }
-                  >
-                    {item.label}
-                    <Chevron dir="right" size={14} />
-                  </button>
-                ) : (
-                  <Link
-                    href={item.href}
-                    className="mm-link"
-                    aria-current={isCurrent(pathname, item) ? "page" : undefined}
-                    data-current={spy === item.href || undefined}
-                    onClick={closeIfSamePage}
-                    transitionTypes={NAV}
-                  >
-                    {item.label}
-                  </Link>
-                )}
-              </li>
-            ))}
+            {(() => {
+              let n = 0;
+              return mobileNav.map((section) => (
+                <Fragment key={section.label}>
+                  <li className="mm-section" role="presentation">
+                    <p className="mm-label">{section.label}</p>
+                  </li>
+                  {section.items.map((item) => {
+                    const i = n++;
+                    return (
+                      <li key={item.href} style={{ "--i": i } as React.CSSProperties}>
+                        {item.menu ? (
+                          <button
+                            type="button"
+                            className="mm-link"
+                            onClick={() => openSub(i)}
+                            aria-label={`${item.label}: more`}
+                            data-current={
+                              (backFrom === null ? isCurrent(pathname, item) || spy === item.href : backFrom === i) || undefined
+                            }
+                          >
+                            {item.label}
+                            <Chevron dir="right" size={14} />
+                          </button>
+                        ) : (
+                          <Link
+                            href={item.href}
+                            className="mm-link"
+                            aria-current={isCurrent(pathname, item) ? "page" : undefined}
+                            data-current={spy === item.href || undefined}
+                            onClick={closeIfSamePage}
+                            transitionTypes={NAV}
+                          >
+                            {item.label}
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
+                  {section.label === "What we do" && <li className="mm-rule" role="presentation" aria-hidden="true" />}
+                </Fragment>
+              ));
+            })()}
           </ul>
           <Link
             href="/build"
             className="btn btn--primary mm-cta"
             onClick={closeIfSamePage}
             transitionTypes={NAV}
-            style={{ "--i": primaryNav.length } as React.CSSProperties}
+            style={{ "--i": mobileItems.length + 1 } as React.CSSProperties}
           >
             Get started
           </Link>
@@ -557,7 +572,7 @@ function SiteHeader() {
             <a
               href={contactPhoneHref}
               className="btn btn--secondary mm-cta"
-              style={{ "--i": primaryNav.length + 1 } as React.CSSProperties}
+              style={{ "--i": mobileItems.length + 2 } as React.CSSProperties}
             >
               Call us
             </a>
@@ -567,7 +582,7 @@ function SiteHeader() {
             className="btn btn--secondary mm-cta"
             onClick={closeIfSamePage}
             transitionTypes={NAV}
-            style={{ "--i": primaryNav.length + 2 } as React.CSSProperties}
+            style={{ "--i": mobileItems.length + 3 } as React.CSSProperties}
           >
             Client sign-in
           </Link>

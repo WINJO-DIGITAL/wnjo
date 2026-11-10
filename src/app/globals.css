@@ -1006,7 +1006,7 @@ button.arrow-link {
 
 .mm-link svg {
   color: var(--color-ink-3);
-  opacity: 0;
+  opacity: 1;
   transition: opacity var(--duration) var(--ease);
 }
 
@@ -13762,4 +13762,28 @@ body:has(.pv) .site-footer {
   .deck__bullets li::before {
     font-size: 1.05em;
   }
+}
+
+/* Phone menu, in sections: small accent labels, a hairline between the two groups, and links that open their own lists. */
+.mm-section {
+  list-style: none;
+  margin-top: var(--space-5);
+}
+.mm-section:first-child {
+  margin-top: 0;
+}
+.mm-label {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.mm-rule {
+  list-style: none;
+  height: 1px;
+  margin: var(--space-6) 0 var(--space-5);
+  background: var(--color-line-strong);
 }

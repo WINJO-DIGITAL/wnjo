@@ -80,6 +80,76 @@ export const primaryNav: NavItem[] = [
   { href: "/contact", label: "Contact", mobileOnly: true },
 ];
 
+/**
+ * The phone menu, in sections. Each entry is a link, or opens a short list of its own. The flat order of the items is
+ * the order they are numbered in, so keep it in step with what is shown.
+ */
+export const mobileNav: { label: string; items: NavItem[] }[] = [
+  {
+    label: "What we do",
+    items: [
+      {
+        href: "/managed-websites",
+        label: "Websites",
+        also: ["/build", "/winjo-refresh", "/pricing"],
+        menu: {
+          primary: [
+            { href: "/managed-websites", label: "How it works" },
+            { href: "/pricing", label: "Plans and pricing" },
+            { href: "/winjo-refresh", label: "Winjo Refresh" },
+            { href: "/faq", label: "Questions" },
+          ],
+          groups: [],
+        },
+      },
+      {
+        href: "/booking-software",
+        label: "Booking systems",
+        menu: {
+          primary: [
+            { href: "/booking-software", label: "About booking systems" },
+            { href: "/contact?topic=booking-software", label: "Request a demo" },
+          ],
+          groups: [],
+        },
+      },
+      {
+        href: "/app-development",
+        label: "Apps & software",
+        menu: {
+          primary: [
+            { href: "/app-development", label: "About apps and software" },
+            { href: "/contact?topic=bespoke", label: "Plan my app" },
+          ],
+          groups: [],
+        },
+      },
+    ],
+  },
+  {
+    label: "Discover Winjo",
+    items: [
+      {
+        href: "/work",
+        label: "Our work",
+        menu: {
+          primary: [
+            { href: "/work", label: "All work" },
+            { href: "/work#ev-exec", label: "EV Exec" },
+            { href: "/work#boonma", label: "Boonma" },
+            { href: "/work#raeng-fitness", label: "RAENG Fitness" },
+            { href: "/work#fystay", label: "FYStay" },
+          ],
+          groups: [],
+        },
+      },
+      { href: "/pricing", label: "Pricing" },
+      { href: "/about", label: "About" },
+      { href: "/contact", label: "Contact" },
+    ],
+  },
+];
+
 export const footerNav: { title: string; links: NavLink[] }[] = [
   {
     title: "Managed websites",
