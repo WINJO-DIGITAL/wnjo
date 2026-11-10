@@ -183,6 +183,7 @@ function Inner({
   // Paying online is the default next step whenever the quote can be paid for straight away.
   const [intent, setIntent] = useState<Intent>("pay");
   const [agree, setAgree] = useState(false);
+  const [startNow, setStartNow] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [stepIndex, setStepIndex] = useState(0);
   const [furthest, setFurthest] = useState(0);
@@ -331,6 +332,7 @@ function Inner({
       kind: "website",
       intent: chosenIntent,
       agree: chosenIntent === "pay" ? agree : undefined,
+      startNow: chosenIntent === "pay" ? startNow : undefined,
       answers,
       details: cleaned,
       brief,
@@ -735,7 +737,7 @@ function Inner({
             {step.id === "next" && (
               <form id="quote-send" onSubmit={onSend} noValidate className="form">
                 {chosenIntent === "pay" && payNow ? (
-                  <PayPanel quote={quote} payNow={payNow} agree={agree} onAgree={setAgree} />
+                  <PayPanel quote={quote} payNow={payNow} agree={agree} onAgree={setAgree} startNow={startNow} onStartNow={setStartNow} />
                 ) : (
                   <>
                     <ChoiceGroup<Exclude<Intent, "pay">>
@@ -1050,11 +1052,15 @@ function PayPanel({
   payNow,
   agree,
   onAgree,
+  startNow,
+  onStartNow,
 }: {
   quote: WebsiteQuote;
   payNow: { kind: "first_payment" | "deposit"; pence: number };
   agree: boolean;
   onAgree: (value: boolean) => void;
+  startNow: boolean;
+  onStartNow: (value: boolean) => void;
 }) {
   const monthly = quote.mode === "monthly";
   return (
@@ -1074,6 +1080,12 @@ function PayPanel({
             terms
           </Link>
           {monthly ? ` and the ${OWNERSHIP.minimumTermMonths}-month minimum term` : ""}.
+        </span>
+      </label>
+      <label className="sub-agree">
+        <input type="checkbox" checked={startNow} onChange={(e) => onStartNow(e.target.checked)} />
+        <span>
+          Please start work straight away. I understand that if I cancel within 14 days, I pay for the work already done.
         </span>
       </label>
     </div>

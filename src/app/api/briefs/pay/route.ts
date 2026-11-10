@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
   const briefId = typeof body.briefId === "string" && UUID.test(body.briefId) ? body.briefId : null;
   if (!briefId) return fail(422, "invalid");
   if (body.agree !== true) return fail(422, "Please agree to the terms before you pay.");
+  const startNow = body.startNow === true;
 
   const { data } = await db
     .from("website_briefs")
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest) {
       quote,
       overrides,
       createdBy: null,
-      consent: { agreedAt: new Date().toISOString() },
+      consent: { agreedAt: new Date().toISOString(), startNow },
     });
     if (!created) return fail(500, "We couldn't start your payment. Please try again.");
     offer = { id: created.id, reference: created.reference };

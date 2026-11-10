@@ -310,6 +310,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
           businessName: details.businessName || null,
           answers,
           quote,
+          startNow: body.startNow === true,
         })
       : null;
 

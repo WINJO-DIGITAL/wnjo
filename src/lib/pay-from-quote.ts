@@ -24,6 +24,8 @@ export async function startQuotePayment(
     businessName: string | null;
     answers: WebsiteAnswers;
     quote: WebsiteQuote;
+    /** The customer asked us to start work within the 14-day cancellation period. */
+    startNow?: boolean;
   },
 ): Promise<{ url: string | null; offer: CreatedOffer } | null> {
   if (!payNowFor(args.route, args.quote)) return null;
@@ -37,7 +39,7 @@ export async function startQuotePayment(
     quote: args.quote,
     overrides: {},
     createdBy: null,
-    consent: { agreedAt: new Date().toISOString() },
+    consent: { agreedAt: new Date().toISOString(), startNow: args.startNow === true },
   });
   if (!offer) return null;
 

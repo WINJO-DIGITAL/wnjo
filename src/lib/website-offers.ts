@@ -30,7 +30,7 @@ export type NewOffer = {
   /** The staff member who made it, or null when the customer did. */
   createdBy: string | null;
   /** Recorded in the snapshot when the customer agreed to the terms before paying. */
-  consent?: { agreedAt: string };
+  consent?: { agreedAt: string; startNow?: boolean };
 };
 
 export type CreatedOffer = { id: string; reference: string; token: string; amounts: OfferAmounts };

@@ -20,6 +20,7 @@ export function PayCard({
   payNow: { kind: "first_payment" | "deposit"; pence: number };
 }) {
   const [agree, setAgree] = useState(false);
+  const [startNow, setStartNow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const deposit = payNow.kind === "deposit";
@@ -33,7 +34,7 @@ export function PayCard({
       ? await fetch("/api/briefs/pay", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ briefId, agree }),
+          body: JSON.stringify({ briefId, agree, startNow }),
         }).catch(() => null)
       : null;
     const json = (await res?.json().catch(() => null)) as { url?: string; error?: string } | null;
@@ -62,6 +63,10 @@ export function PayCard({
           ? "Your proposal is accepted. Pay your 50% deposit to start your website."
           : `Your proposal is accepted. Your first payment covers your setup and first month; the ${OWNERSHIP.minimumTermMonths}-month minimum term applies.`}
       </p>
+      <label className="sub-agree">
+        <input type="checkbox" checked={startNow} onChange={(e) => setStartNow(e.target.checked)} />
+        <span>Please start work straight away. I understand that if I cancel within 14 days, I pay for the work already done.</span>
+      </label>
       <label className="sub-agree">
         <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
         <span>
