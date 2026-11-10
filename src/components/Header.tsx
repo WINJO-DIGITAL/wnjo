@@ -433,9 +433,6 @@ function SiteHeader() {
 
           <div className="header-cta" onMouseEnter={() => hoverItem(null)}>
             <AccountMenu signedOutLink />
-            <Link href="/build" className="btn btn--primary btn--sm" onClick={closeIfSamePage} transitionTypes={NAV}>
-              Get started
-            </Link>
           </div>
 
           <button
