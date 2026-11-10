@@ -68,6 +68,11 @@ export default function TermsPage() {
               licences and subscriptions remain subject to their own terms. Our own reusable tools, components and
               frameworks are not transferred automatically.
             </p>
+            <p>
+              Until ownership transfers, your subscription gives you the right to use the website while it is active.
+              If the subscription ends before ownership transfers, the website stays with us, and we will tell you what
+              happens to your files before that date.
+            </p>
             <h2>Scoped subscriptions</h2>
             <p>
               Booking systems and custom software offered on a monthly subscription are scoped individually. The
@@ -82,7 +87,8 @@ export default function TermsPage() {
 
             <h2>Changes and revisions</h2>
             <p>
-              The number of design revisions included is set out in your quote. Extra rounds are quoted before they start.
+              Each website includes two rounds of changes. A round is one request for changes from you after we share a
+              preview. Extra rounds are quoted before they start.
             </p>
 
             <h2>Hosting and care</h2>
@@ -103,15 +109,30 @@ export default function TermsPage() {
 
             <h2>Your website and files</h2>
             <p>
-              On a bespoke project, the design and build are ours until the final payment is made. We release the finished site, its files
-              and its source code once that payment has cleared. Copyright in the bespoke design passes to you on
-              full payment. Until then, the site is hosted and shown to you for review only.
+              <strong>One-off bespoke projects:</strong> the design and build remain ours until the final payment has
+              cleared. We then release the finished site, its files and its source code to you, and copyright in the
+              bespoke design passes to you on that full payment. Until then, the site is hosted and shown to you for
+              review only.
+            </p>
+            <p>
+              <strong>Monthly packages:</strong> ownership of the website deliverables passes to you after
+              {" "}{OWNERSHIP.ownershipAfterPayments} successful monthly payments, as set out under
+              &ldquo;Ownership after {OWNERSHIP.ownershipAfterPayments} payments&rdquo; above. Until then, your
+              subscription gives you the right to use the website while it is active.
             </p>
 
             <h2>Liability</h2>
             <p>
-              Our liability for any work is limited to the price you have paid for it, except where the law does not
-              allow that limit.
+              Nothing in these terms limits our liability for death or personal injury caused by our negligence, or for
+              fraud. Otherwise, our liability for any work is limited to the price you have paid for it, except where the
+              law does not allow that limit.
+            </p>
+
+            <h2>Complaints</h2>
+            <p>
+              If something goes wrong, please tell us first, so we can try to put it right. Contact us through the
+              details on our website, and we will reply within a reasonable time. You also have rights under UK consumer
+              law that are not affected by these terms.
             </p>
 
             <h2>Governing law</h2>

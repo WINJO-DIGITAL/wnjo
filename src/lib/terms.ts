@@ -6,4 +6,4 @@
  * subscription section and states that the deposit and ownership clauses apply to bespoke projects. 2026-11-08.2
  * (draft, awaiting legal review) replaces it with website packages and ownership after 12 payments.
  */
-export const QUOTE_TERMS_VERSION = "2026-11-08.2";
+export const QUOTE_TERMS_VERSION = "2026-11-10";
