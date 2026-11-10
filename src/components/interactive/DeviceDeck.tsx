@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "@/components/Icons";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { Project } from "@/lib/projects";
 
@@ -281,10 +282,16 @@ export function DeviceDeck({ items }: { items: Item[] }) {
           <span className="deck__btn-text">
             <span className="deck__btn-main">Get started</span>
             <span className="deck__btn-sub">
-              From £99 a month. No minimum term.
+              <strong className="deck__price">£99 a month</strong>
+              <span className="deck__term">Rolling monthly, no minimum term</span>
             </span>
           </span>
+          <span className="deck__btn-arrow" aria-hidden="true">
+            <ArrowRight size={16} />
+          </span>
         </Link>
+        <p className="deck__support">Everything your website needs. One simple monthly payment.</p>
+        <p className="deck__trust">No technical headaches. We handle hosting, updates and fixes.</p>
       </div>
 
       {/* The project pills sit under the button, so the button gets the stage. */}
