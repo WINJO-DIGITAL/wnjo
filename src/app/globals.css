@@ -8226,6 +8226,9 @@ ol.bs {
 .deck__panel + .deck__rail {
   margin-top: 10px;
 }
+.deck__cta + .deck__rail {
+  margin-top: 14px;
+}
 .deck__pill {
   flex: none;
   display: flex;
