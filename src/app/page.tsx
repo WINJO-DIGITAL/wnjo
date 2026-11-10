@@ -122,7 +122,7 @@ export default function HomePage() {
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Winjo Refresh</p>
           <h2 id="refresh-title" className="tile__title">
-            A new design <span className="serif-em">every {REFRESH.everyMonths} months.</span>
+            A design refresh <span className="serif-em">every {REFRESH.everyMonths} months.</span>
           </h2>
           <div className="tile__aside">
             <p className="tile__line">

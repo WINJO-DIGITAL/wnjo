@@ -135,7 +135,7 @@ export function PackageComparison() {
         ["Content written for AI answer engines", from("gold")],
         ["AI search visibility monitoring", (id) => (id === "gold" ? "Where available" : false)],
         ["Structured data for AI tools", from("gold")],
-        ["Technical SEO audit and fixes", from("gold")],
+        ["Advanced SEO and technical optimisation", from("gold")],
         ["Performance reporting", (id) => (id === "bronze" ? false : id === "silver" ? "Monthly snapshot" : "Monthly snapshot and quarterly reviews")],
       ],
     },
