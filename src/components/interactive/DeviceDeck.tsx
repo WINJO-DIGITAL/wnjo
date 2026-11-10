@@ -307,6 +307,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
             </span>
           </span>
         </Link>
+        <p className="deck__eyebrow">Fully managed websites from £99 a month</p>
         <p className="deck__intro">You run your business. We&apos;ll run your website: designed, hosted, maintained and kept up to date.</p>
       </div>
     </div>

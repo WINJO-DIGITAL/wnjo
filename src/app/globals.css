@@ -13435,8 +13435,8 @@ body:has(.pv) .site-footer {
 /* Phones: the phone is bigger. The headline keeps its two styles and the copy stays left-aligned. */
 @media (max-width: 39.99rem) {
   .deck {
-    --u: 0.8px;
-    --deck-fixed: 470px;
+    --u: 0.86px;
+    --deck-fixed: 462px;
   }
 }
 
@@ -13484,4 +13484,17 @@ body:has(.pv) .site-footer {
     display: block;
     margin-inline: auto;
   }
+}
+
+/* The uppercase line under the button, above the introduction. */
+.deck__eyebrow {
+  margin: 14px 0 0;
+  font-size: min(13px, 3.6vw);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #665f57;
+  text-align: center;
+}
+.deck__eyebrow + .deck__intro {
+  margin-top: 6px;
 }

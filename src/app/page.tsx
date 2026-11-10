@@ -50,9 +50,6 @@ export default function HomePage() {
               <span className="hero-ed__line">Your website.</span>{" "}
               <span className="serif-em">Our responsibility.</span>
             </h1>
-            <p className="eyebrow hero-ed__place rise" style={{ "--i": 2 } as React.CSSProperties}>
-              Fully managed websites from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month
-            </p>
             <div
               className="btn-row rise"
               style={{ "--i": 4 } as React.CSSProperties}
