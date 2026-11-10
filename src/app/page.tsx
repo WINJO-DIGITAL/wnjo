@@ -102,7 +102,7 @@ export default function HomePage() {
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Plans</p>
           <h2 id="packages-title" className="tile__title">
-            Three plans. No minimum term.
+            Three plans. <span className="serif-em">No minimum term.</span>
           </h2>
           <div className="tile__aside">
             <p className="tile__line">
