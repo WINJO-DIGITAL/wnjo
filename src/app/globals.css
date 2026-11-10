@@ -13578,8 +13578,8 @@ body:has(.pv) .site-footer {
 }
 .deck__lead {
   margin: 14px 0 0;
-  font: 600 min(20px, 5.2vw) / 1.25 var(--font-sans);
-  color: var(--color-ink);
+  font: 500 min(15px, 4vw) / 1.4 var(--font-sans);
+  color: var(--color-ink-2);
   text-align: center;
   text-wrap: balance;
 }
