@@ -13419,13 +13419,6 @@ body:has(.pv) .site-footer {
     order: 0;
   }
 }
-.resp__col:first-child {
-  display: flex;
-  flex-direction: column;
-}
-.resp__col:first-child .resp__list {
-  margin-block: auto;
-}
 @media (min-width: 64rem) {
   .search-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -13791,11 +13784,11 @@ body:has(.pv) .site-footer {
 /* Phones: the managed websites section is compact, so it fits the screen with its heading in view. */
 @media (max-width: 39.99rem) {
   #managed .tile__title {
-    font-size: clamp(1.9rem, 7.4vw, 2.2rem);
+    font-size: clamp(2.1rem, 8vw, 2.5rem);
     margin-top: var(--space-3);
   }
   #managed .tile__line {
-    font-size: 1rem;
+    font-size: 1.05rem;
     margin-top: var(--space-3);
   }
   #managed .resp {
@@ -13808,14 +13801,14 @@ body:has(.pv) .site-footer {
     margin-bottom: var(--space-3);
   }
   #managed .resp__list {
-    gap: 0;
-    font-size: 0.95rem;
+    gap: 0.25rem;
+    font-size: 1.1rem;
   }
   #managed .resp__list li span {
     padding-block: 0.1em;
   }
   #managed .resp__yours span {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
   #managed .resp__switch button {
     min-height: 40px;
@@ -13834,14 +13827,14 @@ body:has(.pv) .site-footer {
     gap: var(--space-3);
   }
   #managed .resp__col {
-    padding: 0.8rem 1rem;
+    padding: 1.1rem 1.2rem;
   }
   #managed .resp__label {
     margin-bottom: var(--space-2);
   }
   #managed .resp__list li span {
-    line-height: 1.3;
-    padding-block: 0.05em;
+    line-height: 1.35;
+    padding-block: 0.2em;
   }
   #managed .resp__yours {
     margin: 0;
@@ -13869,11 +13862,11 @@ body:has(.pv) .site-footer {
     gap: var(--space-2);
   }
   #packages .pkg-card__amount {
-    font-size: 2.2rem;
+    font-size: 2.6rem;
   }
   #packages .pkg-card__points {
     margin: var(--space-1) 0 var(--space-2);
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
   #packages .pkg-card__points li:nth-child(n + 5) {
     display: none;
@@ -13895,10 +13888,10 @@ body:has(.pv) .site-footer {
     gap: var(--space-1);
   }
   .search-list__benefit {
-    font-size: 1.05rem;
+    font-size: 1.2rem;
   }
   .search-list__line {
-    font-size: 0.92rem;
+    font-size: 1rem;
   }
   .terms-grid {
     grid-template-columns: 1fr 1fr;
@@ -13909,10 +13902,10 @@ body:has(.pv) .site-footer {
   }
   .terms-grid__text,
   .terms-grid .checks {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
   .rf-compare ol {
-    font-size: 0.98rem;
+    font-size: 1.1rem;
   }
   .rf__site {
     padding: 0.75rem;
@@ -13936,7 +13929,7 @@ body:has(.pv) .site-footer {
     aspect-ratio: 4 / 3;
   }
   #process .bs__stage h3 {
-    font-size: 1.05rem;
+    font-size: 1.25rem;
   }
   #refresh .rf__caption {
     display: none;
@@ -13957,7 +13950,7 @@ body:has(.pv) .site-footer {
     display: none;
   }
   #packages .pkg-card {
-    padding: 1rem;
+    padding: 1.3rem;
   }
   #ownership .terms-grid > div {
     padding-top: var(--space-2);
@@ -13974,9 +13967,38 @@ body:has(.pv) .site-footer {
     margin-top: var(--space-4);
   }
   #refresh .rf-compare__col {
-    padding: 0.9rem 1rem;
+    padding: 1.1rem 1.2rem;
   }
   #refresh .rf__timeline button {
     padding-top: var(--space-3);
   }
+}
+
+/* The two lists tell their story at a glance: "On your own" has crosses and a quieter, lighter type; "With Winjo" has
+   ticks and a firmer weight. Sizes stay the same. */
+.resp__col:not(.resp__col--ours) .resp__list li:not(.resp__yours) span {
+  position: relative;
+  padding-left: 1.5em;
+  font-weight: 400;
+  color: var(--color-ink-2);
+}
+.resp__col:not(.resp__col--ours) .resp__list li:not(.resp__yours) span::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 0.8em;
+  height: 0.8em;
+  background-color: var(--color-ink-3);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.resp__col--ours .resp__list li span {
+  font-weight: 600;
+}
+.resp__yours span {
+  padding-left: 0;
+}
+.resp__yours span::before {
+  content: none;
 }
