@@ -51,7 +51,7 @@ export default function HomePage() {
               <span className="serif-em">Our responsibility.</span>
             </h1>
             <p className="lede rise" style={{ "--i": 3 } as React.CSSProperties}>
-              You run your business. We&apos;ll run your website: designed, hosted, maintained and kept up to date.
+              You run your business. We&apos;ll run your website: designed, hosted and kept up to date.
             </p>
             <div
               className="btn-row rise"
