@@ -13485,3 +13485,16 @@ body:has(.pv) .site-footer {
     margin-inline: auto;
   }
 }
+
+/* The uppercase line under the button, above the introduction. */
+.deck__eyebrow {
+  margin: 14px 0 0;
+  font-size: min(13px, 3.6vw);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #665f57;
+  text-align: center;
+}
+.deck__eyebrow + .deck__intro {
+  margin-top: 6px;
+}
