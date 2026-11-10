@@ -101,10 +101,17 @@ export default function TermsPage() {
 
             <h2>Cancellation</h2>
             <p>
-              You have 14 days from accepting a quote to cancel, as UK consumer law allows. If you ask us to start work
-              straight away, and you cancel within those 14 days, you pay for the work done up to the point you cancel,
-              and we refund the rest of what you have paid. Once you have asked us to start, we will ask you to confirm
-              that you understand you may lose the right to cancel once work is complete.
+              You have the right to cancel within 14 days of the day your contract starts (the day you accept your quote
+              or subscribe), without giving a reason. To cancel, tell us by email or in writing using the details on our
+              contact page. If you want us to start work straight away, you can ask us to do so when you accept. If you
+              then cancel within the 14 days, you pay for the work we have done up to that point, in proportion to the
+              service already provided, and we refund anything else you have paid.
+            </p>
+            <p>
+              After the 14-day period, you can end a monthly subscription as set out in its written agreement. Where the
+              new UK subscription contract rules apply to your contract, they give you additional rights, including
+              clear information before you subscribe and easy cancellation. Nothing in these terms affects your statutory
+              rights under the Consumer Rights Act 2015.
             </p>
 
             <h2>Your website and files</h2>
@@ -133,6 +140,12 @@ export default function TermsPage() {
               If something goes wrong, please tell us first, so we can try to put it right. Contact us through the
               details on our website, and we will reply within a reasonable time. You also have rights under UK consumer
               law that are not affected by these terms.
+            </p>
+
+            <h2>Your statutory rights</h2>
+            <p>
+              Nothing in these terms affects your legal rights as a consumer. Services we provide will be performed with
+              reasonable care and skill, as the Consumer Rights Act 2015 requires.
             </p>
 
             <h2>Governing law</h2>
