@@ -13647,3 +13647,27 @@ body:has(.pv) .site-footer {
     font-size: clamp(22px, 7.2vw, 30px);
   }
 }
+
+/* Phones: the phone is bigger, both headline lines share one style, and the hero copy is centred. */
+@media (max-width: 39.99rem) {
+  .deck {
+    --u: 0.72px;
+    --deck-fixed: 500px;
+  }
+  .hero-ed--work .hero-ed__copy {
+    text-align: center;
+    justify-items: center;
+  }
+  .hero-ed--work .hero-ed__title {
+    text-align: center;
+  }
+  .hero-ed--work .hero-ed__title .hero-ed__line {
+    display: block;
+  }
+  .hero-ed--work .hero-ed__title .serif-em {
+    font-family: inherit;
+  }
+  .hero-ed--work .btn-row {
+    justify-content: center;
+  }
+}
