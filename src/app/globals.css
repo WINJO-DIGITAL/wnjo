@@ -13498,3 +13498,22 @@ body:has(.pv) .site-footer {
 .deck__eyebrow + .deck__intro {
   margin-top: 6px;
 }
+
+/* Phones: all three clients show at once, wrapping if needed, with no cut-off chip. The intro balances its lines. */
+@media (max-width: 39.99rem) {
+  .deck__rail {
+    height: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow: visible;
+    padding: 4px 16px;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .deck__rail .deck__pill {
+    scroll-snap-align: none;
+  }
+}
+.deck__intro {
+  text-wrap: balance;
+}
