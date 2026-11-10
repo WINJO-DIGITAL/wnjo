@@ -281,28 +281,35 @@ function StageControl({ row, path, busy, onMove }: { row: BriefRow; path: Stage[
   const [target, setTarget] = useState<Stage>(row.stage);
   const [note, setNote] = useState("");
   const here = path.indexOf(row.stage);
+  const changing = target !== row.stage;
   return (
-    <div>
+    <div className="stage">
       <p className="admin-label">Stage</p>
-      <ol className="build-path" role="list">
-        {path.map((s, i) => (
-          <li key={s} className={i < here ? "is-done" : i === here ? "is-current" : undefined}>
-            {staffStageLabel(s)}
-          </li>
-        ))}
-      </ol>
-      <div className="build-row">
+      <p className="stage__now">
+        {staffStageLabel(row.stage)}
+        {here >= 0 && <span>Step {here + 1} of {path.length}</span>}
+      </p>
+      {here >= 0 && (
+        <div className="stage__bar" role="img" aria-label={`Step ${here + 1} of ${path.length}: ${staffStageLabel(row.stage)}`}>
+          {path.map((s, i) => (
+            <span key={s} className={i < here ? "is-done" : i === here ? "is-current" : undefined} title={staffStageLabel(s)} />
+          ))}
+        </div>
+      )}
+      <div className="stage__move">
         <label htmlFor={`stage-${row.id}`} className="visually-hidden">Move to stage</label>
         <select id={`stage-${row.id}`} className="acct-input" value={target} onChange={(e) => setTarget(e.target.value as Stage)}>
           {[...path, "on_hold" as Stage, "closed" as Stage].map((s) => (
             <option key={s} value={s}>{staffStageLabel(s)}</option>
           ))}
         </select>
-        <input className="acct-input" placeholder="Note (optional)" value={note} maxLength={500} onChange={(e) => setNote(e.target.value)} aria-label="Stage note" />
-        <button type="button" className="btn btn--secondary" disabled={busy || target === row.stage} onClick={() => onMove(target, note)}>
+        <button type="button" className="btn btn--secondary" disabled={busy || !changing} onClick={() => onMove(target, note)}>
           Move
         </button>
       </div>
+      {changing && (
+        <input className="acct-input" placeholder="Note (optional)" value={note} maxLength={500} onChange={(e) => setNote(e.target.value)} aria-label="Stage note" />
+      )}
     </div>
   );
 }

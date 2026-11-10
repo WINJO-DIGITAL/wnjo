@@ -12459,3 +12459,46 @@ body:has(.pv) .site-footer {
     border-radius: 0;
   }
 }
+
+/* Staff stage control: the stage in words, a segmented bar for where it is, then one line to move it. */
+.stage {
+  display: grid;
+  gap: 12px;
+}
+.stage__now {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 0;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 24px;
+  font-weight: 600;
+}
+.stage__now span {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-ink-3);
+}
+.stage__bar {
+  display: flex;
+  gap: 3px;
+}
+.stage__bar span {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: rgb(36 25 15 / 0.12);
+}
+.stage__bar .is-done {
+  background: var(--color-ink);
+}
+.stage__bar .is-current {
+  background: var(--color-accent);
+}
+.stage__move {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
