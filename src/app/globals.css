@@ -13973,3 +13973,32 @@ body:has(.pv) .site-footer {
     padding-top: var(--space-3);
   }
 }
+
+/* The two lists tell their story at a glance: "On your own" has crosses and a quieter, lighter type; "With Winjo" has
+   ticks and a firmer weight. Sizes stay the same. */
+.resp__col:not(.resp__col--ours) .resp__list li:not(.resp__yours) span {
+  position: relative;
+  padding-left: 1.5em;
+  font-weight: 400;
+  color: var(--color-ink-2);
+}
+.resp__col:not(.resp__col--ours) .resp__list li:not(.resp__yours) span::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 0.8em;
+  height: 0.8em;
+  background-color: var(--color-ink-3);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.resp__col--ours .resp__list li span {
+  font-weight: 600;
+}
+.resp__yours span {
+  padding-left: 0;
+}
+.resp__yours span::before {
+  content: none;
+}
