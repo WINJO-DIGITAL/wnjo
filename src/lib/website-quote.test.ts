@@ -11,7 +11,7 @@ import {
 
 const answers = (over: Partial<WebsiteAnswers> = {}): WebsiteAnswers => ({ ...DEFAULT_WEBSITE_ANSWERS, ...over });
 const monthly = (plan: WebsiteAnswers["plan"], over: Partial<WebsiteAnswers> = {}) =>
-  answers({ want: "monthly", mode: "monthly", plan, pages: "1-3", ...over });
+  answers({ want: "monthly", mode: "monthly", plan, pages: "4-5", ...over });
 // The managed subscriptions: Core (bronze) £99 for 5 pages, Pro (silver) £149 for 10, Plus (gold) £199 for 20.
 const oneOff = (over: Partial<WebsiteAnswers> = {}) => answers({ want: "oneOff", mode: "oneOff", pages: "4-5", care: "none", ...over });
 
@@ -63,7 +63,7 @@ describe("monthly packages", () => {
 
 describe("pages", () => {
   it("does not charge for pages a package already includes", () => {
-    expect(websiteQuote(monthly("bronze", { pages: "1-3" })).extraPages).toBe(0);
+    expect(websiteQuote(monthly("bronze", { pages: "4-5" })).extraPages).toBe(0);
     expect(websiteQuote(monthly("bronze", { pages: "4-5" })).extraPages).toBe(0);
     expect(websiteQuote(monthly("silver", { pages: "6-10" })).extraPages).toBe(0);
     expect(websiteQuote(monthly("gold", { pages: "16-20" })).extraPages).toBe(0);
@@ -223,6 +223,6 @@ describe("the starting page band", () => {
     }
   });
   it("keeps the Core package at £99 a month when it starts on its own band", () => {
-    expect(websiteQuote(monthly("bronze", { pages: "1-3" })).monthly).toBe(99);
+    expect(websiteQuote(monthly("bronze", { pages: "4-5" })).monthly).toBe(99);
   });
 });

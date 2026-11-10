@@ -129,9 +129,13 @@ function initialState(params: WebsiteConfiguratorParams, withSaved: boolean): Sa
     Object.assign(answers, { plan: params.plan as WebsitePlanId, mode: "monthly", want: "monthly" });
   }
   if (params.type === "oneOff") Object.assign(answers, { mode: "oneOff", want: "oneOff" });
+  // Drafts saved before an option was removed fall back to the managed website.
+  if (!(answers.want in WANTS)) answers.want = "monthly";
   if (params.care && params.care in CARE_PLANS && params.care !== "none") {
     Object.assign(answers, { mode: "oneOff", want: "oneOff", care: params.care as CarePlan });
   }
+  // A saved draft may hold a page band that no longer exists; fall back to the plan's own band.
+  if (!(answers.pages in WEBSITE_PAGE_BANDS)) answers.pages = bandForPlan(answers.plan);
   if (params.pages && params.pages in WEBSITE_PAGE_BANDS) answers.pages = params.pages as WebsitePageBand;
   else if (params.plan && params.plan in WEBSITE_PLANS) answers.pages = bandForPlan(params.plan as WebsitePlanId);
   const business = params.business?.trim().slice(0, DETAIL_LIMITS.industry);
@@ -292,7 +296,7 @@ function Inner({
   const goToId = (id: StepId) => goTo(stepIndexOf(id));
 
   const chooseWant = (want: Want) =>
-    setAnswers((a) => ({ ...a, want, mode: want === "oneOff" ? "oneOff" : want === "monthly" || want === "unsure" ? "monthly" : a.mode }));
+    setAnswers((a) => ({ ...a, want, mode: want === "oneOff" ? "oneOff" : want === "monthly" ? "monthly" : a.mode }));
 
   const toggleAddOn = (id: AddOnId) =>
     set("addOns", answers.addOns.includes(id) ? answers.addOns.filter((x) => x !== id) : [...answers.addOns, id]);
@@ -507,17 +511,6 @@ function Inner({
 
             {step.id === "package" && (
               <>
-                <ChoiceGroup
-                  legend="How would you like to pay?"
-                  name="mode"
-                  options={{
-                    monthly: { label: "Managed, paid monthly", hint: "Design, hosting, maintenance and support included. No minimum term." },
-                    oneOff: { label: "Website project, paid up front", hint: `From ${formatGBP(ONE_OFF_WEBSITE.from)}.` },
-                  }}
-                  value={answers.mode}
-                  onChange={(v) => setAnswers((a) => ({ ...a, mode: v, want: v === "oneOff" ? "oneOff" : a.want === "oneOff" ? "monthly" : a.want }))}
-                  columns={2}
-                />
                 {monthly ? (
                   <fieldset className={styles.group}>
                     <legend className={styles.legend}>Plan</legend>
@@ -551,7 +544,7 @@ function Inner({
                   <div className={`${styles.choice} cfg-static`}>
                     <span className={styles.choiceBody}>
                       <span className={styles.choiceLabel}>{ONE_OFF_WEBSITE.name}</span>
-                      <span className={styles.choicePrice}>From {formatGBP(ONE_OFF_WEBSITE.from)}, paid up front</span>
+                      <span className={styles.choicePrice}>From {formatGBP(ONE_OFF_WEBSITE.from)}, with a 50% deposit to start</span>
                       <span className={styles.choiceHint}>{ONE_OFF_WEBSITE.summary}</span>
                       <ul className="cfg-includes" role="list">
                         {ONE_OFF_WEBSITE.includes.map((item) => (
@@ -662,7 +655,7 @@ function Inner({
             {step.id === "content" && (
               <>
                 <div className="cfg-yesno">
-                  {CONTENT_QUESTIONS.map(({ key, legend }) => (
+                  {CONTENT_QUESTIONS.filter(({ key }) => !(key === "needCopywriting" && answers.content.copy === "ready")).map(({ key, legend }) => (
                     <ChoiceGroup
                       key={key}
                       legend={legend}
@@ -680,7 +673,10 @@ function Inner({
                   name="copy"
                   options={COPY_STATES}
                   value={answers.content.copy}
-                  onChange={(v) => setContent("copy", v)}
+                  onChange={(v) => {
+                    setContent("copy", v);
+                    if (v === "ready") setContent("needCopywriting", "no");
+                  }}
                   columns={2}
                   compact
                 />
@@ -729,7 +725,7 @@ function Inner({
                 )}
                 <QuoteBreakdown quote={quote} onEdit={goToId} />
                 <p className="fine">
-                  This is an estimate. Final pricing is confirmed in a written proposal before you commit. {VAT_NOTE}
+                  This is an estimate. You agree the price and terms before any payment is taken. {VAT_NOTE}
                 </p>
                 {monthly && <LegalDraftNotice />}
               </>
@@ -753,7 +749,7 @@ function Inner({
                       onChange={(v) => setIntent(v)}
                     />
                     {!calendarEnabled && (
-                      <p className="fine">Online consultation booking is coming soon. For now, ask for a callback and we&apos;ll arrange a time.</p>
+                      <p className="fine">Ask for a callback and we&apos;ll arrange a time.</p>
                     )}
                     {chosenIntent === "callback" && (
                       <Field id="callback-phone" label="Phone number for the callback" type="tel" value={details.phone} error={detailErrors.phone} onChange={(v) => setDetail("phone", v)} autoComplete="tel" />
@@ -851,23 +847,28 @@ function Inner({
                 <EstimatePanel quote={quote} />
               </div>
             )}
-            <button
-              type="button"
-              className={styles.mobileBar}
-              aria-expanded={sheetOpen}
-              aria-controls="estimate-sheet"
-              onClick={() => setSheetOpen((v) => !v)}
-            >
-              <span className={styles.mobileBarLabel}>
-                {quote.mode === "monthly" ? "Monthly" : "Project"}
-                <strong aria-live="polite">
-                  {quote.mode === "monthly"
-                    ? `${formatGBP(quote.monthly)} a month · first ${formatGBP(quote.initialPayment)}`
-                    : `${quote.hasFromPrices ? "from " : ""}${formatGBP(quote.oneOffTotal)}`}
-                </strong>
-              </span>
-              <span className={styles.mobileBarToggle}>{sheetOpen ? "Hide" : "Details"}</span>
-            </button>
+            <div className={styles.focusRow}>
+              <Link href="/" className={styles.focusHome}>
+                Home
+              </Link>
+              <button
+                type="button"
+                className={styles.mobileBar}
+                aria-expanded={sheetOpen}
+                aria-controls="estimate-sheet"
+                onClick={() => setSheetOpen((v) => !v)}
+              >
+                <span className={styles.mobileBarLabel}>
+                  {quote.mode === "monthly" ? "Monthly" : "Project"}
+                  <strong aria-live="polite">
+                    {quote.mode === "monthly"
+                      ? `${formatGBP(quote.monthly)} a month · first ${formatGBP(quote.initialPayment)}`
+                      : `${quote.hasFromPrices ? "from " : ""}${formatGBP(quote.oneOffTotal)}`}
+                  </strong>
+                </span>
+                <span className={styles.mobileBarToggle}>{sheetOpen ? "Hide" : "Details"}</span>
+              </button>
+            </div>
           </div>
         </>
       )}
@@ -906,7 +907,7 @@ function EstimatePanel({ quote, live = false }: { quote: WebsiteQuote; live?: bo
         <p className="eyebrow">Live estimate</p>
       </div>
       <p className="fine">
-        {quote.packageName} · {quote.mode === "monthly" ? "managed, monthly" : "paid up front"}
+        {quote.packageName} · {quote.mode === "monthly" ? "managed, monthly" : "project, 50% deposit"}
       </p>
       {quote.mode === "monthly" ? (
         <>
@@ -974,7 +975,7 @@ function QuoteBreakdown({ quote, onEdit }: { quote: WebsiteQuote; onEdit?: (step
                 {quote.hasFromPrices ? "from " : ""}
                 {formatGBP(quote.oneOffTotal)}
               </strong>
-              <small>paid up front, yours on full payment</small>
+              <small>50% deposit to start, then the balance. Yours on full payment.</small>
             </div>
             <div className="cfg-total">
               <span>Optional ongoing</span>

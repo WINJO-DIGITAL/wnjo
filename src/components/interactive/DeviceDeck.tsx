@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "@/components/Icons";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { Project } from "@/lib/projects";
 
@@ -276,7 +277,24 @@ export function DeviceDeck({ items }: { items: Item[] }) {
 
       </div>
 
-      {/* The project pills sit under the device, so the headline and the phone lead. */}
+      <div className="deck__cta">
+        <p className="deck__support">Design, hosting and updates, for one simple monthly payment.</p>
+        <Link href="/build?plan=bronze" className="deck__btn">
+          <span className="deck__btn-text">
+            <span className="deck__btn-main">Get started</span>
+            <span className="deck__btn-sub">
+              <strong className="deck__price">£99 a month</strong>
+              <span className="deck__term">Rolling monthly, no minimum term</span>
+            </span>
+          </span>
+          <span className="deck__btn-arrow" aria-hidden="true">
+            <ArrowRight size={16} />
+          </span>
+        </Link>
+        <p className="deck__trust">No technical headaches. We handle hosting, updates and fixes.</p>
+      </div>
+
+      {/* The project pills sit under the button, so the button gets the stage. */}
       <div ref={railRef} className="deck__rail" role="group" aria-label="Choose a project">
         {items.map((p, k) => (
           <button
@@ -293,17 +311,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
             <span>{p.name}</span>
           </button>
         ))}
-      </div>
-
-      <div className="deck__cta">
-        <Link href="/build?plan=bronze" className="deck__btn">
-          <span className="deck__btn-text">
-            <span className="deck__btn-main">Get started</span>
-            <span className="deck__btn-sub">
-              From £99 a month. No minimum term.
-            </span>
-          </span>
-        </Link>
       </div>
     </div>
   );
