@@ -13449,3 +13449,62 @@ body:has(.pv) .site-footer {
     padding-top: 0;
   }
 }
+
+/* Client chips: the selected one is a larger pill; the others are smaller tags with square corners, so they read as
+   choices beside the main button rather than as more buttons. */
+.deck__pill {
+  height: 34px;
+  padding: 0 12px 0 5px;
+  gap: 7px;
+  border-radius: 8px;
+  border-style: dashed;
+  border-color: rgb(58 45 34 / 0.22);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+}
+.deck__pill img {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+.deck__pill[aria-pressed="true"] {
+  height: 46px;
+  padding: 0 18px 0 7px;
+  gap: 10px;
+  border-radius: 23px;
+  border-style: solid;
+  border-color: rgb(58 45 34 / 0.45);
+  background: rgb(255 255 255 / 0.85);
+  font-size: 15px;
+  font-weight: 500;
+}
+.deck__pill[aria-pressed="true"] img {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+}
+@media (max-width: 39.99rem) {
+  .deck__pill {
+    height: 30px;
+    padding: 0 10px 0 4px;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .deck__pill img {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+  }
+  .deck__pill[aria-pressed="true"] {
+    height: 40px;
+    padding: 0 14px 0 6px;
+    gap: 8px;
+    font-size: 14px;
+  }
+  .deck__pill[aria-pressed="true"] img {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+}
