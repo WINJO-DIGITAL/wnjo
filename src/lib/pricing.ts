@@ -309,8 +309,7 @@ export const EXTRA_PAGE = { monthly: 10, oneOff: 75 } as const;
 
 /** Page bands offered in the calculator. Pricing uses the top of the band; above maxQuotedPages needs a quote. */
 export const WEBSITE_PAGE_BANDS = {
-  "1-3": { label: "1 to 3 pages", max: 3 },
-  "4-5": { label: "4 to 5 pages", max: 5 },
+  "4-5": { label: "Up to 5 pages", max: 5 },
   "6-10": { label: "6 to 10 pages", max: 10 },
   "11-15": { label: "11 to 15 pages", max: 15 },
   "16-20": { label: "16 to 20 pages", max: 20 },

@@ -132,6 +132,8 @@ function initialState(params: WebsiteConfiguratorParams, withSaved: boolean): Sa
   if (params.care && params.care in CARE_PLANS && params.care !== "none") {
     Object.assign(answers, { mode: "oneOff", want: "oneOff", care: params.care as CarePlan });
   }
+  // A saved draft may hold a page band that no longer exists; fall back to the plan's own band.
+  if (!(answers.pages in WEBSITE_PAGE_BANDS)) answers.pages = bandForPlan(answers.plan);
   if (params.pages && params.pages in WEBSITE_PAGE_BANDS) answers.pages = params.pages as WebsitePageBand;
   else if (params.plan && params.plan in WEBSITE_PLANS) answers.pages = bandForPlan(params.plan as WebsitePlanId);
   const business = params.business?.trim().slice(0, DETAIL_LIMITS.industry);
