@@ -85,7 +85,7 @@ export default function AboutPage() {
                 Most websites are built, handed over and left to age. <em>We think the job starts at launch.</em>
               </p>
               <p className="muted">
-                A website is never finished. It needs hosting, security, backups, updates, changes and, every couple
+                A website is never finished. It needs hosting, security, updates, changes and, every couple
                 of years, a new design. Most business owners end up organising all of that themselves. We take it on
                 instead, for one predictable monthly payment.
               </p>

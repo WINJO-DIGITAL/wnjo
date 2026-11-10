@@ -49,7 +49,7 @@ export const articles: Article[] = [
         heading: "5. Launch and support",
         paragraphs: [
           "Managed websites include hosting, maintenance and support for as long as you subscribe, on a rolling monthly subscription with no minimum term.",
-          "A website project includes launch support. After that, you can host it yourself, or choose managed hosting from £49 a month, which covers hosting, the SSL certificate, daily backups, uptime monitoring, security updates and technical support.",
+          "A website project includes launch support. After that, you can host it yourself, or choose managed hosting from £49 a month, which covers hosting, the SSL certificate, uptime monitoring, security updates and technical support.",
         ],
       },
     ],

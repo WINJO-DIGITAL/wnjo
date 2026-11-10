@@ -22,7 +22,7 @@ export const metadata = pageMetadata(
 const monthly: [string, string][] = [
   ["Bespoke design", "Designed for your business, never a template."],
   ["Managed hosting", "Hosting and your SSL certificate, arranged and renewed for you."],
-  ["Security and backups", "Monitored, with backups taken for you."],
+  ["Security", "Monitored, and fixed when something needs attention."],
   ["Maintenance and updates", "The technical upkeep, done without you asking."],
   ["Monitoring and fixes", "We watch for downtime and resolve faults."],
   ["Support and changes", "One team to ask when something needs changing."],

@@ -12,7 +12,6 @@ const CHORES = [
   "Arrange hosting",
   "Renew the SSL certificate",
   "Keep it secure",
-  "Take backups",
   "Watch for downtime",
   "Fix it when it breaks",
   "Find someone to make changes",
@@ -57,7 +56,7 @@ export function Responsibility() {
       </div>
       <p className="visually-hidden" role="status">
         {ours
-          ? "With Winjo: we design, host, secure, back up, monitor, fix and change your website. You run your business."
+          ? "With Winjo: we design, host, secure, monitor, fix and change your website. You run your business."
           : "On your own: every one of these jobs is yours to organise."}
       </p>
     </div>
