@@ -60,6 +60,7 @@ export function RefreshTimeline() {
           if (Math.abs(dx) > 40) pick(era + (dx < 0 ? 1 : -1));
         }}
       >
+        <p className="fine">Example business, for illustration.</p>
         <div className="rf__browser" aria-hidden="true">
           <div className="rf__chrome">
             <i />

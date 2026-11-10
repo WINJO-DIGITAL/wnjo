@@ -107,7 +107,7 @@ export default function PricingPage() {
         <div className="container container--wide">
           <SectionHead
             eyebrow={`Included in ${pro.name} and ${plus.name}`}
-            title={<span id="refresh-title">Winjo Refresh: a new design every {REFRESH.everyMonths} months.</span>}
+            title={<span id="refresh-title">Winjo Refresh: a design refresh every {REFRESH.everyMonths} months.</span>}
             split
           >
             <p>

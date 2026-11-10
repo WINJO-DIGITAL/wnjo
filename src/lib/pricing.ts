@@ -402,7 +402,7 @@ export const WEBSITE_PLANS = {
       "Everything in Pro",
       "Bespoke website up to 20 pages",
       "Advanced SEO",
-      "Technical SEO audit and fixes",
+      "Advanced SEO and technical optimisation",
       "Expanded AEO and GEO strategy",
       "AI search visibility monitoring where available",
       "Structured data for AI tools",

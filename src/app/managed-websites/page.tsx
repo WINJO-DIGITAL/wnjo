@@ -92,7 +92,7 @@ export default function ManagedWebsitesPage() {
         <div className="container container--wide">
           <SectionHead
             eyebrow="Winjo Refresh"
-            title={<span id="refresh-title">Redesigned every {REFRESH.everyMonths} months, without the redesign bill.</span>}
+            title={<span id="refresh-title">Refreshed every {REFRESH.everyMonths} months, without the bill for a new redesign.</span>}
             split
           >
             <p>
