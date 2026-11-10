@@ -117,7 +117,7 @@ export default function WinjoRefreshPage() {
         body={`Winjo Refresh is included in ${pro.name} and ${plus.name}, from ${formatGBP(pro.monthly)} a month with no minimum term.`}
       >
         <Link href={`/build?plan=silver`} className="btn btn--primary">
-          Get started with {pro.name}
+          Choose {pro.name}
         </Link>
         <Link href="/pricing" className="btn btn--secondary">
           Compare the plans
