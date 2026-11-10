@@ -13419,13 +13419,6 @@ body:has(.pv) .site-footer {
     order: 0;
   }
 }
-.resp__col:first-child {
-  display: flex;
-  flex-direction: column;
-}
-.resp__col:first-child .resp__list {
-  margin-block: auto;
-}
 @media (min-width: 64rem) {
   .search-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
