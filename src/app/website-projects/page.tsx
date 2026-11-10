@@ -17,7 +17,7 @@ export default function WebsiteProjectsPage() {
       <PageHero
         eyebrow="Website projects"
         title={<>Prefer to buy your website outright?</>}
-        lede={`A bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}, paid up front and yours on full payment.`}
+        lede={`A bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}, with a 50% deposit, and yours on full payment.`}
       >
         <div className="btn-row">
           <Link href="/build?type=oneOff" className="btn btn--primary">
@@ -35,7 +35,7 @@ export default function WebsiteProjectsPage() {
             <OneOffWebsite />
           </div>
           <p className="plans-note" data-reveal>
-            Would rather not pay up front? A <Link href="/managed-websites">managed website</Link> includes the
+            Would rather not pay for it all at once? A <Link href="/managed-websites">managed website</Link> includes the
             design, hosting, maintenance and updates from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month.
           </p>
         </div>

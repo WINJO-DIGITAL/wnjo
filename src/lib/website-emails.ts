@@ -66,7 +66,7 @@ export function customerAcknowledgement(args: {
     next,
     "Nothing is charged until you have seen and accepted your written proposal.",
     "",
-    "This is an estimate. Final pricing is confirmed in a written proposal.",
+    "This is an estimate. You agree the price and terms before any payment is taken.",
     ...(LEGAL_REVIEW_PENDING && quote.mode === "monthly"
       ? ["Ownership, cancellation and transfer terms are confirmed in your written agreement."]
       : []),
