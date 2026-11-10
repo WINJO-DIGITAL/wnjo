@@ -256,6 +256,27 @@ export const OWNERSHIP = {
 } as const;
 export const LEGAL_REVIEW_PENDING = true;
 
+/**
+ * Subscription rules the customer relies on (decided 10 November 2026, to match common UK managed-service practice).
+ * The terms page and the subscription summaries read these figures, so they are stated in one place.
+ */
+export const SUBSCRIPTION_TERMS = {
+  /** Days' written notice to end a subscription. No cancellation fee. */
+  noticeDays: 30,
+  /** Days' notice of any change to a monthly price. */
+  priceChangeNoticeDays: 30,
+  /** Days within which we hand over content and design files after a request. */
+  handoverDays: 14,
+  /** Days a site stays live, free of charge, after the end date, so a move can happen without downtime. */
+  liveAfterEndDays: 30,
+  /** Days within which we reply to a support message, by plan. */
+  replyWorkingDays: { bronze: 2, silver: 1, gold: 1 },
+  /** Days within which a customer complaint gets a first written reply. */
+  complaintReplyWorkingDays: 5,
+  /** Monthly time allowed for small changes, in minutes, by plan. Unused time does not carry over. */
+  changeMinutes: { bronze: 30, silver: 60, gold: 180 },
+} as const;
+
 /** Winjo Refresh: a planned design and experience refresh, included in the packages listed. */
 export const REFRESH = {
   everyMonths: 24,
@@ -316,7 +337,7 @@ export const WEBSITE_PLANS = {
     summary: "A professionally designed website with all the essential technical management taken care of.",
     bestFor: "For businesses that need a professional website and want the technical side handled.",
     contentHours: 0,
-    changes: "Small agreed changes",
+    changes: "Up to 30 minutes a month",
     support: "Technical support",
     seo: "Basic SEO foundations",
     refresh: false,
@@ -333,7 +354,7 @@ export const WEBSITE_PLANS = {
       "Mobile optimisation",
       "Basic SEO foundations",
       "Technical support",
-      "Small agreed website changes",
+      "Up to 30 minutes of small website changes a month",
     ],
     includedAddOns: [] as AddOnId[],
   },

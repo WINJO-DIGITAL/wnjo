@@ -1,4 +1,4 @@
-import { CARE_PLANS, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "./pricing";
+import { CARE_PLANS, ONE_OFF_WEBSITE, REFRESH, SUBSCRIPTION_TERMS, WEBSITE_PLANS, formatGBP } from "./pricing";
 
 const { bronze: core, silver: pro, gold: plus } = WEBSITE_PLANS;
 
@@ -48,7 +48,7 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "What happens if I cancel?",
     category: "ongoing",
     short: "Your domain and content stay yours",
-    a: "We manage your website while your subscription is active. If you leave, your domain name and the content you supplied (your words, images and brand) stay yours. The code and framework we build on remain ours, subject to your agreed service terms. The exact steps are set out in your written agreement before you subscribe.",
+    a: `Give ${SUBSCRIPTION_TERMS.noticeDays} days' written notice, with no cancellation fee. We send you a copy of your content and design files within ${SUBSCRIPTION_TERMS.handoverDays} days, keep your website live for ${SUBSCRIPTION_TERMS.liveAfterEndDays} days so you can move it, and help point your domain to a new host at no charge. Your domain name is yours, and the code and framework we build on remain ours. The full steps are in our terms.`,
   },
   {
     q: "Who owns what?",
@@ -78,7 +78,7 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "Can I change plan later?",
     category: "ongoing",
     short: "Yes",
-    a: "Yes. Tell us, and once the change is agreed with you, the new monthly price applies from your next payment.",
+    a: "Yes. Tell us which plan you want. The new plan and price apply from your next monthly payment, and we don't charge or refund part of a month.",
   },
   {
     q: "How long does it take to launch?",

@@ -68,8 +68,8 @@ export default function PricingPage() {
             <PackageComparison />
           </div>
           <p className="fine mt-5">
-            Exact allowances, such as what counts as a small change, are confirmed in your written agreement before you
-            subscribe.
+            Monthly change allowances don&apos;t carry over to the next month. Work beyond them is quoted before we start,
+            at {formatGBP(DAY_RATE)} a day. The full terms are on our <Link href="/terms">terms page</Link>.
           </p>
         </div>
       </section>

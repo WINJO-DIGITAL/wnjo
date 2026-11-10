@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "@/components/Icons";
-import { REFRESH, WEBSITE_PLANS } from "@/lib/pricing";
+import { REFRESH, SUBSCRIPTION_TERMS, WEBSITE_PLANS } from "@/lib/pricing";
 
 /**
  * Search and AI services in business terms: the benefit first, then the name it goes by and the plans that include
@@ -104,8 +104,9 @@ export function SubscriptionTerms() {
       <div>
         <p className="terms-grid__label">If you leave</p>
         <p className="terms-grid__text">
-          You can end your subscription; there is no minimum term to see out. Your domain and your content stay
-          with you. The exact steps are set out in your written agreement before you subscribe.
+          Give {SUBSCRIPTION_TERMS.noticeDays} days&apos; notice, with no cancellation fee. We send you your content and
+          design files within {SUBSCRIPTION_TERMS.handoverDays} days, and keep your site live for{" "}
+          {SUBSCRIPTION_TERMS.liveAfterEndDays} days so you can move it. Your domain stays yours.
         </p>
       </div>
     </div>

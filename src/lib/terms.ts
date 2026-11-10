@@ -7,5 +7,7 @@
  * (draft, awaiting legal review) replaces it with website packages and ownership after 12 payments. 2026-11-10.2
  * (draft, awaiting owner approval and legal review) replaces that with managed website subscriptions: rolling
  * monthly, no minimum term, Winjo Refresh, and the customer keeping their domain and content while we keep our code.
+ * 2026-11-10.3 (draft, awaiting a solicitor's check) redrafts the whole page in full: change allowances, notice to end,
+ * handover of content and design files, price changes, non-payment, liability and governing law.
  */
-export const QUOTE_TERMS_VERSION = "2026-11-10.2";
+export const QUOTE_TERMS_VERSION = "2026-11-10.3";
