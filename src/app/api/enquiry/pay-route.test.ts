@@ -79,7 +79,7 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     const [owner, customer] = emails();
     expect(owner.subject).toContain("Website order (paying now)");
     expect(customer.to).toEqual(["ada@example.com"]);
-    expect(customer.subject).toBe("Finish starting your website [WS-ABC123]");
+    expect(customer.subject).toBe("Your website is waiting [WS-ABC123]");
     expect(customer.text).toContain(`http://localhost/subscribe/${"t".repeat(43)}`);
     expect(customer.text).not.toContain("written proposal");
   });
@@ -100,7 +100,7 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     const res = await post(body({ answers: { ...DEFAULT_WEBSITE_ANSWERS, mode: "oneOff", want: "oneOff", pages: "6-10" } }));
     expect(await res.json()).toMatchObject({ ok: true, route: "proposal", pay: null, paymentStarted: false });
     const customer = emails()[1];
-    expect(customer.subject).toContain("website quote");
+    expect(customer.subject).toContain("website estimate");
     expect(customer.text).toContain("written proposal");
   });
 
@@ -109,7 +109,7 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     const res = await post(body());
     expect(res.status).toBe(200);
     expect(await res.json()).toMatchObject({ ok: true, pay: null, paymentStarted: true });
-    expect(emails()[1].subject).toBe("Finish starting your website [WS-ABC123]");
+    expect(emails()[1].subject).toBe("Your website is waiting [WS-ABC123]");
   });
 
   it("does nothing about payment for the other next steps", async () => {

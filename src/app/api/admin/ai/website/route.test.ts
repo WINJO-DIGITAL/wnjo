@@ -63,7 +63,7 @@ describe("AI website steps", () => {
     expect((await post({ action: "release", previewId: ID })).status).toBe(200);
     expect(sent).toHaveLength(1);
     expect(sent[0].to).toBe("owner@cafe.co.uk");
-    expect(sent[0].subject).toMatch(/preview is ready/);
+    expect(sent[0].subject).toMatch(/ready to look at/);
     expect((await post({ action: "withdraw", previewId: ID })).status).toBe(200);
     expect(calls).toEqual(["release", "withdraw"]);
   });

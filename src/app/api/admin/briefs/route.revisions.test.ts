@@ -74,7 +74,7 @@ describe("staff answer a change request", () => {
     expect(writesTo("build_revisions")[0].payload).toMatchObject({ status: "done", response: "Logo is now larger.", resolved_by: "u1" });
     expect(writesTo("website_briefs")[0].payload).toEqual({ stage: "preview" });
     expect(emails).toHaveLength(1);
-    expect(emails[0]).toMatchObject({ to: "c@example.com", subject: "Your changes are ready to review [WNJO-ABC123]" });
+    expect(emails[0]).toMatchObject({ to: "c@example.com", subject: "Your changes are done [WNJO-ABC123]" });
   });
 
   it("stays in changes, and sends no email, while other changes are still open", async () => {

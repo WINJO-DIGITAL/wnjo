@@ -39,7 +39,7 @@ export function customerAcknowledgement(args: {
   const text = [
     `Hi ${first(details.name)},`,
     "",
-    `Thank you for building your website quote with WINJO DIGITAL. Your reference is ${reference}.`,
+    `Thank you for building your website with us. Here's your estimate. Your reference is ${reference}.`,
     "",
     "YOUR ESTIMATE",
     ...paymentLines(quote),
@@ -59,7 +59,7 @@ export function customerAcknowledgement(args: {
     "",
     "WINJO DIGITAL",
   ].join("\n");
-  return { subject: `Your WINJO DIGITAL website quote [${reference}]`, text };
+  return { subject: `Your website estimate is here [${reference}]`, text };
 }
 
 export function ownerSubject(details: WebsiteDetails, quote: WebsiteQuote, intent: Intent, reference: string): string {
@@ -105,11 +105,11 @@ export function payLinkEmail(f: SubscriptionEmailFacts, link: string): { subject
         ]
       : [`${f.packageName}`, `Deposit: ${gbpPence(f.oneOffPence)}`];
   return {
-    subject: `Finish starting your website [${f.reference}]`,
+    subject: `Your website is waiting [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
       "",
-      "Thank you for building your website with us. If you haven't finished paying, this private link takes you back to your secure payment:",
+      "Thanks for building your website with us. If you didn't finish, this link picks up where you left off:",
       link,
       "",
       ...lines,
@@ -133,11 +133,11 @@ export function offerEmail(f: SubscriptionEmailFacts, link: string): { subject: 
         ]
       : [`${f.packageName}`, `Amount due now: ${gbpPence(f.oneOffPence)}`];
   return {
-    subject: `Your WINJO DIGITAL payment link [${f.reference}]`,
+    subject: `Your secure payment link [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
       "",
-      "Thank you for agreeing your proposal. Here's your private link to review the terms and make your first payment:",
+      "Thank you. Here's your private link to review the terms and make your first payment:",
       link,
       "",
       ...lines,
@@ -150,7 +150,7 @@ export function offerEmail(f: SubscriptionEmailFacts, link: string): { subject: 
 
 export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
   return {
-    subject: `Welcome to WINJO DIGITAL: your ${f.packageName} package [${f.reference}]`,
+    subject: `Welcome to WINJO DIGITAL [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
       "",
@@ -158,9 +158,11 @@ export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text
       "",
       `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month.`,
       `Minimum term: ${f.minimumTermMonths} months.`,
-      `Ownership: after ${f.ownershipAfterPayments} successful monthly payments, ownership of your agreed website deliverables transfers to you.`,
       "",
       "What happens next: we'll be in touch within one working day to start your website. Stripe emails a receipt for every payment.",
+      "",
+      "Your agreement",
+      `Ownership: after ${f.ownershipAfterPayments} successful monthly payments, ownership of your agreed website deliverables transfers to you.`,
       ...sign,
     ].join("\n"),
   };
@@ -174,10 +176,8 @@ export function paymentReceivedEmail(f: SubscriptionEmailFacts, amountPence: num
     text: [
       `Hi ${first(f.name)},`,
       "",
-      `We've received your payment of ${gbpPence(amountPence)} for your ${f.packageName} package. Thank you.`,
-      left > 0
-        ? `That's payment ${count} of ${f.ownershipAfterPayments}. ${left} more and ownership of your website transfers to you.`
-        : "Your website ownership milestone has been reached.",
+      `We've received your ${gbpPence(amountPence)} payment. That's ${count} of ${f.ownershipAfterPayments}.`,
+      left > 0 ? "" : "That's the last one for your agreement. Thank you for being with us.",
       ...sign,
     ].join("\n"),
   };
@@ -185,13 +185,13 @@ export function paymentReceivedEmail(f: SubscriptionEmailFacts, amountPence: num
 
 export function paymentFailedEmail(f: SubscriptionEmailFacts, manageLink: string | null): { subject: string; text: string } {
   return {
-    subject: `Your payment didn't go through [${f.reference}]`,
+    subject: `Your payment needs a quick look [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
       "",
-      `This month's payment of ${gbpPence(f.monthlyPence)} for your ${f.packageName} package didn't go through. Stripe will try again automatically over the next few days.`,
+      `We couldn't take this month's ${gbpPence(f.monthlyPence)}. No action is needed yet: Stripe will try again over the next few days.`,
       manageLink ? `To update your card now, use your billing link: ${manageLink}` : "Reply to this email and we'll help you update your card.",
-      "Your website stays live while we sort it out.",
+      "Your website stays live while this is sorted.",
       ...sign,
     ].join("\n"),
   };
@@ -213,11 +213,11 @@ export function ownershipEmail(f: SubscriptionEmailFacts): { subject: string; te
 
 export function cancelledEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
   return {
-    subject: `Your subscription has ended [${f.reference}]`,
+    subject: `We're sorry to see you go [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
       "",
-      `Your ${f.packageName} subscription has ended and no further payments will be taken.`,
+      `Your ${f.packageName} subscription has ended. No further payments will be taken.`,
       "If this isn't what you expected, reply to this email and we'll look into it straight away.",
       ...sign,
     ].join("\n"),
@@ -230,7 +230,7 @@ export function oneOffPaidEmail(f: SubscriptionEmailFacts): { subject: string; t
     text: [
       `Hi ${first(f.name)},`,
       "",
-      `We've received your payment of ${gbpPence(f.oneOffPence)} for your ${f.packageName}. Thank you. We'll be in touch within one working day to start.`,
+      `Your payment of ${gbpPence(f.oneOffPence)} has arrived. We'll be in touch within one working day to begin.`,
       "Stripe emails you a receipt for the payment.",
       ...sign,
     ].join("\n"),

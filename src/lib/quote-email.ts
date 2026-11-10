@@ -4,11 +4,11 @@ export function quoteEmail(input: { name: string; quoteReference: string; low: n
   const first = input.name.trim().split(/\s+/)[0] || "there";
   const site = input.siteUrl.replace(/\/+$/, "");
   return {
-    subject: `Your WINJO DIGITAL quote ${input.quoteReference}`,
+    subject: `Your quote [${input.quoteReference}]`,
     text: [
       `Hi ${first},`,
       "",
-      `Thanks for your brief. Your quote ${input.quoteReference} is ready: ${gbp(input.low)} to ${gbp(input.high)}, with no VAT added.`,
+      `Thanks for your brief. Your quote is ready: ${gbp(input.low)} to ${gbp(input.high)}. No VAT is added.`,
       "",
       `To see the full quote and accept it, sign in at ${site}/account with this email address.`,
       "",
