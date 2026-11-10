@@ -97,9 +97,9 @@ Booking systems, custom software and other individually scoped services are cove
 
 ## 8. Ending your subscription
 
-8.1 **Ending a subscription.** You can end your subscription at any time by telling us by email or through the contact page. You do not need to give a reason.
+8.1 **Ending a subscription.** You can end your subscription at any time by giving us **30 days' written notice** by email or through the contact page. You do not need to give a reason.
 
-The subscription ends at the end of the billing period you have already paid for. You will not be charged for any later month. Your website stays live and fully supported until that date.
+Your subscription ends at the end of the notice period. Your website stays live and fully supported until then. You will not be charged for any month that starts after it ends.
 
 We will confirm in writing, within **2 working days**, the date your subscription will end. There is no cancellation fee.
 
