@@ -1,16 +1,16 @@
 import { WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
 /*
- * Four steps, no surprises: the same website at each step, from sticky notes to live.
+ * Four steps: the same website at each step, from sticky notes to live and looked after.
  * Phones swipe through them; wider screens show all four in a row.
  * Everything inside the screens is an example.
  */
 
 const STAGES = [
-  { id: "enquire", title: "Enquire", line: "Tell us what you need." },
-  { id: "scope", title: "Scope", line: "A fixed price, in writing." },
+  { id: "enquire", title: "Tell us", line: "Your business and what you need." },
+  { id: "scope", title: "Proposal", line: "Your plan and price, in writing." },
   { id: "build", title: "Build", line: "Designed and built with you." },
-  { id: "launch", title: "Launch", line: "Live, handed over, supported." },
+  { id: "launch", title: "Launch", line: "Live, and looked after from then on." },
 ] as const;
 
 function Screen({ stage }: { stage: (typeof STAGES)[number]["id"] }) {
@@ -26,22 +26,22 @@ function Screen({ stage }: { stage: (typeof STAGES)[number]["id"] }) {
     return (
       <div className="ws-quote">
         <div className="ws-quote__head">
-          <b>Quote</b>
+          <b>Proposal</b>
           <span>Oak &amp; Ember</span>
         </div>
         <span className="ws-quote__row">
           {WEBSITE_PLANS.silver.name} package <b>{formatGBP(WEBSITE_PLANS.silver.monthly)}/mo</b>
         </span>
         <span className="ws-quote__row">
-          Image gallery <b>Included</b>
+          Hosting and care <b>Included</b>
         </span>
         <span className="ws-quote__row">
-          Setup <b>{formatGBP(WEBSITE_PLANS.silver.setup)}</b>
+          Minimum term <b>None</b>
         </span>
         <span className="ws-quote__row ws-quote__total">
           First payment <b>{formatGBP(WEBSITE_PLANS.silver.setup + WEBSITE_PLANS.silver.monthly)}</b>
         </span>
-        <span className="bs-price">Fixed price, in writing</span>
+        <span className="bs-price">One monthly price, in writing</span>
       </div>
     );
   return (
@@ -61,7 +61,7 @@ function Screen({ stage }: { stage: (typeof STAGES)[number]["id"] }) {
 
 export function WebStages() {
   return (
-    <ol role="list" className="bs bs--web" tabIndex={0} aria-label="How a website project runs, step by step">
+    <ol role="list" className="bs bs--web" tabIndex={0} aria-label="How getting started works, step by step">
       {STAGES.map((s, i) => (
         <li key={s.id} className="bs__stage" data-stage={s.id}>
           <div className="bs__screen" aria-hidden="true">

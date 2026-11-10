@@ -93,7 +93,7 @@ export function PaymentConfirmed({ order, paidOn = new Date() }: { order: Confir
             {order.kind === "subscription" && (
               <div>
                 <dt>Then</dt>
-                <dd>{formatPence(order.monthly_pence)} a month, {order.minimum_term_months}-month minimum term</dd>
+                <dd>{formatPence(order.monthly_pence)} a month, {order.minimum_term_months > 0 ? `${order.minimum_term_months}-month minimum term` : "rolling monthly"}</dd>
               </div>
             )}
             <div>

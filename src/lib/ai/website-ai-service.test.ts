@@ -132,6 +132,6 @@ describe("releasing a preview", () => {
 
 describe("pages allowed", () => {
   it("falls back to the package's own allowance", async () => {
-    expect(await pagesAllowedFor(db, brief as never)).toBe(3);
+    expect(await pagesAllowedFor(db, brief as never)).toBe(5);
   });
 });

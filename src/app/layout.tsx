@@ -25,7 +25,7 @@ const url = siteUrl();
 export const metadata: Metadata = {
   ...(url && { metadataBase: new URL(url) }),
   title: {
-    default: `${site.name} | Websites, apps and booking software`,
+    default: `${site.name} | Fully managed business websites`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: site.name,
     locale: site.locale,
-    title: `${site.name} | Websites, apps and booking software`,
+    title: `${site.name} | Fully managed business websites`,
     description: site.description,
   },
   twitter: { card: "summary_large_image" },

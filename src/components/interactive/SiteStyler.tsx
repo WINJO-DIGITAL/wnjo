@@ -253,7 +253,7 @@ export function SiteStyler() {
       </fieldset>
       <p className="ss-benefit">{site.benefit}</p>
       <Link href={href} className="btn btn--primary">
-        {auto ? "Build my website" : `Price my ${site.kind.toLowerCase()} website`}
+        {auto ? "Get started" : `Start my ${site.kind.toLowerCase()} website`}
         <ArrowRight />
       </Link>
       <p className="fine ss-example-note">

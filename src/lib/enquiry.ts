@@ -33,10 +33,10 @@ export type Timeline = keyof typeof TIMELINES;
 
 /** What happens after an enquiry is sent; shown beside the form and on its confirmation. */
 export const NEXT_STEPS = [
-  ["We review your enquiry", "Your goals, budget and timeline tell us how we can help."],
+  ["We review your enquiry", "Your business and your goals tell us how we can help."],
   ["We reply by email", "With questions, honest advice or a next step."],
   ["Discovery call", "A short conversation about your goals, if the project is a good fit."],
-  ["Written scope & price", "A fixed quote to approve. Nothing to pay until you do."],
+  ["Written proposal", "Your plan and price to approve. Nothing to pay until you do."],
 ] as const;
 
 export const LIMITS = {

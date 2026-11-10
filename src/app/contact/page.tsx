@@ -8,8 +8,8 @@ import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata(
   "/contact",
-  "Start a project",
-  "Tell WINJO DIGITAL about your website or app project: what you need, your budget, your goals and your timeline.",
+  "Contact",
+  "Tell WINJO DIGITAL about your business and the website you need. We reply with honest advice, a recommended plan and a clear monthly price.",
 );
 
 export default async function ContactPage({
@@ -21,13 +21,13 @@ export default async function ContactPage({
   return (
     <>
       <PageHero
-        eyebrow="Start a project"
+        eyebrow="Get started"
         title={
           <>
-            Tell us what you want to achieve.
+            Tell us about your business.
           </>
         }
-        lede="Your goal, the challenge, and a budget if you have one. It takes about a minute."
+        lede="What you do, and what you need your website to do. It takes about a minute."
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">
@@ -55,14 +55,13 @@ export default async function ContactPage({
                 </ol>
               </div>
               <div className="feature">
-                <h2 className="h3">Want a price first?</h2>
+                <h2 className="h3">Know which plan you want?</h2>
                 <p className="muted">
-                  The website configurator gives you an indicative price in about two minutes and sends us a complete
-                  brief.
+                  Choose Core, Pro or Plus, tell us about your business, and see your monthly price as you go.
                 </p>
                 <p className="mt-4">
                   <Link href="/build" className="arrow-link">
-                    Build my website <ArrowRight />
+                    Choose a plan <ArrowRight />
                   </Link>
                 </p>
               </div>

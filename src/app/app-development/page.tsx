@@ -43,7 +43,7 @@ export default function AppDevelopmentPage() {
   return (
     <>
       <PageHero
-        eyebrow="Build · Apps and software"
+        eyebrow="Apps and software"
         title={
           <>
             Apps, built around how you work.

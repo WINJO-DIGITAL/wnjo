@@ -29,7 +29,7 @@ describe("FAQ search", () => {
 
   it("matches words in the question or the answer, in any order", () => {
     expect(matchesFaq(payments, "VAT payments")).toBe(true);
-    expect(matchesFaq(payments, "hosting")).toBe(false);
+    expect(matchesFaq(payments, "backups")).toBe(false);
   });
 
   it("is not case sensitive", () => {

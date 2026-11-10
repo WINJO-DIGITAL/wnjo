@@ -53,9 +53,12 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  // The app development page used to live at /bespoke-systems.
+  // The app development page used to live at /bespoke-systems; the websites page became the managed service.
   async redirects() {
-    return [{ source: "/bespoke-systems", destination: "/app-development", permanent: true }];
+    return [
+      { source: "/bespoke-systems", destination: "/app-development", permanent: true },
+      { source: "/websites", destination: "/managed-websites", permanent: true },
+    ];
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

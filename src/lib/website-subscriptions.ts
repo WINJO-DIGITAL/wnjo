@@ -8,7 +8,7 @@ import type { WebsiteAnswers, WebsiteQuote } from "./website-quote";
  * Website subscriptions and one-off website payments (Stage 6). Pure helpers first (tested without Stripe or a
  * database), then the small set of Stripe calls, which use the HTTP API directly like lib/stripe.ts.
  *
- * - A subscription's first payment is the setup fee plus any one-off extras plus the first month, collected together
+ * - A subscription's first payment is any setup fee plus any one-off extras plus the first month, collected together
  *   by Stripe Checkout; then the monthly price each month.
  * - A one-off website takes a single payment of the amount on the offer (by default the 50% deposit in the terms).
  * - Nothing is charged twice: Checkout is created from the amounts on the offer row, and each paid invoice is recorded
@@ -123,7 +123,7 @@ export function checkoutParams(
       p.set("line_items[1][price_data][unit_amount]", String(upfront));
       p.set(
         "line_items[1][price_data][product_data][name]",
-        offer.oneOffPence > 0 ? "Setup fee and one-off extras" : "Setup fee",
+        offer.setupPence > 0 ? (offer.oneOffPence > 0 ? "Setup fee and one-off extras" : "Setup fee") : "One-off extras",
       );
     }
     p.set("subscription_data[metadata][website_subscription_id]", offer.id);
@@ -161,7 +161,8 @@ export function statusFromStripe(stripeStatus: string | undefined): Subscription
 
 /** The moment ownership becomes due: the paid date of the qualifying payment, once enough have been made. */
 export function ownershipDue(paidDates: string[], threshold: number = OWNERSHIP.ownershipAfterPayments): string | null {
-  if (paidDates.length < threshold) return null;
+  // 0 means the subscription never transfers ownership (rolling managed subscriptions).
+  if (threshold <= 0 || paidDates.length < threshold) return null;
   return [...paidDates].sort()[threshold - 1] ?? null;
 }
 

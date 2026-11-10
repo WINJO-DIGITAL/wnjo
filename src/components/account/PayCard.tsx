@@ -61,7 +61,9 @@ export function PayCard({
       <p>
         {deposit
           ? "Your proposal is accepted. Pay your 50% deposit to start your website."
-          : `Your proposal is accepted. Your first payment covers your setup and first month; the ${OWNERSHIP.minimumTermMonths}-month minimum term applies.`}
+          : OWNERSHIP.minimumTermMonths > 0
+            ? `Your proposal is accepted. Your first payment covers your setup and first month; the ${OWNERSHIP.minimumTermMonths}-month minimum term applies.`
+            : "Your proposal is accepted. Your first payment starts your subscription, which is rolling monthly with no minimum term."}
       </p>
       <label className="sub-agree">
         <input type="checkbox" checked={startNow} onChange={(e) => setStartNow(e.target.checked)} />
@@ -74,7 +76,7 @@ export function PayCard({
           <Link href="/terms" target="_blank">
             terms
           </Link>
-          {deposit ? "" : ` and the ${OWNERSHIP.minimumTermMonths}-month minimum term`}.
+          {deposit || OWNERSHIP.minimumTermMonths <= 0 ? "" : ` and the ${OWNERSHIP.minimumTermMonths}-month minimum term`}.
         </span>
       </label>
       {error && (

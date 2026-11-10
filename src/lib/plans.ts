@@ -40,7 +40,7 @@ export const packagePlanCards: PlanCard[] = packageOrder.map((id) => ({
   from: true,
   includes: PACKAGES[id].includes,
   href: `/build?pages=${packagePages[id]}`,
-  cta: "Build my website",
+  cta: "Price my project",
 }));
 
 /** App development, priced after scoping. It is not a website package, so it can't be picked in the flow. */

@@ -8,17 +8,17 @@ import { site } from "@/lib/site";
 export const metadata = pageMetadata(
   "/about",
   "About",
-  "Why WINJO DIGITAL exists: bespoke websites clients are proud of, honest pricing, and apps that solve real problems.",
+  "Why WINJO DIGITAL exists: bespoke websites we take long-term responsibility for, so business owners have one less thing to worry about.",
 );
 
 // Each principle as a plain statement: what we do, in one sentence.
 const beliefs = [
-  ["Outcomes first", "We judge the work by the enquiries, bookings and hours it is built to win back."],
-  ["Designed around your business", "Every site and system is shaped for the business it serves."],
-  ["Prices on the page", "You can see a price before you speak to us, and every quote is in writing."],
-  ["Plain English", "Quick answers and no jargon, from the first message to launch."],
-  ["Only what solves a problem", "Each feature has to earn its place in what we build."],
-  ["Launch focused, grow later", "We start with what matters most, then improve it once it is live."],
+  ["Your website, our responsibility", "If something breaks, dates or needs changing, it is ours to sort out."],
+  ["Designed around your business", "Every website is bespoke. We don't sell templates."],
+  ["Prices on the page", "One monthly price you can see before you speak to us, confirmed in writing."],
+  ["No lock-in", "Rolling monthly, with no minimum term. We'd rather earn your next month."],
+  ["Plain English", "Quick answers and no jargon, from the first message onwards."],
+  ["Honest about search", "Strong foundations, and no promises nobody can keep."],
 ];
 
 const standards = [
@@ -35,7 +35,7 @@ function StandardDemo({ kind }: { kind: (typeof standards)[number][2] }) {
       <span className="std std--a11y">
         <kbd>Tab</kbd>
         <span className="std__arrow" />
-        <span className="std__btn">Build my website</span>
+        <span className="std__btn">Get started</span>
       </span>
     );
   if (kind === "fast")
@@ -73,8 +73,8 @@ export default function AboutPage() {
     <>
       <PageHero
         eyebrow={`About ${site.name}`}
-        title={<>A small studio with exacting standards.</>}
-        lede={`${site.name} builds digital work businesses are proud to show their customers, and makes buying it straightforward.`}
+        title={<>We don&apos;t hand over and disappear.</>}
+        lede={`${site.name} designs bespoke websites, then stays responsible for them: hosting, maintenance, updates and regular redesigns.`}
       />
 
       <section className="section section--ruled">
@@ -82,17 +82,18 @@ export default function AboutPage() {
           <div className="split">
             <div className="prose">
               <p className="statement">
-                Cheap templates, or agencies that take weeks to quote. <em>We think there&apos;s a better way.</em>
+                Most websites are built, handed over and left to age. <em>We think the job starts at launch.</em>
               </p>
               <p className="muted">
-                {site.name} combines bespoke web design with app development and booking software. On the website
-                side, that means considered design, careful engineering and prices you can see before you commit. On
-                the app side, it means tools built around real operations, like the driver and operator apps we
-                developed for EV Exec, and FYStay, the holiday stays platform we run ourselves.
+                A website is never finished. It needs hosting, security, backups, updates, changes and, every couple
+                of years, a new design. Most business owners end up organising all of that themselves. We take it on
+                instead, for one predictable monthly payment.
               </p>
               <p className="muted">
-                We&apos;re deliberately not competing in the template market. Every site we&apos;ve built looks and
-                works differently, because every business we&apos;ve built for is different.
+                We&apos;re deliberately not competing in the template market. Every website we&apos;ve built looks and
+                works differently, because every business we&apos;ve built for is different. We also build booking
+                systems and software, like the driver and operator apps we developed for EV Exec, and FYStay, the
+                holiday stays platform we run ourselves.
               </p>
             </div>
             <div className="about-phones" aria-label="A selection of our work">
@@ -137,9 +138,9 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <CtaBand tone="light" title={<>Let&apos;s build something you&apos;re proud of.</>}>
+      <CtaBand tone="light" title={<>Your website. Our responsibility.</>}>
         <Link href="/build" className="btn btn--primary">
-          Build my website
+          Get started
         </Link>
         <Link href="/contact" className="btn btn--secondary">
           Talk to us

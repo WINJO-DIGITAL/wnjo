@@ -1,88 +1,108 @@
-import { CARE_PLANS, ONE_OFF_WEBSITE, OWNERSHIP, WEBSITE_PLANS, formatGBP } from "./pricing";
+import { CARE_PLANS, ONE_OFF_WEBSITE, REFRESH, SUBSCRIPTION_TERMS, WEBSITE_PLANS, formatGBP } from "./pricing";
+
+const { bronze: core, silver: pro, gold: plus } = WEBSITE_PLANS;
 
 /**
  * Frequently asked questions. Answers state only what the site already commits to, with every figure taken from
- * lib/pricing. Ownership, cancellation and transfer details point to the written agreement rather than inventing
- * terms: they are awaiting legal review (LEGAL_REVIEW_PENDING).
+ * lib/pricing. Cancellation, notice and transfer details point to the written agreement rather than inventing
+ * terms: they are still being finalised (LEGAL_REVIEW_PENDING).
  * `short` is the answer at a glance, shown large on the card; it must say no more than `a`.
  */
 export const FAQ_CATEGORIES = [
   { id: "getting-started", title: "Getting started" },
   { id: "pricing", title: "Pricing" },
-  { id: "website", title: "Website design and development" },
+  { id: "website", title: "Your website" },
   { id: "bookings", title: "Bookings and functionality" },
   { id: "hosting", title: "Hosting and maintenance" },
-  { id: "ongoing", title: "Ongoing support" },
+  { id: "ongoing", title: "Your subscription" },
 ] as const;
 
 export type FaqCategory = (typeof FAQ_CATEGORIES)[number]["id"];
 
 export const faqs: { q: string; short: string; a: string; category: FaqCategory }[] = [
   {
-    q: "What's included in a monthly website package?",
-    category: "pricing",
-    short: "Hosting and support in",
-    a: `A bespoke website with hosting, an SSL certificate, security updates, technical maintenance and support, for one monthly price. Core is ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month for up to ${WEBSITE_PLANS.bronze.pages} pages, Plus ${formatGBP(WEBSITE_PLANS.silver.monthly)} for up to ${WEBSITE_PLANS.silver.pages}, and Pro ${formatGBP(WEBSITE_PLANS.gold.monthly)} for up to ${WEBSITE_PLANS.gold.pages}, each with a one-off setup fee. Plus and Pro also include monthly content updates.`,
+    q: "What is a managed website?",
+    category: "getting-started",
+    short: "We run it for you",
+    a: "We design and build a bespoke website for your business, then host it, maintain it, keep it secure and backed up, and make changes for you, all for one monthly payment. You run your business; we run your website.",
   },
   {
-    q: "Is a monthly website a template?",
-    category: "website",
-    short: "No, bespoke",
-    a: "No. Every package is designed for your business. The packages differ in pages, features and the depth of design, not in whether the design is your own.",
+    q: "What does each plan cost?",
+    category: "pricing",
+    short: `From ${formatGBP(core.monthly)} a month`,
+    a: `${core.name} is ${formatGBP(core.monthly)} a month for a bespoke website of up to ${core.pages} pages. ${pro.name} is ${formatGBP(pro.monthly)} for up to ${pro.pages} pages and ${plus.name} is ${formatGBP(plus.monthly)} for up to ${plus.pages}. Every plan includes hosting, an SSL certificate, security monitoring, backups, maintenance and support. ${pro.name} and ${plus.name} add search work, performance reporting, monthly time for changes and Winjo Refresh.`,
   },
   {
     q: "How do payments work?",
     category: "pricing",
     short: "Nothing until agreed",
-    a: `On a monthly package, the first payment is the setup fee plus your first month, then one payment a month. A one-off website starts from ${formatGBP(ONE_OFF_WEBSITE.from)}, with the payment schedule set out in your proposal. Either way, nothing is charged until you accept a written proposal. WINJO DIGITAL is not VAT registered, so no VAT is added to our prices.`,
+    a: `A managed website is one payment a month, taken automatically, starting with your first month. A website project bought outright starts from ${formatGBP(ONE_OFF_WEBSITE.from)}, with the payment schedule set out in your proposal. Either way, nothing is charged until you agree to go ahead. WINJO DIGITAL is not VAT registered, so no VAT is added to our prices.`,
   },
   {
-    q: "When do I own my website?",
-    category: "website",
-    short: `After ${OWNERSHIP.ownershipAfterPayments} payments`,
-    a: `On a monthly package, ownership of your agreed website deliverables transfers to you after ${OWNERSHIP.ownershipAfterPayments} successful monthly payments. A one-off website is yours on full payment. Your domain is registered in your name. Third-party licences and subscriptions stay under their own terms, and our own reusable tools and frameworks are not transferred automatically. The details are confirmed in your written agreement.`,
-  },
-  {
-    q: "What happens after the first 12 months?",
+    q: "Is there a minimum contract?",
     category: "ongoing",
-    short: "Month to month",
-    a: `Your subscription continues month to month, with hosting, maintenance and support as before. You can also ask us to transfer the website to you under the transfer policy, with ${OWNERSHIP.noticeDays} days' notice.`,
+    short: "No",
+    a: "No. Every plan is a rolling monthly subscription with no minimum contract term.",
   },
   {
-    q: "Can I cancel during the first 12 months?",
-    category: "pricing",
-    short: `${OWNERSHIP.minimumTermMonths}-month minimum`,
-    a: `Monthly packages have a ${OWNERSHIP.minimumTermMonths}-month minimum term. What happens if you need to end it early is set out in your written agreement before you sign up.`,
+    q: "What happens if I cancel?",
+    category: "ongoing",
+    short: "Your domain and content stay yours",
+    a: `Give ${SUBSCRIPTION_TERMS.noticeDays} days' written notice, with no cancellation fee. We send you a copy of your content and design files within ${SUBSCRIPTION_TERMS.handoverDays} days, keep your website live for ${SUBSCRIPTION_TERMS.liveAfterEndDays} days so you can move it, and help point your domain to a new host at no charge. Your domain name is yours, and the code and framework we build on remain ours. The full steps are in our terms.`,
   },
   {
-    q: "How long does a project take?",
+    q: "Who owns what?",
+    category: "ongoing",
+    short: "Domain and content: you",
+    a: "You own your domain name and the business content you supply. Winjo keeps ownership of its own code and framework, subject to your agreed service terms. A website project bought outright is yours on full payment.",
+  },
+  {
+    q: "What is Winjo Refresh?",
+    category: "website",
+    short: `A redesign every ${REFRESH.everyMonths} months`,
+    a: `A planned refresh of your website's design and experience every ${REFRESH.everyMonths} months, included in ${pro.name} and ${plus.name}. It modernises how your website looks, improves how it works for visitors, and reflects changes in your business while staying true to your brand. It is a defined refresh service, not unlimited redevelopment or an unlimited number of new pages and features.`,
+  },
+  {
+    q: "Is a managed website a template?",
+    category: "website",
+    short: "No, bespoke",
+    a: "No. Every plan includes a website designed for your business. The plans differ in size, in how much we do each month and in the search work included, not in whether the design is your own.",
+  },
+  {
+    q: "Can you guarantee I'll rank first on Google or appear in AI answers?",
+    category: "website",
+    short: "No, and nobody can",
+    a: "No. We build and maintain your website so search engines, answer engines and AI tools can read and understand it properly, which gives it strong foundations. Nobody can honestly guarantee rankings, AI visibility or recommendations.",
+  },
+  {
+    q: "Can I change plan later?",
+    category: "ongoing",
+    short: "Yes",
+    a: "Yes. Tell us which plan you want. The new plan and price apply from your next monthly payment, and we don't charge or refund part of a month.",
+  },
+  {
+    q: "How long does it take to launch?",
     category: "getting-started",
     short: "A date in writing",
-    a: "It depends on the size of the site and the features it needs: a three-page website is a much smaller job than a web application. Once the scope is agreed, we confirm a delivery date in writing. We don't promise dates before that.",
+    a: "It depends on the size of the website and what it needs to do. Once the scope is agreed, we confirm a delivery date in writing. We don't promise dates before that.",
   },
   {
-    q: "How many revisions are included?",
-    category: "website",
-    short: "Set in your proposal",
-    a: "Your written proposal sets out the review rounds for your website. Bigger changes of direction are discussed, and quoted, before any extra work.",
+    q: "What isn't included?",
+    category: "pricing",
+    short: "Listed on the pricing page",
+    a: "Domain registration and renewal, business email, paid licences, third-party subscriptions and major new features are not part of any plan. Each is flagged up front, and the pricing page lists how they are handled.",
   },
   {
-    q: "What happens after launch?",
-    category: "ongoing",
-    short: "Support continues",
-    a: `Monthly packages include hosting, maintenance and support for as long as you subscribe. A one-off website includes launch support; after that you can host it yourself, or choose Hosting (${formatGBP(CARE_PLANS.hosting.monthly)} a month), Care (${formatGBP(CARE_PLANS.care.monthly)}) or Care Plus (${formatGBP(CARE_PLANS.carePlus.monthly)}).`,
+    q: "I'd rather buy my website outright. Can I?",
+    category: "pricing",
+    short: `Yes, from ${formatGBP(ONE_OFF_WEBSITE.from)}`,
+    a: `Yes. A website project starts from ${formatGBP(ONE_OFF_WEBSITE.from)} and is yours on full payment. After launch you can host it yourself, or choose Hosting (${formatGBP(CARE_PLANS.hosting.monthly)} a month), Care (${formatGBP(CARE_PLANS.care.monthly)}) or Care Plus (${formatGBP(CARE_PLANS.carePlus.monthly)}).`,
   },
   {
-    q: "Can you build an app for my business?",
+    q: "Can you build an app or booking system for my business?",
     category: "website",
     short: "Yes",
-    a: "Yes. Apps are scoped individually: a conversation about how your business works, then a written scope, price and payment schedule for you to approve. We developed the driver and operator apps for EV Exec, and we run our own platform, FYStay.",
-  },
-  {
-    q: "Can you add features to my site later?",
-    category: "ongoing",
-    short: "Yes",
-    a: "Yes. Add-on features have published prices on the pricing page. Larger improvements are quoted as separate work, or covered by the monthly content allowance in Plus and Pro, or the hours in Care Plus.",
+    a: "Yes. Apps and booking systems are scoped individually: a conversation about how your business works, then a written scope, price and payment schedule for you to approve. We developed the driver and operator apps for EV Exec, and we run our own platform, FYStay.",
   },
 ];
 

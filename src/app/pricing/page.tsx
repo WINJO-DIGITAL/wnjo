@@ -1,30 +1,27 @@
 import Link from "next/link";
 import { CtaBand, PageHero, PricingNotice, SectionHead } from "@/components/Blocks";
-import { HostingPicker, PlanFlow } from "@/components/interactive/PlanFlow";
-import {
-  AddOnsTable,
-  OneOffWebsite,
-  OwnershipPromise,
-  PackageCards,
-  PackageComparison,
-} from "@/components/pricing/WebsitePackages";
+import { ArrowRight } from "@/components/Icons";
+import { RefreshCompare, SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
+import { AddOnsTable, PackageCards, PackageComparison } from "@/components/pricing/WebsitePackages";
 import { pageMetadata } from "@/lib/metadata";
-import { DAY_RATE, ONE_OFF_WEBSITE, SCOPED_FROM, SUBSCRIPTIONS, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { DAY_RATE, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+
+const { bronze: core, silver: pro, gold: plus } = WEBSITE_PLANS;
 
 export const metadata = pageMetadata(
   "/pricing",
-  "Website pricing",
-  `Bespoke business websites from ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, or a one-off bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}. Hosting and care plans, add-on features, booking systems and custom software.`,
+  "Managed website pricing",
+  `Fully managed websites on a rolling monthly subscription: ${core.name} ${formatGBP(core.monthly)}, ${pro.name} ${formatGBP(pro.monthly)} and ${plus.name} ${formatGBP(plus.monthly)} a month. Bespoke design, hosting, maintenance and support included, with no minimum term.`,
 );
 
-// Always flagged up front, whichever option is chosen.
+// Always flagged up front, whichever plan is chosen.
 const costRows: [string, string][] = [
-  ["Domain registration and renewal", "Charged separately, or registered in your name"],
+  ["Domain registration and renewal", "Registered in your name and paid to the registrar"],
   ["Business email", "Charged separately by your email provider"],
   ["Paid plugins, fonts and software licences", "Charged separately, agreed in advance"],
   ["Third-party subscriptions and usage fees", "Paid directly to the provider"],
-  ["Major new features after launch", "Quoted as separate work"],
-  ["Work beyond a plan's monthly allowance", `Quoted before it starts, at ${formatGBP(DAY_RATE)} a day`],
+  ["Major new features", "Quoted as separate work"],
+  ["Work beyond your plan's monthly allowance", `Quoted before it starts, at ${formatGBP(DAY_RATE)} a day`],
 ];
 
 export default function PricingPage() {
@@ -32,74 +29,104 @@ export default function PricingPage() {
     <>
       <PageHero
         eyebrow="Pricing"
-        title={<>Bespoke websites from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month.</>}
-        lede={`Or a one-off bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}. Every price is on this page, and confirmed in a written proposal before you commit.`}
+        title={<>One monthly payment. One team looking after it.</>}
+        lede={`Bespoke design, hosting, maintenance and support from ${formatGBP(core.monthly)} a month. Rolling monthly, with no minimum term.`}
       >
         <div className="btn-row">
           <Link href="/build" className="btn btn--primary">
-            Build my website
+            Get started
           </Link>
           <Link href="#compare" className="btn btn--secondary">
-            Compare packages
+            Compare the plans
           </Link>
         </div>
       </PageHero>
 
-      {/* 1. Monthly website subscriptions: the main offer. */}
-      <section id="monthly" className="section--tight" style={{ paddingTop: 0 }} aria-labelledby="monthly-title">
+      {/* 1. The three plans. */}
+      <section id="plans" className="section--tight" style={{ paddingTop: 0 }} aria-label="Plans">
         <div className="container container--wide">
-          <SectionHead eyebrow="Monthly" title={<span id="monthly-title">Monthly websites.</span>} split>
-            <p>A bespoke website with hosting, maintenance and support in one monthly price.</p>
-          </SectionHead>
-          <div className="mt-6" data-reveal>
+          <div data-reveal>
             <PackageCards />
           </div>
-          <div className="mt-8" data-reveal>
-            <OwnershipPromise />
-          </div>
-          <h3 id="compare" className="h3 mt-8" data-reveal>
-            Compare packages
-          </h3>
-          <div className="mt-5" data-reveal>
-            <PackageComparison />
-          </div>
+          <p className="plans-note" data-reveal>
+            Every plan is a rolling monthly subscription with no minimum contract and no large upfront cost. Change
+            plan as your business changes.
+          </p>
         </div>
       </section>
 
-      {/* 2. One-off bespoke website, clearly separate. */}
-      <section id="one-off" className="section section--ruled" aria-labelledby="oneoff-title">
+      {/* 2. Side by side. */}
+      <section id="compare" className="section section--ruled" aria-labelledby="compare-title">
         <div className="container container--wide">
-          <SectionHead eyebrow="Pay up front" title={<span id="oneoff-title">One-off bespoke website.</span>} split>
-            <p>Prefer to pay once? Own your website on full payment, with hosting and care as optional extras.</p>
+          <SectionHead eyebrow="Compare" title={<span id="compare-title">What each plan includes.</span>} split>
+            <p>
+              {core.name} covers the essentials. {pro.name} keeps your website improving. {plus.name} adds more of our
+              time and deeper search work.
+            </p>
           </SectionHead>
           <div data-reveal>
-            <OneOffWebsite />
+            <PackageComparison />
+          </div>
+          <p className="fine mt-5">
+            Monthly change allowances don&apos;t carry over to the next month. Work beyond them is quoted before we start,
+            at {formatGBP(DAY_RATE)} a day. The full terms are on our <Link href="/terms">terms page</Link>.
+          </p>
+        </div>
+      </section>
+
+      {/* 3. Winjo Refresh: the reason to choose Pro or Plus. */}
+      <section id="refresh" className="section inverse" aria-labelledby="refresh-title">
+        <div className="container container--wide">
+          <SectionHead
+            eyebrow={`Included in ${pro.name} and ${plus.name}`}
+            title={<span id="refresh-title">Winjo Refresh: a new design every {REFRESH.everyMonths} months.</span>}
+            split
+          >
+            <p>
+              Your website shouldn&apos;t become outdated, and keeping it current shouldn&apos;t become another expense
+              to organise.
+            </p>
+            <p className="mt-4">
+              <Link href="/winjo-refresh" className="arrow-link">
+                How Winjo Refresh works <ArrowRight />
+              </Link>
+            </p>
+          </SectionHead>
+          <div data-reveal>
+            <RefreshCompare />
           </div>
         </div>
       </section>
 
-      {/* 3. Hosting and maintenance, for websites paid up front. */}
-      <PlanFlow>
-        <section id="care" className="section section--ruled">
-          <div className="container container--wide">
-            <SectionHead eyebrow="After launch" title="Hosting and care." split>
-              <p>
-                For websites paid up front. Monthly packages already include hosting and maintenance, so they are never
-                charged twice.
-              </p>
-            </SectionHead>
-          </div>
+      {/* 4. The subscription and ownership, plainly. */}
+      <section id="how-it-works" className="section" aria-labelledby="terms-title">
+        <div className="container container--wide">
+          <SectionHead eyebrow="Your subscription" title={<span id="terms-title">No lock-in. Here&apos;s how it works.</span>} split>
+            <p>What&apos;s yours, what&apos;s ours, and what happens if you leave.</p>
+          </SectionHead>
           <div data-reveal>
-            <HostingPicker />
+            <SubscriptionTerms />
           </div>
-        </section>
-      </PlanFlow>
+        </div>
+      </section>
 
-      {/* 4. Additional website features. */}
+      {/* 5. The search services behind Pro and Plus. */}
+      <section id="search" className="section section--ruled" aria-labelledby="search-title">
+        <div className="container container--wide">
+          <SectionHead eyebrow="Being found" title={<span id="search-title">What the search work means for you.</span>} split>
+            <p>The benefit first, then the name it goes by and the plans that include it.</p>
+          </SectionHead>
+          <div data-reveal>
+            <SearchServices />
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Optional extras. */}
       <section id="features" className="section section--ruled" aria-labelledby="features-title">
         <div className="container container--wide">
-          <SectionHead eyebrow="Add more" title={<span id="features-title">Additional features.</span>} split>
-            <p>Add them to any package. Anything your package already includes is never charged again.</p>
+          <SectionHead eyebrow="Optional extras" title={<span id="features-title">Add what your business needs.</span>} split>
+            <p>Anything your plan already includes is never charged again.</p>
           </SectionHead>
           <div data-reveal>
             <AddOnsTable />
@@ -107,49 +134,13 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* 5 and 6. Simplify and Build: scoped and quoted separately. */}
-      <section id="software" className="section section--ruled" aria-labelledby="software-title">
-        <div className="container container--wide">
-          <SectionHead
-            eyebrow="Beyond websites"
-            title={<span id="software-title">Booking systems and custom software.</span>}
-            split
-          >
-            <p>Scoped to your business and quoted separately. Not squeezed into a website package.</p>
-          </SectionHead>
-          <div className="home-ways" data-reveal>
-            <article className="home-way">
-              <h3 className="home-way__name">Simplify: booking systems</h3>
-              <p className="home-way__text">
-                Bookings, payments, an operator app and automation. From {formatGBP(SCOPED_FROM.bookingSystem)}, or{" "}
-                {formatGBP(SUBSCRIPTIONS.simplify.monthly)} a month with a {formatGBP(SUBSCRIPTIONS.simplify.setup)}{" "}
-                setup fee.
-              </p>
-              <Link href="/booking-software" className="arrow-link">
-                See booking systems
-              </Link>
-            </article>
-            <article className="home-way">
-              <h3 className="home-way__name">Build: apps and custom software</h3>
-              <p className="home-way__text">
-                Portals, platforms, internal tools and integrations. From {formatGBP(SCOPED_FROM.software)}, or from{" "}
-                {formatGBP(SUBSCRIPTIONS.build.monthly)} a month.
-              </p>
-              <Link href="/app-development" className="arrow-link">
-                See app development
-              </Link>
-            </article>
-          </div>
-        </div>
-      </section>
-
       <section className="section section--ruled" aria-labelledby="not-included">
         <div className="container container--wide">
           <h2 id="not-included" className="h3">
-            What&apos;s not included in any price
+            What&apos;s not included in any plan
           </h2>
           <p className="muted small mt-4">Always flagged up front.</p>
-          <div className="table-wrap mt-5" role="region" aria-label="Costs not included in any price" tabIndex={0}>
+          <div className="table-wrap mt-5" role="region" aria-label="Costs not included in any plan" tabIndex={0}>
             <table className="table table--stack">
               <thead>
                 <tr>
@@ -170,19 +161,23 @@ export default function PricingPage() {
           <div className="mt-6">
             <PricingNotice />
           </div>
+          <p className="mt-6">
+            Prefer to buy your website outright?{" "}
+            <Link href="/website-projects">Website projects start from {formatGBP(ONE_OFF_WEBSITE.from)}</Link>.
+          </p>
         </div>
       </section>
 
       <CtaBand
         tone="light"
-        title={<>What would yours cost?</>}
-        body="Choose a package, add what you need, and see your first payment and monthly price as you go."
+        title={<>Not sure which plan fits?</>}
+        body="Tell us about your business and we'll recommend one. Nothing is charged until you agree to go ahead."
       >
         <Link href="/build" className="btn btn--primary">
-          Build my website
+          Get started
         </Link>
         <Link href="/contact?topic=website" className="btn btn--secondary">
-          Talk to us
+          Talk to us first
         </Link>
       </CtaBand>
     </>

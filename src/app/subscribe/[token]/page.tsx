@@ -88,14 +88,14 @@ function Offer({ row, token }: { row: Row; token: string }) {
             <div className="cfg-total cfg-total--main">
               <span>Monthly subscription</span>
               <strong>{gbp(row.monthly_pence)}</strong>
-              <small>a month, {row.minimum_term_months}-month minimum term</small>
+              <small>a month, {row.minimum_term_months > 0 ? `${row.minimum_term_months}-month minimum term` : "rolling monthly, no minimum term"}</small>
             </div>
             <div className="cfg-total">
               <span>First payment today</span>
               <strong>{gbp(first)}</strong>
               <small>
-                setup {gbp(row.setup_pence)}
-                {row.one_off_pence ? ` + one-off extras ${gbp(row.one_off_pence)}` : ""} + first month
+                {row.setup_pence ? `setup ${gbp(row.setup_pence)} + ` : ""}
+                {row.one_off_pence ? `one-off extras ${gbp(row.one_off_pence)} + ` : ""}first month
               </small>
             </div>
           </>
@@ -110,8 +110,16 @@ function Offer({ row, token }: { row: Row; token: string }) {
       {sub && (
         <ul className="sub-facts" role="list">
           <li>Your first payment is taken today. Then {gbp(row.monthly_pence)} is taken automatically each month.</li>
-          <li>The minimum term is {row.minimum_term_months} months. After that, it continues month to month.</li>
-          <li>After {row.ownership_after_payments} successful monthly payments, ownership of your agreed website deliverables transfers to you.</li>
+          {row.minimum_term_months > 0 ? (
+            <li>The minimum term is {row.minimum_term_months} months. After that, it continues month to month.</li>
+          ) : (
+            <li>Your subscription is rolling monthly, with no minimum term.</li>
+          )}
+          {row.ownership_after_payments > 0 ? (
+            <li>After {row.ownership_after_payments} successful monthly payments, ownership of your agreed website deliverables transfers to you.</li>
+          ) : (
+            <li>Your domain name and the content you give us stay yours. We keep ownership of our own code and framework.</li>
+          )}
           <li>Hosting, maintenance and support in your package are included while you subscribe.</li>
         </ul>
       )}
@@ -120,7 +128,7 @@ function Offer({ row, token }: { row: Row; token: string }) {
         token={token}
         mode="pay"
         firstPayment={gbp(first)}
-        commitment={sub ? `the ${row.minimum_term_months}-month minimum term` : undefined}
+        commitment={sub && row.minimum_term_months > 0 ? `the ${row.minimum_term_months}-month minimum term` : undefined}
       />
     </div>
   );
@@ -145,7 +153,7 @@ function Account({ row, token }: { row: Row; token: string }) {
         {sub && (
           <div>
             <dt>Payments made</dt>
-            <dd>{row.payments_count} of {row.ownership_after_payments} towards ownership</dd>
+            <dd>{row.ownership_after_payments > 0 ? `${row.payments_count} of ${row.ownership_after_payments} towards ownership` : row.payments_count}</dd>
           </div>
         )}
         {sub && row.ownership_eligible_at && (

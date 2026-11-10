@@ -8,11 +8,11 @@ export default function NotFound() {
         <Link href="/" className="btn btn--primary">
           Go to the homepage
         </Link>
-        <Link href="/pricing" className="btn btn--secondary">
-          See prices
+        <Link href="/managed-websites" className="btn btn--secondary">
+          Managed websites
         </Link>
-        <Link href="/websites" className="btn btn--secondary">
-          Websites
+        <Link href="/pricing" className="btn btn--secondary">
+          Pricing
         </Link>
         <Link href="/contact" className="btn btn--secondary">
           Contact us
