@@ -1,36 +1,49 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { serviceClient } from "@/lib/quote-store";
 import { stripeConfig } from "@/lib/stripe";
 import { readCheckout } from "@/lib/website-subscriptions";
+import { PaymentConfirmed, type ConfirmedOrder } from "@/components/PaymentConfirmed";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Payment", robots: { index: false, follow: false } };
 
-/** After Stripe Checkout. Only says payment went through if Stripe confirms it for this session. */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * After Stripe Checkout. Only says payment went through if Stripe confirms it for this session. The order's details
+ * come from our own record of the offer the session was made for, never from the address.
+ */
 export default async function SubscribeDone({ searchParams }: { searchParams: Promise<{ session_id?: string }> }) {
   const { session_id: sessionId } = await searchParams;
   const key = stripeConfig().secretKey;
   let confirmed = false;
+  let order: ConfirmedOrder | null = null;
   if (key && typeof sessionId === "string" && /^cs_(test|live)_[A-Za-z0-9]+$/.test(sessionId)) {
     try {
       const s = await readCheckout(key, sessionId);
       confirmed = s.status === "complete" && (s.paymentStatus === "paid" || s.paymentStatus === "no_payment_required");
+      if (confirmed && s.clientReferenceId && UUID.test(s.clientReferenceId)) {
+        const db = serviceClient();
+        const { data } = db
+          ? await db
+              .from("website_subscriptions")
+              .select("reference, kind, package_name, email, setup_pence, monthly_pence, one_off_pence, minimum_term_months")
+              .eq("id", s.clientReferenceId)
+              .maybeSingle()
+          : { data: null };
+        order = (data as ConfirmedOrder | null) ?? null;
+      }
     } catch {
       confirmed = false;
     }
   }
+
   return (
     <section className="section">
       <div className="container sub-page stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
         {confirmed ? (
-          <>
-            <p className="eyebrow">Payment received</p>
-            <h1 className="h1">Thank you. You&apos;re all set.</h1>
-            <p className="lede">
-              Stripe has confirmed your payment and will email you a receipt. We&apos;ll be in touch within one working
-              day to start your website.
-            </p>
-          </>
+          <PaymentConfirmed order={order} />
         ) : (
           <>
             <p className="eyebrow">Payment</p>
@@ -39,11 +52,11 @@ export default async function SubscribeDone({ searchParams }: { searchParams: Pr
               If you completed the payment, it can take a moment to confirm, and we&apos;ll email you as soon as it does.
               If not, you can use your payment link again.
             </p>
+            <p>
+              <Link href="/" className="btn btn--secondary">Back to home</Link>
+            </p>
           </>
         )}
-        <p>
-          <Link href="/" className="btn btn--secondary">Back to home</Link>
-        </p>
       </div>
     </section>
   );

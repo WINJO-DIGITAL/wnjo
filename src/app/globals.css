@@ -12502,3 +12502,61 @@ body:has(.pv) .site-footer {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
 }
+
+/* Order confirmation after payment: the confirmation number first, then the order, then what happens next. */
+.order-confirm {
+  display: grid;
+  gap: 8px;
+  max-width: 560px;
+  padding: 28px 0 8px;
+  border-top: 1px solid rgb(36 25 15 / 0.12);
+}
+.order-confirm__label {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-ink-3);
+}
+.order-confirm__number {
+  margin: 0;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: clamp(32px, 6vw, 44px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.order-confirm__rows {
+  display: grid;
+  margin: 12px 0 0;
+}
+.order-confirm__rows > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 24px;
+  padding: 14px 0;
+  border-top: 1px solid rgb(36 25 15 / 0.08);
+}
+.order-confirm__rows dt {
+  color: var(--color-ink-3);
+}
+.order-confirm__rows dd {
+  margin: 0;
+  text-align: right;
+}
+.order-next {
+  display: grid;
+  gap: 12px;
+  max-width: 560px;
+}
+.order-next__title {
+  margin: 0;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 24px;
+  font-weight: 600;
+}
+.order-next ol {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--color-ink-2);
+  line-height: 1.5;
+}
