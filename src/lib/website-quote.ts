@@ -74,9 +74,9 @@ export type WebsiteAnswers = {
 
 export const DEFAULT_WEBSITE_ANSWERS: WebsiteAnswers = {
   want: "monthly",
-  plan: "silver",
+  plan: "bronze",
   mode: "monthly",
-  pages: "6-10",
+  pages: "4-5",
   addOns: [],
   content: {
     logo: "yes",
