@@ -8150,7 +8150,6 @@ ol.bs {
   }
 }
 
-
 /* ==========================================================================
    Phone hero: the device deck (components/interactive/DeviceDeck). Below 40rem only.
    The stage is laid out for 410px tall and scales with --u (stage height / 410, set by
@@ -9222,7 +9221,6 @@ tr[aria-selected="true"] {
 .account-menu__item:hover {
   background: var(--color-bg);
 }
-
 
 /* Redesign: the order card is the centrepiece; the progress rail is large and tappable. */
 .acct-order {
@@ -13463,4 +13461,15 @@ body:has(.pv) .site-footer {
     width: 170px !important;
     height: auto !important;
   }
+}
+
+
+/* The introduction sits under the button, centred. */
+.deck__intro {
+  margin: 14px 0 0;
+  max-width: 34ch;
+  font-size: min(15px, 4vw);
+  line-height: 1.5;
+  color: #574a3f;
+  text-align: center;
 }
