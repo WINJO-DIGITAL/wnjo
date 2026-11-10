@@ -14,6 +14,7 @@ export const publicRoutes = [
   "/app-development",
   "/privacy",
   "/terms",
+  "/dpa",
   "/cookies",
   "/resources",
 ] as const;
