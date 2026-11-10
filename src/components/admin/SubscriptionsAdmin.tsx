@@ -109,7 +109,9 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
                   {r.kind === "subscription"
                     ? r.ownership_eligible_at
                       ? `Due since ${when.format(new Date(r.ownership_eligible_at))}`
-                      : `${r.payments_count} of ${r.ownership_after_payments}`
+                      : r.ownership_after_payments > 0
+                        ? `${r.payments_count} of ${r.ownership_after_payments}`
+                        : "Not applicable (rolling)"
                     : "On full payment"}
                 </td>
                 <td>{r.kind === "subscription" && (r.status === "active" || r.status === "past_due") ? <Manage row={r} call={call} onDone={load} /> : <span className="acct-meta">—</span>}</td>

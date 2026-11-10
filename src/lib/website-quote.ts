@@ -9,6 +9,7 @@
  * - On a one-off website, an add-on with only a monthly price becomes an optional recurring cost.
  * - Anything priced by the amount of work is marked as needing a custom quote rather than given a figure.
  * - Hosting and care are never added to a monthly package: the package already includes them.
+ * - A monthly package is rolling monthly. Where a minimum term is configured (OWNERSHIP), its total is also shown.
  */
 import {
   ADD_ONS,
@@ -25,8 +26,8 @@ import {
 } from "./pricing";
 
 export const WANTS = {
-  monthly: { label: "Monthly website", hint: "A bespoke website for a monthly fee, with hosting and support included." },
-  oneOff: { label: "One-off bespoke website", hint: "Pay for your website up front and own it on full payment." },
+  monthly: { label: "Managed website", hint: "We design, host, maintain and update your website for one monthly payment." },
+  oneOff: { label: "One-off website project", hint: "Buy your website outright and own it on full payment." },
   booking: { label: "Booking system", hint: "Bookings, payments and an operator app for your business." },
   software: { label: "Custom application or software", hint: "Portals, platforms, internal tools and integrations." },
   unsure: { label: "Not sure yet", hint: "We'll help you choose. Start with a website and change it any time." },
@@ -75,7 +76,7 @@ export const DEFAULT_WEBSITE_ANSWERS: WebsiteAnswers = {
   want: "monthly",
   plan: "silver",
   mode: "monthly",
-  pages: "4-5",
+  pages: "6-10",
   addOns: [],
   content: {
     logo: "yes",
@@ -115,7 +116,7 @@ export type WebsiteQuote = {
   oneOffTotal: number;
   /** What is paid first: setup + first month + one-off extras, or the project price. */
   initialPayment: number;
-  /** Monthly package: setup plus the minimum term's payments plus one-off extras. */
+  /** Monthly package with a minimum term: setup plus the term's payments plus one-off extras. Null when rolling monthly. */
   minimumTermTotal: number | null;
   /** Some figures are starting prices ("from"). */
   hasFromPrices: boolean;
@@ -128,13 +129,13 @@ export type WebsiteQuote = {
 const ADD_ON_ORDER = Object.keys(ADD_ONS) as AddOnId[];
 
 /**
- * The page band that matches a monthly package's included pages (Core 1 to 3, Plus 4 to 5, Pro 6 to 10). A new
+ * The page band that matches a monthly package's included pages (Core 4 to 5, Pro 6 to 10, Plus 16 to 20). A new
  * calculator starts on this band, so a package never shows pages it doesn't include.
  */
 export function bandForPlan(plan: WebsitePlanId): WebsitePageBand {
   const included = WEBSITE_PLANS[plan].pages;
   const band = (Object.keys(WEBSITE_PAGE_BANDS) as WebsitePageBand[]).find((b) => WEBSITE_PAGE_BANDS[b].max === included);
-  return band ?? "4-5";
+  return band ?? "6-10";
 }
 
 export function websiteQuote(answers: WebsiteAnswers): WebsiteQuote {
@@ -221,7 +222,8 @@ export function websiteQuote(answers: WebsiteAnswers): WebsiteQuote {
   const oneOffTotal = lines.reduce((sum, l) => sum + (l.oneOff ?? 0), 0);
   const setup = monthlyMode ? plan.setup : 0;
   const initialPayment = monthlyMode ? setup + monthly + oneOffTotal : oneOffTotal;
-  const minimumTermTotal = monthlyMode ? setup + monthly * OWNERSHIP.minimumTermMonths + oneOffTotal : null;
+  const minimumTermTotal =
+    monthlyMode && OWNERSHIP.minimumTermMonths > 0 ? setup + monthly * OWNERSHIP.minimumTermMonths + oneOffTotal : null;
 
   return {
     mode: answers.mode,
@@ -304,10 +306,12 @@ export function formatWebsiteQuote(answers: WebsiteAnswers, quote: WebsiteQuote,
   ];
   if (quote.mode === "monthly") {
     out.push(
-      `Setup fee: ${gbp(quote.setup)}`,
-      `Initial payment: ${gbp(quote.initialPayment)}`,
+      ...(quote.setup > 0 ? [`Setup fee: ${gbp(quote.setup)}`] : []),
+      `First payment: ${gbp(quote.initialPayment)}`,
       `Monthly subscription: ${gbp(quote.monthly)}`,
-      `Minimum term (${OWNERSHIP.minimumTermMonths} months) total: ${gbp(quote.minimumTermTotal ?? 0)}`,
+      quote.minimumTermTotal !== null
+        ? `Minimum term (${OWNERSHIP.minimumTermMonths} months) total: ${gbp(quote.minimumTermTotal)}`
+        : "Term: rolling monthly, no minimum term",
     );
   } else {
     out.push(

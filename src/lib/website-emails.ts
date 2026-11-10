@@ -8,13 +8,29 @@ import type { WebsiteQuote } from "./website-quote";
 
 const first = (name: string) => name.trim().split(/\s+/)[0] || "there";
 
+/** What the first payment is made of, in words: "your first month", or "setup, one-off extras and your first month". */
+export function firstPaymentParts(hasSetup: boolean, hasOneOff: boolean): string {
+  const parts = [...(hasSetup ? ["setup"] : []), ...(hasOneOff ? ["one-off extras"] : [])];
+  return parts.length ? `${parts.join(", ")} and your first month` : "your first month";
+}
+
+/** The term in one line. Subscriptions agreed with a minimum term keep it; new ones are rolling monthly. */
+export function termLine(minimumTermMonths: number): string {
+  return minimumTermMonths > 0 ? `Minimum term: ${minimumTermMonths} months.` : "Rolling monthly, with no minimum term.";
+}
+const termSuffix = (minimumTermMonths: number) =>
+  minimumTermMonths > 0 ? `${minimumTermMonths}-month minimum term` : "rolling monthly, no minimum term";
+
 function paymentLines(quote: WebsiteQuote): string[] {
   if (quote.mode === "monthly") {
     return [
       `Package: ${quote.packageName}`,
-      `Initial payment: ${formatGBP(quote.initialPayment)} (setup ${formatGBP(quote.setup)} plus your first month${quote.oneOffTotal ? " and one-off extras" : ""})`,
+      `First payment: ${formatGBP(quote.initialPayment)} (${firstPaymentParts(quote.setup > 0, quote.oneOffTotal > 0)})`,
       `Then: ${formatGBP(quote.monthly)} a month`,
-      `Minimum term: ${OWNERSHIP.minimumTermMonths} months. After ${OWNERSHIP.ownershipAfterPayments} successful payments, ownership of your agreed website transfers to you.`,
+      termLine(OWNERSHIP.minimumTermMonths),
+      ...(OWNERSHIP.ownershipAfterPayments > 0
+        ? [`After ${OWNERSHIP.ownershipAfterPayments} successful payments, ownership of your agreed website transfers to you.`]
+        : []),
     ];
   }
   return [
@@ -39,7 +55,7 @@ export function customerAcknowledgement(args: {
   const text = [
     `Hi ${first(details.name)},`,
     "",
-    `Thank you for building your website with us. Here's your estimate. Your reference is ${reference}.`,
+    `Thank you for getting started with us. Here's your estimate. Your reference is ${reference}.`,
     "",
     "YOUR ESTIMATE",
     ...paymentLines(quote),
@@ -100,8 +116,8 @@ export function payLinkEmail(f: SubscriptionEmailFacts, link: string): { subject
     f.kind === "subscription"
       ? [
           `Package: ${f.packageName}`,
-          `First payment: ${gbpPence(f.setupPence + f.oneOffPence + f.monthlyPence)} (setup${f.oneOffPence ? ", one-off extras" : ""} and your first month)`,
-          `Then: ${gbpPence(f.monthlyPence)} a month, ${f.minimumTermMonths}-month minimum term`,
+          `First payment: ${gbpPence(f.setupPence + f.oneOffPence + f.monthlyPence)} (${firstPaymentParts(f.setupPence > 0, f.oneOffPence > 0)})`,
+          `Then: ${gbpPence(f.monthlyPence)} a month, ${termSuffix(f.minimumTermMonths)}`,
         ]
       : [`${f.packageName}`, `Deposit: ${gbpPence(f.oneOffPence)}`];
   return {
@@ -109,7 +125,7 @@ export function payLinkEmail(f: SubscriptionEmailFacts, link: string): { subject
     text: [
       `Hi ${first(f.name)},`,
       "",
-      "Thanks for building your website with us. If you didn't finish, this link picks up where you left off:",
+      "Thanks for getting started with us. If you didn't finish, this link picks up where you left off:",
       link,
       "",
       ...lines,
@@ -127,9 +143,11 @@ export function offerEmail(f: SubscriptionEmailFacts, link: string): { subject: 
     f.kind === "subscription"
       ? [
           `Package: ${f.packageName}`,
-          `First payment: ${gbpPence(f.setupPence + f.oneOffPence + f.monthlyPence)} (setup${f.oneOffPence ? ", one-off extras" : ""} and your first month)`,
-          `Then: ${gbpPence(f.monthlyPence)} a month, ${f.minimumTermMonths}-month minimum term`,
-          `Ownership of your agreed website transfers to you after ${f.ownershipAfterPayments} successful monthly payments.`,
+          `First payment: ${gbpPence(f.setupPence + f.oneOffPence + f.monthlyPence)} (${firstPaymentParts(f.setupPence > 0, f.oneOffPence > 0)})`,
+          `Then: ${gbpPence(f.monthlyPence)} a month, ${termSuffix(f.minimumTermMonths)}`,
+          ...(f.ownershipAfterPayments > 0
+            ? [`Ownership of your agreed website transfers to you after ${f.ownershipAfterPayments} successful monthly payments.`]
+            : []),
         ]
       : [`${f.packageName}`, `Amount due now: ${gbpPence(f.oneOffPence)}`];
   return {
@@ -157,12 +175,14 @@ export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text
       `Your ${f.packageName} website package is set up and your first payment has been received. Thank you.`,
       "",
       `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month.`,
-      `Minimum term: ${f.minimumTermMonths} months.`,
+      termLine(f.minimumTermMonths),
       "",
       "What happens next: we'll be in touch within one working day to start your website. Stripe emails a receipt for every payment.",
       "",
       "Your agreement",
-      `Ownership: after ${f.ownershipAfterPayments} successful monthly payments, ownership of your agreed website deliverables transfers to you.`,
+      f.ownershipAfterPayments > 0
+        ? `Ownership: after ${f.ownershipAfterPayments} successful monthly payments, ownership of your agreed website deliverables transfers to you.`
+        : "We look after your website for as long as your subscription is active. Your domain name and the content you give us stay yours.",
       ...sign,
     ].join("\n"),
   };
@@ -170,6 +190,13 @@ export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text
 
 export function paymentReceivedEmail(f: SubscriptionEmailFacts, amountPence: number): { subject: string; text: string } {
   const count = f.paymentsCount ?? 0;
+  // Rolling monthly subscriptions count towards nothing: a plain receipt.
+  if (f.ownershipAfterPayments <= 0) {
+    return {
+      subject: `Payment received [${f.reference}]`,
+      text: [`Hi ${first(f.name)},`, "", `We've received your ${gbpPence(amountPence)} payment. Thank you.`, ...sign].join("\n"),
+    };
+  }
   const left = Math.max(0, f.ownershipAfterPayments - count);
   return {
     subject: `Payment received: ${count} of ${f.ownershipAfterPayments} [${f.reference}]`,

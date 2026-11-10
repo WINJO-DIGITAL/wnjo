@@ -213,8 +213,8 @@ export const SCOPED_FROM = {
 export const DAY_RATE = 450;
 
 /**
- * Monthly subscriptions for scoped work (Simplify and Build). Website subscriptions are the Core, Plus and
- * Pro packages below. Setup and term are confirmed in the written proposal.
+ * Monthly subscriptions for scoped work (Simplify and Build). Website subscriptions are the Core, Pro and
+ * Plus packages below. Setup and term are confirmed in the written proposal.
  */
 export const SUBSCRIPTIONS = {
   simplify: {
@@ -241,15 +241,26 @@ export type SubscriptionId = keyof typeof SUBSCRIPTIONS;
 /* ------------------------------------------------------------------ */
 
 /**
- * Ownership and term rules for website subscriptions. LEGAL_REVIEW_PENDING keeps a visible "draft" notice on the
- * terms, pricing and quote summary until the owner confirms a legal review; set it to false at launch.
+ * Term rules for managed website subscriptions, set by the owner's repositioning brief (10 November 2026):
+ * rolling monthly, no minimum term, and no transfer of ownership of our code. Both figures are stored on every
+ * subscription when it is offered, so customers who joined under the earlier 12-month terms keep exactly what they
+ * agreed. 0 means "does not apply" (no minimum term; ownership of the build does not transfer).
+ *
+ * LEGAL_REVIEW_PENDING keeps a visible "draft" notice on the terms and wherever the subscription rules are shown.
+ * The cancellation, notice and transfer details of the new model are NOT yet agreed: keep this true until the owner
+ * confirms them and the terms have been reviewed.
  */
 export const OWNERSHIP = {
-  minimumTermMonths: 12,
-  ownershipAfterPayments: 12,
-  noticeDays: 30,
+  minimumTermMonths: 0,
+  ownershipAfterPayments: 0,
 } as const;
-export const LEGAL_REVIEW_PENDING = false;
+export const LEGAL_REVIEW_PENDING = true;
+
+/** Winjo Refresh: a planned design and experience refresh, included in the packages listed. */
+export const REFRESH = {
+  everyMonths: 24,
+  plans: ["silver", "gold"] as string[],
+} as const;
 
 /** Add-ons a website can carry. A null price means that payment mode doesn't apply to the add-on. */
 export const ADD_ONS = {
@@ -286,82 +297,103 @@ export const WEBSITE_PAGE_BANDS = {
 } as const;
 export type WebsitePageBand = keyof typeof WEBSITE_PAGE_BANDS;
 
-/** The three monthly website packages. `includedAddOns` are shown as included and never charged. */
+/**
+ * The three managed website subscriptions: Core, Pro and Plus. The ids (bronze, silver, gold) are the codes stored
+ * with every subscription and must not change; only the names and contents do. Prices and inclusions are the
+ * standard ones from the owner's brief of 10 November 2026. `setup` is 0: the brief describes one monthly payment
+ * with no large upfront cost (OWNER TO CONFIRM that no setup fee applies). `includedAddOns` are shown as included
+ * and never charged. Exact service limits ("small agreed changes", response times, what a refresh covers) are still
+ * being finalised and are deliberately not defined here.
+ */
 export const WEBSITE_PLANS = {
   bronze: {
     name: "Core",
     monthly: 99,
-    setup: 99,
-    pages: 3,
+    setup: 0,
+    pages: 5,
     popular: false,
-    summary: "For startups and smaller businesses that need a professional online presence.",
+    tagline: "Essential managed website service.",
+    summary: "A professionally designed website with all the essential technical management taken care of.",
+    bestFor: "For businesses that need a professional website and want the technical side handled.",
     contentHours: 0,
-    support: "Standard support",
-    design: "Bespoke design",
+    changes: "Small agreed changes",
+    support: "Technical support",
+    seo: "Basic SEO foundations",
+    refresh: false,
     includes: [
       "Bespoke website design",
-      "Up to 3 pages",
-      "Mobile responsive development",
-      "Contact form",
-      "Domain connection",
-      "Managed website hosting",
+      "Up to 5 pages",
+      "Managed hosting",
       "SSL certificate",
+      "Security monitoring",
+      "Website backups",
+      "Technical maintenance and updates",
+      "Uptime monitoring and fault resolution",
+      "Contact forms",
+      "Mobile optimisation",
       "Basic SEO foundations",
-      "Security updates",
-      "Technical maintenance",
-      "Standard support",
+      "Technical support",
+      "Small agreed website changes",
     ],
     includedAddOns: [] as AddOnId[],
   },
   silver: {
-    name: "Plus",
+    name: "Pro",
     monthly: 149,
-    setup: 149,
-    pages: 5,
+    setup: 0,
+    pages: 10,
     popular: true,
-    summary: "For businesses wanting a more comprehensive website that generates enquiries.",
+    tagline: "A website that\u2019s actively maintained and improved.",
+    summary: "Everything in Core, with search foundations, a monthly snapshot of how the site is doing, and a refresh every 24 months.",
+    bestFor: "For businesses that rely on their website for enquiries and want it kept moving.",
     contentHours: 1,
+    changes: "1 hour of content changes a month",
     support: "Priority support",
-    design: "More advanced bespoke design",
+    seo: "Enhanced and local SEO foundations",
+    refresh: true,
     includes: [
       "Everything in Core",
-      "Up to 5 pages",
-      "More advanced bespoke design",
+      "Bespoke website up to 10 pages",
       "Enhanced SEO foundations",
+      "Local SEO foundations",
       "Google Analytics integration",
-      "Image gallery",
-      "Testimonials section",
-      "WhatsApp integration",
-      "Lead notification emails",
-      "Up to 1 hour of small content updates a month",
+      "Google Search Console integration",
+      "AEO foundations for AI-powered search",
+      "Monthly website performance snapshot",
+      "One hour of monthly content changes",
       "Priority support",
+      "Winjo Refresh every 24 months",
     ],
-    includedAddOns: ["gallery", "testimonials", "whatsapp", "leadNotifications"] as AddOnId[],
+    includedAddOns: ["localSeo"] as AddOnId[],
   },
   gold: {
-    name: "Pro",
+    name: "Plus",
     monthly: 199,
-    setup: 199,
-    pages: 10,
+    setup: 0,
+    pages: 20,
     popular: false,
-    summary: "For growing businesses requiring a more advanced website.",
-    contentHours: 2,
-    support: "Priority support",
-    design: "Fully bespoke design",
+    tagline: "A more complete digital partnership.",
+    summary: "Everything in Pro, with advanced search and technical work, quarterly reviews and more time for changes each month.",
+    bestFor: "For growing businesses with a larger site and more going on each month.",
+    contentHours: 3,
+    changes: "3 hours of content and agreed development changes a month",
+    support: "Enhanced priority support",
+    seo: "Advanced SEO",
+    refresh: true,
     includes: [
-      "Everything in Plus",
-      "Up to 10 pages",
-      "Fully bespoke design",
-      "Advanced animations",
-      "Blog",
-      "Advanced enquiry forms",
-      "Booking integration (subject to agreed functionality and third-party costs)",
-      "Conversion tracking",
-      "Enhanced SEO setup",
-      "Up to 2 hours of content updates a month",
-      "Priority support",
+      "Everything in Pro",
+      "Bespoke website up to 20 pages",
+      "Advanced SEO",
+      "Advanced technical optimisation",
+      "Expanded AEO and GEO strategy",
+      "AI search visibility monitoring where available",
+      "Agentic-readiness foundations",
+      "Quarterly performance reviews",
+      "Three hours of monthly content and agreed development changes",
+      "Enhanced priority support",
+      "Winjo Refresh every 24 months",
     ],
-    includedAddOns: ["gallery", "testimonials", "whatsapp", "leadNotifications", "blog", "advancedForms", "booking"] as AddOnId[],
+    includedAddOns: ["localSeo"] as AddOnId[],
   },
 } as const;
 export type WebsitePlanId = keyof typeof WEBSITE_PLANS;
@@ -371,7 +403,7 @@ export const ONE_OFF_WEBSITE = {
   name: "Bespoke website",
   from: 999,
   pages: 5,
-  summary: "For businesses that want to pay for their website up front and own it on full payment.",
+  summary: "For businesses that would rather buy their website outright and own it on full payment.",
   includes: [
     "Up to 5 pages",
     "Bespoke design",

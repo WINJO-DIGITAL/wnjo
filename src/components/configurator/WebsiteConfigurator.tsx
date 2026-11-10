@@ -74,6 +74,8 @@ const stepIndexOf = (id: StepId) => STEPS.findIndex((s) => s.id === id);
 const PLAN_ORDER: WebsitePlanId[] = ["bronze", "silver", "gold"];
 const ADD_ON_ORDER = Object.keys(ADD_ONS) as AddOnId[];
 const CARE_ORDER: CarePlan[] = ["none", "hosting", "care", "carePlus"];
+/** The subscription term in a few words: rolling monthly unless a minimum term is configured. */
+const TERM = OWNERSHIP.minimumTermMonths > 0 ? `${OWNERSHIP.minimumTermMonths}-month minimum term` : "rolling monthly, no minimum term";
 
 const CONTENT_QUESTIONS: { key: keyof ContentAnswers; legend: string }[] = [
   { key: "logo", legend: "Do you have a logo?" },
@@ -528,17 +530,16 @@ function Inner({
                             <span className={styles.choiceBody}>
                               <span className={styles.choiceLabel}>
                                 {p.name}
-                                {p.popular && <span className="cfg-tag">Most popular</span>}
                               </span>
                               <span className={styles.choicePrice}>
-                                {formatGBP(p.monthly)} a month + {formatGBP(p.setup)} setup
+                                {formatGBP(p.monthly)} a month{p.setup > 0 ? ` + ${formatGBP(p.setup)} setup` : ""}
                               </span>
                               <span className={styles.choiceHint}>{p.summary}</span>
                               <ul className="cfg-includes" role="list">
                                 {p.includes.map((item) => (
                                   <li key={item}>{item}</li>
                                 ))}
-                                <li>Ownership after {OWNERSHIP.ownershipAfterPayments} successful monthly payments</li>
+                                <li>Rolling monthly, no minimum term</li>
                               </ul>
                             </span>
                           </label>
@@ -917,7 +918,7 @@ function EstimatePanel({ quote, live = false }: { quote: WebsiteQuote; live?: bo
             First payment <strong>{formatGBP(quote.initialPayment)}</strong>
             <span>
               {" "}
-              (setup {formatGBP(quote.setup)} + first month{quote.oneOffTotal ? " + one-off extras" : ""})
+              ({quote.setup > 0 ? `setup ${formatGBP(quote.setup)} + ` : ""}first month{quote.oneOffTotal ? " + one-off extras" : ""})
             </span>
           </p>
         </>
@@ -957,12 +958,12 @@ function QuoteBreakdown({ quote, onEdit }: { quote: WebsiteQuote; onEdit?: (step
             <div className="cfg-total cfg-total--main">
               <span>Monthly subscription</span>
               <strong>{formatGBP(quote.monthly)}</strong>
-              <small>a month, {OWNERSHIP.minimumTermMonths}-month minimum term</small>
+              <small>a month, {TERM}</small>
             </div>
             <div className="cfg-total">
-              <span>Initial payment</span>
+              <span>First payment</span>
               <strong>{formatGBP(quote.initialPayment)}</strong>
-              <small>setup {formatGBP(quote.setup)} + first month{quote.oneOffTotal ? ` + ${formatGBP(quote.oneOffTotal)} one-off` : ""}</small>
+              <small>{quote.setup > 0 ? `setup ${formatGBP(quote.setup)} + ` : ""}first month{quote.oneOffTotal ? ` + ${formatGBP(quote.oneOffTotal)} one-off` : ""}</small>
             </div>
           </>
         ) : (
@@ -986,7 +987,7 @@ function QuoteBreakdown({ quote, onEdit }: { quote: WebsiteQuote; onEdit?: (step
       <table className={styles.lines}>
         <caption className="visually-hidden">Quote breakdown</caption>
         <tbody>
-          {monthly && (
+          {monthly && quote.setup > 0 && (
             <tr>
               <th scope="row">Setup fee</th>
               <td>{formatGBP(quote.setup)}</td>
@@ -1028,8 +1029,8 @@ function QuoteBreakdown({ quote, onEdit }: { quote: WebsiteQuote; onEdit?: (step
       )}
       {monthly && (
         <p className="fine">
-          After {OWNERSHIP.ownershipAfterPayments} successful monthly payments, ownership of your agreed website
-          deliverables transfers to you. You can carry on month to month with hosting and support.
+          We look after your website for as long as you subscribe. Your domain name and the content you give us stay
+          yours. <Link href="/pricing#how-it-works" target="_blank">How the subscription works</Link>.
         </p>
       )}
       {onEdit && (
@@ -1069,7 +1070,7 @@ function PayPanel({
       <p className={styles.payAmount}>{formatPence(payNow.pence)}</p>
       <p className="muted">
         {monthly
-          ? `Your setup fee and first month. Then ${formatGBP(quote.monthly)} a month, with a ${OWNERSHIP.minimumTermMonths}-month minimum term.`
+          ? `${quote.setup > 0 ? "Your setup fee and first month" : "Your first month"}${quote.oneOffTotal ? ", plus one-off extras" : ""}. Then ${formatGBP(quote.monthly)} a month, ${TERM}.`
           : `A 50% deposit on your ${formatGBP(quote.oneOffTotal)} website, as set out in our terms.`}
       </p>
       <label className="sub-agree">
@@ -1079,7 +1080,7 @@ function PayPanel({
           <Link href="/terms" target="_blank">
             terms
           </Link>
-          {monthly ? ` and the ${OWNERSHIP.minimumTermMonths}-month minimum term` : ""}.
+          {monthly && OWNERSHIP.minimumTermMonths > 0 ? ` and the ${OWNERSHIP.minimumTermMonths}-month minimum term` : ""}.
         </span>
       </label>
       <label className="sub-agree">

@@ -64,12 +64,12 @@ describe("POST /api/enquiry (website quote)", () => {
     const owner = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(owner.to).toEqual(["inbox@example.com"]);
     expect(owner.reply_to).toBe("ada@example.com");
-    expect(owner.subject).toContain("Plus £199/month");
-    expect(owner.text).toContain("Initial payment: £348");
+    expect(owner.subject).toContain("Pro £149/month");
+    expect(owner.text).toContain("First payment: £149");
     const customer = JSON.parse(fetchMock.mock.calls[1][1].body);
     expect(customer.to).toEqual(["ada@example.com"]);
     expect(customer.subject).toContain(reference);
-    expect(customer.text).toContain("Initial payment: £348");
+    expect(customer.text).toContain("First payment: £149");
     expect(customer.text).toContain("Then: £199 a month");
     expect(customer.text).toContain("Final pricing is confirmed in a written proposal");
   });
@@ -81,7 +81,7 @@ describe("POST /api/enquiry (website quote)", () => {
     expect(row.kind).toBe("brief");
     expect(row.topic).toBe("Website quote");
     expect(row.company).toBe("Analytical Engines Ltd");
-    expect((row.answers as { figures: { monthly: number; setup: number } }).figures).toMatchObject({ monthly: 199, setup: 149 });
+    expect((row.answers as { figures: { monthly: number; setup: number } }).figures).toMatchObject({ monthly: 149, setup: 0 });
   });
 
   it("needs a phone number for a callback", async () => {

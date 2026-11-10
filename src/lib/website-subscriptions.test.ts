@@ -25,10 +25,11 @@ const monthly = (over: Partial<WebsiteAnswers> = {}): WebsiteAnswers => ({
 
 describe("offers", () => {
   it("turns a monthly quote into setup, monthly and one-off amounts in pence", () => {
-    const a = monthly({ addOns: ["localSeo", "booking"] });
+    // Core with local SEO (a one-off extra, not included in Core) and booking (a monthly extra).
+    const a = monthly({ plan: "bronze", pages: "4-5", addOns: ["localSeo", "booking"] });
     const offer = offerFromQuote(a, websiteQuote(a));
-    expect(offer).toMatchObject({ kind: "subscription", packageCode: "silver", setupPence: 14900, monthlyPence: 16400, oneOffPence: 19900 });
-    expect(firstPaymentPence(offer)).toBe(14900 + 16400 + 19900);
+    expect(offer).toMatchObject({ kind: "subscription", packageCode: "bronze", setupPence: 0, monthlyPence: 11400, oneOffPence: 19900 });
+    expect(firstPaymentPence(offer)).toBe(11400 + 19900);
   });
 
   it("uses staff overrides to match the written proposal", () => {
@@ -95,10 +96,16 @@ describe("figures", () => {
     expect(statusFromStripe("incomplete")).toBeNull();
   });
 
-  it("dates ownership from the 12th payment, not before", () => {
+  it("dates ownership from the 12th payment, not before, for subscriptions agreed on the earlier terms", () => {
     const dates = Array.from({ length: 12 }, (_, i) => `2027-${String(i + 1).padStart(2, "0")}-01T00:00:00Z`);
-    expect(ownershipDue(dates.slice(0, 11))).toBeNull();
-    expect(ownershipDue(dates)).toBe("2027-12-01T00:00:00Z");
+    expect(ownershipDue(dates.slice(0, 11), 12)).toBeNull();
+    expect(ownershipDue(dates, 12)).toBe("2027-12-01T00:00:00Z");
+  });
+
+  it("never dates ownership on a rolling subscription, however many payments are made", () => {
+    const dates = Array.from({ length: 12 }, (_, i) => `2027-${String(i + 1).padStart(2, "0")}-01T00:00:00Z`);
+    expect(ownershipDue(dates)).toBeNull();
+    expect(ownershipDue(dates, 0)).toBeNull();
   });
 
   it("counts active and overdue subscriptions in monthly recurring revenue", () => {
