@@ -13610,3 +13610,25 @@ body:has(.pv) .site-footer {
 .deck__btn {
   gap: 2px;
 }
+
+/* The card carries its ticks: price and term on one line, the two ticks beneath. */
+.deck__btn-price {
+  display: block;
+}
+.deck__btn-term {
+  font: 500 min(15px, 4vw) / 1.2 var(--font-sans);
+  color: #f6f0e6;
+}
+.deck__btn-ticks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  margin-top: 6px;
+  font: 500 min(13px, 3.6vw) / 1.2 var(--font-sans);
+  color: #f6f0e6;
+}
+.deck__btn-ticks span::before {
+  content: "\2713  ";
+  color: #f0b48f;
+}

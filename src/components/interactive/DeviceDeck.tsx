@@ -301,14 +301,15 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       <div className="deck__cta">
         <Link href="/build?plan=bronze" className="deck__btn">
           <span className="deck__btn-main">Get your website</span>
-          <span className="deck__btn-price">From £99/month</span>
-          <span className="deck__btn-term">No minimum term</span>
+          <span className="deck__btn-price">
+            From £99/month <span className="deck__btn-term">· No minimum term</span>
+          </span>
+          <span className="deck__btn-ticks">
+            <span>No long-term contracts</span>
+            <span>Ongoing support</span>
+          </span>
         </Link>
         <p className="deck__lead">You focus on your business. We&apos;ll take care of your website.</p>
-        <ul className="deck__ticks" role="list">
-          <li>No long-term contracts</li>
-          <li>Ongoing support</li>
-        </ul>
       </div>
     </div>
   );
