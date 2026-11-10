@@ -13729,3 +13729,37 @@ body:has(.pv) .site-footer {
     height: 36px;
   }
 }
+
+/* Phones: the whole hero scales up a step so it fills the first screen, while the button and points stay visible. */
+@media (max-width: 39.99rem) {
+  .hero-ed--work .hero-ed__title {
+    font-size: clamp(26px, 8vw, 34px);
+  }
+  .deck {
+    --u: 1.08px;
+    --deck-fixed: 430px;
+  }
+  .deck__rail .deck__pill {
+    height: 36px;
+    width: 52px;
+  }
+  .deck__rail .deck__pill[aria-pressed="true"] {
+    height: 60px;
+    width: 60px;
+  }
+  .deck__btn {
+    min-height: 74px;
+  }
+  .deck__btn-main {
+    font-size: min(22px, 5.8vw);
+  }
+  .deck__btn-price {
+    font-size: min(26px, 6.8vw);
+  }
+  .deck__bullets {
+    font-size: min(15px, 4vw);
+  }
+  .deck__bullets li::before {
+    font-size: 1.05em;
+  }
+}
