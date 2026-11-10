@@ -8558,9 +8558,9 @@ ol.bs {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  min-height: 74px;
-  padding: 14px 16px;
-  border-radius: 37px;
+  min-height: 58px;
+  padding: 12px 18px;
+  border-radius: 12px;
   background: linear-gradient(180deg, #3a2e25, #2a2019);
   color: #f6f0e6;
   font: 600 min(18px, 4.8vw) / 1 var(--font-sans);
@@ -8636,7 +8636,7 @@ ol.bs {
   .deck__btn {
     min-height: 60px;
     padding: 10px 14px;
-    border-radius: 30px;
+    border-radius: 12px;
   }
   .deck__btn-main {
     font-size: min(19px, 5vw);
