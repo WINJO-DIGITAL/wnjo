@@ -13517,3 +13517,41 @@ body:has(.pv) .site-footer {
 .deck__intro {
   text-wrap: balance;
 }
+
+/* Phones: the three client chips sit on one row, and the introduction runs to two lines. */
+@media (max-width: 39.99rem) {
+  .deck__rail {
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding-inline: 12px;
+  }
+  .deck__rail .deck__pill {
+    height: 32px;
+    padding: 0 9px 0 4px;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .deck__rail .deck__pill img {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+  }
+  .deck__rail .deck__pill[aria-pressed="true"] {
+    height: 38px;
+    padding: 0 12px 0 5px;
+    font-size: 13px;
+  }
+  .deck__rail .deck__pill[aria-pressed="true"] img {
+    width: 28px;
+    height: 28px;
+  }
+}
+@media (max-width: 23.74rem) {
+  .deck__rail {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+.deck__intro {
+  max-width: 40ch;
+}
