@@ -13689,3 +13689,10 @@ body:has(.pv) .site-footer {
     opacity: 1;
   }
 }
+
+/* Phones: the first section after the hero starts closer, so there's no empty band under the promise. */
+@media (max-width: 39.99rem) {
+  #managed {
+    padding-top: 1.5rem;
+  }
+}
