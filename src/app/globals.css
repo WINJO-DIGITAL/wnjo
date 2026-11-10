@@ -13821,3 +13821,29 @@ body:has(.pv) .site-footer {
     min-height: 40px;
   }
 }
+
+/* Phones: the managed websites section fits on one screen below the header. */
+@media (max-width: 39.99rem) {
+  #managed {
+    padding-bottom: 2.5rem;
+  }
+  #managed .tile__more {
+    display: none;
+  }
+  #managed .resp {
+    gap: var(--space-3);
+  }
+  #managed .resp__col {
+    padding: 0.8rem 1rem;
+  }
+  #managed .resp__label {
+    margin-bottom: var(--space-2);
+  }
+  #managed .resp__list li span {
+    line-height: 1.3;
+    padding-block: 0.05em;
+  }
+  #managed .resp__yours {
+    margin: 0;
+  }
+}
