@@ -48,7 +48,7 @@ export default function HomePage() {
               style={{ "--i": 1 } as React.CSSProperties}
             >
               <span className="hero-ed__line">Your website.</span>{" "}
-              <span className="hero-ed__line">Our responsibility.</span>
+              <span className="serif-em">Our responsibility.</span>
             </h1>
             <p className="eyebrow hero-ed__place rise" style={{ "--i": 2 } as React.CSSProperties}>
               Fully managed websites from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month
