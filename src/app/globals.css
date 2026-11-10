@@ -13435,8 +13435,8 @@ body:has(.pv) .site-footer {
 /* Phones: the phone is bigger. The headline keeps its two styles and the copy stays left-aligned. */
 @media (max-width: 39.99rem) {
   .deck {
-    --u: 0.8px;
-    --deck-fixed: 470px;
+    --u: 0.86px;
+    --deck-fixed: 462px;
   }
 }
 
