@@ -33,7 +33,13 @@ export function StickyCta() {
       // on every screen size, and steps aside only over the footer.
       let topVisible = true;
       let footerVisible = false;
-      const apply = () => setShow(!topVisible && !footerVisible);
+      let closingVisible = false;
+      const apply = () => setShow(!topVisible && !footerVisible && !closingVisible);
+      // The closing band already offers the same next step, so the bar doesn't repeat it there.
+      const closingObserver = new IntersectionObserver(([entry]) => {
+        closingVisible = entry.isIntersecting;
+        apply();
+      });
       const topObserver = new IntersectionObserver(([entry]) => {
         topVisible = entry.isIntersecting;
         apply();
@@ -52,6 +58,8 @@ export function StickyCta() {
           topObserver.observe(top);
         }
         if (footer) footerObserver.observe(footer);
+        const closing = document.querySelector(".cta-band");
+        if (closing) closingObserver.observe(closing);
         return Boolean(top);
       };
       const found = attach();
@@ -61,6 +69,7 @@ export function StickyCta() {
         waiter?.disconnect();
         topObserver.disconnect();
         footerObserver.disconnect();
+        closingObserver.disconnect();
         setShow(false);
       };
     }

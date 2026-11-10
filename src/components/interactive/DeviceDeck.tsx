@@ -311,7 +311,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         <ul className="deck__bullets" role="list">
           <li>No Contracts</li>
           <li>No Minimum Term</li>
-          <li>24/7 Support</li>
+          <li>Ongoing Support</li>
         </ul>
       </div>
     </div>
