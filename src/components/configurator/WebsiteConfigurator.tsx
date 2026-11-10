@@ -129,6 +129,8 @@ function initialState(params: WebsiteConfiguratorParams, withSaved: boolean): Sa
     Object.assign(answers, { plan: params.plan as WebsitePlanId, mode: "monthly", want: "monthly" });
   }
   if (params.type === "oneOff") Object.assign(answers, { mode: "oneOff", want: "oneOff" });
+  // Drafts saved before an option was removed fall back to the managed website.
+  if (!(answers.want in WANTS)) answers.want = "monthly";
   if (params.care && params.care in CARE_PLANS && params.care !== "none") {
     Object.assign(answers, { mode: "oneOff", want: "oneOff", care: params.care as CarePlan });
   }
@@ -294,7 +296,7 @@ function Inner({
   const goToId = (id: StepId) => goTo(stepIndexOf(id));
 
   const chooseWant = (want: Want) =>
-    setAnswers((a) => ({ ...a, want, mode: want === "oneOff" ? "oneOff" : want === "monthly" || want === "unsure" ? "monthly" : a.mode }));
+    setAnswers((a) => ({ ...a, want, mode: want === "oneOff" ? "oneOff" : want === "monthly" ? "monthly" : a.mode }));
 
   const toggleAddOn = (id: AddOnId) =>
     set("addOns", answers.addOns.includes(id) ? answers.addOns.filter((x) => x !== id) : [...answers.addOns, id]);
