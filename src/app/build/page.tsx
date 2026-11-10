@@ -31,7 +31,7 @@ export default async function BuildPage({
   // Consultation booking appears only once a real calendar is connected (Cal.com); until then, callbacks.
   const calendarEnabled = Boolean(process.env.CALCOM_API_KEY?.trim() && process.env.CALCOM_EVENT_TYPE_ID?.trim());
   return (
-    <>
+    <div className="build-page">
       <PageHero
         eyebrow="Get started"
         title={<>Let&apos;s get your website started.</>}
@@ -50,6 +50,6 @@ export default async function BuildPage({
           </noscript>
         </div>
       </section>
-    </>
+    </div>
   );
 }

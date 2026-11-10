@@ -13433,3 +13433,16 @@ body:has(.pv) .site-footer {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* Phones on Get started: the calculator takes the screen. The site header, breadcrumb and intro give way to its own
+   top bar (step, Home and price), so the first question is visible on arrival. */
+@media (max-width: 39.99rem) {
+  body:has(.build-page) .site-header,
+  body:has(.build-page) .breadcrumbs,
+  body:has(.build-page) .page-hero {
+    display: none;
+  }
+  body:has(.build-page) main {
+    padding-top: 0;
+  }
+}

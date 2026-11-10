@@ -845,23 +845,28 @@ function Inner({
                 <EstimatePanel quote={quote} />
               </div>
             )}
-            <button
-              type="button"
-              className={styles.mobileBar}
-              aria-expanded={sheetOpen}
-              aria-controls="estimate-sheet"
-              onClick={() => setSheetOpen((v) => !v)}
-            >
-              <span className={styles.mobileBarLabel}>
-                {quote.mode === "monthly" ? "Monthly" : "Project"}
-                <strong aria-live="polite">
-                  {quote.mode === "monthly"
-                    ? `${formatGBP(quote.monthly)} a month · first ${formatGBP(quote.initialPayment)}`
-                    : `${quote.hasFromPrices ? "from " : ""}${formatGBP(quote.oneOffTotal)}`}
-                </strong>
-              </span>
-              <span className={styles.mobileBarToggle}>{sheetOpen ? "Hide" : "Details"}</span>
-            </button>
+            <div className={styles.focusRow}>
+              <Link href="/" className={styles.focusHome}>
+                Home
+              </Link>
+              <button
+                type="button"
+                className={styles.mobileBar}
+                aria-expanded={sheetOpen}
+                aria-controls="estimate-sheet"
+                onClick={() => setSheetOpen((v) => !v)}
+              >
+                <span className={styles.mobileBarLabel}>
+                  {quote.mode === "monthly" ? "Monthly" : "Project"}
+                  <strong aria-live="polite">
+                    {quote.mode === "monthly"
+                      ? `${formatGBP(quote.monthly)} a month · first ${formatGBP(quote.initialPayment)}`
+                      : `${quote.hasFromPrices ? "from " : ""}${formatGBP(quote.oneOffTotal)}`}
+                  </strong>
+                </span>
+                <span className={styles.mobileBarToggle}>{sheetOpen ? "Hide" : "Details"}</span>
+              </button>
+            </div>
           </div>
         </>
       )}
