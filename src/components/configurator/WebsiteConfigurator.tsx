@@ -58,7 +58,7 @@ const STORAGE_KEY = "wnjo.website-quote.v1";
 
 const STEPS = [
   { id: "want", label: "Start", title: "What would you like?" },
-  { id: "package", label: "Package", title: "Choose your package." },
+  { id: "package", label: "Plan", title: "Choose your plan." },
   { id: "goals", label: "Goals", title: "What should it achieve?" },
   { id: "pages", label: "Pages", title: "Which pages?" },
   { id: "features", label: "Features", title: "What should it do?" },
@@ -511,8 +511,8 @@ function Inner({
                   legend="How would you like to pay?"
                   name="mode"
                   options={{
-                    monthly: { label: "Monthly package", hint: "Hosting, maintenance and support included." },
-                    oneOff: { label: "One-off, paid up front", hint: `From ${formatGBP(ONE_OFF_WEBSITE.from)}.` },
+                    monthly: { label: "Managed, paid monthly", hint: "Design, hosting, maintenance and support included. No minimum term." },
+                    oneOff: { label: "Website project, paid up front", hint: `From ${formatGBP(ONE_OFF_WEBSITE.from)}.` },
                   }}
                   value={answers.mode}
                   onChange={(v) => setAnswers((a) => ({ ...a, mode: v, want: v === "oneOff" ? "oneOff" : a.want === "oneOff" ? "monthly" : a.want }))}
@@ -520,7 +520,7 @@ function Inner({
                 />
                 {monthly ? (
                   <fieldset className={styles.group}>
-                    <legend className={styles.legend}>Package</legend>
+                    <legend className={styles.legend}>Plan</legend>
                     <div className={styles.choices}>
                       {PLAN_ORDER.map((id) => {
                         const p = WEBSITE_PLANS[id];
@@ -906,7 +906,7 @@ function EstimatePanel({ quote, live = false }: { quote: WebsiteQuote; live?: bo
         <p className="eyebrow">Live estimate</p>
       </div>
       <p className="fine">
-        {quote.packageName} · {quote.mode === "monthly" ? "monthly package" : "paid up front"}
+        {quote.packageName} · {quote.mode === "monthly" ? "managed, monthly" : "paid up front"}
       </p>
       {quote.mode === "monthly" ? (
         <>
@@ -1036,7 +1036,7 @@ function QuoteBreakdown({ quote, onEdit }: { quote: WebsiteQuote; onEdit?: (step
       {onEdit && (
         <p className="btn-row">
           <button type="button" className="arrow-link" onClick={() => onEdit("package")}>
-            Change package
+            Change plan
           </button>
           <button type="button" className="arrow-link" onClick={() => onEdit("features")}>
             Change features

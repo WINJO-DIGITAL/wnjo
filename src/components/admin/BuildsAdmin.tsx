@@ -91,7 +91,7 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
 
   if (error) return <p role="alert">Website builds couldn&apos;t be loaded.</p>;
   if (rows === null) return <p className="lede">Loading…</p>;
-  if (rows.length === 0) return <p className="lede">No briefs yet. They appear here when someone sends one from Build my website.</p>;
+  if (rows.length === 0) return <p className="lede">No briefs yet. They appear here when someone sends one from Get started.</p>;
 
   const current = rows.find((r) => r.id === selected) ?? null;
   return (

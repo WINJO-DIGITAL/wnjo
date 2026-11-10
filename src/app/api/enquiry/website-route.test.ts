@@ -70,7 +70,7 @@ describe("POST /api/enquiry (website quote)", () => {
     expect(customer.to).toEqual(["ada@example.com"]);
     expect(customer.subject).toContain(reference);
     expect(customer.text).toContain("First payment: £149");
-    expect(customer.text).toContain("Then: £199 a month");
+    expect(customer.text).toContain("Then: £149 a month");
     expect(customer.text).toContain("Final pricing is confirmed in a written proposal");
   });
 

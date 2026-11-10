@@ -55,17 +55,17 @@ const stroke = {
 /** What each option means, a line icon, and example goals visitors can tap to add. */
 const OPTIONS: Record<Topic, { note: string; icon: ReactNode; examples: string[]; askSite?: boolean }> = {
   website: {
-    note: "A new website built to bring them in",
+    note: "Designed, hosted and looked after for you",
     icon: (
       <>
         <rect x="3" y="4.5" width="18" height="15" rx="2.5" {...stroke} />
         <path d="M3 9h18" {...stroke} />
       </>
     ),
-    examples: ["More enquiries from local customers", "Take bookings online", "Look as good as we are"],
+    examples: ["I don't want to manage it myself", "More enquiries from local customers", "Look as good as we are"],
   },
   redesign: {
-    note: "Rebuild or refresh what you have",
+    note: "Replace what you have, then we keep it current",
     icon: (
       <>
         <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" {...stroke} />
@@ -234,11 +234,11 @@ function OptionCards<K extends string>({
 
 /** What the visitor wants to achieve, shown in place of the product name. The enquiry still records TOPICS[t]. */
 const GOAL_TITLES: Record<Topic, string> = {
-  website: "Win more enquiries",
-  redesign: "Fix a website that underperforms",
+  website: "Get a managed website",
+  redesign: "Replace a dated website",
   bespoke: "Replace spreadsheets and admin",
   "booking-software": "Take bookings without the phone",
-  care: "Keep my site running well",
+  care: "Have my current site looked after",
   other: "Not sure yet",
 };
 
@@ -251,8 +251,8 @@ const TOPIC_CHOICES: Choice<Topic>[] = (Object.keys(TOPICS) as Topic[]).map((t) 
 
 // Budget notes point at the published starting prices, so they stay in step with lib/pricing.
 const BUDGET_NOTES: Record<Budget, string> = {
-  "under-2k": `Monthly from ${formatGBP(WEBSITE_PLANS.bronze.monthly)}, or bespoke from ${formatGBP(ONE_OFF_WEBSITE.from)}`,
-  "2k-5k": "A larger bespoke website",
+  "under-2k": `Managed from ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, or a project from ${formatGBP(ONE_OFF_WEBSITE.from)}`,
+  "2k-5k": "A larger website project",
   "5k-10k": `Booking systems from ${formatGBP(SCOPED_FROM.bookingSystem)}`,
   "10k-plus": `Apps and software from ${formatGBP(SCOPED_FROM.software)}`,
   unsure: "We'll help you work it out",

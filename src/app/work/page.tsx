@@ -12,7 +12,7 @@ import { PortfolioFilter } from "@/components/interactive/PortfolioFilter";
 export const metadata = pageMetadata(
   "/work",
   "Our work",
-  "Business problems solved with bespoke websites, booking systems and software: EV Exec, Boonma, RAENG Fitness and our own platform, FYStay.",
+  "Bespoke websites we designed, built and look after: EV Exec, Boonma, RAENG Fitness and our own platform, FYStay.",
 );
 
 export default function WorkPage() {
@@ -21,8 +21,8 @@ export default function WorkPage() {
     <>
       <PageHero
         eyebrow="Our work"
-        title={<>Problems solved, in production.</>}
-        lede="Three client businesses and our own platform: the problem each one had, and what we built to solve it."
+        title={<>Bespoke, every time.</>}
+        lede="Three client businesses and our own platform. Each one designed around the business it serves, and live today."
       />
 
       <section className="section--tight" style={{ paddingTop: 0 }}>
@@ -125,10 +125,10 @@ export default function WorkPage() {
           </ul>
         }
         title={<>Your business could be next.</>}
-        body="Tell us what's getting in the way. We reply with honest advice, a clear price and a plan."
+        body="Tell us about your business. We'll come back with a plan and a clear monthly price."
       >
         <Link href="/build" className="btn btn--primary">
-          Build my website
+          Get started
         </Link>
         <Link href="/contact" className="btn btn--secondary">
           Talk to us

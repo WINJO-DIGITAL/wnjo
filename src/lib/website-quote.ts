@@ -155,7 +155,7 @@ export function websiteQuote(answers: WebsiteAnswers): WebsiteQuote {
 
   lines.push(
     monthlyMode
-      ? { label: `${plan.name} package`, monthly: plan.monthly }
+      ? { label: `${plan.name} plan`, monthly: plan.monthly }
       : { label: ONE_OFF_WEBSITE.name, oneOff: ONE_OFF_WEBSITE.from, status: "from" },
   );
   if (!monthlyMode) hasFromPrices = true;

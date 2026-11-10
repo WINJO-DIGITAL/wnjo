@@ -40,7 +40,7 @@ export default function BookingSoftwarePage() {
                 Booked in a minute. In your app in a second.
               </h1>
               <p className="tile__line rise" style={{ "--i": 2 } as React.CSSProperties}>
-                Simplify · Booking systems for any business.
+                Booking systems for any business.
               </p>
             </div>
             <div className="booking-hero__visual rise" style={{ "--i": 3 } as React.CSSProperties}>

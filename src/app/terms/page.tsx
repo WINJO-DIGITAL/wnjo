@@ -1,13 +1,13 @@
 import { PageHero } from "@/components/Blocks";
 import { pageMetadata } from "@/lib/metadata";
 import { LegalDraftNotice } from "@/components/pricing/WebsitePackages";
-import { CARE_PLANS, OWNERSHIP, formatGBP } from "@/lib/pricing";
+import { CARE_PLANS, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { site } from "@/lib/site";
 
 export const metadata = pageMetadata(
   "/terms",
   "Terms and conditions",
-  "The terms that apply to quotes, deposits, balances, monthly subscriptions and work with WINJO DIGITAL.",
+  "The terms that apply to managed website subscriptions, quotes, deposits, balances and work with WINJO DIGITAL.",
 );
 
 /*
@@ -17,6 +17,12 @@ export const metadata = pageMetadata(
  * shows a notice while LEGAL_REVIEW_PENDING is true and must not go live until it is reviewed). Not reviewed by a
  * lawyer; a short legal review is recommended before taking live payments. Bump QUOTE_TERMS_VERSION whenever the
  * payment, cancellation or refund wording here changes.
+ *
+ * 10 November 2026 (version 2026-11-10.2, DRAFT): the monthly section is rewritten for managed website subscriptions
+ * (Core, Pro and Plus): rolling monthly, no minimum term, no setup fee, Winjo Refresh, and the ownership position
+ * from the owner's repositioning brief. It states principles only. Notice periods, what happens to the website when
+ * a subscription ends, transfer arrangements and any fees are NOT agreed and are deliberately left to the written
+ * agreement. LEGAL_REVIEW_PENDING is true, so the draft notice shows; this must be reviewed before it is relied on.
  */
 export default function TermsPage() {
   return (
@@ -45,33 +51,40 @@ export default function TermsPage() {
               first. Payments are taken through Stripe. {site.name} is not VAT registered, so no VAT is charged.
             </p>
 
-            <h2>Monthly website packages</h2>
+            <h2>Managed website subscriptions</h2>
             <p>
-              A monthly website package (Core, Plus or Pro) has a one-off setup fee, then a monthly payment that
-              covers the design and build of your website, managed hosting, security updates, technical maintenance,
-              support and any content updates your package includes. Your proposal sets out the package, the price and
-              exactly what it covers. Payments are taken monthly in advance through Stripe.
+              A managed website subscription ({WEBSITE_PLANS.bronze.name}, {WEBSITE_PLANS.silver.name} or{" "}
+              {WEBSITE_PLANS.gold.name}) is a monthly payment that covers the design and build of your website, managed
+              hosting, security monitoring, backups, technical maintenance, support and the other services your plan
+              includes. Your proposal sets out the plan, the price and exactly what it covers. Payments are taken
+              monthly in advance through Stripe.
             </p>
             <p>
-              The minimum term is {OWNERSHIP.minimumTermMonths} months. After that, the subscription continues month to
-              month, with hosting, maintenance, support and any agreed ongoing services as set out in your agreement.
-              What happens if a subscription ends during the minimum term is set out in your written agreement.
+              Subscriptions are rolling monthly. There is no minimum contract term. We manage your website for as long
+              as your subscription is active. How to end a subscription, and what happens to the website when it ends,
+              are set out in your written agreement before you subscribe.
             </p>
-            <h2>Ownership after {OWNERSHIP.ownershipAfterPayments} payments</h2>
+            <h2>Winjo Refresh</h2>
             <p>
-              After {OWNERSHIP.ownershipAfterPayments} successful monthly payments, ownership of the website deliverables
-              agreed in your proposal transfers to you. You can keep your hosting and support with us, or ask us to
-              transfer the website to you under the transfer policy, with {OWNERSHIP.noticeDays} days&apos; notice.
+              {WEBSITE_PLANS.silver.name} and {WEBSITE_PLANS.gold.name} subscriptions include Winjo Refresh: a planned
+              refresh of your website&apos;s design and experience every {REFRESH.everyMonths} months while your
+              subscription is active. It is a defined refresh service. It does not include unlimited redevelopment or
+              an unlimited number of new pages or features, which are quoted separately. What your refresh covers is
+              set out in your written agreement.
+            </p>
+            <h2>What you own and what we own</h2>
+            <p>
+              Your domain name is yours, and its registration is documented in your agreement. The business content you
+              supply, such as your text, images and branding, remains yours. Third-party licences and subscriptions
+              remain subject to their own terms.
             </p>
             <p>
-              Your domain is registered in your name, and its registration is documented in your agreement. Third-party
-              licences and subscriptions remain subject to their own terms. Our own reusable tools, components and
-              frameworks are not transferred automatically.
+              The code and framework we use to build and run managed websites remain ours, subject to the service terms
+              agreed with you. Your subscription gives you the right to use the website while it is active.
             </p>
             <p>
-              Until ownership transfers, your subscription gives you the right to use the website while it is active.
-              If the subscription ends before ownership transfers, the website stays with us, and we will tell you what
-              happens to your files before that date.
+              Subscriptions that began under earlier terms, with a minimum term or with ownership passing after a set
+              number of payments, continue under the terms agreed when they began.
             </p>
             <h2>Scoped subscriptions</h2>
             <p>
@@ -95,7 +108,7 @@ export default function TermsPage() {
             <p>
               For websites paid up front, managed hosting is {formatGBP(CARE_PLANS.hosting.monthly)} a month. It covers
               hosting, the SSL certificate, daily backups, uptime monitoring, security updates and technical support.
-              Monthly website packages already include hosting.
+              Managed website subscriptions already include hosting.
               You can cancel hosting with 30 days&apos; notice. We will help move your site to another host if you ask.
             </p>
 
@@ -127,10 +140,8 @@ export default function TermsPage() {
               review only.
             </p>
             <p>
-              <strong>Monthly packages:</strong> ownership of the website deliverables passes to you after
-              {" "}{OWNERSHIP.ownershipAfterPayments} successful monthly payments, as set out under
-              &ldquo;Ownership after {OWNERSHIP.ownershipAfterPayments} payments&rdquo; above. Until then, your
-              subscription gives you the right to use the website while it is active.
+              <strong>Managed website subscriptions:</strong> see &ldquo;What you own and what we own&rdquo;
+              above.
             </p>
 
             <h2>Liability</h2>

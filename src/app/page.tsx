@@ -2,20 +2,16 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CtaBand } from "@/components/Blocks";
-import { BrowserFrame } from "@/components/Devices";
 import { ArrowRight } from "@/components/Icons";
-import { BookingDemo } from "@/components/interactive/BookingDemo";
-import { SheetToApp } from "@/components/interactive/SheetToApp";
 import { HeroShowcase } from "@/components/interactive/HeroShowcase";
-import { SiteFan } from "@/components/interactive/SiteStyler";
-import { StageSwiper } from "@/components/interactive/StageSwiper";
-import { WebStages } from "@/components/WebStages";
-import { WebsitesTile } from "@/components/WebsitesTile";
-import { jost } from "@/lib/fonts";
-import { ONE_OFF_WEBSITE, OWNERSHIP, formatGBP } from "@/lib/pricing";
-import { PackageSelector } from "@/components/pricing/PackageSelector";
-import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
+import { RefreshTimeline } from "@/components/managed/RefreshTimeline";
+import { Responsibility } from "@/components/managed/Responsibility";
+import { SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
+import { PackageCards } from "@/components/pricing/WebsitePackages";
+import { WebStages } from "@/components/WebStages";
+import { REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
 
@@ -24,9 +20,7 @@ export const metadata: Metadata = siteUrl()
   ? { alternates: { canonical: "/" } }
   : {};
 
-const evexec = projectBySlug("ev-exec")!;
 const fystay = projectBySlug("fystay")!;
-const evexecQuote = OWNER_QUOTES.find((q) => q.project.slug === "ev-exec")!;
 /** The three client projects, then our own platform. */
 const work = [...heroProjects, fystay];
 
@@ -39,10 +33,10 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      {/* Hero: the promise, the starting prices, the calculator, and our real work straight beneath. */}
+      {/* Hero: the promise, the price it starts at, and real work straight beneath. */}
       <section
         className="hero-ed hero-ed--work"
-        data-nav="/work"
+        data-nav="/"
         aria-labelledby="hero-title"
         data-cta-hide
       >
@@ -53,162 +47,121 @@ export default function HomePage() {
               className="hero-ed__title rise"
               style={{ "--i": 1 } as React.CSSProperties}
             >
-              <span className="hero-ed__line">Bespoke websites</span>{" "}
-              <span className="serif-em">from £99 a month.</span>
+              <span className="hero-ed__line">Your website.</span>{" "}
+              <span className="serif-em">Our responsibility.</span>
             </h1>
             <p className="eyebrow hero-ed__place rise" style={{ "--i": 2 } as React.CSSProperties}>
-              Based in Lancashire, working across the UK.
+              Fully managed websites from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month
             </p>
             <p className="lede rise" style={{ "--i": 3 } as React.CSSProperties}>
-              Hosting and support included with monthly plans. Your website, your business, your ownership.
+              You run your business. We&apos;ll run your website: designed, hosted, maintained and kept up to date.
             </p>
             <div
               className="btn-row rise"
               style={{ "--i": 4 } as React.CSSProperties}
             >
               <Link href="/build" className="btn btn--primary">
-                Build my website
+                Get started
               </Link>
-              <Link href="/work" className="hero-ed__textlink">
-                Explore our work
+              <Link href="/pricing" className="hero-ed__textlink">
+                See plans and pricing
               </Link>
             </div>
           </div>
         </div>
         <div
-          aria-label="Recent work"
+          aria-label="Websites we designed and look after"
           className="container container--wide showcase-section"
         >
           <HeroShowcase items={heroProjects} />
         </div>
       </section>
 
-      {/* Pricing preview: the three monthly packages, Plus highlighted, the calculator as the next step. */}
-      <section id="packages" className="tile home-tile" data-nav="/pricing" aria-labelledby="packages-title">
+      {/* What changes: the list of website jobs moves from the owner to us. */}
+      <section id="managed" className="tile home-tile" data-nav="/managed-websites" aria-labelledby="managed-title">
         <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Website packages</p>
-          <h2 id="packages-title" className="tile__title">
-            A bespoke website, one monthly price.
+          <p className="tile__name">Managed websites</p>
+          <h2 id="managed-title" className="tile__title">
+            One less thing <span className="serif-em">to worry about.</span>
           </h2>
           <div className="tile__aside">
             <p className="tile__line">
-              Hosting, maintenance and support included. You own the website once your plan ends.
+              One predictable monthly payment. One team looking after it.
             </p>
             <p className="tile__more">
-              <Link href="/pricing#compare" className="arrow-link">
-                Compare every package <ArrowRight />
+              <Link href="/managed-websites" className="arrow-link">
+                How managed websites work <ArrowRight />
               </Link>
             </p>
           </div>
         </div>
-        <div className="container container--wide" data-reveal>
-          <PackageSelector />
-          <p className="home-terms">
-            Prefer to pay up front? <Link href="/pricing#one-off">Bespoke websites from {formatGBP(ONE_OFF_WEBSITE.from)}</Link>.
-          </p>
+        <div className="container container--wide tile__visual" data-reveal>
+          <Responsibility />
         </div>
       </section>
 
-      {/* What we do, in one line, before it's shown three ways. */}
-      <section className="tile home-tile home-tile--intro" data-nav="/" aria-labelledby="what-title">
+      {/* The three subscriptions. */}
+      <section id="packages" className="tile home-tile" data-nav="/pricing" aria-labelledby="packages-title">
         <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">What we do</p>
-          <h2 id="what-title" className="tile__title">
-            Grow. Simplify. Build.
+          <p className="tile__name">Plans</p>
+          <h2 id="packages-title" className="tile__title">
+            Three plans. No minimum term.
           </h2>
           <div className="tile__aside">
             <p className="tile__line">
-              We find what&apos;s costing you customers and hours, then build the digital solution that fixes it.
+              Rolling monthly, with no large upfront cost. We grow as you grow.
+            </p>
+            <p className="tile__more">
+              <Link href="/pricing#compare" className="arrow-link">
+                Compare the plans <ArrowRight />
+              </Link>
             </p>
           </div>
         </div>
+        <div className="container container--wide tile__visual" data-reveal>
+          <PackageCards compact />
+        </div>
       </section>
 
-      {/* Three acts: light, dark, light. On phones they sit side by side and swipe. */}
-      <StageSwiper labels={["Grow", "Simplify", "Build"]}>
-        {/* Grow: four example businesses, each with its own site. */}
-        <WebsitesTile
-          id="grow"
-          navLink="/websites"
-          compact
-          name="Grow"
-          title={<>A website that <span className="serif-em">brings in enquiries.</span></>}
-          line="Bespoke websites, landing pages and lead capture, built for phones first."
-          visual={<SiteFan />}
-        />
+      {/* Winjo Refresh: the same website at launch and after each planned refresh. */}
+      <section id="refresh" className="tile inverse home-tile" data-nav="/winjo-refresh" aria-labelledby="refresh-title">
+        <div className="container container--wide tile__head" data-reveal>
+          <p className="tile__name">Winjo Refresh</p>
+          <h2 id="refresh-title" className="tile__title">
+            A new design <span className="serif-em">every {REFRESH.everyMonths} months.</span>
+          </h2>
+          <div className="tile__aside">
+            <p className="tile__line">
+              Your website shouldn&apos;t become outdated, and keeping it current shouldn&apos;t be another expense to
+              organise. Included in {WEBSITE_PLANS.silver.name} and {WEBSITE_PLANS.gold.name}.
+            </p>
+            <p className="tile__more">
+              <Link href="/winjo-refresh" className="arrow-link">
+                How Winjo Refresh works <ArrowRight />
+              </Link>
+            </p>
+          </div>
+        </div>
+        <div className="container container--wide tile__visual" data-reveal>
+          <RefreshTimeline />
+        </div>
+      </section>
 
-        {/* Simplify: a customer books, the office is pinged. */}
-        <section
-          id="simplify"
-          data-nav="/booking-software"
-          className={`tile inverse home-tile ${jost.variable}`}
-          aria-labelledby="simplify-title"
-        >
-          <div className="container container--wide tile__head" data-reveal>
-            <p className="tile__name">Simplify</p>
-            <h2 id="simplify-title" className="tile__title">
-              Bookings that run <span className="serif-em">without a phone call.</span>
-            </h2>
-            <div className="tile__aside">
-              <blockquote className="home-quote">
-                <p>&ldquo;{evexecQuote.pull}&rdquo;</p>
-                <footer>Owner, {evexec.name}</footer>
-              </blockquote>
-              <p className="tile__more">
-                <Link href="/booking-software#make-it-yours" className="arrow-link">
-                  Try the booking demo <ArrowRight />
-                </Link>
-              </p>
-            </div>
-          </div>
-          <div className="container container--wide tile__visual tile__visual--pad" data-reveal>
-            <BookingDemo />
-          </div>
-        </section>
-
-        {/* Build: our own platform in the browser, and the spreadsheet that became an app. */}
-        <section id="build" data-nav="/app-development" className="tile home-tile" aria-labelledby="build-title">
-          <div className="container container--wide tile__head" data-reveal>
-            <p className="tile__name">Build</p>
-            <h2 id="build-title" className="tile__title">
-              Stop running the business <span className="serif-em">from spreadsheets.</span>
-            </h2>
-            <div className="tile__aside">
-              <p className="tile__line">
-                Apps, portals and platforms. We run our own: <Link href="/work#fystay">{fystay.name}</Link>.
-              </p>
-              <div className="tile__ctas">
-                <Link href="/contact?topic=bespoke" className="btn btn--primary">
-                  Plan my app
-                </Link>
-                <Link href="/app-development" className="btn btn--secondary">
-                  See how it works
-                </Link>
-              </div>
-            </div>
-          </div>
-          <div className="container container--wide build-stage" data-reveal>
-            <BrowserFrame
-              src={fystay.desktop}
-              alt={`The ${fystay.name} platform in a browser`}
-              host={fystay.host}
-              sizes="(min-width: 64rem) 720px, 100vw"
-              className="build-stage__browser"
-            />
-            <div className="build-stage__app">
-              <SheetToApp still />
-            </div>
-          </div>
-        </section>
-      </StageSwiper>
-
-      {/* Work: each project as the problem it solved, with the live site. Swipes on phones. */}
+      {/* Work: real websites we designed, as evidence. Swipes on phones. */}
       <section id="work" className="tile home-tile" data-nav="/work" aria-labelledby="work-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Our work</p>
           <h2 id="work-title" className="tile__title">
-            Problems solved, in production.
+            Bespoke, every time.
           </h2>
+          <div className="tile__aside">
+            <p className="tile__line">No templates. Each of these was designed around the business it serves.</p>
+            <p className="tile__more">
+              <Link href="/work" className="arrow-link">
+                See all our work <ArrowRight />
+              </Link>
+            </p>
+          </div>
         </div>
         <div className="container container--wide" data-reveal>
           <ul className="home-work" role="list">
@@ -226,7 +179,7 @@ export default function HomePage() {
                     <Image src={p.logo} alt="" width={28} height={28} sizes="28px" className="home-work__logo" />
                     <span className="home-work__name">{p.name}</span>
                   </span>
-                  <span className="home-work__problem">{p.challenge}</span>
+                  <span className="home-work__problem">{p.sector}</span>
                 </Link>
               </li>
             ))}
@@ -234,15 +187,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Our approach: a real sequence, so it keeps its numbers. */}
-      <section id="process" data-nav="/about" className="tile home-tile" aria-labelledby="process-title">
+      {/* Search and AI, benefit first. */}
+      <section id="search" className="tile home-tile" data-nav="/managed-websites" aria-labelledby="search-title">
         <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">How we work</p>
-          <h2 id="process-title" className="tile__title">
-            Four steps. No surprises.
+          <p className="tile__name">Being found</p>
+          <h2 id="search-title" className="tile__title">
+            Built to be found, <span className="serif-em">by people and by AI.</span>
           </h2>
           <div className="tile__aside">
-            <p className="tile__line">Nothing to pay until you approve the scope.</p>
+            <p className="tile__line">
+              Search is changing. {WEBSITE_PLANS.silver.name} and {WEBSITE_PLANS.gold.name} keep your website ready
+              for it.
+            </p>
+          </div>
+        </div>
+        <div className="container container--wide" data-reveal>
+          <SearchServices />
+        </div>
+      </section>
+
+      {/* How it works: a real sequence, so it keeps its numbers. */}
+      <section id="process" data-nav="/managed-websites" className="tile home-tile" aria-labelledby="process-title">
+        <div className="container container--wide tile__head" data-reveal>
+          <p className="tile__name">How it works</p>
+          <h2 id="process-title" className="tile__title">
+            Four steps. Then we keep going.
+          </h2>
+          <div className="tile__aside">
+            <p className="tile__line">Nothing is charged until you agree to go ahead.</p>
           </div>
         </div>
         <div className="container container--wide apps-tile__body">
@@ -250,28 +222,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* The ownership promise, in short. */}
-      <section className="tile inverse home-tile" data-nav="/pricing" aria-labelledby="own-title">
+      {/* The subscription and ownership, plainly. */}
+      <section id="ownership" className="tile home-tile" data-nav="/pricing" aria-labelledby="own-title">
         <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Ownership</p>
+          <p className="tile__name">No lock-in</p>
           <h2 id="own-title" className="tile__title">
-            Your website. Your business. Your ownership.
+            Stay because it works, <span className="serif-em">not because you have to.</span>
           </h2>
           <div className="tile__aside">
-            <p className="tile__line">
-              A website should be a business asset, not something you rent forever. After{" "}
-              {OWNERSHIP.ownershipAfterPayments} successful monthly payments, your agreed website is yours.
-            </p>
+            <p className="tile__line">Your domain and your content are always yours.</p>
             <p className="tile__more">
-              <Link href="/pricing#monthly" className="arrow-link">
-                How ownership works <ArrowRight />
+              <Link href="/pricing#how-it-works" className="arrow-link">
+                How the subscription works <ArrowRight />
               </Link>
             </p>
           </div>
         </div>
+        <div className="container container--wide" data-reveal>
+          <SubscriptionTerms />
+        </div>
       </section>
 
-      {/* Trust: the owners in their own words, and the terms we publish. */}
+      {/* Trust: the owners in their own words. */}
       <section className="owner-quotes" aria-label="From the owners">
         <div className="container container--wide">
           <OwnerQuotes
@@ -290,14 +262,14 @@ export default function HomePage() {
       </section>
 
       <CtaBand
-        title={<>Let&apos;s talk about your business.</>}
-        body={<>Tell us what&apos;s getting in the way. We&apos;ll tell you honestly how we&apos;d fix it.</>}
+        title={<>Hand us your website.</>}
+        body={<>Tell us about your business and what you need. We&apos;ll come back with a plan and a clear monthly price.</>}
       >
         <Link href="/build" className="btn btn--primary">
-          Build my website
+          Get started
         </Link>
         <Link href="/contact" className="btn btn--secondary">
-          Let&apos;s talk about your business
+          Talk to us first
         </Link>
       </CtaBand>
     </>

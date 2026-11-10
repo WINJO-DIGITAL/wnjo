@@ -49,7 +49,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </section>
             ))}
             <p>
-              <Link href="/pricing">See all prices</Link> or <Link href="/build">get your price</Link>.
+              <Link href="/pricing">See plans and pricing</Link> or <Link href="/build">get started</Link>.
             </p>
           </article>
         </div>

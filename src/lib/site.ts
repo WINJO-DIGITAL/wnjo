@@ -6,9 +6,9 @@
 export const site = {
   name: "WINJO DIGITAL",
   shortName: "WINJO DIGITAL",
-  tagline: "More enquiries, less admin, and software that fits.",
+  tagline: "Your website. Our responsibility.",
   description:
-    "WINJO DIGITAL designs and builds bespoke websites, booking systems, business automation and custom software that help businesses win more enquiries, cut repetitive admin and run on technology that fits.",
+    "WINJO DIGITAL builds, hosts, maintains and updates bespoke business websites for one predictable monthly payment, from £99 a month. Rolling monthly, with no minimum term.",
   locale: "en_GB",
   themeColor: "#F2ECE2",
 } as const;
@@ -47,15 +47,47 @@ export type NavItem = NavLink & {
 
 export const primaryNav: NavItem[] = [
   {
+    href: "/managed-websites",
+    label: "Managed websites",
+    also: ["/build"],
+    menu: {
+      primary: [
+        { href: "/managed-websites", label: "How it works" },
+        { href: "/pricing", label: "Plans and pricing" },
+        { href: "/winjo-refresh", label: "Winjo Refresh" },
+        { href: "/build", label: "Get started" },
+      ],
+      groups: [
+        {
+          title: "Plans",
+          links: [
+            { href: "/pricing#core", label: "Core" },
+            { href: "/pricing#pro", label: "Pro" },
+            { href: "/pricing#plus", label: "Plus" },
+          ],
+        },
+        {
+          title: "Good to know",
+          links: [
+            { href: "/pricing#how-it-works", label: "What happens if you leave" },
+            { href: "/faq", label: "Questions" },
+          ],
+        },
+      ],
+    },
+  },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/winjo-refresh", label: "Winjo Refresh" },
+  {
     href: "/work",
-    label: "Work",
+    label: "Our work",
     menu: {
       primary: [
         { href: "/work", label: "All work" },
         { href: "/work#ev-exec", label: "EV Exec" },
         { href: "/work#boonma", label: "Boonma" },
-        { href: "/work#fystay", label: "FYStay" },
         { href: "/work#raeng-fitness", label: "RAENG Fitness" },
+        { href: "/work#fystay", label: "FYStay" },
       ],
       groups: [
         {
@@ -63,104 +95,35 @@ export const primaryNav: NavItem[] = [
           links: [
             { href: "https://www.evexec.co.uk", label: "evexec.co.uk", external: true },
             { href: "https://boonma.vercel.app", label: "boonma.vercel.app", external: true },
-            { href: "https://www.fystay.co.uk", label: "fystay.co.uk", external: true },
             { href: "https://raengfitness.co.uk", label: "raengfitness.co.uk", external: true },
+            { href: "https://www.fystay.co.uk", label: "fystay.co.uk", external: true },
           ],
         },
       ],
     },
   },
-  {
-    href: "/websites",
-    label: "Grow",
-    also: ["/build"],
-    menu: {
-      primary: [
-        { href: "/websites", label: "Websites that win customers" },
-        { href: "/build", label: "Build my website" },
-        { href: "/pricing", label: "Packages & prices" },
-        { href: "/pricing#care", label: "Hosting & care" },
-      ],
-      groups: [
-        {
-          title: "Packages",
-          links: [
-            { href: "/pricing", label: "Essential" },
-            { href: "/pricing", label: "Professional" },
-            { href: "/pricing", label: "Premium" },
-          ],
-        },
-        {
-          title: "Get started",
-          links: [
-            { href: "/build", label: "Build my website" },
-            { href: "/contact?topic=website", label: "Talk to us" },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    href: "/booking-software",
-    label: "Simplify",
-    menu: {
-      primary: [
-        { href: "/booking-software", label: "Booking systems" },
-        { href: "/contact?topic=booking-software", label: "Request a demo" },
-      ],
-      groups: [
-        {
-          title: "Learn more",
-          links: [
-            { href: "/booking-software#apps", label: "The apps" },
-            { href: "/booking-software#make-it-yours", label: "Make it yours" },
-            { href: "/work#ev-exec", label: "Built for EV Exec" },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    href: "/app-development",
-    label: "Build",
-    menu: {
-      primary: [
-        { href: "/app-development", label: "Apps and bespoke software" },
-        { href: "/contact?topic=bespoke", label: "Plan my app" },
-      ],
-      groups: [
-        {
-          title: "From our work",
-          links: [
-            { href: "/app-development#examples", label: "Examples" },
-            { href: "/work#ev-exec", label: "EV Exec booking" },
-            { href: "/work#fystay", label: "FYStay platform" },
-          ],
-        },
-      ],
-    },
-  },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/about", label: "About", mobileOnly: true },
+  { href: "/about", label: "About" },
+  { href: "/website-projects", label: "Website projects", mobileOnly: true },
   { href: "/contact", label: "Contact", mobileOnly: true },
 ];
 
 export const footerNav: { title: string; links: NavLink[] }[] = [
   {
-    title: "Solutions",
+    title: "Managed websites",
     links: [
-      { href: "/websites", label: "Grow: websites" },
-      { href: "/booking-software", label: "Simplify: booking systems" },
-      { href: "/app-development", label: "Build: apps and software" },
+      { href: "/managed-websites", label: "How it works" },
+      { href: "/pricing", label: "Pricing" },
+      { href: "/winjo-refresh", label: "Winjo Refresh" },
       { href: "/work", label: "Our work" },
+      { href: "/build", label: "Get started" },
     ],
   },
   {
-    title: "Pricing",
+    title: "Other services",
     links: [
-      { href: "/pricing", label: "Ways to work with us" },
-      { href: "/build", label: "Build my website" },
-      { href: "/pricing#care", label: "Hosting & care" },
+      { href: "/website-projects", label: "Website projects" },
+      { href: "/booking-software", label: "Booking systems" },
+      { href: "/app-development", label: "Apps and software" },
     ],
   },
   {

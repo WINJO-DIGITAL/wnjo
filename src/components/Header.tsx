@@ -434,7 +434,7 @@ function SiteHeader() {
           <div className="header-cta" onMouseEnter={() => hoverItem(null)}>
             <AccountMenu signedOutLink />
             <Link href="/build" className="btn btn--primary btn--sm" onClick={closeIfSamePage} transitionTypes={NAV}>
-              Build my website
+              Get started
             </Link>
           </div>
 
@@ -554,7 +554,7 @@ function SiteHeader() {
             transitionTypes={NAV}
             style={{ "--i": primaryNav.length } as React.CSSProperties}
           >
-            Build my website
+            Get started
           </Link>
           {contactPhoneHref && (
             <a

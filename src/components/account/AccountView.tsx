@@ -259,7 +259,7 @@ export function AccountView() {
         <div className="acct-empty">
           <p className="acct-empty__title">Nothing here yet</p>
           <p className="acct-empty__body">Orders appear here as soon as they&apos;re linked to {session.user.email}.</p>
-          <a href="/build" className="btn btn--primary">Build my website</a>
+          <a href="/build" className="btn btn--primary">Get started</a>
         </div>
       )}
 
