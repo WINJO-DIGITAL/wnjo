@@ -7,7 +7,7 @@ import { HeroShowcase } from "@/components/interactive/HeroShowcase";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
 import { RefreshTimeline } from "@/components/managed/RefreshTimeline";
 import { Responsibility } from "@/components/managed/Responsibility";
-import { SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
+import { SubscriptionTerms } from "@/components/managed/Sections";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
 import { WebStages } from "@/components/WebStages";
 import { REFRESH, WEBSITE_PLANS } from "@/lib/pricing";
@@ -178,25 +178,6 @@ export default function HomePage() {
               </li>
             ))}
           </ul>
-        </div>
-      </section>
-
-      {/* Search and AI, benefit first. */}
-      <section id="search" className="tile home-tile" data-nav="/managed-websites" aria-labelledby="search-title">
-        <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Being found</p>
-          <h2 id="search-title" className="tile__title">
-            Built to be found, <span className="serif-em">by people and by AI.</span>
-          </h2>
-          <div className="tile__aside">
-            <p className="tile__line">
-              Search is changing. {WEBSITE_PLANS.silver.name} and {WEBSITE_PLANS.gold.name} keep your website ready
-              for it.
-            </p>
-          </div>
-        </div>
-        <div className="container container--wide" data-reveal>
-          <SearchServices />
         </div>
       </section>
 
