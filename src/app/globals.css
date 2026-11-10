@@ -13561,15 +13561,15 @@ body:has(.pv) .site-footer {
   flex-direction: column;
   gap: 4px;
   min-height: 0;
-  padding: 18px 20px;
+  padding: 12px 20px;
   text-align: center;
 }
 .deck__btn-main {
-  font: 600 min(20px, 5.2vw) / 1.1 var(--font-sans);
+  font: 600 min(18px, 4.8vw) / 1.1 var(--font-sans);
   color: #f6f0e6;
 }
 .deck__btn-price {
-  font: 600 min(24px, 6vw) / 1.1 var(--font-sans);
+  font: 600 min(21px, 5.4vw) / 1.1 var(--font-sans);
   color: #f0b48f;
 }
 .deck__btn-term {
@@ -13578,8 +13578,8 @@ body:has(.pv) .site-footer {
 }
 .deck__lead {
   margin: 14px 0 0;
-  font: 600 min(20px, 5.2vw) / 1.25 var(--font-sans);
-  color: var(--color-ink);
+  font: 500 min(15px, 4vw) / 1.4 var(--font-sans);
+  color: var(--color-ink-2);
   text-align: center;
   text-wrap: balance;
 }
@@ -13602,6 +13602,28 @@ body:has(.pv) .site-footer {
   color: var(--color-ink-2);
 }
 .deck__ticks li::before {
+  content: "\2713  ";
+  color: var(--color-accent);
+}
+
+/* The price card is a little shorter, so the phone leads. */
+.deck__btn {
+  gap: 2px;
+}
+
+/* Three points under the button, each with a tick. */
+.deck__bullets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font: 500 min(13px, 3.4vw) / 1.2 var(--font-sans);
+  color: var(--color-ink);
+}
+.deck__bullets li::before {
   content: "\2713  ";
   color: var(--color-accent);
 }
