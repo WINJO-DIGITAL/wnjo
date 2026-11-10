@@ -129,7 +129,7 @@ export type WebsiteQuote = {
 const ADD_ON_ORDER = Object.keys(ADD_ONS) as AddOnId[];
 
 /**
- * The page band that matches a monthly package's included pages (Core 4 to 5, Pro 6 to 10, Plus 16 to 20). A new
+ * The page band that matches a monthly package's included pages (Core 4 to 5, Plus 6 to 10, Pro 16 to 20). A new
  * calculator starts on this band, so a package never shows pages it doesn't include.
  */
 export function bandForPlan(plan: WebsitePlanId): WebsitePageBand {
