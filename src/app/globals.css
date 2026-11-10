@@ -13787,3 +13787,196 @@ body:has(.pv) .site-footer {
   margin: var(--space-6) 0 var(--space-5);
   background: var(--color-line-strong);
 }
+
+/* Phones: the managed websites section is compact, so it fits the screen with its heading in view. */
+@media (max-width: 39.99rem) {
+  #managed .tile__title {
+    font-size: clamp(1.9rem, 7.4vw, 2.2rem);
+    margin-top: var(--space-3);
+  }
+  #managed .tile__line {
+    font-size: 1rem;
+    margin-top: var(--space-3);
+  }
+  #managed .resp {
+    gap: var(--space-4);
+  }
+  #managed .resp__col {
+    padding: 1rem 1.1rem;
+  }
+  #managed .resp__label {
+    margin-bottom: var(--space-3);
+  }
+  #managed .resp__list {
+    gap: 0;
+    font-size: 0.95rem;
+  }
+  #managed .resp__list li span {
+    padding-block: 0.1em;
+  }
+  #managed .resp__yours span {
+    font-size: 1.25rem;
+  }
+  #managed .resp__switch button {
+    min-height: 40px;
+  }
+}
+
+/* Phones: the managed websites section fits on one screen below the header. */
+@media (max-width: 39.99rem) {
+  #managed {
+    padding-bottom: 2.5rem;
+  }
+  #managed .tile__more {
+    display: none;
+  }
+  #managed .resp {
+    gap: var(--space-3);
+  }
+  #managed .resp__col {
+    padding: 0.8rem 1rem;
+  }
+  #managed .resp__label {
+    margin-bottom: var(--space-2);
+  }
+  #managed .resp__list li span {
+    line-height: 1.3;
+    padding-block: 0.05em;
+  }
+  #managed .resp__yours {
+    margin: 0;
+  }
+}
+
+/* Phones: the home page sections fit the screen. Plans and search points swipe sideways instead of stacking,
+   and the ownership and refresh blocks are more compact. */
+@media (max-width: 39.99rem) {
+  #packages .pkg-cards {
+    display: flex;
+    gap: var(--space-3);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: var(--space-2);
+    scrollbar-width: none;
+  }
+  #packages .pkg-cards::-webkit-scrollbar {
+    display: none;
+  }
+  #packages .pkg-card {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
+    padding: 1.1rem;
+    gap: var(--space-2);
+  }
+  #packages .pkg-card__amount {
+    font-size: 2.2rem;
+  }
+  #packages .pkg-card__points {
+    margin: var(--space-1) 0 var(--space-2);
+    font-size: 0.9rem;
+  }
+  #packages .pkg-card__points li:nth-child(n + 5) {
+    display: none;
+  }
+  #packages .pkg-card__tagline,
+  #packages .pkg-card__summary {
+    font-size: 0.92rem;
+  }
+  .search-list {
+    display: flex;
+    gap: var(--space-3);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: var(--space-2);
+  }
+  .search-list li {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+    gap: var(--space-1);
+  }
+  .search-list__benefit {
+    font-size: 1.05rem;
+  }
+  .search-list__line {
+    font-size: 0.92rem;
+  }
+  .terms-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+  .terms-grid > div {
+    padding-top: var(--space-3);
+  }
+  .terms-grid__text,
+  .terms-grid .checks {
+    font-size: 0.9rem;
+  }
+  .rf-compare ol {
+    font-size: 0.98rem;
+  }
+  .rf__site {
+    padding: 0.75rem;
+  }
+}
+
+/* Phones: the home page sections are one screen each. The header menu keeps every page one tap away, so the
+   inline "learn more" links step aside here, and the step screens are shorter. */
+@media (max-width: 39.99rem) {
+  main > .home-tile .tile__more,
+  main > .tile.inverse .tile__more {
+    display: none;
+  }
+  main > .home-tile .tile__head {
+    row-gap: var(--space-2);
+  }
+  main > .home-tile .tile__line {
+    font-size: 0.98rem;
+  }
+  #process .bs__screen {
+    aspect-ratio: 4 / 3;
+  }
+  #process .bs__stage h3 {
+    font-size: 1.05rem;
+  }
+  #refresh .rf__caption {
+    display: none;
+  }
+  #refresh .rf__stage,
+  #refresh .rf__timeline {
+    width: 100%;
+  }
+}
+
+/* Phones: Plans and Ownership show their headline and the content, with the intro line and taglines stepping aside. */
+@media (max-width: 39.99rem) {
+  #packages .tile__aside,
+  #ownership .tile__aside {
+    display: none;
+  }
+  #packages .pkg-card__tagline {
+    display: none;
+  }
+  #packages .pkg-card {
+    padding: 1rem;
+  }
+  #ownership .terms-grid > div {
+    padding-top: var(--space-2);
+  }
+}
+
+/* Phones: the refresh section is one screen. */
+@media (max-width: 39.99rem) {
+  #refresh .rf {
+    gap: var(--space-3);
+  }
+  #refresh .rf-compare {
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+  #refresh .rf-compare__col {
+    padding: 0.9rem 1rem;
+  }
+  #refresh .rf__timeline button {
+    padding-top: var(--space-3);
+  }
+}

@@ -8,9 +8,9 @@ import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
 import { RefreshTimeline } from "@/components/managed/RefreshTimeline";
 import { Responsibility } from "@/components/managed/Responsibility";
 import { SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
-import { PackageCards } from "@/components/pricing/WebsitePackages";
+import { PlanChooser } from "@/components/pricing/PlanChooser";
 import { WebStages } from "@/components/WebStages";
-import { REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { REFRESH, WEBSITE_PLANS } from "@/lib/pricing";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
@@ -113,7 +113,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="container container--wide tile__visual" data-reveal>
-          <PackageCards compact />
+          <PlanChooser />
         </div>
       </section>
 
