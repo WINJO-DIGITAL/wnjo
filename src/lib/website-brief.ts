@@ -13,7 +13,7 @@ export const BRIEF_VERSION = 1;
 export const GOALS = {
   enquiries: { label: "More enquiries", hint: "Calls, forms and messages" },
   bookings: { label: "Online bookings", hint: "Customers book without calling" },
-  sales: { label: "Sell online", hint: "Products or vouchers. Shop features are quoted separately." },
+  sales: { label: "Sell online", hint: "Products or vouchers" },
   trust: { label: "Look established", hint: "Credibility and reviews" },
   showcase: { label: "Show our work", hint: "Gallery and portfolio" },
   local: { label: "Be found locally", hint: "Google and maps" },
