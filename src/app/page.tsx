@@ -10,7 +10,7 @@ import { Responsibility } from "@/components/managed/Responsibility";
 import { SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
 import { PackageCards } from "@/components/pricing/WebsitePackages";
 import { WebStages } from "@/components/WebStages";
-import { REFRESH, WEBSITE_PLANS } from "@/lib/pricing";
+import { REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
@@ -50,6 +50,12 @@ export default function HomePage() {
               <span className="hero-ed__line">Your website.</span>{" "}
               <span className="serif-em">Our responsibility.</span>
             </h1>
+            <p className="eyebrow hero-ed__place rise" style={{ "--i": 2 } as React.CSSProperties}>
+              Fully managed websites from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month
+            </p>
+            <p className="lede rise" style={{ "--i": 3 } as React.CSSProperties}>
+              You run your business. We&apos;ll run your website: designed, hosted, maintained and kept up to date.
+            </p>
             <div
               className="btn-row rise"
               style={{ "--i": 4 } as React.CSSProperties}

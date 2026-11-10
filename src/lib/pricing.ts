@@ -297,6 +297,7 @@ export const ADD_ONS = {
   aiAssistant: { label: "AI enquiry assistant", monthly: 29, oneOff: null },
   leadNotifications: { label: "Automated lead notifications", monthly: 10, oneOff: null },
   localSeo: { label: "Local SEO setup", monthly: null, oneOff: 199 },
+  seoManagement: { label: "Ongoing SEO management", monthly: 99, oneOff: null, from: true },
 } as const satisfies Record<
   string,
   { label: string; monthly: number | null; oneOff: number | null; from?: boolean; monthlyQuoted?: boolean; thirdParty?: string }

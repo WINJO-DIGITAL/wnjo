@@ -53,8 +53,6 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  // Hides the "N" development badge that Next.js shows bottom-left while running locally.
-  devIndicators: false,
   // The app development page used to live at /bespoke-systems; the websites page became the managed service.
   async redirects() {
     return [

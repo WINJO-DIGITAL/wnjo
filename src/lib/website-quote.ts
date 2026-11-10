@@ -30,6 +30,7 @@ export const WANTS = {
   oneOff: { label: "One-off website project", hint: "Buy your website outright and own it on full payment." },
   booking: { label: "Booking system", hint: "Bookings, payments and an operator app for your business." },
   software: { label: "Custom application or software", hint: "Portals, platforms, internal tools and integrations." },
+  unsure: { label: "Not sure yet", hint: "We'll help you choose. Start with a website and change it any time." },
 } as const;
 export type Want = keyof typeof WANTS;
 
@@ -62,7 +63,7 @@ export type ContentAnswers = {
 export type WebsiteAnswers = {
   want: Want;
   plan: WebsitePlanId;
-  /** Managed or one-off, once a website is chosen. */
+  /** Monthly or one-off, once a website is chosen ("unsure" prices as monthly). */
   mode: "monthly" | "oneOff";
   pages: WebsitePageBand;
   addOns: AddOnId[];
