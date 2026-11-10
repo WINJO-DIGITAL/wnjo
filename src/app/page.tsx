@@ -53,9 +53,6 @@ export default function HomePage() {
             <p className="eyebrow hero-ed__place rise" style={{ "--i": 2 } as React.CSSProperties}>
               Fully managed websites from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month
             </p>
-            <p className="lede rise" style={{ "--i": 3 } as React.CSSProperties}>
-              You run your business. We&apos;ll run your website: designed, hosted, maintained and kept up to date.
-            </p>
             <div
               className="btn-row rise"
               style={{ "--i": 4 } as React.CSSProperties}

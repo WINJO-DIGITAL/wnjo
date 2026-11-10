@@ -8150,7 +8150,6 @@ ol.bs {
   }
 }
 
-
 /* ==========================================================================
    Phone hero: the device deck (components/interactive/DeviceDeck). Below 40rem only.
    The stage is laid out for 410px tall and scales with --u (stage height / 410, set by
@@ -9222,7 +9221,6 @@ tr[aria-selected="true"] {
 .account-menu__item:hover {
   background: var(--color-bg);
 }
-
 
 /* Redesign: the order card is the centrepiece; the progress rail is large and tappable. */
 .acct-order {
@@ -13432,4 +13430,46 @@ body:has(.pv) .site-footer {
   .search-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+/* Phones: the phone is bigger. The headline keeps its two styles and the copy stays left-aligned. */
+@media (max-width: 39.99rem) {
+  .deck {
+    --u: 0.8px;
+    --deck-fixed: 470px;
+  }
+}
+
+/* Phones: nothing runs wider than the screen. */
+.deck,
+.deck__rail,
+.deck__cta {
+  max-width: 100%;
+}
+@media (max-width: 39.99rem) {
+  .hero-ssr-phone,
+  .hero-ssr-phone > .deck {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+}
+
+/* Smallest phones: the logo gives way so the menu button stays on screen. */
+@media (max-width: 23.74rem) {
+  .site-header .brand img {
+    width: 170px !important;
+    height: auto !important;
+  }
+}
+
+
+/* The introduction sits under the button, centred. */
+.deck__intro {
+  margin: 14px 0 0;
+  max-width: 34ch;
+  font-size: min(15px, 4vw);
+  line-height: 1.5;
+  color: #574a3f;
+  text-align: center;
 }
