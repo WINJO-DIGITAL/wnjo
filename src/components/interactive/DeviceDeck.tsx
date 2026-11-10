@@ -301,7 +301,9 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       <div className="deck__cta">
         <Link href="/build?plan=bronze" className="deck__btn">
           <span className="deck__btn-main">GET YOUR WEBSITE</span>
-          <span className="deck__btn-price">From £99/Month</span>
+          <span className="deck__btn-price">
+            From £99<span className="deck__unit">/Month</span>
+          </span>
         </Link>
         <ul className="deck__bullets" role="list">
           <li>No Contracts</li>
