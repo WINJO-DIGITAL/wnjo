@@ -13787,3 +13787,37 @@ body:has(.pv) .site-footer {
   margin: var(--space-6) 0 var(--space-5);
   background: var(--color-line-strong);
 }
+
+/* Phones: the managed websites section is compact, so it fits the screen with its heading in view. */
+@media (max-width: 39.99rem) {
+  #managed .tile__title {
+    font-size: clamp(1.9rem, 7.4vw, 2.2rem);
+    margin-top: var(--space-3);
+  }
+  #managed .tile__line {
+    font-size: 1rem;
+    margin-top: var(--space-3);
+  }
+  #managed .resp {
+    gap: var(--space-4);
+  }
+  #managed .resp__col {
+    padding: 1rem 1.1rem;
+  }
+  #managed .resp__label {
+    margin-bottom: var(--space-3);
+  }
+  #managed .resp__list {
+    gap: 0;
+    font-size: 0.95rem;
+  }
+  #managed .resp__list li span {
+    padding-block: 0.1em;
+  }
+  #managed .resp__yours span {
+    font-size: 1.25rem;
+  }
+  #managed .resp__switch button {
+    min-height: 40px;
+  }
+}
