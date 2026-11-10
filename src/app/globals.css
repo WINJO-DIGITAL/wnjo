@@ -13655,13 +13655,6 @@ body:has(.pv) .site-footer {
   font-weight: 500;
   opacity: 0.85;
 }
-@media (max-width: 39.99rem) {
-  .hero-ed--work + .home-tile,
-  #managed {
-    padding-top: 2.25rem;
-    border-top: 1px solid var(--color-line-strong);
-  }
-}
 
 /* Phones: the client chips step back, so the button and the work lead. Hairline outlines, muted type, no shadow. */
 @media (max-width: 39.99rem) {
