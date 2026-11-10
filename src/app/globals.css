@@ -13435,8 +13435,8 @@ body:has(.pv) .site-footer {
 /* Phones: the phone is bigger. The headline keeps its two styles and the copy stays left-aligned. */
 @media (max-width: 39.99rem) {
   .deck {
-    --u: 0.86px;
-    --deck-fixed: 462px;
+    --u: 1px;
+    --deck-fixed: 446px;
   }
 }
 
@@ -13687,5 +13687,45 @@ body:has(.pv) .site-footer {
     width: 24px;
     height: 24px;
     opacity: 1;
+  }
+}
+
+/* Phones: the first section after the hero starts closer, so there's no empty band under the promise. */
+@media (max-width: 39.99rem) {
+  #managed {
+    padding-top: 1.5rem;
+  }
+}
+
+/* Phones: the client chips show their logos only. The names stay for screen readers. */
+@media (max-width: 39.99rem) {
+  .deck__pill {
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .deck__pill img {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+  .deck__pill .deck__pill-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .deck__rail .deck__pill[aria-pressed="true"] {
+    width: 54px;
+    height: 54px;
+  }
+  .deck__rail .deck__pill[aria-pressed="true"] img {
+    width: 36px;
+    height: 36px;
   }
 }
