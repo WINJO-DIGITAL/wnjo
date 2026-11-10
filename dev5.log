@@ -1,0 +1,11 @@
+▲ Next.js 16.4.2 (Turbopack)
+- Local:         http://localhost:3113
+- Network:       http://192.0.2.2:3113
+✓ Ready in 421ms
+✓ Running next.config.ts took 37ms
+
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3113". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET /build?plan=bronze 200 in 583ms (next.js: 223ms, application-code: 360ms)
+ GET /build?plan=silver 200 in 69ms (next.js: 1.3ms, application-code: 68ms)
+ GET /build 200 in 79ms (next.js: 1.5ms, application-code: 77ms)
+[?25h

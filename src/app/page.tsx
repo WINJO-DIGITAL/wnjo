@@ -60,7 +60,7 @@ export default function HomePage() {
               className="btn-row rise"
               style={{ "--i": 4 } as React.CSSProperties}
             >
-              <Link href="/build" className="btn btn--primary">
+              <Link href="/build?plan=bronze" className="btn btn--primary">
                 Get started
               </Link>
               <Link href="/pricing" className="hero-ed__textlink">
