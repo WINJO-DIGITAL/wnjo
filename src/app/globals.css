@@ -13433,3 +13433,50 @@ body:has(.pv) .site-footer {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* Phones: the phone is bigger, both headline lines share one style, and the hero copy is centred. */
+@media (max-width: 39.99rem) {
+  .deck {
+    --u: 0.72px;
+    --deck-fixed: 500px;
+  }
+  .hero-ed--work .hero-ed__copy {
+    text-align: center;
+    justify-items: center;
+  }
+  .hero-ed--work .hero-ed__title {
+    text-align: center;
+  }
+  .hero-ed--work .hero-ed__title .hero-ed__line {
+    display: block;
+  }
+  .hero-ed--work .hero-ed__title .serif-em {
+    font-family: inherit;
+  }
+  .hero-ed--work .btn-row {
+    justify-content: center;
+  }
+}
+
+/* Phones: nothing runs wider than the screen. */
+.deck,
+.deck__rail,
+.deck__cta {
+  max-width: 100%;
+}
+@media (max-width: 39.99rem) {
+  .hero-ssr-phone,
+  .hero-ssr-phone > .deck {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+}
+
+/* Smallest phones: the logo gives way so the menu button stays on screen. */
+@media (max-width: 23.74rem) {
+  .site-header .brand img {
+    width: 170px !important;
+    height: auto !important;
+  }
+}
