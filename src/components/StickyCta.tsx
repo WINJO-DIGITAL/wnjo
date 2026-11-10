@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { contactPhoneHref } from "@/lib/site";
+import { PLAN_EVENT } from "@/lib/plan-selection";
+import { WEBSITE_PLANS, type WebsitePlanId } from "@/lib/pricing";
 
 /** Pages that already are the next step, so the bar would only get in the way. */
 const HIDDEN_ON = ["/contact", "/build", "/account", "/admin"];
@@ -17,6 +19,13 @@ const HIDDEN_ON = ["/contact", "/build", "/account", "/admin"];
 export function StickyCta() {
   const pathname = usePathname();
   const [show, setShow] = useState(false);
+  // The plan chosen on the homepage, so the bar can carry it into the calculator.
+  const [plan, setPlan] = useState<string | null>(null);
+  useEffect(() => {
+    const onPlan = (e: Event) => setPlan((e as CustomEvent<string | null>).detail ?? null);
+    window.addEventListener(PLAN_EVENT, onPlan);
+    return () => window.removeEventListener(PLAN_EVENT, onPlan);
+  }, []);
   useEffect(() => {
     if (HIDDEN_ON.includes(pathname)) return;
     if (pathname === "/") {
@@ -90,11 +99,19 @@ export function StickyCta() {
 
   if (HIDDEN_ON.includes(pathname)) return null;
 
+  const chosen = plan && plan in WEBSITE_PLANS ? WEBSITE_PLANS[plan as WebsitePlanId] : null;
+
   return (
     <aside className="sticky-cta" aria-label="Get started" data-show={show} inert={!show}>
-      <Link href="/build" className="btn btn--primary">
-        Get started
-      </Link>
+      {chosen ? (
+        <Link href={`/build?plan=${plan}`} className="btn btn--primary">
+          Continue with {chosen.name}
+        </Link>
+      ) : (
+        <Link href="#packages" className="btn btn--primary">
+          Choose a package
+        </Link>
+      )}
       {contactPhoneHref ? (
         <a href={contactPhoneHref} className="btn btn--secondary">
           Call us
