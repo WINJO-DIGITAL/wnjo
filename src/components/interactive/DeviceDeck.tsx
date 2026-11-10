@@ -68,7 +68,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
   const nudgeTimer = useRef(0);
   const placeRef = useRef<(drag: number) => void>(() => {});
 
-  const last = items.length - 1;
 
   /** Place every card for the current index, plus a drag offset in nominal pixels. */
   const place = useCallback(
@@ -76,7 +75,11 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       const sp = SPACING[mode];
       cardRefs.current.forEach((el, k) => {
         if (!el) return;
-        const o = k - index + drag / sp;
+        // Looped: the nearest way round, so the next and previous clients always sit either side.
+        const n = items.length;
+        let base = (((k - index) % n) + n) % n;
+        if (base > n / 2) base -= n;
+        const o = base + drag / sp;
         const a = Math.abs(o);
         el.style.setProperty("--x", (o * sp).toFixed(1));
         el.style.setProperty("--s", (1 - Math.min(a, 1) * 0.17).toFixed(3));
@@ -84,7 +87,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         el.style.zIndex = String(10 - Math.round(a * 2));
       });
     },
-    [index, mode],
+    [index, mode, items.length],
   );
 
   // The nudge's frames call the latest `place`, never a stale one.
@@ -179,8 +182,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       stageRef.current?.classList.add("is-dragging");
       setDragging(true);
     }
-    const edge = (index === 0 && dx > 0) || (index === last && dx < 0);
-    place((edge ? dx * 0.3 : dx) / unit.current);
+    place(dx / unit.current);
   };
   const onPointerEnd = (e: React.PointerEvent) => {
     const g = gesture.current;
@@ -194,8 +196,9 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       window.setTimeout(() => (justDragged.current = false), 300);
       setStopped(true);
     }
-    const target = index + (dx < 0 ? 1 : -1);
-    if (Math.abs(dx) > 45 && target >= 0 && target <= last) goTo(target);
+    // Looped: swiping past the last client brings the first round, and back again.
+    const target = (index + (dx < 0 ? 1 : -1) + items.length) % items.length;
+    if (Math.abs(dx) > 45) goTo(target);
     else place(0);
   };
   const onKeyDown = (e: React.KeyboardEvent) => {
