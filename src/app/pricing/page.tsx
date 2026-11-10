@@ -4,7 +4,7 @@ import { ArrowRight } from "@/components/Icons";
 import { RefreshCompare, SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
 import { AddOnsTable, PackageCards, PackageComparison } from "@/components/pricing/WebsitePackages";
 import { pageMetadata } from "@/lib/metadata";
-import { DAY_RATE, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { CARE_PLANS, DAY_RATE, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
 const { bronze: core, silver: pro, gold: plus } = WEBSITE_PLANS;
 
@@ -71,6 +71,34 @@ export default function PricingPage() {
             Monthly change allowances don&apos;t carry over to the next month. Work beyond them is quoted before we start,
             at {formatGBP(DAY_RATE)} a day. The full terms are on our <Link href="/terms">terms page</Link>.
           </p>
+        </div>
+      </section>
+
+      {/* 2b. After launch: hosting and care for a site you own. */}
+      <section id="after-launch" className="section--tight" aria-labelledby="after-launch-title">
+        <div className="container container--wide">
+          <SectionHead eyebrow="After launch" title={<span id="after-launch-title">Hosting and care for a site you own.</span>} split>
+            <p>If you keep your own website and want it looked after, these plans cover hosting and care. Rolling monthly, with 30 days&apos; notice to end.</p>
+          </SectionHead>
+          <div data-reveal style={{ display: "grid", gap: "2rem", gridTemplateColumns: "repeat(auto-fit, minmax(14rem, 1fr))" }}>
+            {(["hosting", "care", "carePlus"] as const).map((key) => {
+              const plan = CARE_PLANS[key];
+              return (
+                <article key={key}>
+                  <h3>{plan.label}</h3>
+                  <p>
+                    <b>{formatGBP(plan.monthly)} a month</b>
+                  </p>
+                  <p>{plan.summary}</p>
+                  <ul>
+                    {plan.includes.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 

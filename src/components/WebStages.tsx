@@ -27,7 +27,7 @@ function Screen({ stage }: { stage: (typeof STAGES)[number]["id"] }) {
       <div className="ws-quote">
         <div className="ws-quote__head">
           <b>Proposal</b>
-          <span>Oak &amp; Ember</span>
+          <span>Your business</span>
         </div>
         <span className="ws-quote__row">
           {WEBSITE_PLANS.silver.name} package <b>{formatGBP(WEBSITE_PLANS.silver.monthly)}/mo</b>
@@ -47,13 +47,13 @@ function Screen({ stage }: { stage: (typeof STAGES)[number]["id"] }) {
   return (
     <>
       {stage === "launch" && <div className="bs-live">You&apos;re live</div>}
-      <div className="ws-url">{stage === "launch" ? "oakandember.co.uk" : "preview.oakandember.co.uk"}</div>
+      <div className="ws-url">{stage === "launch" ? "yourbusiness.co.uk" : "preview.yourbusiness.co.uk"}</div>
       <div className="ws-nav">
-        <b>Oak &amp; Ember</b>
+        <b>Your business</b>
         <i className="ws-menu" />
       </div>
       <div className="ws-photo">{stage === "build" && <span className="ws-note">Warmer photo?</span>}</div>
-      <b className="ws-title">Wood-fired, all day.</b>
+      <b className="ws-title">Your headline here.</b>
       <span className="ws-btn">Book a table</span>
     </>
   );

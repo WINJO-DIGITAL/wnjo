@@ -42,9 +42,9 @@ export const SEARCH_SERVICES: { benefit: string; term: string; line: string; pla
     plans: PLUS,
   },
   {
-    benefit: "Prepared for what comes next",
-    term: "Agentic readiness",
-    line: "Your information organised for emerging AI-driven tools and interactions.",
+    benefit: "Easier for AI tools to read",
+    term: "Structured data",
+    line: "Your business details marked up so AI tools can read them accurately.",
     plans: PLUS,
   },
 ];

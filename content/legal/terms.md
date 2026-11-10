@@ -196,7 +196,7 @@ We will confirm in writing, within **2 working days**, the date your subscriptio
 
 11.5 **Third-party materials.** Third-party plugins, fonts, stock imagery and open-source components keep their own licences. You are responsible for complying with those licences after release.
 
-11.6 **Hosting and care.** Hosting and care after launch are optional and priced separately.
+11.6 **Hosting and care.** Hosting and care after launch are optional and priced separately. See section 22.
 
 ## 12. Our service standard
 
@@ -311,3 +311,14 @@ We will confirm in writing, within **2 working days**, the date your subscriptio
 21.5 **Notices.** Formal notices must be sent by email to the address in section 1.1 or by post to the address in section 1.1. A notice sent by email is received on the day it is sent, if sent before 5pm on a working day, and otherwise on the next working day.
 
 21.6 **Late payment (business customers).** If you are a business customer and pay late, we may charge interest and compensation under the Late Payment of Commercial Debts (Interest) Act 1998.
+
+## 22. Hosting and care plans
+
+22.1 If you keep your own website and want us to host or look after it after launch, you can choose one of these plans:
+- **Hosting:** £49 a month. Managed hosting, SSL certificate, uptime monitoring, security updates and technical support.
+- **Care:** £95 a month. Everything in Hosting, plus routine updates and up to 1 hour of small content changes each month.
+- **Care Plus:** £220 a month. Everything in Care, plus up to 3 hours of changes or improvements each month and a quarterly performance and accessibility review.
+
+22.2 These plans are rolling monthly, with no minimum term. Sections 4.4 (allowances do not carry over), 6 (price changes), 7 (failed payments), 8 (ending) and 17 (changes to these terms) apply to them in the same way as to managed website subscriptions.
+
+22.3 We reply to email support within **2 working days** on Hosting and Care, and within **1 working day** on Care Plus.
