@@ -13553,7 +13553,7 @@ body:has(.pv) .site-footer {
   background: rgb(246 240 230 / 0.24);
 }
 .deck__support {
-  margin: 4px 0 0;
+  margin: 0 0 4px;
   font-size: min(14px, 3.6vw);
   color: #574a3f;
   text-align: center;

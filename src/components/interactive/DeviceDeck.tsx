@@ -278,6 +278,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       </div>
 
       <div className="deck__cta">
+        <p className="deck__support">Design, hosting and updates, for one simple monthly payment.</p>
         <Link href="/build?plan=bronze" className="deck__btn">
           <span className="deck__btn-text">
             <span className="deck__btn-main">Get started</span>
@@ -290,7 +291,6 @@ export function DeviceDeck({ items }: { items: Item[] }) {
             <ArrowRight size={16} />
           </span>
         </Link>
-        <p className="deck__support">Everything your website needs. One simple monthly payment.</p>
         <p className="deck__trust">No technical headaches. We handle hosting, updates and fixes.</p>
       </div>
 
