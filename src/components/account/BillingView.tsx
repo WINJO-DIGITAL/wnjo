@@ -115,13 +115,17 @@ function Plan({ client, row }: { client: SupabaseClient; row: Subscription }) {
           body: JSON.stringify({ reference: row.reference }),
         }).catch(() => null)
       : null;
-    const json = (await res?.json().catch(() => null)) as { url?: string } | null;
+    const json = (await res?.json().catch(() => null)) as { url?: string; error?: string } | null;
     if (res?.ok && json?.url) {
       window.location.assign(json.url);
       return;
     }
     setBusy(false);
-    setError("We couldn't open your billing page. Please try again, or reply to our email.");
+    setError(
+      json?.error === "not_found"
+        ? "Billing isn't available for this plan yet. Reply to our email and we'll help."
+        : "We couldn't open your billing page. Please try again, or reply to our email.",
+    );
   };
 
   return (
