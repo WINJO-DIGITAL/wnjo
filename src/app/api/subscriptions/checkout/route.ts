@@ -22,14 +22,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  const body = (await request.json().catch(() => null)) as { token?: unknown; agree?: unknown } | null;
+  const body = (await request.json().catch(() => null)) as { token?: unknown; agree?: unknown; startNow?: unknown } | null;
   const token = typeof body?.token === "string" ? body.token : "";
   if (!OFFER_TOKEN_RE.test(token)) return NextResponse.json({ error: "not_found" }, { status: 404 });
   if (body?.agree !== true) return NextResponse.json({ error: "agree_required" }, { status: 422 });
+  const startNow = body?.startNow === true;
 
   const { data } = await db
     .from("website_subscriptions")
-    .select("id, reference, kind, status, email, package_code, package_name, setup_pence, monthly_pence, one_off_pence, offer_expires_at")
+    .select("id, reference, kind, status, email, package_code, package_name, setup_pence, monthly_pence, one_off_pence, offer_expires_at, quote_snapshot")
     .eq("offer_token_hash", hashOfferToken(token))
     .maybeSingle();
   const row = data as {
@@ -44,10 +45,19 @@ export async function POST(request: NextRequest) {
     monthly_pence: number;
     one_off_pence: number;
     offer_expires_at: string;
+    quote_snapshot: Record<string, unknown> | null;
   } | null;
   if (!row) return NextResponse.json({ error: "not_found" }, { status: 404 });
   if (row.status !== "offered") return NextResponse.json({ error: "already_paid" }, { status: 409 });
   if (new Date(row.offer_expires_at).getTime() < Date.now()) return NextResponse.json({ error: "expired" }, { status: 410 });
+
+  // Record the early-start choice with the consent the offer was made under.
+  const snapshot = row.quote_snapshot ?? {};
+  const consent = (snapshot.consent as Record<string, unknown> | undefined) ?? {};
+  await db
+    .from("website_subscriptions")
+    .update({ quote_snapshot: { ...snapshot, consent: { ...consent, startNow } } })
+    .eq("id", row.id);
 
   const origin = new URL(request.url).origin;
   try {

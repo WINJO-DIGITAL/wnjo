@@ -16,6 +16,7 @@ export function SubscribeActions({
   commitment?: string;
 }) {
   const [agree, setAgree] = useState(false);
+  const [startNow, setStartNow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +27,7 @@ export function SubscribeActions({
       const res = await fetch(mode === "pay" ? "/api/subscriptions/checkout" : "/api/subscriptions/portal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, agree }),
+        body: JSON.stringify({ token, agree, startNow }),
       });
       const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
       if (res.ok && data.url) {
@@ -61,6 +62,10 @@ export function SubscribeActions({
 
   return (
     <div className="stack" style={{ "--stack": "var(--space-4)" } as React.CSSProperties}>
+      <label className="sub-agree">
+        <input type="checkbox" checked={startNow} onChange={(e) => setStartNow(e.target.checked)} />
+        <span>Please start work straight away. I understand that if I cancel within 14 days, I pay for the work already done.</span>
+      </label>
       <label className="sub-agree">
         <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
         <span>
