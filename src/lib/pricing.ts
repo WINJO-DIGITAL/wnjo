@@ -104,7 +104,6 @@ export const CARE_PLANS = {
     includes: [
       "Managed hosting",
       "SSL certificate",
-      "Daily backups",
       "Uptime monitoring",
       "Security updates",
       "Technical support",
@@ -346,7 +345,6 @@ export const WEBSITE_PLANS = {
       "Managed hosting",
       "SSL certificate",
       "Security monitoring",
-      "Website backups",
       "Technical maintenance and updates",
       "Uptime monitoring and fault resolution",
       "Contact forms",

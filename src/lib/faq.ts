@@ -30,7 +30,7 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "What does each plan cost?",
     category: "pricing",
     short: `From ${formatGBP(core.monthly)} a month`,
-    a: `${core.name} is ${formatGBP(core.monthly)} a month for a bespoke website of up to ${core.pages} pages. ${pro.name} is ${formatGBP(pro.monthly)} for up to ${pro.pages} pages and ${plus.name} is ${formatGBP(plus.monthly)} for up to ${plus.pages}. Every plan includes hosting, an SSL certificate, security monitoring, backups, maintenance and support. ${pro.name} and ${plus.name} add search work, performance reporting, monthly time for changes and Winjo Refresh.`,
+    a: `${core.name} is ${formatGBP(core.monthly)} a month for a bespoke website of up to ${core.pages} pages. ${pro.name} is ${formatGBP(pro.monthly)} for up to ${pro.pages} pages and ${plus.name} is ${formatGBP(plus.monthly)} for up to ${plus.pages}. Every plan includes hosting, an SSL certificate, security monitoring, maintenance and support. ${pro.name} and ${plus.name} add search work, performance reporting, monthly time for changes and Winjo Refresh.`,
   },
   {
     q: "How do payments work?",

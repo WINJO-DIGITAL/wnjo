@@ -50,7 +50,7 @@ export default function TermsPage() {
             <h2>3. Managed website subscriptions</h2>
             <p>
               A managed website subscription ({core.name}, {pro.name} or {plus.name}) covers the design and build of your
-              website, managed hosting, security monitoring, backups, technical maintenance, support and the other services
+              website, managed hosting, security monitoring, technical maintenance, support and the other services
               listed for your plan on our pricing page and in your proposal.
             </p>
             <p>

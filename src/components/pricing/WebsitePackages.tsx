@@ -25,7 +25,7 @@ export const CARD_POINTS: Record<WebsitePlanId, string[]> = {
   bronze: [
     "Bespoke design, up to 5 pages",
     "Managed hosting and SSL",
-    "Security monitoring and backups",
+    "Security monitoring",
     "Maintenance, updates and fault resolution",
     "Basic SEO foundations",
     "Technical support and small agreed changes",
@@ -119,7 +119,6 @@ export function PackageComparison() {
       rows: [
         ["Managed hosting and SSL certificate", () => true],
         ["Security monitoring", () => true],
-        ["Website backups", () => true],
         ["Technical maintenance and updates", () => true],
         ["Uptime monitoring and fault resolution", () => true],
         ["Support", (id) => WEBSITE_PLANS[id].support],

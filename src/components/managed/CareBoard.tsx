@@ -6,7 +6,6 @@ const CHECKS = [
   ["Hosting", "Online"],
   ["SSL certificate", "Valid"],
   ["Security", "Monitored"],
-  ["Backups", "Up to date"],
   ["Software", "Updated"],
   ["Uptime", "Watched"],
 ] as const;
