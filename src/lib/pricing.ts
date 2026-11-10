@@ -356,7 +356,7 @@ export const WEBSITE_PLANS = {
     includedAddOns: [] as AddOnId[],
   },
   silver: {
-    name: "Pro",
+    name: "Plus",
     monthly: 149,
     setup: 0,
     pages: 10,
@@ -385,13 +385,13 @@ export const WEBSITE_PLANS = {
     includedAddOns: ["localSeo"] as AddOnId[],
   },
   gold: {
-    name: "Plus",
+    name: "Pro",
     monthly: 199,
     setup: 0,
     pages: 20,
     popular: false,
     tagline: "A more complete digital partnership.",
-    summary: "Everything in Pro, with advanced search and technical work, quarterly reviews and more time for changes each month.",
+    summary: "Everything in Plus, with advanced search and technical work, quarterly reviews and more time for changes each month.",
     bestFor: "For growing businesses with a larger site and more going on each month.",
     contentHours: 3,
     changes: "3 hours of content and agreed development changes a month",
@@ -399,7 +399,7 @@ export const WEBSITE_PLANS = {
     seo: "Advanced SEO",
     refresh: true,
     includes: [
-      "Everything in Pro",
+      "Everything in Plus",
       "Bespoke website up to 20 pages",
       "Advanced SEO",
       "Advanced SEO and technical optimisation",

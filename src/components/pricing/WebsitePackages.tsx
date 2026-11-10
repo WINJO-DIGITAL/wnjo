@@ -14,8 +14,8 @@ import {
 
 export const PLAN_ORDER: WebsitePlanId[] = ["bronze", "silver", "gold"];
 
-/** The page anchor for each plan (/pricing#core, #pro, #plus). */
-export const PLAN_ANCHOR: Record<WebsitePlanId, string> = { bronze: "core", silver: "pro", gold: "plus" };
+/** The page anchor for each plan (/pricing#core, #plus, #pro). */
+export const PLAN_ANCHOR: Record<WebsitePlanId, string> = { bronze: "core", silver: "plus", gold: "pro" };
 
 /**
  * The highlights shown on each card, taken from the plan's own inclusions in lib/pricing; the full list is in the
@@ -41,7 +41,7 @@ export const CARD_POINTS: Record<WebsitePlanId, string[]> = {
     "Priority support, replies within 1 working day",
   ],
   gold: [
-    "Everything in Pro",
+    "Everything in Plus",
     "Bespoke design, up to 20 pages",
     "Advanced SEO and technical optimisation",
     "Expanded AEO and GEO strategy",
@@ -148,7 +148,7 @@ export function PackageComparison() {
     },
   ];
   return (
-    <div className="table-wrap" role="region" aria-label="Compare Core, Pro and Plus" tabIndex={0}>
+    <div className="table-wrap" role="region" aria-label="Compare Core, Plus and Pro" tabIndex={0}>
       <table className="table pkg-compare">
         <thead>
           <tr>

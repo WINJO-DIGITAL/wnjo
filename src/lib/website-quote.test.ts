@@ -12,7 +12,7 @@ import {
 const answers = (over: Partial<WebsiteAnswers> = {}): WebsiteAnswers => ({ ...DEFAULT_WEBSITE_ANSWERS, ...over });
 const monthly = (plan: WebsiteAnswers["plan"], over: Partial<WebsiteAnswers> = {}) =>
   answers({ want: "monthly", mode: "monthly", plan, pages: "4-5", ...over });
-// The managed subscriptions: Core (bronze) £99 for 5 pages, Pro (silver) £149 for 10, Plus (gold) £199 for 20.
+// The managed subscriptions: Core (bronze) £99 for 5 pages, Plus (silver) £149 for 10, Pro (gold) £199 for 20.
 const oneOff = (over: Partial<WebsiteAnswers> = {}) => answers({ want: "oneOff", mode: "oneOff", pages: "4-5", care: "none", ...over });
 
 describe("monthly packages", () => {
@@ -24,27 +24,27 @@ describe("monthly packages", () => {
     expect(q.initialPayment).toBe(99);
   });
 
-  it("prices Pro at £149 a month for up to 10 pages", () => {
+  it("prices Plus at £149 a month for up to 10 pages", () => {
     const q = websiteQuote(monthly("silver", { pages: "6-10" }));
-    expect(WEBSITE_PLANS.silver.name).toBe("Pro");
+    expect(WEBSITE_PLANS.silver.name).toBe("Plus");
     expect(q.monthly).toBe(149);
     expect(q.extraPages).toBe(0);
     expect(q.initialPayment).toBe(149);
   });
 
-  it("prices Plus at £199 a month for up to 20 pages", () => {
+  it("prices Pro at £199 a month for up to 20 pages", () => {
     const q = websiteQuote(monthly("gold", { pages: "16-20" }));
-    expect(WEBSITE_PLANS.gold.name).toBe("Plus");
+    expect(WEBSITE_PLANS.gold.name).toBe("Pro");
     expect(q.monthly).toBe(199);
     expect(q.extraPages).toBe(0);
     expect(q.initialPayment).toBe(199);
   });
 
-  it("highlights Pro and only Pro", () => {
+  it("highlights Plus and only Plus", () => {
     expect(Object.entries(WEBSITE_PLANS).filter(([, p]) => p.popular).map(([id]) => id)).toEqual(["silver"]);
   });
 
-  it("includes Winjo Refresh in Pro and Plus, and not in Core", () => {
+  it("includes Winjo Refresh in Plus and Pro, and not in Core", () => {
     expect(Object.entries(WEBSITE_PLANS).filter(([, p]) => p.refresh).map(([id]) => id)).toEqual(["silver", "gold"]);
   });
 
@@ -205,7 +205,7 @@ describe("validation", () => {
   it("summarises the quote for email with the first and monthly payments", () => {
     const a = monthly("silver", { pages: "11-15" });
     const text = formatWebsiteQuote(a, websiteQuote(a), formatGBP);
-    expect(text).toContain("Package: Pro (monthly)");
+    expect(text).toContain("Package: Plus (monthly)");
     expect(text).toContain("First payment: £199");
     expect(text).toContain("Monthly subscription: £199");
     expect(text).toContain("rolling monthly, no minimum term");

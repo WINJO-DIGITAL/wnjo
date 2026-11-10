@@ -11,7 +11,7 @@ Version 2026-11-10.5. Replaces 2026-11-10.4.
 1.2 We are not registered for VAT, so no VAT is charged.
 
 1.3 These terms apply to:
-- managed website subscriptions (Core, Pro and Plus);
+- managed website subscriptions (Core, Plus and Pro);
 - website projects bought outright;
 - any other work we agree with you in writing.
 
@@ -29,12 +29,12 @@ Booking systems, custom software and other individually scoped services are cove
 
 ## 3. Managed website subscriptions
 
-3.1 A managed website subscription (Core, Pro or Plus) covers the design and build of your website, managed hosting, security monitoring, technical maintenance, support and the other services listed for your plan on our pricing page and in your proposal.
+3.1 A managed website subscription (Core, Plus or Pro) covers the design and build of your website, managed hosting, security monitoring, technical maintenance, support and the other services listed for your plan on our pricing page and in your proposal.
 
 3.2 Prices are:
 - **Core:** £99 a month;
-- **Pro:** £149 a month;
-- **Plus:** £199 a month.
+- **Plus:** £149 a month;
+- **Pro:** £199 a month.
 
 3.3 There is no setup fee. Payments are taken monthly in advance through Stripe, starting with your first payment when you agree to go ahead.
 
@@ -48,18 +48,18 @@ Booking systems, custom software and other individually scoped services are cove
 
 4.3 **Monthly allowances.** Each plan includes a monthly allowance for small changes:
 - **Core:** up to 30 minutes a month;
-- **Pro:** up to 1 hour a month;
-- **Plus:** up to 3 hours a month.
+- **Plus:** up to 1 hour a month;
+- **Pro:** up to 3 hours a month.
 
 4.4 Allowances are used in each calendar month. **Unused allowance does not carry over** to the next month.
 
 4.5 **Work beyond the allowance** is quoted in writing before we start, at **£450 a day**. Work is charged in part-days, rounded up to the nearest half hour.
 
-4.6 **Response times.** We reply to support messages within 2 working days on Core and within 1 working day on Pro and Plus. We monitor your website and work to fix faults as quickly as we reasonably can. We do not promise a particular percentage of uptime, because hosting depends partly on third-party providers.
+4.6 **Response times.** We reply to support messages within 2 working days on Core and within 1 working day on Plus and Pro. We monitor your website and work to fix faults as quickly as we reasonably can. We do not promise a particular percentage of uptime, because hosting depends partly on third-party providers.
 
 ## 5. Winjo Refresh
 
-5.1 Pro and Plus include Winjo Refresh: a planned refresh of your website's design and experience **every 24 months**, counted from the start of your subscription. We will agree the date with you at least 30 days in advance.
+5.1 Plus and Pro include Winjo Refresh: a planned refresh of your website's design and experience **every 24 months**, counted from the start of your subscription. We will agree the date with you at least 30 days in advance.
 
 5.2 **Eligibility.** The refresh is available only while your subscription is active on the refresh date.
 
@@ -294,7 +294,7 @@ We will confirm in writing, within **2 working days**, the date your subscriptio
 
 20.1 Booking systems, custom software and other individually scoped services are not covered by sections 3 to 11. Each has its own written proposal, which sets out the price, term, ownership, cancellation, support and data protection terms for that service.
 
-20.2 Do not assume that these services carry the same terms as Core, Pro or Plus.
+20.2 Do not assume that these services carry the same terms as Core, Plus or Pro.
 
 20.3 Where a proposal does not say otherwise, sections 13 (liability), 14 (complaints), 16 (data protection), 17 (changes), 18 (governing law) and 21 (general) still apply.
 

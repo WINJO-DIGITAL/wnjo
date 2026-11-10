@@ -64,7 +64,7 @@ describe("POST /api/enquiry (website quote)", () => {
     const owner = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(owner.to).toEqual(["inbox@example.com"]);
     expect(owner.reply_to).toBe("ada@example.com");
-    expect(owner.subject).toContain("Pro £149/month");
+    expect(owner.subject).toContain("Plus £149/month");
     expect(owner.text).toContain("First payment: £149");
     const customer = JSON.parse(fetchMock.mock.calls[1][1].body);
     expect(customer.to).toEqual(["ada@example.com"]);

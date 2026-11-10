@@ -57,7 +57,7 @@ export default async function ContactPage({
               <div className="feature">
                 <h2 className="h3">Know which plan you want?</h2>
                 <p className="muted">
-                  Choose Core, Pro or Plus, tell us about your business, and see your monthly price as you go.
+                  Choose Core, Plus or Pro, tell us about your business, and see your monthly price as you go.
                 </p>
                 <p className="mt-4">
                   <Link href="/build" className="arrow-link">

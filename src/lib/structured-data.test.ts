@@ -12,8 +12,8 @@ describe("businessSchema", () => {
     expect(offers.flatMap((o) => (o.priceSpecification ? [o.priceSpecification.price] : []))).toEqual([99, 149, 199, 999, 49]);
     expect(offers.slice(0, 3).map((o) => o.name)).toEqual([
       "Core managed website subscription",
-      "Pro managed website subscription",
       "Plus managed website subscription",
+      "Pro managed website subscription",
     ]);
     // Services without a published price are listed by name only.
     expect(offers.filter((o) => !o.priceSpecification).map((o) => o.name)).toEqual([
