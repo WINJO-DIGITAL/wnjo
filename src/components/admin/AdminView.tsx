@@ -553,17 +553,19 @@ function InvitesPanel({ client, tenantId }: { client: SupabaseClient; tenantId: 
   const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const fetchAll = () =>
+  // The first request can run before the sign-in has settled and fail once; try again before showing an error.
+  const fetchAll = (retry = true): Promise<void> =>
     Promise.all([
       client.from("client_invites").select("id, email, order_id, created_at, claimed_at").order("created_at", { ascending: false }).limit(50),
       client.from("orders").select("id, business_name").order("created_at", { ascending: false }).limit(100),
     ]).then(([inv, ord]) => {
+      if ((inv.error || ord.error) && retry) return new Promise<void>((resolve) => setTimeout(resolve, 800)).then(() => fetchAll(false));
       setInvites(inv.error ? null : ((inv.data as InviteRow[]) ?? []));
       setOrders(ord.error ? [] : ((ord.data as OrderOption[]) ?? []));
     });
 
   useEffect(() => {
-    fetchAll();
+    void fetchAll();
     // Reloads only when the client changes; fetchAll reads the client it was given.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client]);
