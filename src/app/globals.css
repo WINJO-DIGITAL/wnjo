@@ -13640,3 +13640,10 @@ body:has(.pv) .site-footer {
     overflow-x: clip;
   }
 }
+
+/* Phones: the longer headline ("Start running your business.") stays on one line per part and inside the screen. */
+@media (max-width: 39.99rem) {
+  .hero-ed--work .hero-ed__title {
+    font-size: clamp(22px, 7.2vw, 30px);
+  }
+}

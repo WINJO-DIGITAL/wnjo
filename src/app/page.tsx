@@ -47,8 +47,8 @@ export default function HomePage() {
               className="hero-ed__title rise"
               style={{ "--i": 1 } as React.CSSProperties}
             >
-              <span className="hero-ed__line">Your website.</span>{" "}
-              <span className="serif-em">Our responsibility.</span>
+              <span className="hero-ed__line">Stop managing your website.</span>{" "}
+              <span className="serif-em">Start running your business.</span>
             </h1>
             <div
               className="btn-row rise"
