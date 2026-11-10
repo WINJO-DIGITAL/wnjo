@@ -2,7 +2,8 @@ import Link from "next/link";
 import { CtaBand, PageHero, PricingNotice, SectionHead } from "@/components/Blocks";
 import { ArrowRight } from "@/components/Icons";
 import { RefreshCompare, SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
-import { AddOnsTable, PackageCards, PackageComparison } from "@/components/pricing/WebsitePackages";
+import { AddOnsTable, PackageComparison } from "@/components/pricing/WebsitePackages";
+import { PlanChooser } from "@/components/pricing/PlanChooser";
 import { pageMetadata } from "@/lib/metadata";
 import { CARE_PLANS, DAY_RATE, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
@@ -46,7 +47,7 @@ export default function PricingPage() {
       <section id="plans" className="section--tight" style={{ paddingTop: 0 }} aria-label="Plans">
         <div className="container container--wide">
           <div data-reveal>
-            <PackageCards />
+            <PlanChooser />
           </div>
           <p className="plans-note" data-reveal>
             Every plan is a rolling monthly subscription with no minimum contract and no large upfront cost. Change
