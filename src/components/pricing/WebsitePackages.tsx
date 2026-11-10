@@ -85,7 +85,7 @@ export function PackageCards({ compact = false }: { compact?: boolean }) {
               href={`/build?plan=${id}`}
               className={`btn ${plan.popular ? "btn--primary" : "btn--secondary"} pkg-card__cta`}
             >
-              Get started with {plan.name}
+              Choose {plan.name}
             </Link>
           </li>
         );
