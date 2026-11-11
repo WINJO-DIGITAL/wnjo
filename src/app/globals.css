@@ -1236,6 +1236,24 @@ button.arrow-link {
   margin-top: var(--space-6);
 }
 
+/* Pricing: less air above the plans, so they start sooner. */
+.page-hero--compact {
+  padding-block: var(--space-4) var(--space-5);
+}
+.page-hero--compact .eyebrow {
+  margin-bottom: var(--space-3);
+}
+.page-hero--compact .h1 {
+  font-size: var(--text-2xl);
+}
+.page-hero--compact .lede {
+  margin-top: var(--space-3);
+  font-size: 1.0625rem;
+}
+.page-hero--compact .btn-row {
+  margin-top: var(--space-4);
+}
+
 /* ---------- Home hero ---------- */
 .hero {
   position: relative;

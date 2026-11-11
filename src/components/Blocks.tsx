@@ -8,17 +8,20 @@ export function PageHero({
   title,
   lede,
   children,
+  compact = false,
 }: {
   eyebrow: string;
   title: ReactNode;
   lede?: ReactNode;
   children?: ReactNode;
+  /** A tighter top section, for pages where the content below is what the visitor came for (pricing). */
+  compact?: boolean;
 }) {
   return (
-    <section className="page-hero">
+    <section className={compact ? "page-hero page-hero--compact" : "page-hero"}>
       <div className="container container--wide">
         <p className="eyebrow rise">{eyebrow}</p>
-        <h1 className="h1 rise" style={{ "--i": 1, maxWidth: "20ch" } as React.CSSProperties}>
+        <h1 className="h1 rise" style={{ "--i": 1, maxWidth: compact ? "26ch" : "20ch" } as React.CSSProperties}>
           {title}
         </h1>
         {lede && (
