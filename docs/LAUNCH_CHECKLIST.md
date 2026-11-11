@@ -80,4 +80,4 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 
 ### Suggested decisions
 - [ ] **Refresh slider:** keep it as the main refresh visual (suggested).
-- [ ] **Payment confirmation:** keep "Hi there" in the emails for customers who pay with only an email address (suggested).
+- [x] **Payment confirmation:** decided by the owner: customers can no longer pay with only an email address. The name and business name are required at checkout, and the server refuses a payment without them, so "Hi there" only appears in older records saved before this rule.
