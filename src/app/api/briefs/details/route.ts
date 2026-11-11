@@ -3,7 +3,8 @@ import { mailConfig, sendEnquiryEmail } from "@/lib/mailer";
 import { serviceClient } from "@/lib/quote-store";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { customerFromRequest } from "@/lib/staff-auth";
-import { BRIEF_VERSION, cleanBrief, formatBrief, validateBrief } from "@/lib/website-brief";
+import { BRIEF_VERSION, DRAFT_ID_RE, cleanBrief, formatBrief, validateBrief } from "@/lib/website-brief";
+import { confirmBriefFiles } from "@/lib/brief-store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -44,8 +45,10 @@ export async function POST(request: NextRequest) {
   if (!row || row.email.toLowerCase() !== customer.email) return fail(404, "not_found");
   if (!EDITABLE_STAGES.includes(row.stage)) return fail(409, "This brief can't be changed now. Ask for changes on your preview instead.");
 
-  // No file uploads here: files are not part of this form, so any sent are dropped by the cleaner (no draft folder).
-  const brief = cleanBrief(body.brief);
+  // Files were uploaded to this form's draft folder; only those really in it are kept.
+  const draftId = typeof body.draftId === "string" && DRAFT_ID_RE.test(body.draftId) ? body.draftId : null;
+  let brief = cleanBrief(body.brief, draftId ?? undefined);
+  if (draftId) brief = await confirmBriefFiles(db, draftId, brief);
   const errors = validateBrief(brief);
   if (Object.keys(errors).length) return fail(422, "Please complete your brief.", { brief: errors });
 

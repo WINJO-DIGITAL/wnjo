@@ -40,6 +40,29 @@ function paymentLines(quote: WebsiteQuote): string[] {
   ];
 }
 
+/**
+ * The acknowledgement for a buy-outright request. There is no price yet: staff write a proposal, and the deposit is
+ * taken only after it is accepted. Quoting "from £999" here would read as an estimate, so it doesn't.
+ */
+export function projectAcknowledgement(args: { reference: string; details: WebsiteDetails; siteUrl: string }): { subject: string; text: string } {
+  const { reference, details, siteUrl } = args;
+  const text = [
+    `Hi ${first(details.name)},`,
+    "",
+    `Thank you for asking us to build your website. Your reference is ${reference}.`,
+    "",
+    "WHAT HAPPENS NEXT",
+    "We'll review what you've told us and reply within one working day with a written proposal and a fixed price.",
+    "Nothing is charged until you have read and accepted that proposal.",
+    "When you accept, the first payment is a 50% deposit. The rest is due as set out in the proposal.",
+    "",
+    `Questions? Reply to this email, or see ${siteUrl.replace(/\/+$/, "")}/website-projects`,
+    "",
+    "WINJO DIGITAL",
+  ].join("\n");
+  return { subject: `Your website project request [${reference}]`, text };
+}
+
 export function customerAcknowledgement(args: {
   reference: string;
   details: WebsiteDetails;

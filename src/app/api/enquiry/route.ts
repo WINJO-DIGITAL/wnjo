@@ -11,7 +11,7 @@ import { rateLimited } from "@/lib/rate-limit";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { serviceClient } from "@/lib/quote-store";
 import { INTENTS, cleanDetails, formatDetails, validateDetails, type Intent } from "@/lib/website-enquiry";
-import { customerAcknowledgement, ownerSubject, payLinkEmail } from "@/lib/website-emails";
+import { customerAcknowledgement, ownerSubject, payLinkEmail, projectAcknowledgement } from "@/lib/website-emails";
 import { startQuotePayment } from "@/lib/pay-from-quote";
 import { routeFor } from "@/lib/build-journey";
 import { payNowFor } from "@/lib/pay-now";
@@ -241,7 +241,7 @@ async function handleProjectRequest(body: Json, request: NextRequest) {
   const customerConfig = notificationMailConfig();
   if (customerConfig) {
     const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
-    const ack = customerAcknowledgement({ reference, details, quote, intent: "quote", siteUrl: site });
+    const ack = projectAcknowledgement({ reference, details, siteUrl: site });
     await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Project request acknowledgement");
   }
   return NextResponse.json({ ok: true, reference, route: created?.route ?? null, tracked: Boolean(created), pay: null, paymentStarted: false });

@@ -7,7 +7,7 @@ import { STAGES, progressIndex, stagePath, type ProposalLine, type ProposalStatu
 import type { RevisionRow } from "@/lib/build-revisions";
 import { proposalPayNowFor } from "@/lib/pay-now";
 import { GOALS, STYLES, cleanBrief, validateBrief, type BriefErrors, type WebsiteBrief } from "@/lib/website-brief";
-import { DesignFields, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
+import { DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
 import { Confirmation } from "./Confirmation";
 import { FeedbackCard } from "./FeedbackCard";
 import { PayCard } from "./PayCard";
@@ -260,6 +260,8 @@ function BriefDetailsCard({
   const [errors, setErrors] = useState<BriefErrors>({});
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  // A folder for this form's uploads. The id is never printed, so the server and browser renders still match.
+  const [draftId] = useState<string | null>(() => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : null));
   const update: BriefChange = (patch) => {
     setBrief((b) => ({ ...b, ...(typeof patch === "function" ? patch(b) : patch) }));
     setErrors({});
@@ -267,7 +269,7 @@ function BriefDetailsCard({
 
   const send = async (event: React.FormEvent) => {
     event.preventDefault();
-    const cleaned = cleanBrief(brief);
+    const cleaned = cleanBrief(brief, draftId ?? undefined);
     const missing = validateBrief(cleaned);
     if (missing.goals || missing.pages) {
       setErrors(missing);
@@ -281,7 +283,7 @@ function BriefDetailsCard({
       ? await fetch("/api/briefs/details", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ briefId, brief: cleaned }),
+          body: JSON.stringify({ briefId, draftId, brief: cleaned }),
         }).catch(() => null)
       : null;
     const json = (await res?.json().catch(() => null)) as { error?: string } | null;
@@ -298,6 +300,7 @@ function BriefDetailsCard({
       <GoalsField brief={brief} onChange={update} error={errors.goals} />
       <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} />
       <DesignFields brief={brief} onChange={update} />
+      <FilesField brief={brief} onChange={update} draftId={draftId} />
       <FunctionalityField brief={brief} onChange={update} />
       {message && (
         <p className="field-error" role="alert">
