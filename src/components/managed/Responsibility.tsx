@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * The whole proposition in one switch: everything a business owner has to sort out with an ordinary website, and
@@ -19,8 +19,24 @@ const CHORES = [
 
 export function Responsibility() {
   const [ours, setOurs] = useState(true);
+  // The points arrive one at a time. The first run waits until the switch is on screen; after that, every switch
+  // between the two lists plays them again (see .resp__list li in globals.css).
+  const root = useRef<HTMLDivElement>(null);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const el = root.current;
+    if (!el || seen) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setSeen(true);
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [seen]);
   return (
-    <div className="resp" data-ours={ours}>
+    <div className="resp" ref={root} data-ours={ours} data-seen={seen || undefined}>
       <div className="resp__switch" role="group" aria-label="Who looks after the website">
         <button type="button" aria-pressed={!ours} onClick={() => setOurs(false)}>
           On your own

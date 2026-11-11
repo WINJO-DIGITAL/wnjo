@@ -12934,11 +12934,28 @@ body:has(.pv) .site-footer {
 }
 .resp__list li {
   overflow: hidden;
-  /* Tall enough for a item that wraps onto two or three lines; the switch still collapses items to 0. */
+  /* Tall enough for a item that wraps onto two or three lines. */
   max-height: 6em;
-  transition:
-    max-height var(--duration-slow) var(--ease) calc(var(--i, 0) * 45ms),
-    opacity var(--duration-slow) var(--ease) calc(var(--i, 0) * 45ms);
+  /* Each point arrives on its own, one after the other. The list is hidden while it isn't the one showing, so the
+     whole sequence starts again every time the switch brings it back. */
+  animation: resp-in 460ms var(--ease) both;
+  animation-delay: calc(140ms + var(--i, 0) * 150ms);
+}
+@keyframes resp-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+/* The first run waits until the switch is on screen (the component sets data-seen). */
+.resp:not([data-seen]) .resp__list li {
+  animation-play-state: paused;
+}
+/* Without scripting the points just show. */
+@media (scripting: none) {
+  .resp__list li {
+    animation: none;
+  }
 }
 .resp__list li span {
   display: block;
@@ -13531,9 +13548,11 @@ body:has(.pv) .site-footer {
 @media (prefers-reduced-motion: reduce) {
   .rf__site,
   .rf__site *,
-  .resp__list li,
   .resp__col {
     transition: none;
+  }
+  .resp__list li {
+    animation: none;
   }
 }
 /* The homepage tiles end with breathing room when they hold a contained visual. */
