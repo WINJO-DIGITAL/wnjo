@@ -1,9 +1,10 @@
+import { redirect } from "next/navigation";
 import { PageHero } from "@/components/Blocks";
 import {
   WebsiteConfigurator,
   type WebsiteConfiguratorParams,
 } from "@/components/configurator/WebsiteConfigurator";
-import { isShortCheckout } from "@/lib/short-checkout";
+import { isPlanlessBuild, isShortCheckout } from "@/lib/short-checkout";
 import { pageMetadata } from "@/lib/metadata";
 import { ONE_OFF_WEBSITE, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
@@ -30,6 +31,8 @@ export default async function BuildPage({
     draft: first(query.draft),
     full: first(query.full),
   };
+  // A bare /build would open the form on Core £99 as if chosen; the plans are where that choice is made.
+  if (isPlanlessBuild(params)) redirect("/pricing#plans");
   // Consultation booking appears only once a real calendar is connected (Cal.com); until then, callbacks.
   const calendarEnabled = Boolean(process.env.CALCOM_API_KEY?.trim() && process.env.CALCOM_EVENT_TYPE_ID?.trim());
   const short = isShortCheckout(params);

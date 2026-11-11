@@ -189,9 +189,9 @@ export function SiteStyler() {
   const root = useRef<HTMLDivElement>(null);
   const start = useRef<number | null>(null);
   const site = SITES[i];
-  // Only once the visitor has picked does the button name their business (not while it cycles),
-  // and carry it into the estimate.
-  const href = auto ? "/build" : `/build?business=${encodeURIComponent(site.kind)}`;
+  // Only once the visitor has picked does the button name their business (not while it cycles).
+  // Either way it goes to the plans: /build needs a chosen plan, and asks about the business after payment.
+  const href = "/pricing#plans";
 
   const pick = (n: number) => {
     setAuto(false);
