@@ -10,7 +10,7 @@ import { Responsibility } from "@/components/managed/Responsibility";
 import { SubscriptionTerms } from "@/components/managed/Sections";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
 import { WebStages } from "@/components/WebStages";
-import { REFRESH, WEBSITE_PLANS } from "@/lib/pricing";
+import { ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
@@ -238,13 +238,16 @@ export default function HomePage() {
 
       <CtaBand
         title={<>Hand us your website.</>}
-        body={<>Tell us about your business and what you need. We&apos;ll come back with a plan and a clear monthly price.</>}
+        body={<>Managed from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, or buy it outright from {formatGBP(ONE_OFF_WEBSITE.from)}.</>}
       >
         <Link href="/build" className="btn btn--primary">
           Get started
         </Link>
-        <Link href="/contact" className="btn btn--secondary">
-          Talk to us first
+        <Link href="/website-projects" className="btn btn--secondary">
+          Buy outright
+        </Link>
+        <Link href="/contact" className="arrow-link">
+          Talk to us first <ArrowRight />
         </Link>
       </CtaBand>
     </>
