@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "@/components/Icons";
 import { REFRESH, SUBSCRIPTION_TERMS, WEBSITE_PLANS } from "@/lib/pricing";
+import { RefreshSlider } from "./RefreshSlider";
 
 /**
  * Search and AI services in business terms: the benefit first, then the name it goes by and the plans that include
@@ -113,26 +114,14 @@ export function SubscriptionTerms() {
   );
 }
 
-/** The usual way against the Winjo way: three steps each, so the difference is seen at a glance. */
+/** The refresh, shown rather than listed: the same example website before and after, with a handle to drag between. */
 export function RefreshCompare() {
   return (
     <div className="rf-compare">
-      <div className="rf-compare__col">
-        <p className="terms-grid__label">The usual way</p>
-        <ol role="list">
-          <li>Your website slowly dates</li>
-          <li>You look for another designer</li>
-          <li>You pay for another redesign, and organise it yourself</li>
-        </ol>
-      </div>
-      <div className="rf-compare__col rf-compare__col--ours">
-        <p className="terms-grid__label">With Winjo Refresh</p>
-        <ol role="list">
-          <li>We plan your refresh every {REFRESH.everyMonths} months</li>
-          <li>We redesign around your business as it is now</li>
-          <li>It&apos;s included in {PRO} and {PLUS}</li>
-        </ol>
-      </div>
+      <RefreshSlider />
+      <p className="rf-compare__line">
+        We plan it, design it and include it every {REFRESH.everyMonths} months in {PRO} and {PLUS}.
+      </p>
     </div>
   );
 }

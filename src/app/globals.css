@@ -13175,63 +13175,124 @@ body:has(.pv) .site-footer {
   margin: 0;
 }
 
-/* The usual way against Winjo Refresh. */
+/* Winjo Refresh before and after: the same example website, with a handle to drag between the two. */
 .rf-compare {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-5);
   margin-top: var(--space-6);
+  justify-items: center;
   text-align: left;
 }
-.rf-compare__col {
-  padding: clamp(1.25rem, 1rem + 1.2vw, 2.25rem);
-  border: 1px solid var(--color-line-strong);
-  border-radius: var(--radius-md);
-}
-.inverse .rf-compare__col {
-  border-color: var(--color-inverse-line);
-}
-.rf-compare__col--ours {
-  background: var(--color-inverse-bg);
-  border-color: var(--color-inverse-bg);
-  color: var(--color-inverse-ink);
-}
-.inverse .rf-compare__col--ours {
-  background: var(--color-inverse-ink);
-  border-color: var(--color-inverse-ink);
-  color: var(--color-inverse-bg);
-}
-.rf-compare ol {
+.rf-compare__line {
   margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: rf;
+  width: min(100%, 52rem);
+  font-family: var(--font-serif);
+  font-size: clamp(1.15rem, 1rem + 0.8vw, 1.6rem);
+  line-height: 1.25;
+}
+.rfc {
+  margin: 0;
+  width: min(100%, 52rem);
   display: grid;
   gap: var(--space-3);
-  font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
 }
-.rf-compare li {
-  counter-increment: rf;
-  display: grid;
-  grid-template-columns: 2.2em minmax(0, 1fr);
+.rfc__stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.5);
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
-.rf-compare li::before {
-  content: counter(rf, decimal-leading-zero);
-  font-family: var(--font-price);
-  font-size: 0.75em;
-  padding-top: 0.25em;
-  opacity: 0.6;
+.rfc__stage .rf {
+  display: block;
 }
-.rf-compare__col:not(.rf-compare__col--ours) {
-  color: var(--color-ink-2);
+/* Both versions share one layout, so the divider lines up exactly; only the look changes. */
+.rfc__stage .rf__photo {
+  aspect-ratio: 4 / 3 !important;
 }
-.inverse .rf-compare__col:not(.rf-compare__col--ours) {
+.rfc__stage .rf__browser {
+  border-radius: 0;
+  box-shadow: none;
+  border: 0;
+}
+.rfc__layer--after {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 0 var(--pos, 50%));
+}
+.rfc__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pos, 50%);
+  width: 2px;
+  margin-left: -1px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.18);
+  pointer-events: none;
+}
+.rfc__grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: -1.375rem 0 0 -1.375rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.3);
+}
+.rfc__grip::before,
+.rfc__grip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-top: -0.25rem;
+  border-top: 2px solid #2b211b;
+  border-left: 2px solid #2b211b;
+}
+.rfc__grip::before {
+  left: 0.8rem;
+  transform: rotate(-45deg);
+}
+.rfc__grip::after {
+  right: 0.8rem;
+  transform: rotate(135deg);
+}
+.rfc__tag {
+  position: absolute;
+  bottom: var(--space-3);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: rgb(18 24 28 / 0.78);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.rfc__tag--before {
+  left: var(--space-3);
+}
+.rfc__tag--after {
+  right: var(--space-3);
+}
+.rfc__stage:has(input:focus-visible) .rfc__grip {
+  outline: 2px solid var(--home-orange);
+  outline-offset: 3px;
+}
+.rfc__caption {
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
+}
+.inverse .rfc__caption {
   color: var(--color-inverse-ink-2);
-}
-@media (max-width: 47.99rem) {
-  .rf-compare {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 /* Winjo Refresh timeline: one example website, three eras. */
@@ -13971,9 +14032,6 @@ body:has(.pv) .site-footer {
   .terms-grid .checks {
     font-size: 1rem;
   }
-  .rf-compare ol {
-    font-size: 1.1rem;
-  }
   .rf__site {
     padding: 0.75rem;
   }
@@ -14032,9 +14090,6 @@ body:has(.pv) .site-footer {
   #refresh .rf-compare {
     gap: var(--space-3);
     margin-top: var(--space-4);
-  }
-  #refresh .rf-compare__col {
-    padding: 1.1rem 1.2rem;
   }
   #refresh .rf__timeline button {
     padding-top: var(--space-3);

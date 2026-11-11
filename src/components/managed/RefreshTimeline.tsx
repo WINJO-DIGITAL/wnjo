@@ -14,6 +14,40 @@ const ERAS = [
   { id: "second", when: `Month ${REFRESH.everyMonths * 2}`, label: "Second refresh, included" },
 ] as const;
 
+/** The example website, drawn in CSS. Its look comes from the nearest `.rf[data-era]`. Shared by the timeline and the slider. */
+export function RefreshBrowser() {
+  return (
+    <div className="rf__browser" aria-hidden="true">
+      <div className="rf__chrome">
+        <i />
+        <i />
+        <i />
+        <span>harbourkitchen.co.uk</span>
+      </div>
+      <div className="rf__site">
+        <div className="rf__nav">
+          <b>Harbour Kitchen</b>
+          <span>Menu</span>
+          <span>Book</span>
+        </div>
+        <div className="rf__hero">
+          <div className="rf__copy">
+            <strong>Seafood, straight off the boat.</strong>
+            <em>Open Wednesday to Sunday</em>
+            <span className="rf__btn">Book a table</span>
+          </div>
+          <div className="rf__photo" />
+        </div>
+        <div className="rf__cards">
+          <i />
+          <i />
+          <i />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function RefreshTimeline() {
   const [era, setEra] = useState(0);
   const [touched, setTouched] = useState(false);
@@ -61,34 +95,7 @@ export function RefreshTimeline() {
         }}
       >
         <p className="fine">Example business, for illustration.</p>
-        <div className="rf__browser" aria-hidden="true">
-          <div className="rf__chrome">
-            <i />
-            <i />
-            <i />
-            <span>harbourkitchen.co.uk</span>
-          </div>
-          <div className="rf__site">
-            <div className="rf__nav">
-              <b>Harbour Kitchen</b>
-              <span>Menu</span>
-              <span>Book</span>
-            </div>
-            <div className="rf__hero">
-              <div className="rf__copy">
-                <strong>Seafood, straight off the boat.</strong>
-                <em>Open Wednesday to Sunday</em>
-                <span className="rf__btn">Book a table</span>
-              </div>
-              <div className="rf__photo" />
-            </div>
-            <div className="rf__cards">
-              <i />
-              <i />
-              <i />
-            </div>
-          </div>
-        </div>
+        <RefreshBrowser />
       </div>
       <div className="rf__timeline" role="group" aria-label="The same website over time">
         {ERAS.map((e, i) => (
