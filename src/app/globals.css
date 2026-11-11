@@ -1236,6 +1236,37 @@ button.arrow-link {
   margin-top: var(--space-6);
 }
 
+/* Pricing: what every monthly plan includes, as four plain cells. */
+.included-strip {
+  list-style: none;
+  margin: var(--space-6) 0 var(--space-7);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  border-top: 1px solid var(--color-line-strong);
+}
+.included-strip li {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-4) var(--space-5) 0;
+  border-bottom: 1px solid var(--color-line);
+}
+.included-strip__n {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-3);
+}
+.included-strip__t {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  color: var(--color-ink);
+}
+.included-strip__l {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
 /* Pricing: less air above the plans, so they start sooner. */
 .page-hero--compact {
   padding-block: var(--space-4) var(--space-5);

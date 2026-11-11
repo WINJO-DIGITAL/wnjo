@@ -76,12 +76,30 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* 2b. After launch: hosting and care for a site you own. */}
+      {/* 2b. Bought outright: hosting and care are added. The monthly plans already include all of it. */}
       <section id="after-launch" className="section--tight" aria-labelledby="after-launch-title">
         <div className="container container--wide">
-          <SectionHead eyebrow="After launch" title={<span id="after-launch-title">Hosting and care for a site you own.</span>} split>
-            <p>If you keep your own website and want it looked after, these plans cover hosting and care. Rolling monthly, with 30 days&apos; notice to end.</p>
+          <SectionHead eyebrow="Bought outright?" title={<span id="after-launch-title">Add hosting and care to your website.</span>} split>
+            <p>
+              Every £99 plan already includes all of this, so you only have to run your business. If you buy your website
+              outright, add hosting and care below. Rolling monthly, with 30 days&apos; notice to end.{" "}
+              <a href="#plans">See the monthly plans</a>.
+            </p>
           </SectionHead>
+          <ul className="included-strip" role="list" data-reveal aria-label="Included in every monthly plan">
+            {[
+              ["01", "Design", "Built around your business"],
+              ["02", "Hosting", "Fast, secure, always on"],
+              ["03", "Updates", "Security and upkeep handled"],
+              ["04", "Support", "A real team when you need one"],
+            ].map(([n, title, line]) => (
+              <li key={n}>
+                <span className="included-strip__n">{n}</span>
+                <span className="included-strip__t">{title}</span>
+                <span className="included-strip__l">{line}</span>
+              </li>
+            ))}
+          </ul>
           <div data-reveal style={{ display: "grid", gap: "2rem", gridTemplateColumns: "repeat(auto-fit, minmax(14rem, 1fr))" }}>
             {(["hosting", "care", "carePlus"] as const).map((key) => {
               const plan = CARE_PLANS[key];
