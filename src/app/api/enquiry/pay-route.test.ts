@@ -94,6 +94,23 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("short plan checkout: pays with just name, business and email, and no brief", async () => {
+    const short = { short: true, brief: undefined, draftId: null, details: { ...body().details, industry: "", description: "" } };
+    const res = await post(body(short));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ ok: true, tracked: true, pay: { url: "https://checkout.stripe.com/c/pay/cs_test_1" } });
+    expect(vi.mocked(startQuotePayment).mock.calls[0][1].quote.monthly).toBe(149);
+  });
+
+  it("short plan checkout: refuses a project (one-off) and anything that isn't a payment", async () => {
+    const short = { short: true, brief: undefined, details: { ...body().details, industry: "", description: "" } };
+    const oneOff = await post(body({ ...short, answers: { ...DEFAULT_WEBSITE_ANSWERS, mode: "oneOff", want: "oneOff" } }));
+    expect(oneOff.status).toBe(422);
+    const quoteOnly = await post(body({ ...short, intent: "quote" }));
+    expect(quoteOnly.status).toBe(422);
+    expect(startQuotePayment).not.toHaveBeenCalled();
+  });
+
   it("never takes payment for a bespoke build: it stays a proposal and the customer gets the usual acknowledgement", async () => {
     state.route = "proposal";
     state.payment = null;

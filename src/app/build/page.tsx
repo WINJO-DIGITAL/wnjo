@@ -3,6 +3,7 @@ import {
   WebsiteConfigurator,
   type WebsiteConfiguratorParams,
 } from "@/components/configurator/WebsiteConfigurator";
+import { isShortCheckout } from "@/lib/short-checkout";
 import { pageMetadata } from "@/lib/metadata";
 import { ONE_OFF_WEBSITE, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
@@ -27,15 +28,17 @@ export default async function BuildPage({
     pages: first(query.pages),
     business: first(query.business),
     draft: first(query.draft),
+    full: first(query.full),
   };
   // Consultation booking appears only once a real calendar is connected (Cal.com); until then, callbacks.
   const calendarEnabled = Boolean(process.env.CALCOM_API_KEY?.trim() && process.env.CALCOM_EVENT_TYPE_ID?.trim());
+  const short = isShortCheckout(params);
   return (
     <>
       <PageHero
         eyebrow="Get started"
-        title={<>Let&apos;s get your website started.</>}
-        lede={`Choose a plan and tell us about your business. From ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, with no minimum term. Nothing is charged until you agree to go ahead.`}
+        title={short ? <>Start your website.</> : <>Let&apos;s get your website started.</>}
+        lede={short ? "Three details, then pay securely. We ask about your design after." : `Choose a plan and tell us about your business. From ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, with no minimum term. Nothing is charged until you agree to go ahead.`}
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">

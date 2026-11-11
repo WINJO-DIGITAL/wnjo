@@ -58,8 +58,11 @@ export function cleanDetails(input: unknown): WebsiteDetails {
   return out;
 }
 
-/** Required: name, business name, email, industry and a short description. Phone is required for a callback. */
-export function validateDetails(details: WebsiteDetails, intent: Intent): DetailErrors {
+/**
+ * Required: name, business name, email, industry and a short description. Phone is required for a callback.
+ * The short plan checkout (`short`) needs only name, business name and email; the rest comes in the brief after payment.
+ */
+export function validateDetails(details: WebsiteDetails, intent: Intent, short = false): DetailErrors {
   const errors: DetailErrors = {};
   if (details.name.length < 2) errors.name = "Please tell us your name.";
   if (details.businessName.length < 2) errors.businessName = "Please tell us your business name.";
@@ -68,11 +71,11 @@ export function validateDetails(details: WebsiteDetails, intent: Intent): Detail
   else if (details.phone && (!PHONE_RE.test(details.phone) || details.phone.replace(/\D/g, "").length < 10)) {
     errors.phone = "Please enter a full phone number, including the area code.";
   }
-  if (details.industry.length < 2) errors.industry = "Please tell us your industry, for example: hair salon.";
+  if (!short && details.industry.length < 2) errors.industry = "Please tell us your industry, for example: hair salon.";
   if (details.existingWebsite && !URL_RE.test(details.existingWebsite)) {
     errors.existingWebsite = "Please enter a web address, like yourbusiness.co.uk, or leave it blank.";
   }
-  if (details.description.length < 10) errors.description = "Please describe your business in a sentence or two.";
+  if (!short && details.description.length < 10) errors.description = "Please describe your business in a sentence or two.";
   return errors;
 }
 

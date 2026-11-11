@@ -13,6 +13,8 @@ import { serviceClient } from "@/lib/quote-store";
 import { INTENTS, cleanDetails, formatDetails, validateDetails, type Intent } from "@/lib/website-enquiry";
 import { customerAcknowledgement, ownerSubject, payLinkEmail } from "@/lib/website-emails";
 import { startQuotePayment } from "@/lib/pay-from-quote";
+import { routeFor } from "@/lib/build-journey";
+import { payNowFor } from "@/lib/pay-now";
 import { OWNERSHIP } from "@/lib/pricing";
 import { ROUTED_WANTS, formatWebsiteQuote, parseWebsiteAnswers, websiteQuote } from "@/lib/website-quote";
 import { formatGBP } from "@/lib/pricing";
@@ -198,14 +200,19 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
     return NextResponse.json({ error: "Some of your choices were missing. Please review your quote." }, { status: 422 });
   }
   const details = cleanDetails(body.details);
-  const fieldErrors = validateDetails(details, intent);
+  // The short plan checkout: a monthly plan paid for straight away, with the brief collected afterwards.
+  const short = body.short === true;
+  if (short && (intent !== "pay" || answers.mode !== "monthly")) {
+    return NextResponse.json({ error: "Some of your choices were missing. Please review your plan." }, { status: 422 });
+  }
+  const fieldErrors = validateDetails(details, intent, short);
   if (Object.keys(fieldErrors).length) {
     return NextResponse.json({ error: "Please check the highlighted fields.", fields: fieldErrors }, { status: 422 });
   }
   // The brief (goals, pages, design, files). Older pages without it still send a quote.
   const draftId = typeof body.draftId === "string" && DRAFT_ID_RE.test(body.draftId) ? body.draftId : null;
-  const hasBrief = body.brief !== undefined && body.brief !== null;
-  let brief = cleanBrief(body.brief, draftId ?? undefined);
+  const hasBrief = !short && body.brief !== undefined && body.brief !== null;
+  let brief = cleanBrief(short ? undefined : body.brief, draftId ?? undefined);
   if (hasBrief) {
     const briefErrors = validateBrief(brief);
     if (Object.keys(briefErrors).length) {
@@ -232,6 +239,10 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
   }
 
   const quote = websiteQuote(answers);
+  // A short checkout must be payable on the spot; anything that needs a written proposal goes through the full steps.
+  if (short && !payNowFor(routeFor(quote), quote)) {
+    return NextResponse.json({ error: "That plan needs a written proposal first. Please use the full steps." }, { status: 422 });
+  }
   const reference = newReference();
   const subject = ownerSubject(details, quote, intent, reference);
   const text = [
@@ -282,7 +293,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
 
   // The tracked brief: what the customer follows in their account and staff approve stage by stage.
   const created =
-    hasBrief && saved && db
+    (hasBrief || short) && saved && db
       ? await createBrief(db, {
           tenantId: WNJO_TENANT_ID,
           reference,

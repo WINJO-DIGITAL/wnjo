@@ -46,6 +46,7 @@ import {
 } from "@/lib/website-quote";
 import { routeFor } from "@/lib/build-journey";
 import { payNowFor } from "@/lib/pay-now";
+import { isShortCheckout } from "@/lib/short-checkout";
 import { draftHasProgress } from "@/lib/brief-draft";
 import { loadBriefDraft, saveBriefDraft } from "@/lib/brief-draft-client";
 import { cleanBrief, validateBrief, EMPTY_BRIEF, DRAFT_ID_RE, type BriefErrors, type WebsiteBrief } from "@/lib/website-brief";
@@ -87,7 +88,16 @@ const CONTENT_QUESTIONS: { key: keyof ContentAnswers; legend: string }[] = [
 ];
 
 /** Choices carried in the link: ?plan=silver from a package card, ?type=oneOff, ?care=hosting, ?business=Café. */
-export type WebsiteConfiguratorParams = { plan?: string; type?: string; care?: string; pages?: string; business?: string; draft?: string };
+export type WebsiteConfiguratorParams = {
+  plan?: string;
+  type?: string;
+  care?: string;
+  pages?: string;
+  business?: string;
+  draft?: string;
+  /** ?full=1 keeps the ten-step brief even when a plan is chosen. */
+  full?: string;
+};
 
 type Saved = { answers: WebsiteAnswers; details: WebsiteDetails; brief: WebsiteBrief; draftId: string | null };
 
@@ -316,6 +326,33 @@ function Inner({
     goTo(stepIndex + 1);
   };
 
+  // The short plan checkout: name, business and email, then straight to payment. The brief follows after payment.
+  const shortCheckout = isShortCheckout(params) && Boolean(payNow) && monthly;
+  const onShortPay = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!agree) return;
+    const cleaned = cleanDetails(details);
+    const errors = validateDetails(cleaned, "pay", true);
+    if (Object.keys(errors).length) {
+      setDetailErrors(errors);
+      return;
+    }
+    const result = await submit({
+      kind: "website",
+      intent: "pay",
+      short: true,
+      agree,
+      startNow,
+      answers,
+      details: cleaned,
+      website: honeypot,
+      startedAt,
+    });
+    if (result?.status === "error" && result.fields && Object.keys(result.fields).length) {
+      setDetailErrors(result.fields as DetailErrors);
+    }
+  };
+
   const onSend = async (event: React.FormEvent) => {
     event.preventDefault();
     const cleaned = cleanDetails(details);
@@ -360,7 +397,8 @@ function Inner({
             Taking you to our secure payment page.
           </h2>
           <p className="muted">
-            Your brief is saved. If nothing happens, <a href={state.pay.url}>continue to payment</a>.
+            {shortCheckout ? "Your details are saved." : "Your brief is saved."} If nothing happens,{" "}
+            <a href={state.pay.url}>continue to payment</a>.
           </p>
         </div>
       </div>
@@ -410,6 +448,28 @@ function Inner({
           </div>
         </div>
       </div>
+    );
+  }
+
+  if (shortCheckout && payNow) {
+    return (
+      <PlanCheckout
+        quote={quote}
+        planName={plan.name}
+        includes={plan.includes}
+        payNow={payNow}
+        details={details}
+        errors={detailErrors}
+        onDetail={setDetail}
+        agree={agree}
+        onAgree={setAgree}
+        startNow={startNow}
+        onStartNow={setStartNow}
+        honeypot={honeypot}
+        onHoneypot={setHoneypot}
+        status={state}
+        onSubmit={onShortPay}
+      />
     );
   }
 
@@ -1045,6 +1105,91 @@ function QuoteBreakdown({ quote, onEdit }: { quote: WebsiteQuote; onEdit?: (step
           </button>
         </p>
       )}
+    </div>
+  );
+}
+
+/** One screen for a plan button: the plan, what it costs, three details, and pay. The brief comes after payment. */
+function PlanCheckout({
+  quote,
+  planName,
+  includes,
+  payNow,
+  details,
+  errors,
+  onDetail,
+  agree,
+  onAgree,
+  startNow,
+  onStartNow,
+  honeypot,
+  onHoneypot,
+  status,
+  onSubmit,
+}: {
+  quote: WebsiteQuote;
+  planName: string;
+  includes: readonly string[];
+  payNow: { kind: "first_payment" | "deposit"; pence: number };
+  details: WebsiteDetails;
+  errors: DetailErrors;
+  onDetail: (key: keyof WebsiteDetails, value: string) => void;
+  agree: boolean;
+  onAgree: (value: boolean) => void;
+  startNow: boolean;
+  onStartNow: (value: boolean) => void;
+  honeypot: string;
+  onHoneypot: (value: string) => void;
+  status: ReturnType<typeof useEnquirySubmit>["state"];
+  onSubmit: (event: React.FormEvent) => void;
+}) {
+  const submitting = status.status === "submitting";
+  return (
+    <div className={styles.done}>
+      <form onSubmit={onSubmit} noValidate className="card card--raised stack form" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
+        <div>
+          <p className="eyebrow">{planName}</p>
+          <h2 className="h2">
+            {formatGBP(quote.monthly)} a month
+          </h2>
+          <p className="muted">{TERM.charAt(0).toUpperCase() + TERM.slice(1)}.</p>
+        </div>
+        <ul className="ticks" role="list">
+          {includes.slice(0, 5).map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <Field id="name" label="Your name" value={details.name} error={errors.name} onChange={(v) => onDetail("name", v)} autoComplete="name" />
+        <Field id="businessName" label="Business name" value={details.businessName} error={errors.businessName} onChange={(v) => onDetail("businessName", v)} autoComplete="organization" />
+        <Field id="email" label="Email" type="email" value={details.email} error={errors.email} onChange={(v) => onDetail("email", v)} autoComplete="email" inputMode="email" />
+        <PayPanel quote={quote} payNow={payNow} agree={agree} onAgree={onAgree} startNow={startNow} onStartNow={onStartNow} />
+        <div className="visually-hidden" aria-hidden="true">
+          <label htmlFor="cfg-website">Leave this field empty</label>
+          <input id="cfg-website" tabIndex={-1} autoComplete="off" value={honeypot} onChange={(e) => onHoneypot(e.target.value)} />
+        </div>
+        {status.status === "error" && !status.fields && (
+          <p className="field-error" role="alert">
+            {status.message}
+          </p>
+        )}
+        {status.status === "not_configured" && (
+          <p className="field-error" role="alert">
+            {status.message} <Link href="/contact">Send us a message instead</Link>.
+          </p>
+        )}
+        <div className="btn-row">
+          <button type="submit" className="btn btn--primary" disabled={submitting || !agree}>
+            {submitting ? "Opening secure payment…" : `Pay ${formatPence(payNow.pence)} and start`}
+          </button>
+          <Link href="/contact?topic=website" className="btn btn--secondary">
+            Talk to us first
+          </Link>
+        </div>
+        <p className="fine">
+          Payment is handled by Stripe. We&apos;ll ask about your goals, pages and design once you&apos;ve paid.{" "}
+          <Link href="/build">Change plan</Link>
+        </p>
+      </form>
     </div>
   );
 }
