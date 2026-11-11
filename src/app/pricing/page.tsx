@@ -2,10 +2,10 @@ import Link from "next/link";
 import { CtaBand, PageHero, PricingNotice, SectionHead } from "@/components/Blocks";
 import { ArrowRight } from "@/components/Icons";
 import { RefreshCompare, SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
-import { AddOnsTable, PackageComparison } from "@/components/pricing/WebsitePackages";
+import { AddOnsTable, CareComparison, PackageComparison } from "@/components/pricing/WebsitePackages";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
 import { pageMetadata } from "@/lib/metadata";
-import { CARE_PLANS, DAY_RATE, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { DAY_RATE, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
 const { bronze: core, silver: pro, gold: plus } = WEBSITE_PLANS;
 
@@ -86,38 +86,17 @@ export default function PricingPage() {
               <a href="#plans">See the monthly plans</a>.
             </p>
           </SectionHead>
-          <ul className="included-strip" role="list" data-reveal aria-label="Included in every monthly plan">
-            {[
-              ["01", "Design", "Built around your business"],
-              ["02", "Hosting", "Fast, secure, always on"],
-              ["03", "Updates", "Security and upkeep handled"],
-              ["04", "Support", "A real team when you need one"],
-            ].map(([n, title, line]) => (
-              <li key={n}>
-                <span className="included-strip__n">{n}</span>
-                <span className="included-strip__t">{title}</span>
-                <span className="included-strip__l">{line}</span>
-              </li>
-            ))}
-          </ul>
-          <div data-reveal style={{ display: "grid", gap: "2rem", gridTemplateColumns: "repeat(auto-fit, minmax(14rem, 1fr))" }}>
-            {(["hosting", "care", "carePlus"] as const).map((key) => {
-              const plan = CARE_PLANS[key];
-              return (
-                <article key={key}>
-                  <h3>{plan.label}</h3>
-                  <p>
-                    <b>{formatGBP(plan.monthly)} a month</b>
-                  </p>
-                  <p>{plan.summary}</p>
-                  <ul>
-                    {plan.includes.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </article>
-              );
-            })}
+          <div className="included-panel" data-reveal>
+            <p className="included-panel__label">Included in every £99 plan</p>
+            <ul className="checks included-panel__list" role="list">
+              <li>Bespoke design for your business</li>
+              <li>Managed hosting and SSL</li>
+              <li>Security, updates and upkeep</li>
+              <li>A real team to ask for help</li>
+            </ul>
+          </div>
+          <div data-reveal>
+            <CareComparison />
           </div>
         </div>
       </section>

@@ -1236,35 +1236,49 @@ button.arrow-link {
   margin-top: var(--space-6);
 }
 
-/* Pricing: what every monthly plan includes, as four plain cells. */
-.included-strip {
-  list-style: none;
-  margin: var(--space-6) 0 var(--space-7);
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  border-top: 1px solid var(--color-line-strong);
+/* Pricing: what every monthly plan already includes, in a box that matches the tables. */
+.included-panel {
+  margin: var(--space-6) 0 var(--space-5);
+  padding: var(--space-5);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
 }
-.included-strip li {
-  display: grid;
-  gap: var(--space-2);
-  padding: var(--space-5) var(--space-4) var(--space-5) 0;
-  border-bottom: 1px solid var(--color-line);
-}
-.included-strip__n {
+.included-panel__label {
+  margin: 0 0 var(--space-4);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--color-ink-3);
 }
-.included-strip__t {
-  font-family: var(--font-serif);
-  font-size: var(--text-lg);
-  color: var(--color-ink);
+.included-panel__list {
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
-.included-strip__l {
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
+
+/* A tick in a table cell, in place of the word "Included". */
+.cell-tick {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--color-ink);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Phones: the row labels stay in view while the plan columns are swiped across. */
+@media (max-width: 39.99rem) {
+  .pkg-compare th[scope="row"] {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--color-surface);
+    box-shadow: 1px 0 0 var(--color-line);
+  }
 }
 
 /* Pricing: less air above the plans, so they start sooner. */
@@ -12836,6 +12850,9 @@ body:has(.pv) .site-footer {
 }
 .pkg-compare {
   min-width: 40rem;
+}
+.pkg-compare--care {
+  min-width: 34rem;
 }
 
 /* The responsibility switch: your list empties, ours fills. */

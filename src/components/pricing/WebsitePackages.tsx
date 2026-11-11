@@ -96,7 +96,18 @@ export function PackageCards({ compact = false }: { compact?: boolean }) {
 
 type Cell = string | boolean;
 const tick = (v: Cell) =>
-  v === true ? <span aria-label="Included">Included</span> : v === false ? <span className="muted" aria-label="Not included">–</span> : v;
+  v === true ? (
+    <span className="cell-tick">
+      <span className="visually-hidden">Included</span>
+    </span>
+  ) : v === false ? (
+    <span className="muted">
+      <span aria-hidden="true">–</span>
+      <span className="visually-hidden">Not included</span>
+    </span>
+  ) : (
+    v
+  );
 
 const has = (id: WebsitePlanId, addOn: AddOnId) => (WEBSITE_PLANS[id].includedAddOns as AddOnId[]).includes(addOn);
 const from = (first: WebsitePlanId) => (id: WebsitePlanId) => PLAN_ORDER.indexOf(id) >= PLAN_ORDER.indexOf(first);
@@ -176,6 +187,72 @@ export function PackageComparison() {
                 {PLAN_ORDER.map((id) => (
                   <td key={id} className={WEBSITE_PLANS[id].popular ? "pkg-compare__popular" : undefined}>
                     {tick(cell(id))}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        ))}
+      </table>
+    </div>
+  );
+}
+
+/**
+ * Hosting and care for a website bought outright, side by side in the same table as the monthly plans, so the two
+ * read as one family: the £99 plans include all of this; an outright website adds it by choice.
+ */
+export function CareComparison() {
+  const keys = ["hosting", "care", "carePlus"] as const;
+  const groups: { title: string; rows: [string, (key: (typeof keys)[number]) => Cell][] }[] = [
+    {
+      title: "Looked after for you",
+      rows: [
+        ["Managed hosting", () => true],
+        ["SSL certificate", () => true],
+        ["Uptime monitoring", () => true],
+        ["Security updates", () => true],
+      ],
+    },
+    {
+      title: "Support and changes",
+      rows: [
+        ["Support", (k) => (k === "hosting" ? "Technical support" : k === "care" ? "Technical and email support" : "Technical and priority email support")],
+        ["Routine updates", (k) => k !== "hosting"],
+        ["Content changes each month", (k) => (k === "hosting" ? false : k === "care" ? "Up to 1 hour" : "Up to 3 hours of changes or improvements")],
+        ["Quarterly performance and accessibility review", (k) => k === "carePlus"],
+      ],
+    },
+  ];
+  return (
+    <div className="table-wrap" role="region" aria-label="Compare Hosting, Care and Care Plus" tabIndex={0}>
+      <table className="table pkg-compare pkg-compare--care">
+        <thead>
+          <tr>
+            <th scope="col">
+              <span className="visually-hidden">Feature</span>
+            </th>
+            {keys.map((k) => (
+              <th key={k} scope="col" className={k === "care" ? "pkg-compare__popular" : undefined}>
+                {CARE_PLANS[k].label}
+                <span className="pkg-compare__tag">{formatGBP(CARE_PLANS[k].monthly)} a month</span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        {groups.map((group) => (
+          <tbody key={group.title}>
+            <tr className="pkg-compare__group">
+              <th scope="colgroup" colSpan={keys.length + 1}>
+                {group.title}
+              </th>
+            </tr>
+            {group.rows.map(([label, cell]) => (
+              <tr key={label}>
+                <th scope="row">{label}</th>
+                {keys.map((k) => (
+                  <td key={k} className={k === "care" ? "pkg-compare__popular" : undefined}>
+                    {tick(cell(k))}
                   </td>
                 ))}
               </tr>
