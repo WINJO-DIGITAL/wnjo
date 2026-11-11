@@ -61,7 +61,7 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 ### Needs the owner
 - [x] **Trust facts:** done. Sole trader, so no company number. The registered address is in the terms. Not VAT registered. No reviews yet (new business). One-person business, so no team photos. The guarantees are as already agreed.
 - [x] **Delivery timeline:** decided. A managed website is live within 14 days of us having the customer's goals, pages and style. Shown on the pay screen and in the welcome email (`DELIVERY` in `src/lib/pricing.ts`).
-- [ ] **Refresh slider:** the before-and-after comparison on the Winjo Refresh and managed websites pages uses an example site, labelled as an example. Owner to decide: keep it, or remove it until a real client is available.
+- [x] **Refresh slider:** decided. Keep the before-and-after with the Harbour Kitchen example, labelled as an example, using the owner's three photos (launch, first refresh, second refresh). Open: confirm the photos' licence before launch.
 - [x] **Terms:** agreed. Published as drafted, without a solicitor review.
 - [x] **Two tick boxes on the payment screen:** kept, under a "Before you pay" heading, with plainer wording. The owner is happy with them.
 
@@ -71,7 +71,7 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 - [x] **Customer emails after payment:** pay a plan in Stripe test mode and confirm the customer gets only the welcome email, with no "Your website is waiting" email and no "Tell us about your website" reminder for a day or until the goals form is filled in. Confirmed by the owner: the customer gets an email after payment.
 - [ ] **Account form and reminder:** sign in as a customer and check the goals form, uploads and the reminder email.
 - [ ] **Buy-outright request:** submit one end to end and check the proposal route in the staff admin.
-- [ ] **Production builds:** check the production build of `f8e7389` on a phone and a desktop.
+- [ ] **Production builds:** check the production build of `4a82cb4` on a phone and a desktop.
 
 ### Known issues, not fixed
 - [x] **Project package sizes:** the cards now pass the form's own sizes (Essential up to 5, Professional 11 to 15, Premium more than 20 pages), read from the form's size list, with a test.
