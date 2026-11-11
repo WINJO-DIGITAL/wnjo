@@ -125,7 +125,12 @@ export default function AppDevelopmentPage() {
             What would you replace first?
           </>
         }
-        body="Tap one to start. We'll take it from there."
+        body={
+          <>
+            Tap one to start. We&apos;ll take it from there. Need a website only?{" "}
+            <Link href="/website-projects">Buy your website outright</Link>.
+          </>
+        }
       >
         {replace.map(([label, brief]) => (
           <Link
