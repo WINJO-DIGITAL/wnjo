@@ -71,7 +71,7 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 - [x] **Customer emails after payment:** pay a plan in Stripe test mode and confirm the customer gets only the welcome email, with no "Your website is waiting" email and no "Tell us about your website" reminder for a day or until the goals form is filled in. Confirmed by the owner: the customer gets an email after payment.
 - [ ] **Account form and reminder:** sign in as a customer and check the goals form, uploads and the reminder email.
 - [ ] **Buy-outright request:** submit one end to end and check the proposal route in the staff admin.
-- [ ] **Production builds:** check the production build of `4a82cb4` on a phone and a desktop.
+- [x] **Production builds:** checked on the live site for `4a82cb4`. The Winjo Refresh photos and "Own your website" wording are being served. Winjo Refresh and pricing look right on a phone (390px) and a desktop (1280px), with no sideways overflow and no page errors.
 
 ### Known issues, not fixed
 - [x] **Project package sizes:** the cards now pass the form's own sizes (Essential up to 5, Professional 11 to 15, Premium more than 20 pages), read from the form's size list, with a test.
