@@ -70,7 +70,7 @@ export default function AppDevelopmentPage() {
         <div className="container container--wide" data-reveal>
           <p className="tile__name">Build your app</p>
           <h2 id="build-title" className="tile__title">
-            Pick the parts. Watch it come together.
+            Pick the parts and watch it come together.
           </h2>
         </div>
         <div className="container container--wide apps-tile__body">

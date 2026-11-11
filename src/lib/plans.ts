@@ -18,7 +18,7 @@ export const carePlanCards: PlanCard[] = careOrder.map((id) => ({
   name: CARE_PLANS[id].label,
   summary: CARE_PLANS[id].summary,
   price: formatGBP(CARE_PLANS[id].monthly),
-  suffix: "/month",
+  suffix: "a month",
   includes: CARE_PLANS[id].includes,
   href: `/build/project?care=${id}`,
   cta: `Choose ${CARE_PLANS[id].label}`,

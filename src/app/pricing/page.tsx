@@ -79,15 +79,15 @@ export default function PricingPage() {
       {/* 2b. Bought outright: hosting and care are added. The monthly plans already include all of it. */}
       <section id="after-launch" className="section--tight" aria-labelledby="after-launch-title">
         <div className="container container--wide">
-          <SectionHead eyebrow="Bought outright?" title={<span id="after-launch-title">Add hosting and care to your website.</span>} split>
+          <SectionHead eyebrow="Own your website?" title={<span id="after-launch-title">Add hosting and care to your website.</span>} split>
             <p>
-              Every £99 plan already includes all of this, so you only have to run your business. If you buy your website
+              Every managed plan already includes all of this, so you only have to run your business. If you buy your website
               outright, add hosting and care below. Rolling monthly, with 30 days&apos; notice to end.{" "}
               <a href="#plans">See the monthly plans</a>.
             </p>
           </SectionHead>
           <div className="included-panel" data-reveal>
-            <p className="included-panel__label">Included in every £99 plan</p>
+            <p className="included-panel__label">Included in every managed plan</p>
             <ul className="checks included-panel__list" role="list">
               <li>Bespoke design for your business</li>
               <li>Managed hosting and SSL</li>
@@ -128,7 +128,7 @@ export default function PricingPage() {
       {/* 4. The subscription and ownership, plainly. */}
       <section id="how-it-works" className="section" aria-labelledby="terms-title">
         <div className="container container--wide">
-          <SectionHead eyebrow="Your subscription" title={<span id="terms-title">No lock-in. Here&apos;s how it works.</span>} split>
+          <SectionHead eyebrow="Your subscription" title={<span id="terms-title">How it works, with no lock-in.</span>} split>
             <p>What&apos;s yours, what&apos;s ours, and what happens if you leave.</p>
           </SectionHead>
           <div data-reveal>
@@ -189,7 +189,7 @@ export default function PricingPage() {
             <PricingNotice />
           </div>
           <p className="mt-6">
-            Prefer to buy your website outright?{" "}
+            Prefer to own your website?{" "}
             <Link href="/website-projects">Website projects start from {formatGBP(ONE_OFF_WEBSITE.from)}</Link>.
           </p>
         </div>

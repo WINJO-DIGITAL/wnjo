@@ -3881,18 +3881,8 @@ body:has(.plan-bar) .sticky-cta {
 }
 
 .next-steps li {
-  display: grid;
-  grid-template-columns: 2.25rem minmax(0, 1fr);
-  gap: var(--space-3);
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-line);
-}
-
-.next-steps__num {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--color-ink-3);
-  padding-top: 0.2rem;
 }
 
 .next-steps strong {
@@ -7915,12 +7905,6 @@ ol.bs {
 
 .bs__stage[data-stage="scope"] .bs__screen {
   background: #f1f1f1;
-}
-
-.bs__num {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--color-ink-3);
 }
 
 .bs__stage h3 {
@@ -12745,19 +12729,14 @@ body:has(.pv) .site-footer {
   text-align: left;
 }
 .pc__steps li {
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgb(36 25 15 / 0.12);
 }
-.pc__steps li > span {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid rgb(36 25 15 / 0.2);
-  border-radius: 50%;
-  font-size: 14px;
+.pc__steps li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.pc__steps li > strong {
   font-weight: 600;
 }
 .pc__steps p {
@@ -12784,9 +12763,11 @@ body:has(.pv) .site-footer {
     gap: 24px;
   }
   .pc__steps li {
-    grid-template-columns: 1fr;
-    justify-items: start;
-    gap: 10px;
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    padding-bottom: 0;
+    border-bottom: 0;
   }
   .pc__steps p {
     margin: 0;

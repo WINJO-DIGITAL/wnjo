@@ -8,7 +8,7 @@ import { ONE_OFF_WEBSITE, SCOPED_FROM, SUBSCRIPTIONS, WEBSITE_PLANS, formatGBP }
 export const metadata = pageMetadata(
   "/website-projects",
   "Website projects",
-  `Prefer to buy your website outright? A bespoke website project from ${formatGBP(ONE_OFF_WEBSITE.from)}, yours on full payment, with optional hosting and care.`,
+  `Own your website: a bespoke website project from ${formatGBP(ONE_OFF_WEBSITE.from)}, yours on full payment, with optional hosting and care.`,
 );
 
 export default function WebsiteProjectsPage() {
@@ -16,7 +16,7 @@ export default function WebsiteProjectsPage() {
     <>
       <PageHero
         eyebrow="Website projects"
-        title={<>Prefer to buy your website outright?</>}
+        title={<>Own your website.</>}
         lede={`A bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}, paid up front and yours on full payment.`}
       >
         <div className="btn-row">

@@ -15,40 +15,40 @@ export const articles: Article[] = [
   {
     slug: "how-ordering-a-website-works",
     title: "What happens when you order a website from WINJO DIGITAL",
-    description: "Each step from first enquiry to launch, for a managed website or a website project bought outright: the proposal, the first payment, design and build, launch and ongoing care.",
+    description: "Each step from choosing a plan to launch for a managed website, and how owning your website outright differs: the first payment, your goals, design and build, launch and ongoing care.",
     published: "2026-11-07",
     sections: [
       {
-        heading: "1. Get a price",
+        heading: "Choose a plan and pay your first month",
         paragraphs: [
-          "Choose a plan and tell us about your business, or send us a message. Managed websites start from £99 a month, and website projects bought outright from £999.",
-          "You see your first payment and monthly price as you choose, and we follow up with a written proposal. Nothing is charged at this stage.",
+          "Pick a plan on the pricing page and enter your name and email. Managed websites start from £99 a month, with no minimum term.",
+          "You pay your first month securely through Stripe. WINJO DIGITAL is not VAT registered, so no VAT is added.",
         ],
       },
       {
-        heading: "2. Accept your proposal and make the first payment",
+        heading: "Tell us about your website",
         paragraphs: [
-          "On a managed website, the first payment is your first month. For a website project, the payment schedule is set out in your proposal. Work starts once the first payment has cleared. WINJO DIGITAL is not VAT registered, so no VAT is added.",
+          "Sign in to your account with the email you ordered with and tell us your goals, the pages you need and the style you like. It takes a few minutes, and you can add files too.",
+          "We start designing as soon as we have them.",
         ],
       },
       {
-        heading: "3. Design and build",
+        heading: "Design, build and review",
         paragraphs: [
-          "We design the site around your business and build it for phones first. Your written proposal sets the number of design review rounds.",
-          "You can follow progress in your account, where each stage and update is posted as it happens.",
+          "We design the site around your business and build it for phones first. You can follow progress in your account, where each stage and update is posted as it happens.",
+          "When a preview is ready, you look it over and tell us what to change before anything goes live.",
         ],
       },
       {
-        heading: "4. Review and launch",
+        heading: "Launch and ongoing care",
         paragraphs: [
-          "When the site is ready, you review the finished work before it goes live.",
-          "A website project is yours on full payment. On a managed website, your domain name and the content you supply are always yours, and we look after the website for as long as you subscribe.",
+          "Managed websites include hosting, maintenance and support for as long as you subscribe, on a rolling monthly subscription with no minimum term. Your domain name and the content you supply are always yours.",
         ],
       },
       {
-        heading: "5. Launch and support",
+        heading: "If you would rather own your website",
         paragraphs: [
-          "Managed websites include hosting, maintenance and support for as long as you subscribe, on a rolling monthly subscription with no minimum term.",
+          "Choose Own your website and answer a few questions. We send a written proposal within one working day, and nothing is charged until you accept it. A 50% deposit then starts the build, and the website is yours on full payment. Website projects start from £999.",
           "A website project includes launch support. After that, you can host it yourself, or choose managed hosting from £49 a month, which covers hosting, the SSL certificate, uptime monitoring, security updates and technical support.",
         ],
       },

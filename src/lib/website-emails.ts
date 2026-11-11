@@ -3,6 +3,7 @@
  * first payment and the ongoing payment separately, and says that the final price is confirmed in writing.
  */
 import { LEGAL_REVIEW_PENDING, OWNERSHIP, formatGBP, formatPence } from "./pricing";
+import { siteUrl } from "./site";
 import { UNNAMED, type Intent, type WebsiteDetails } from "./website-enquiry";
 import type { WebsiteQuote } from "./website-quote";
 
@@ -196,12 +197,15 @@ export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text
     text: [
       `Hi ${first(f.name)},`,
       "",
-      `Your ${f.packageName} website package is set up and your first payment has been received. Thank you.`,
+      `Thank you. Your first payment for the ${f.packageName} package has been received.`,
       "",
       `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month.`,
       termLine(f.minimumTermMonths),
       "",
-      "What happens next: we'll be in touch within one working day to start your website. Stripe emails a receipt for every payment.",
+      "Next, tell us about your website. Sign in with this email address and share your goals, the pages you need and the style you like. It takes a few minutes, and we start designing as soon as we have it:",
+      `${(siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "")}/account`,
+      "",
+      "Stripe emails a receipt for every payment.",
       "",
       "Your agreement",
       f.ownershipAfterPayments > 0

@@ -122,8 +122,8 @@ export default function ManagedWebsitesPage() {
       {/* How getting started works. */}
       <section id="process" className="section section--ruled" aria-labelledby="process-title">
         <div className="container container--wide">
-          <SectionHead eyebrow="Getting started" title={<span id="process-title">Four steps. Then we keep going.</span>} split>
-            <p>Nothing is charged until you agree to go ahead.</p>
+          <SectionHead eyebrow="Getting started" title={<span id="process-title">Four steps, then we keep looking after it.</span>} split>
+            <p>Your first month is paid when you choose a plan. No minimum term.</p>
           </SectionHead>
           <WebStages />
         </div>
@@ -132,7 +132,7 @@ export default function ManagedWebsitesPage() {
       {/* The subscription and ownership. */}
       <section id="subscription" className="section section--ruled" aria-labelledby="subscription-title">
         <div className="container container--wide">
-          <SectionHead eyebrow="Your subscription" title={<span id="subscription-title">Rolling monthly. No lock-in.</span>} split>
+          <SectionHead eyebrow="Your subscription" title={<span id="subscription-title">Rolling monthly, with no lock-in.</span>} split>
             <p>Your domain and your content are always yours.</p>
           </SectionHead>
           <div data-reveal>

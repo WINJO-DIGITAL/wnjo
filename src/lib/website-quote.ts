@@ -27,7 +27,7 @@ import {
 
 export const WANTS = {
   monthly: { label: "Managed website", hint: "We design, host, maintain and update your website for one monthly payment." },
-  oneOff: { label: "One-off website project", hint: "Buy your website outright and own it on full payment." },
+  oneOff: { label: "One-off website project", hint: "Own your website: pay once, and it is yours on full payment." },
   booking: { label: "Booking system", hint: "Bookings, payments and an operator app for your business." },
   software: { label: "Custom application or software", hint: "Portals, platforms, internal tools and integrations." },
   unsure: { label: "Not sure yet", hint: "We'll help you choose. Start with a website and change it any time." },

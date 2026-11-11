@@ -25,6 +25,12 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Wording:** "Buy your website outright" is now "Own your website" in the menus, the project page and the App development link.
 - [x] **Tagline kept:** "Your website. Our responsibility." stays as the brand tagline, in the footer, the metadata and the About page call to action. Decided by the owner.
 - [x] **About page tidied:** the two long paragraphs are now short labelled tick lists, the statement is smaller, and the four engineering standards have three ticks each. Ticks now show on dark sections.
+- [x] **Plan journey told truthfully:** "How it works" now reads Choose, Tell us, Build, Launch; the article describes the real plan checkout and the separate "Own your website" proposal route; the confirmation page says "Thank you, your payment is in" instead of "You're all set".
+- [x] **Welcome email:** tells the customer to sign in and share their goals, pages and style, with the account link. No longer says the package "is set up".
+- [x] **Numbered steps removed:** app development, contact "What happens next" and the confirmation page. Carousel position counters ("01 / 03") stay.
+- [x] **"Own your website" used everywhere:** menu, project page title, home and pricing buttons and headings. "Every £99 plan" is now "every managed plan"; "£99/month" is "£99 a month".
+- [x] **Remaining two-sentence headlines rewritten** on home, managed websites, pricing, booking systems and app development.
+- [x] **Confirmation page no longer imports a server-only module** (it pulled Node's crypto into the browser bundle and broke the dev build).
 
 ## Still to do before launch
 - [ ] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data.
@@ -51,6 +57,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 Source: the handover list. Checked against `main` at `3b554bc`, which is the same commit as this branch.
 
 ### Needs the owner
+- [ ] **Boonma on its own domain:** the case study shows `boonma.vercel.app`, which looks unfinished. Send the client's real domain and the links will be updated.
 - [ ] **Trust facts:** company number, registered address, VAT number, reviews, team photos and a guarantee. None have been invented.
 - [ ] **Delivery timeline:** the "live in X days" line needs a real figure.
 - [ ] **Real client before and after:** send screenshots to replace the example site in the refresh slider.

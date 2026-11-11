@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatPence } from "@/lib/pricing";
-import { firstPaymentPence } from "@/lib/website-subscriptions";
 
 export type ConfirmedOrder = {
   reference: string;
@@ -15,6 +14,13 @@ export type ConfirmedOrder = {
   one_off_pence: number;
   minimum_term_months: number;
 };
+
+/**
+ * What was paid today: setup, one-off extras and the first month, or the one-off amount. The same sum as the server's
+ * firstPaymentPence, written here because that module uses Node's crypto and this page runs in the browser.
+ */
+const paidToday = (order: ConfirmedOrder) =>
+  order.kind === "subscription" ? order.setup_pence + order.one_off_pence + order.monthly_pence : order.one_off_pence;
 
 const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
@@ -67,7 +73,7 @@ export function PaymentConfirmed({ order, paidOn = new Date() }: { order: Confir
         <p className="pc__status" role="status" aria-live="polite">
           {done ? "Payment received" : "Confirming your payment…"}
         </p>
-        <h1 className="pc__title pc__reveal">Thank you. You&apos;re all set.</h1>
+        <h1 className="pc__title pc__reveal">Thank you, your payment is in.</h1>
       </div>
 
       {order && (
@@ -88,7 +94,7 @@ export function PaymentConfirmed({ order, paidOn = new Date() }: { order: Confir
             </div>
             <div>
               <dt>Paid today</dt>
-              <dd>{formatPence(firstPaymentPence({ kind: order.kind, setupPence: order.setup_pence, monthlyPence: order.monthly_pence, oneOffPence: order.one_off_pence }))}</dd>
+              <dd>{formatPence(paidToday(order))}</dd>
             </div>
             {order.kind === "subscription" && (
               <div>
@@ -112,16 +118,16 @@ export function PaymentConfirmed({ order, paidOn = new Date() }: { order: Confir
         <h2 id="pc-next-title" className="pc__next-title">What happens next</h2>
         <ol className="pc__steps">
           <li>
-            <span aria-hidden="true">1</span>
-            <p>Stripe emails you a receipt. Keep your confirmation number to hand.</p>
+            <strong>Tell us about your website</strong>
+            <p>Sign in to your account and share your goals, pages and style, if you haven&apos;t already. We start designing as soon as we have them.</p>
           </li>
           <li>
-            <span aria-hidden="true">2</span>
-            <p>Sign in to your account and tell us your goals, pages and style if you haven&apos;t already. We start designing as soon as we have them.</p>
+            <strong>Check your inbox</strong>
+            <p>Stripe emails a receipt, and we send a welcome message. Keep your confirmation number to hand.</p>
           </li>
           <li>
-            <span aria-hidden="true">3</span>
-            <p>Follow progress any time by signing in to your account with this email address.</p>
+            <strong>Follow progress</strong>
+            <p>Sign in to your account with this email address at any time.</p>
           </li>
         </ol>
       </section>

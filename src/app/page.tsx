@@ -55,7 +55,7 @@ export default function HomePage() {
               style={{ "--i": 4 } as React.CSSProperties}
             >
               <Link href="/pricing" className="btn btn--primary">
-                Get your website from £99/month
+                Get your website from £99 a month
               </Link>
             </div>
           </div>
@@ -96,7 +96,7 @@ export default function HomePage() {
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Plans</p>
           <h2 id="packages-title" className="tile__title">
-            Three plans. <span className="serif-em">No minimum term.</span>
+            Three plans, <span className="serif-em">no minimum term.</span>
           </h2>
           <div className="tile__aside">
             <p className="tile__line">
@@ -183,10 +183,10 @@ export default function HomePage() {
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">How it works</p>
           <h2 id="process-title" className="tile__title">
-            Four steps. Then we keep going.
+            Four steps, then we keep looking after it.
           </h2>
           <div className="tile__aside">
-            <p className="tile__line">Nothing is charged until you agree to go ahead.</p>
+            <p className="tile__line">Your first month is paid when you choose a plan. No minimum term.</p>
           </div>
         </div>
         <div className="container container--wide apps-tile__body">
@@ -234,10 +234,10 @@ export default function HomePage() {
       </section>
 
       <CtaBand
-        title={<>Hand us your website.</>}
+        title={<>Let us look after your website.</>}
         body={
           <>
-            Managed from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, or buy it outright from {formatGBP(ONE_OFF_WEBSITE.from)}.
+            Managed from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, or own it outright from {formatGBP(ONE_OFF_WEBSITE.from)}.
             Questions first? <Link href="/faq">Read the FAQ</Link>.
           </>
         }
@@ -246,7 +246,7 @@ export default function HomePage() {
           Choose a plan
         </Link>
         <Link href="/website-projects" className="btn btn--secondary">
-          Buy outright
+          Own your website
         </Link>
         <Link href="/contact" className="arrow-link">
           Talk to us first <ArrowRight />

@@ -7,8 +7,8 @@ import { WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
  */
 
 const STAGES = [
-  { id: "enquire", title: "Tell us", line: "Your business and what you need." },
-  { id: "scope", title: "Proposal", line: "Your plan and price, in writing." },
+  { id: "scope", title: "Choose", line: "Pick your plan and pay your first month." },
+  { id: "enquire", title: "Tell us", line: "Your goals, pages and style." },
   { id: "build", title: "Build", line: "Designed and built with you." },
   { id: "launch", title: "Launch", line: "Live, and looked after from then on." },
 ] as const;
@@ -26,7 +26,7 @@ function Screen({ stage }: { stage: (typeof STAGES)[number]["id"] }) {
     return (
       <div className="ws-quote">
         <div className="ws-quote__head">
-          <b>Proposal</b>
+          <b>Your plan</b>
           <span>Your business</span>
         </div>
         <span className="ws-quote__row">

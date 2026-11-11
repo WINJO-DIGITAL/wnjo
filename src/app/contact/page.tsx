@@ -43,9 +43,8 @@ export default async function ContactPage({
               <div>
                 <h2 className="h3">What happens next</h2>
                 <ol role="list" className="next-steps mt-5">
-                  {NEXT_STEPS.map(([title, body], i) => (
+                  {NEXT_STEPS.map(([title, body]) => (
                     <li key={title}>
-                      <span className="next-steps__num">{String(i + 1).padStart(2, "0")}</span>
                       <div>
                         <strong>{title}</strong>
                         <p>{body}</p>
