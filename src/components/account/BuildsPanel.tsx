@@ -6,7 +6,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { STAGES, progressIndex, stagePath, type ProposalLine, type ProposalStatus, type Route, type Stage } from "@/lib/build-journey";
 import type { RevisionRow } from "@/lib/build-revisions";
 import { proposalPayNowFor } from "@/lib/pay-now";
-import { GOALS, STYLES, type WebsiteBrief } from "@/lib/website-brief";
+import { GOALS, STYLES, cleanBrief, validateBrief, type BriefErrors, type WebsiteBrief } from "@/lib/website-brief";
+import { DesignFields, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
 import { Confirmation } from "./Confirmation";
 import { FeedbackCard } from "./FeedbackCard";
 import { PayCard } from "./PayCard";
@@ -123,7 +124,11 @@ function BuildCard({
   const [tab, setTab] = useState<"overview" | "progress" | "changes">("overview");
   const [allSteps, setAllSteps] = useState(false);
   const step = portalStepIndex(brief.stage, lastOnPath);
-  const next = nextStepFor({ stage: brief.stage, route: brief.route, proposalSent: Boolean(proposal) });
+  // A website paid for through the short checkout has no goals yet: ask for them before anything else.
+  const needsDetails = brief.brief.goals.length === 0 && ["brief_received", "reviewing", "awaiting_payment", "specification"].includes(brief.stage);
+  const next = needsDetails
+    ? { title: "Tell us about your website", body: "Your goals, pages and style. We start designing as soon as you send them.", action: true, tab: "overview" as const, cta: null }
+    : nextStepFor({ stage: brief.stage, route: brief.route, proposalSent: Boolean(proposal) });
   const showPay = brief.route === "proposal" && brief.stage === "awaiting_payment" && accepted;
   const canChange = ["preview", "changes", "approval", "live"].includes(brief.stage) || revisions.length > 0;
   const showPreview = ["preview", "changes", "approval"].includes(brief.stage);
@@ -203,12 +208,13 @@ function BuildCard({
         {showPreview && tab !== "progress" && <PreviewLink client={client} briefId={brief.id} />}
         {tab === "overview" && (
           <>
+            {needsDetails && <BriefDetailsCard client={client} briefId={brief.id} initial={brief.brief} onChanged={onChanged} />}
             {proposal && <ProposalCard client={client} proposal={proposal} onChanged={onChanged} />}
             {showPay && <PayCard client={client} briefId={brief.id} payNow={proposalPayNowFor(brief.figures.mode === "oneOff" ? "oneOff" : "monthly", accepted)} />}
             {!proposal && !showPay && brief.brief.goals.length > 0 && (
               <p className="build-card__meta">Built for {brief.brief.goals.map((g) => GOALS[g]?.label).filter(Boolean).join(", ")}</p>
             )}
-            {!proposal && !showPay && brief.brief.goals.length === 0 && <p className="build-card__meta">Nothing to do here right now.</p>}
+            {!proposal && !showPay && !needsDetails && brief.brief.goals.length === 0 && <p className="build-card__meta">Nothing to do here right now.</p>}
           </>
         )}
         {tab === "progress" && (
@@ -235,6 +241,73 @@ function BuildCard({
         {tab === "changes" && <FeedbackCard client={client} briefId={brief.id} stage={brief.stage} revisions={revisions} onChanged={onChanged} />}
       </div>
     </article>
+  );
+}
+
+/** Goals, pages and design for a website paid for through the short checkout. Saved on the website, then we start drafting. */
+function BriefDetailsCard({
+  client,
+  briefId,
+  initial,
+  onChanged,
+}: {
+  client: SupabaseClient;
+  briefId: string;
+  initial: WebsiteBrief;
+  onChanged: () => void;
+}) {
+  const [brief, setBrief] = useState<WebsiteBrief>(initial);
+  const [errors, setErrors] = useState<BriefErrors>({});
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const update: BriefChange = (patch) => {
+    setBrief((b) => ({ ...b, ...(typeof patch === "function" ? patch(b) : patch) }));
+    setErrors({});
+  };
+
+  const send = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const cleaned = cleanBrief(brief);
+    const missing = validateBrief(cleaned);
+    if (missing.goals || missing.pages) {
+      setErrors(missing);
+      return;
+    }
+    setBusy(true);
+    setMessage(null);
+    const { data } = await client.auth.getSession();
+    const token = data.session?.access_token;
+    const res = token
+      ? await fetch("/api/briefs/details", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ briefId, brief: cleaned }),
+        }).catch(() => null)
+      : null;
+    const json = (await res?.json().catch(() => null)) as { error?: string } | null;
+    setBusy(false);
+    if (res?.ok) {
+      onChanged();
+      return;
+    }
+    setMessage(json?.error ?? "We couldn't save that just now. Please try again.");
+  };
+
+  return (
+    <form onSubmit={send} noValidate className="form stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
+      <GoalsField brief={brief} onChange={update} error={errors.goals} />
+      <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} />
+      <DesignFields brief={brief} onChange={update} />
+      <FunctionalityField brief={brief} onChange={update} />
+      {message && (
+        <p className="field-error" role="alert">
+          {message}
+        </p>
+      )}
+      <button type="submit" className="btn btn--primary" disabled={busy}>
+        {busy ? "Sending…" : "Send to the team"}
+      </button>
+    </form>
   );
 }
 

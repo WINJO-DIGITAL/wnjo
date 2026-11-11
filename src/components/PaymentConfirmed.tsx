@@ -117,7 +117,7 @@ export function PaymentConfirmed({ order, paidOn = new Date() }: { order: Confir
           </li>
           <li>
             <span aria-hidden="true">2</span>
-            <p>We&apos;ll be in touch within one working day to start your website.</p>
+            <p>Sign in to your account and tell us your goals, pages and style if you haven&apos;t already. We start designing as soon as we have them.</p>
           </li>
           <li>
             <span aria-hidden="true">3</span>

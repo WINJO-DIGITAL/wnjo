@@ -11,15 +11,17 @@ export async function runAutoDrafts(db: SupabaseClient, provider: AiProvider | n
   if (!provider) return { attempted: 0, drafted: 0 };
   const { data } = await db
     .from("website_briefs")
-    .select("id, tenant_id")
+    .select("id, tenant_id, brief")
     .eq("stage", "specification")
     .order("created_at", { ascending: true })
     .limit(limit * 3);
-  const briefs = (data ?? []) as { id: string; tenant_id: string }[];
+  const briefs = (data ?? []) as { id: string; tenant_id: string; brief: { goals?: unknown[] } | null }[];
   let attempted = 0;
   let drafted = 0;
   for (const brief of briefs) {
     if (attempted >= limit) break;
+    // A short checkout pays before the brief is filled in. Nothing is drafted until the customer has told us their goals.
+    if (!brief.brief?.goals?.length) continue;
     const { data: existing } = await db.from("website_plans").select("id").eq("brief_id", brief.id).limit(1).maybeSingle();
     if (existing) continue;
     attempted += 1;
