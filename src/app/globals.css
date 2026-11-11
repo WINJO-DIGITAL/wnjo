@@ -14387,3 +14387,19 @@ body:has(.pv) .site-footer {
 .pay-info .checks {
   font-size: var(--text-sm);
 }
+
+/* Winjo Refresh example: the Harbour Kitchen photos, one per stage (see public/refresh). The example is labelled as
+   an example on the page. Each stage keeps its own frame; only the picture changes. */
+.rf__photo {
+  background-size: cover;
+  background-position: center;
+}
+.rf[data-era="launch"] .rf__photo {
+  background-image: url("/refresh/harbour-launch.jpg");
+}
+.rf[data-era="first"] .rf__photo {
+  background-image: url("/refresh/harbour-first.jpg");
+}
+.rf[data-era="second"] .rf__photo {
+  background-image: url("/refresh/harbour-second.jpg");
+}
