@@ -61,7 +61,7 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 ### Needs the owner
 - [x] **Trust facts:** done. Sole trader, so no company number. The registered address is in the terms. Not VAT registered. No reviews yet (new business). One-person business, so no team photos. The guarantees are as already agreed.
 - [x] **Delivery timeline:** decided. A managed website is live within 14 days of us having the customer's goals, pages and style. Shown on the pay screen and in the welcome email (`DELIVERY` in `src/lib/pricing.ts`).
-- [x] **Refresh slider:** decided. Keep the before-and-after with the Harbour Kitchen example, labelled as an example, using the owner's three photos (launch, first refresh, second refresh). Open: confirm the photos' licence before launch.
+- [x] **Refresh slider:** decided. Keep the before-and-after with the Harbour Kitchen example, labelled as an example, using the owner's three photos (launch, first refresh, second refresh). The owner confirms the photos are licensed for use.
 - [x] **Terms:** agreed. Published as drafted, without a solicitor review.
 - [x] **Two tick boxes on the payment screen:** kept, under a "Before you pay" heading, with plainer wording. The owner is happy with them.
 
