@@ -10,4 +10,6 @@ These apply to every design or user interface change, whatever the prompt, brief
 
 - **No red dots next to headings or titles.** Never add coloured dots, bullets or similar markers before or beside section headers, eyebrows, labels or titles, in any colour (including the accent/terracotta). If a design reference shows them, leave them out. Section labels use plain monospace text, optionally numbered (for example `04 / PRICING`), with no dot.
 
+- **Look bespoke, never templated or AI-generated.** The owner wants every page to read as designed by a person. Don't number cells, cards or list items (01, 02, 03); numbers belong only on section labels. Don't leave content as bare bullet lists or loose paragraphs: group related items in purposeful, structured components (a card, a panel, a table, a labelled row), and vary the layout so sections don't all look alike. Avoid generic filler phrasing and anything that looks stamped from a template. When a section looks messy, tidy it before shipping.
+
 - **The family line has been removed.** The owner asked for the homepage family line ("Every site here is bespoke. Made by us.") to be removed and confirmed it twice (7 November 2026). Don't bring it back unless the owner asks for it.
