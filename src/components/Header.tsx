@@ -312,7 +312,7 @@ function SiteHeader() {
         toggleRef.current?.focus();
       }
     };
-    const onResize = () => window.matchMedia("(min-width: 74rem)").matches && setOpen(false);
+    const onResize = () => window.matchMedia("(min-width: 64rem)").matches && setOpen(false);
     document.addEventListener("keydown", onKey);
     window.addEventListener("resize", onResize);
     return () => {

@@ -1116,15 +1116,15 @@ button.arrow-link {
   }
 }
 
-/* Below 74rem (where the links would wrap beside the logo) the hamburger menu is used. */
-@media (max-width: 73.99rem) {
+/* Below 64rem (where the links would wrap beside the logo) the hamburger menu is used. */
+@media (max-width: 63.99rem) {
   .flyout,
   .nav-backdrop {
     display: none;
   }
 }
 
-@media (min-width: 74rem) {
+@media (min-width: 64rem) {
   .nav-desktop,
   .header-cta {
     display: block;
@@ -4881,8 +4881,8 @@ main #process ol.steps li::after {
   background: transparent;
 }
 
-/* The full menu (with its own Start a Project button) shows from 74rem. */
-@media (min-width: 74rem) {
+/* The full menu (with its own Start a Project button) shows from 64rem. */
+@media (min-width: 64rem) {
   .sticky-cta {
     display: none;
   }
