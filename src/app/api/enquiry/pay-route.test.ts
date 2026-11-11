@@ -74,14 +74,25 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     expect(args.reference).toMatch(/^WNJO-[0-9A-F]{6}$/);
   });
 
-  it("emails the owner that an order is coming, and the customer their private payment link", async () => {
+  it("emails the customer their private payment link, and does not email the owner before they have paid", async () => {
     await post(body());
-    const [owner, customer] = emails();
-    expect(owner.subject).toContain("Website order (paying now)");
+    const sent = emails();
+    // Staff hear about it when the payment lands (the Stripe webhook), not when the form is submitted.
+    expect(sent).toHaveLength(1);
+    const [customer] = sent;
     expect(customer.to).toEqual(["ada@example.com"]);
     expect(customer.subject).toBe("Your website is waiting [WS-ABC123]");
     expect(customer.text).toContain(`http://localhost/subscribe/${"t".repeat(43)}`);
     expect(customer.text).not.toContain("written proposal");
+  });
+
+  it("still emails the owner when the payment could not be started, so the request is not missed", async () => {
+    state.payment = null;
+    const res = await post(body());
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ ok: true, pay: null, paymentStarted: false });
+    const owner = emails().find((e) => e.subject.includes("Website order (paying now)"));
+    expect(owner).toBeDefined();
   });
 
   it("refuses to take an order unless the customer agreed to the terms, and saves nothing", async () => {
@@ -140,7 +151,7 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     const res = await post(body());
     expect(res.status).toBe(200);
     expect(await res.json()).toMatchObject({ ok: true, pay: null, paymentStarted: true });
-    expect(emails()[1].subject).toBe("Your website is waiting [WS-ABC123]");
+    expect(emails().map((e) => e.subject)).toEqual(["Your website is waiting [WS-ABC123]"]);
   });
 
   it("does nothing about payment for the other next steps", async () => {

@@ -354,7 +354,13 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
         },
       })
     : false;
-  const sent = config ? await sendEnquiryEmail(config, { subject, text: text.join("\n"), replyTo: details.email }) : false;
+  const notifyOwner = async () =>
+    config ? await sendEnquiryEmail(config, { subject, text: text.join("\n"), replyTo: details.email }) : false;
+  // Someone about to pay isn't a customer until the money lands, so staff are told then (the Stripe webhook sends
+  // "New subscription" / "payment received"), not when the form is submitted. The request is still saved and shows
+  // in the admin. If the payment can't be started, staff are emailed below instead, so it is never lost.
+  const holdForPayment = intent === "pay" && saved && Boolean(db);
+  const sent = holdForPayment ? false : await notifyOwner();
 
   if (!saved && !sent) {
     return NextResponse.json({ error: "We couldn't send your quote just now. Please try again shortly." }, { status: 502 });
@@ -393,6 +399,8 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
           startNow: body.startNow === true,
         })
       : null;
+  // No payment started (it failed, or the brief couldn't be tracked): tell staff now so the request isn't missed.
+  if (holdForPayment && !payment) await notifyOwner();
 
   // The customer's copy. A failure here doesn't undo the enquiry: we already have it.
   const customerConfig = notificationMailConfig();
