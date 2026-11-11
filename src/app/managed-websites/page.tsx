@@ -37,11 +37,11 @@ export default function ManagedWebsitesPage() {
         lede="From bespoke design and hosting to maintenance, updates and ongoing improvements, Winjo takes care of everything behind your online presence."
       >
         <div className="btn-row">
-          <Link href="/build" className="btn btn--primary">
-            Get started
+          <Link href="/pricing" className="btn btn--primary">
+            Choose a plan
           </Link>
-          <Link href="/pricing" className="btn btn--secondary">
-            See plans and pricing
+          <Link href="/contact?topic=website" className="btn btn--secondary">
+            Talk to us
           </Link>
         </div>
       </PageHero>
@@ -177,11 +177,11 @@ export default function ManagedWebsitesPage() {
         title={<>You run your business. We&apos;ll run your website.</>}
         body={`Plans from ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, with no minimum term.`}
       >
-        <Link href="/build" className="btn btn--primary">
-          Get started
+        <Link href="/pricing" className="btn btn--primary">
+          Choose a plan
         </Link>
-        <Link href="/pricing" className="btn btn--secondary">
-          See plans and pricing
+        <Link href="/contact?topic=website" className="btn btn--secondary">
+          Talk to us
         </Link>
       </CtaBand>
     </>

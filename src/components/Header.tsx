@@ -560,13 +560,13 @@ function SiteHeader() {
             })()}
           </ul>
           <Link
-            href="/build"
+            href="/pricing"
             className="btn btn--primary mm-cta"
             onClick={closeIfSamePage}
             transitionTypes={NAV}
             style={{ "--i": mobileItems.length + 1 } as React.CSSProperties}
           >
-            Get started
+            Choose a plan
           </Link>
           {contactPhoneHref && (
             <a

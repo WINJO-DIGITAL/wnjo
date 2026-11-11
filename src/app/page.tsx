@@ -237,8 +237,8 @@ export default function HomePage() {
         title={<>Hand us your website.</>}
         body={<>Managed from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, or buy it outright from {formatGBP(ONE_OFF_WEBSITE.from)}.</>}
       >
-        <Link href="/build" className="btn btn--primary">
-          Get started
+        <Link href="/pricing" className="btn btn--primary">
+          Choose a plan
         </Link>
         <Link href="/website-projects" className="btn btn--secondary">
           Buy outright

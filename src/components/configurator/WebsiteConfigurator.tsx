@@ -1185,7 +1185,7 @@ function PlanCheckout({
         </div>
         <p className="fine">
           Payment is handled by Stripe. After you&apos;ve paid, we&apos;ll ask for your name, goals, pages and style.{" "}
-          <Link href="/build">Change plan</Link>
+          <Link href="/pricing">Change plan</Link>
         </p>
       </form>
     </div>

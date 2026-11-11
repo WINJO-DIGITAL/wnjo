@@ -34,8 +34,8 @@ export default function PricingPage() {
         lede={`Bespoke design, hosting, maintenance and support from ${formatGBP(core.monthly)} a month. Rolling monthly, with no minimum term.`}
       >
         <div className="btn-row">
-          <Link href="/build" className="btn btn--primary">
-            Get started
+          <Link href="#plans" className="btn btn--primary">
+            Choose a plan
           </Link>
           <Link href="#compare" className="btn btn--secondary">
             Compare the plans

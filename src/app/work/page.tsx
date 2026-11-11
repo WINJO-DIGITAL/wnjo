@@ -125,10 +125,10 @@ export default function WorkPage() {
           </ul>
         }
         title={<>Your business could be next.</>}
-        body="Tell us about your business. We'll come back with a plan and a clear monthly price."
+        body="One clear monthly price, with no minimum term."
       >
-        <Link href="/build" className="btn btn--primary">
-          Get started
+        <Link href="/pricing" className="btn btn--primary">
+          Choose a plan
         </Link>
         <Link href="/contact" className="btn btn--secondary">
           Talk to us

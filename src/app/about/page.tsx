@@ -139,8 +139,8 @@ export default function AboutPage() {
       </section>
 
       <CtaBand tone="light" title={<>Your website. Our responsibility.</>}>
-        <Link href="/build" className="btn btn--primary">
-          Get started
+        <Link href="/pricing" className="btn btn--primary">
+          Choose a plan
         </Link>
         <Link href="/contact" className="btn btn--secondary">
           Talk to us

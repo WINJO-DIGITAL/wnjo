@@ -158,7 +158,6 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
       { href: "/pricing", label: "Pricing" },
       { href: "/winjo-refresh", label: "Winjo Refresh" },
       { href: "/work", label: "Our work" },
-      { href: "/build", label: "Get started" },
     ],
   },
   {

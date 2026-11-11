@@ -81,8 +81,8 @@ export function Faq() {
           <Link href="/contact?topic=other" className="btn btn--primary">
             Talk to us
           </Link>
-          <Link href="/build" className="btn btn--secondary">
-            Get started
+          <Link href="/pricing" className="btn btn--secondary">
+            Choose a plan
           </Link>
         </div>
       </aside>
