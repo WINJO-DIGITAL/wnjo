@@ -6600,6 +6600,11 @@ main #process ol.steps li::after {
   text-align: left;
 }
 
+/* A section that pins its content while the visitor scrolls: sticky can't work inside overflow: hidden. */
+.tile.tile--pinned {
+  overflow: clip;
+}
+
 .tile__name {
   padding-top: var(--space-3);
   border-top: 1px solid var(--color-line-strong);

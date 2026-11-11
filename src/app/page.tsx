@@ -9,7 +9,7 @@ import { RefreshTimeline } from "@/components/managed/RefreshTimeline";
 import { Responsibility } from "@/components/managed/Responsibility";
 import { SubscriptionTerms } from "@/components/managed/Sections";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
-import { WebStages } from "@/components/WebStages";
+import { ProcessScroll } from "@/components/interactive/ProcessScroll";
 import { ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
@@ -178,8 +178,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How it works: a real sequence, so it keeps its numbers. */}
-      <section id="process" data-nav="/managed-websites" className="tile home-tile" aria-labelledby="process-title">
+      {/* How it works: one pinned screen that plays the four steps as the visitor scrolls. */}
+      <section id="process" data-nav="/managed-websites" className="tile tile--pinned home-tile" aria-labelledby="process-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">How it works</p>
           <h2 id="process-title" className="tile__title">
@@ -190,7 +190,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="container container--wide apps-tile__body">
-          <WebStages />
+          <ProcessScroll />
         </div>
       </section>
 

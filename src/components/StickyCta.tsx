@@ -48,7 +48,16 @@ export function StickyCta() {
       let topVisible = true;
       let footerVisible = false;
       let closingVisible = false;
-      const apply = () => setShow(!topVisible && !footerVisible && !closingVisible);
+      // Sections that hold the screen themselves (the pinned "How it works") mark themselves with data-cta-hide.
+      const holding = new Set<Element>();
+      const apply = () => setShow(!topVisible && !footerVisible && !closingVisible && holding.size === 0);
+      const holdObserver = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) holding.add(e.target);
+          else holding.delete(e.target);
+        }
+        apply();
+      });
       // The closing band already offers the same next step, so the bar doesn't repeat it there.
       const closingObserver = new IntersectionObserver(([entry]) => {
         closingVisible = entry.isIntersecting;
@@ -74,6 +83,7 @@ export function StickyCta() {
         if (footer) footerObserver.observe(footer);
         const closing = document.querySelector(".cta-band");
         if (closing) closingObserver.observe(closing);
+        document.querySelectorAll("[data-cta-hide]:not(.hero-ed)").forEach((el) => holdObserver.observe(el));
         return Boolean(top);
       };
       const found = attach();
@@ -84,6 +94,7 @@ export function StickyCta() {
         topObserver.disconnect();
         footerObserver.disconnect();
         closingObserver.disconnect();
+        holdObserver.disconnect();
         setShow(false);
       };
     }
