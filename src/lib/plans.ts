@@ -4,8 +4,10 @@ import {
   PACKAGES,
   SCOPED_FROM,
   formatGBP,
+  WEBSITE_PAGE_BANDS,
   type CarePlan,
   type PackageId,
+  type WebsitePageBand,
 } from "./pricing";
 
 const careOrder: CarePlan[] = ["hosting", "care", "carePlus"];
@@ -23,12 +25,20 @@ export const carePlanCards: PlanCard[] = careOrder.map((id) => ({
 }));
 
 const packageOrder: PackageId[] = ["essential", "professional", "premium"];
-/** The page size each package covers, as the price form reads it. */
-export const packagePages: Record<PackageId, string> = {
-  essential: "1-5",
-  professional: "6-12",
-  premium: "13-25",
-};
+/**
+ * The smallest page size on the price form that holds each package's pages (Essential 5, Professional 12, Premium 25).
+ * Read from the form's own sizes, so a package can never pass one the form doesn't recognise.
+ */
+export const packagePages = Object.fromEntries(
+  packageOrder.map((id) => {
+    const bands = Object.keys(WEBSITE_PAGE_BANDS) as WebsitePageBand[];
+    const fit = bands.find((b) => {
+      const max = WEBSITE_PAGE_BANDS[b].max;
+      return max === null || max >= PACKAGES[id].pageLimit;
+    });
+    return [id, fit ?? bands[bands.length - 1]];
+  }),
+) as Record<PackageId, WebsitePageBand>;
 
 /** Website packages as selectable cards with their full inclusions; each opens the configurator. */
 export const packagePlanCards: PlanCard[] = packageOrder.map((id) => ({
