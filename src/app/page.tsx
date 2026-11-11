@@ -263,6 +263,9 @@ export default function HomePage() {
               <Link href="/contact" className="arrow-link">
                 Talk to us first <ArrowRight />
               </Link>
+              <Link href="/website-projects" className="arrow-link">
+                Own your website <ArrowRight />
+              </Link>
             </div>
           </div>
         </div>
