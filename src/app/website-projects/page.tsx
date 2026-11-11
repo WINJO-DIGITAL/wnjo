@@ -20,8 +20,8 @@ export default function WebsiteProjectsPage() {
         lede={`A bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}, paid up front and yours on full payment.`}
       >
         <div className="btn-row">
-          <Link href="/build?type=oneOff" className="btn btn--primary">
-            Price my project
+          <Link href="/build/project" className="btn btn--primary">
+            Get my proposal
           </Link>
           <Link href="/contact?topic=website" className="btn btn--secondary">
             Talk to us
@@ -92,8 +92,8 @@ export default function WebsiteProjectsPage() {
         title={<>Tell us about your project.</>}
         body="A fixed price in writing before any work starts. Nothing to pay until you approve it."
       >
-        <Link href="/build?type=oneOff" className="btn btn--primary">
-          Price my project
+        <Link href="/build/project" className="btn btn--primary">
+          Get my proposal
         </Link>
         <Link href="/contact?topic=website" className="btn btn--secondary">
           Talk to us

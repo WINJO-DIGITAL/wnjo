@@ -210,8 +210,8 @@ export function OneOffWebsite() {
           <span className="pkg-card__amount">from {formatGBP(ONE_OFF_WEBSITE.from)}</span>
         </p>
         <p className="pkg-card__setup">Paid up front, yours on full payment</p>
-        <Link href="/build?type=oneOff" className="btn btn--secondary">
-          Price my project
+        <Link href="/build/project" className="btn btn--secondary">
+          Get my proposal
         </Link>
       </div>
       <div className="oneoff__detail">

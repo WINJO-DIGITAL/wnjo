@@ -136,4 +136,25 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     }
     expect(startQuotePayment).not.toHaveBeenCalled();
   });
+
+  it("buy-outright request: saves a proposal-route brief, takes no payment, and sends the usual acknowledgement", async () => {
+    const res = await post({
+      kind: "project",
+      details: { ...body().details, industry: "", description: "" },
+      goals: ["bookings"],
+      budget: "2k-5k",
+      timeline: "1-3m",
+      notes: "",
+      startedAt: Date.now() - 10_000,
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ ok: true, tracked: true, pay: null, paymentStarted: false });
+    expect(startQuotePayment).not.toHaveBeenCalled();
+    expect(emails().some((e) => e.to.includes("ada@example.com"))).toBe(true);
+  });
+
+  it("buy-outright request: refuses one with no budget or goals", async () => {
+    const res = await post({ kind: "project", details: body().details, goals: [], startedAt: Date.now() - 10_000 });
+    expect(res.status).toBe(422);
+  });
 });

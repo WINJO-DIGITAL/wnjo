@@ -18,7 +18,7 @@ export const carePlanCards: PlanCard[] = careOrder.map((id) => ({
   price: formatGBP(CARE_PLANS[id].monthly),
   suffix: "/month",
   includes: CARE_PLANS[id].includes,
-  href: `/build?care=${id}`,
+  href: `/build/project?care=${id}`,
   cta: `Choose ${CARE_PLANS[id].label}`,
 }));
 
@@ -39,8 +39,8 @@ export const packagePlanCards: PlanCard[] = packageOrder.map((id) => ({
   price: formatGBP(PACKAGES[id].from),
   from: true,
   includes: PACKAGES[id].includes,
-  href: `/build?pages=${packagePages[id]}`,
-  cta: "Price my project",
+  href: `/build/project?pages=${packagePages[id]}`,
+  cta: "Get my proposal",
 }));
 
 /** App development, priced after scoping. It is not a website package, so it can't be picked in the flow. */

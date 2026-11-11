@@ -20,6 +20,7 @@ import { ROUTED_WANTS, formatWebsiteQuote, parseWebsiteAnswers, websiteQuote } f
 import { formatGBP } from "@/lib/pricing";
 import { confirmBriefFiles, createBrief } from "@/lib/brief-store";
 import { WNJO_TENANT_ID } from "@/lib/enquiry-store";
+import { cleanProjectRequest } from "@/lib/project-request";
 import { DRAFT_ID_RE, cleanBrief, formatBrief as formatWebsiteBrief, validateBrief } from "@/lib/website-brief";
 
 export const runtime = "nodejs";
@@ -71,6 +72,8 @@ export async function POST(request: NextRequest) {
 
   // The website calculator (/build) sends its own shape: answers, details and what to do next.
   if (body.kind === "website" && !fromForm) return handleWebsiteQuote(body, request);
+  // The buy-outright request (/build/project): a short brief that goes to a written proposal.
+  if (body.kind === "project" && !fromForm) return handleProjectRequest(body, request);
 
   const kind = body.kind === "brief" ? "brief" : "contact";
   // Budget and timeline help, but are optional everywhere, so nobody is stopped for not knowing yet.
@@ -176,6 +179,72 @@ export async function POST(request: NextRequest) {
     }
   }
   return reply(200, { ok: true, reference, quoteReference });
+}
+
+/**
+ * A buy-outright request: name, business and email, what the site is for, a budget and a deadline. Saved as a tracked
+ * brief on the proposal route, so staff write the proposal and the customer pays the 50% deposit after accepting it.
+ * Nothing is charged here.
+ */
+async function handleProjectRequest(body: Json, request: NextRequest) {
+  const parsed = cleanProjectRequest(body);
+  if (!parsed.ok) return NextResponse.json({ error: "Please check the highlighted fields.", fields: parsed.errors }, { status: 422 });
+  const { details, answers, brief, quote, budget, timeline } = parsed.value;
+
+  const config = mailConfig();
+  const storeOn = enquiryStoreConfigured();
+  if (!config && !storeOn) {
+    return NextResponse.json({ error: "Online enquiries aren't connected yet, so this request has not been sent.", code: "not_configured" }, { status: 503 });
+  }
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const shared = LIMITS_PER_ROUTE.enquiry;
+  if (rateLimited(ip) || (await sharedRateLimited(serviceClient(), "enquiry", ip, shared.max, shared.windowSeconds))) {
+    return NextResponse.json({ error: "Too many submissions from this connection. Please try again in a few minutes." }, { status: 429 });
+  }
+
+  const reference = newReference();
+  const subject = `Website project request from ${details.businessName || details.name} [${reference}]`;
+  const text = [
+    `Reference: ${reference}`,
+    "Route: buy outright (written proposal, then 50% deposit)",
+    `Budget: ${budget ? BUDGETS[budget] : "not given"}`,
+    `Wanted by: ${timeline ? TIMELINES[timeline] : "not given"}`,
+    "",
+    formatDetails(details),
+    "",
+    formatWebsiteBrief(brief),
+  ];
+  const db = serviceClient();
+  const saved = storeOn
+    ? await saveEnquiry({
+        reference,
+        kind: "brief",
+        name: details.name,
+        email: details.email,
+        company: details.businessName,
+        topic: "Website project request",
+        subject,
+        body: text.join("\n"),
+        answers: { type: "website", version: 1, intent: "quote", answers, details: { phone: details.phone, industry: details.industry, launchDate: details.launchDate }, figures: { mode: quote.mode, package: quote.packageName, setup: quote.setup, monthly: quote.monthly, oneOffTotal: quote.oneOffTotal, initialPayment: quote.initialPayment, requiresQuote: true } },
+      })
+    : false;
+  const sent = config ? await sendEnquiryEmail(config, { subject, text: text.join("\n"), replyTo: details.email }) : false;
+  if (!saved && !sent) {
+    return NextResponse.json({ error: "We couldn't send your request just now. Please try again shortly." }, { status: 502 });
+  }
+
+  const created =
+    saved && db
+      ? await createBrief(db, { tenantId: WNJO_TENANT_ID, reference, email: details.email, name: details.name, businessName: details.businessName, draftId: null, brief, answers, quote })
+      : null;
+
+  const customerConfig = notificationMailConfig();
+  if (customerConfig) {
+    const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
+    const ack = customerAcknowledgement({ reference, details, quote, intent: "quote", siteUrl: site });
+    await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Project request acknowledgement");
+  }
+  return NextResponse.json({ ok: true, reference, route: created?.route ?? null, tracked: Boolean(created), pay: null, paymentStarted: false });
 }
 
 /**

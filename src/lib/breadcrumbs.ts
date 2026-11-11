@@ -4,6 +4,7 @@ const LABELS: Record<string, string> = {
   "/winjo-refresh": "Winjo Refresh",
   "/website-projects": "Website projects",
   "/build": "Get started",
+  "/build/project": "Buy outright",
   "/booking-software": "Booking software",
   "/app-development": "App development",
   "/work": "Our work",

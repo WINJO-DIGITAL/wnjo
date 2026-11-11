@@ -8,6 +8,7 @@ export const publicRoutes = [
   "/about",
   "/website-projects",
   "/build",
+  "/build/project",
   "/contact",
   "/faq",
   "/booking-software",

@@ -115,7 +115,7 @@ function FlowBar() {
   const total = pkgInfo.from;
   const deposit = depositPence(total * 100) / 100;
   const href = care
-    ? `/build?pages=${encodeURIComponent(packagePages[pkg])}&care=${care}`
+    ? `/build/project?pages=${encodeURIComponent(packagePages[pkg])}&care=${care}`
     : null;
 
   let hostingText: string;
