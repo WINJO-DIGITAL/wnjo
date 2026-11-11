@@ -6280,7 +6280,6 @@ main #process ol.steps li::after {
   max-width: none;
   margin-inline: 0;
   font-size: min(9.1vw, 4rem);
-  white-space: nowrap;
 }
 
 .booking-hero .tile__title .serif-em {
@@ -6356,8 +6355,13 @@ main #process ol.steps li::after {
   .booking-hero__ctas.tile__ctas {
     align-self: start;
   }
+  /* The copy column is narrower than the replay, so the title may wrap onto more lines rather than run under it. */
   .booking-hero .tile__title {
     font-size: clamp(2.5rem, 3.6vw, 4rem);
+    white-space: normal;
+  }
+  .booking-hero__copy {
+    min-width: 0;
   }
   .booking-hero {
     --hero-top: 172px;
