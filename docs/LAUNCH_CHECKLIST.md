@@ -13,7 +13,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] Billing button only opens the customer's own Stripe billing page. Email matching is exact (no wildcard matches).
 - [x] Staff: builds, approvals (quality, pricing, contract, publication), subscriptions, orders and expected dates.
 - [x] Admin screens on desktop and phone: enquiries, quotes, approvals, projects, orders and subscriptions.
-- [x] 461 automated tests pass; type checks and lint pass.
+- [x] 500 automated tests pass; type checks and lint pass.
 - [x] Customer-facing AI wording removed: the planning step reads "Planning your website".
 - [x] Phone menu has a "Client sign-in" link.
 
@@ -71,7 +71,7 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 - [x] **Customer emails after payment:** pay a plan in Stripe test mode and confirm the customer gets only the welcome email, with no "Your website is waiting" email and no "Tell us about your website" reminder for a day or until the goals form is filled in. Confirmed by the owner: the customer gets an email after payment.
 - [ ] **Account form and reminder:** sign in as a customer and check the goals form, uploads and the reminder email.
 - [ ] **Buy-outright request:** submit one end to end and check the proposal route in the staff admin.
-- [ ] **Production builds:** check the production build of `3b554bc` on a phone and a desktop.
+- [ ] **Production builds:** check the production build of `f8e7389` on a phone and a desktop.
 
 ### Known issues, not fixed
 - [x] **Project package sizes:** the cards now pass the form's own sizes (Essential up to 5, Professional 11 to 15, Premium more than 20 pages), read from the form's size list, with a test.
@@ -79,5 +79,4 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 - [x] **Cost of `/build`:** a plan-less `/build` now goes to the plans. Plan, project, care, draft and `?full=1` links still open the form. The site styler links to the plans directly.
 
 ### Suggested decisions
-- [ ] **Refresh slider:** keep it as the main refresh visual (suggested).
 - [x] **Payment confirmation:** decided by the owner: customers can no longer pay with only an email address. The name and business name are required at checkout, and the server refuses a payment without them, so "Hi there" only appears in older records saved before this rule.
