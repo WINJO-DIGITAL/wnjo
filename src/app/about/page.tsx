@@ -138,7 +138,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <CtaBand tone="light" title={<>Your website. Our responsibility.</>}>
+      <CtaBand tone="light" title={<>Your website is our responsibility.</>}>
         <Link href="/pricing" className="btn btn--primary">
           Choose a plan
         </Link>

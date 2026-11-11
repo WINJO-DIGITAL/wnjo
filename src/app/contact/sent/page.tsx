@@ -12,7 +12,7 @@ export default async function SentPage({ searchParams }: { searchParams: Promise
   return (
     <PageHero
       eyebrow="Message received"
-      title={<>Thank you. It&apos;s with us.</>}
+      title={<>Your enquiry is with us.</>}
       lede={
         <>
           {reference ? <>Your reference is <strong>{reference}</strong>. </> : null}

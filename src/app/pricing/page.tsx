@@ -31,7 +31,7 @@ export default function PricingPage() {
       <PageHero
         compact
         eyebrow="Pricing"
-        title={<>One monthly payment. One team looking after it.</>}
+        title={<>One monthly payment covers all of it.</>}
         lede={`Bespoke design, hosting, maintenance and support from ${formatGBP(core.monthly)} a month. Rolling monthly, with no minimum term.`}
       >
         <div className="btn-row">

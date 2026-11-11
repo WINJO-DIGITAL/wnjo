@@ -36,7 +36,7 @@ export default function ManagedWebsitesPage() {
     <>
       <PageHero
         eyebrow="Managed websites"
-        title={<>Built for your business. Looked after by ours.</>}
+        title={<>A website built for your business, looked after by us.</>}
         lede="From bespoke design and hosting to maintenance, updates and ongoing improvements, Winjo takes care of everything behind your online presence."
         visual={<CareHero site={heroSite} />}
       >
@@ -171,7 +171,7 @@ export default function ManagedWebsitesPage() {
       </section>
 
       <CtaBand
-        title={<>You run your business. We&apos;ll run your website.</>}
+        title={<>We run the website, so you can run the business.</>}
         body={`Plans from ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, with no minimum term.`}
       >
         <Link href="/pricing" className="btn btn--primary">
