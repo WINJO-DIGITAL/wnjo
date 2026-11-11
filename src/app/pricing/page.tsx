@@ -200,10 +200,10 @@ export default function PricingPage() {
       <CtaBand
         tone="light"
         title={<>Not sure which plan fits?</>}
-        body="Tell us about your business and we'll recommend one. Nothing is charged until you agree to go ahead."
+        body="Compare the three plans, or talk to us and we'll recommend one. Nothing is charged until you agree to go ahead."
       >
-        <Link href="/build" className="btn btn--primary">
-          Get started
+        <Link href="#plans" className="btn btn--primary">
+          Choose a plan
         </Link>
         <Link href="/contact?topic=website" className="btn btn--secondary">
           Talk to us first

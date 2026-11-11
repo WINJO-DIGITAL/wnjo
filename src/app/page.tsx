@@ -55,7 +55,7 @@ export default function HomePage() {
               style={{ "--i": 4 } as React.CSSProperties}
             >
               <Link href="/pricing" className="btn btn--primary">
-                Choose a plan
+                Get your website from £99/month
               </Link>
             </div>
           </div>
