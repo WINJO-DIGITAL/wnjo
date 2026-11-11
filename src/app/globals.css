@@ -13973,7 +13973,8 @@ body:has(.pv) .site-footer {
 /* Phones: the home page sections fit the screen. Plans and search points swipe sideways instead of stacking,
    and the ownership and refresh blocks are more compact. */
 @media (max-width: 39.99rem) {
-  #packages .pkg-cards {
+  #packages .pkg-cards,
+  #plans .pkg-cards {
     display: flex;
     gap: var(--space-3);
     overflow-x: auto;
@@ -13981,27 +13982,34 @@ body:has(.pv) .site-footer {
     padding-bottom: var(--space-2);
     scrollbar-width: none;
   }
-  #packages .pkg-cards::-webkit-scrollbar {
+  #packages .pkg-cards::-webkit-scrollbar,
+  #plans .pkg-cards::-webkit-scrollbar {
     display: none;
   }
-  #packages .pkg-card {
+  #packages .pkg-card,
+  #plans .pkg-card {
     flex: 0 0 82%;
     scroll-snap-align: start;
     padding: 1.1rem;
     gap: var(--space-2);
   }
-  #packages .pkg-card__amount {
+  #packages .pkg-card__amount,
+  #plans .pkg-card__amount {
     font-size: 2.6rem;
   }
-  #packages .pkg-card__points {
+  #packages .pkg-card__points,
+  #plans .pkg-card__points {
     margin: var(--space-1) 0 var(--space-2);
     font-size: 1rem;
   }
-  #packages .pkg-card__points li:nth-child(n + 5) {
+  #packages .pkg-card__points li:nth-child(n + 5),
+  #plans .pkg-card__points li:nth-child(n + 5) {
     display: none;
   }
   #packages .pkg-card__tagline,
-  #packages .pkg-card__summary {
+  #packages .pkg-card__summary,
+  #plans .pkg-card__tagline,
+  #plans .pkg-card__summary {
     font-size: 0.92rem;
   }
   .search-list {
