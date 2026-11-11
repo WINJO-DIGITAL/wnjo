@@ -204,13 +204,20 @@ function NeedsYou({ client }: { client: SupabaseClient }) {
       client.from("website_proposals").select("id", head).eq("status", "approved"),
       client.from("website_briefs").select("id", head).in("stage", ["brief_received", "reviewing"]),
       client.from("quotes").select("id", head).eq("status", "sent"),
-    ]).then(([previews, changes, toApprove, toSend, briefs, quotes]) => {
+      // Websites still in specification whose customer has sent their goals: the team should look. The line clears
+      // when the website moves on (the AI or staff take the next step).
+      client.from("website_briefs").select("id, brief").eq("stage", "specification"),
+    ]).then(([previews, changes, toApprove, toSend, briefs, quotes, specs]) => {
+      const withGoals = ((specs.data as Array<{ id: string; brief: { goals?: unknown[] } | null }>) ?? []).filter(
+        (row) => (row.brief?.goals?.length ?? 0) > 0,
+      ).length;
       const all: Need[] = [
         { label: "Previews to release", count: previews.count ?? 0, href: "#builds" },
         { label: "Customer changes to make", count: changes.count ?? 0, href: "#builds" },
         { label: "Proposals to approve", count: toApprove.count ?? 0, href: "#builds" },
         { label: "Proposals to send", count: toSend.count ?? 0, href: "#builds" },
         { label: "Briefs to review", count: briefs.count ?? 0, href: "#builds" },
+        { label: "Goals received, ready for the team", count: withGoals, href: "#builds" },
         { label: "Quotes waiting", count: quotes.count ?? 0, href: "#quotes" },
       ];
       setNeeds(all.filter((n) => n.count > 0));
