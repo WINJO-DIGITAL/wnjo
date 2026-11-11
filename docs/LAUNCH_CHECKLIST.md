@@ -30,6 +30,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Numbered steps removed:** app development, contact "What happens next" and the confirmation page. Carousel position counters ("01 / 03") stay.
 - [x] **"Own your website" used everywhere:** menu, project page title, home and pricing buttons and headings. "Every £99 plan" is now "every managed plan"; "£99/month" is "£99 a month".
 - [x] **Remaining two-sentence headlines rewritten** on home, managed websites, pricing, booking systems and app development.
+- [x] **Boonma on its own domain:** the case study, the work pages and the "Visit the live site" links now use `boonma.co.uk` (the owner confirmed it; `www.boonma.co.uk` redirects to it).
 - [x] **Confirmation page no longer imports a server-only module** (it pulled Node's crypto into the browser bundle and broke the dev build).
 
 ## Still to do before launch
@@ -57,7 +58,6 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 Source: the handover list. Checked against `main` at `3b554bc`, which is the same commit as this branch.
 
 ### Needs the owner
-- [ ] **Boonma on its own domain:** the case study shows `boonma.vercel.app`, which looks unfinished. Send the client's real domain and the links will be updated.
 - [ ] **Trust facts:** company number, registered address, VAT number, reviews, team photos and a guarantee. None have been invented.
 - [ ] **Delivery timeline:** the "live in X days" line needs a real figure.
 - [ ] **Real client before and after:** send screenshots to replace the example site in the refresh slider.
