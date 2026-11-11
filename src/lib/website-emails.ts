@@ -131,8 +131,9 @@ const gbpPence = (p: number) => formatPence(p);
 const sign = ["", "WINJO DIGITAL"];
 
 /**
- * Sent when a customer starts paying straight from their quote, so the link is in their inbox if they close the
- * Stripe page before finishing. If they pay straight away they also get the welcome or receipt email, which says so.
+ * Sent only when the customer asked to pay straight from their quote but Stripe's page could not be opened, so the
+ * link reaches them by email instead. It is not sent to anyone who was taken to Stripe: they are paying right now,
+ * and "if you didn't finish" would be wrong for them. They get the welcome or receipt email after paying.
  */
 export function payLinkEmail(f: SubscriptionEmailFacts, link: string): { subject: string; text: string } {
   const lines =

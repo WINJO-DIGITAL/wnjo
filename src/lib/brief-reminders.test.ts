@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { REMINDER_AFTER_MS, detailsReminderEmail, needsDetailsReminder } from "./brief-reminders";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { REMINDER_AFTER_MS, detailsReminderEmail, needsDetailsReminder, sendBriefDetailsReminders } from "./brief-reminders";
 import { projectAcknowledgement } from "./website-emails";
 
 const now = Date.parse("2026-11-12T09:00:00Z");
@@ -42,5 +43,29 @@ describe("buy-outright acknowledgement", () => {
     expect(m.text).not.toContain("£999");
     expect(m.text).toContain("Nothing is charged until you have read and accepted that proposal.");
     expect(m.text).toContain("50% deposit");
+  });
+});
+
+describe("who the reminder looks at", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("only picks briefs that have been paid for, never the stages before payment", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_test");
+    vi.stubEnv("ENQUIRY_FROM_EMAIL", "hello@example.test");
+    const seen: { column: string; values: string[] }[] = [];
+    // A chainable stand-in for the query builder that records the stages asked for and returns no rows.
+    const chain: unknown = new Proxy(
+      {},
+      {
+        get: (_target, prop) => {
+          if (prop === "then") return (resolve: (v: { data: unknown[] }) => void) => resolve({ data: [] });
+          if (prop === "in") return (column: string, values: string[]) => (seen.push({ column, values }), chain);
+          return () => chain;
+        },
+      },
+    );
+    await sendBriefDetailsReminders({ from: () => chain } as unknown as SupabaseClient, now);
+    // "Thank you for paying" must never reach someone still at brief_received, reviewing or awaiting_payment.
+    expect(seen).toEqual([{ column: "stage", values: ["specification"] }]);
   });
 });

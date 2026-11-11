@@ -10,7 +10,9 @@ export const REMINDER_AFTER_MS = 24 * 60 * 60 * 1000;
 // Recorded as a "note" event (the kinds the database allows), tagged so it can be found again.
 const REMINDER_KIND = "note";
 const REMINDER_TAG = { reminder: "details" };
-const WAITING_STAGES = ["brief_received", "reviewing", "awaiting_payment", "specification"];
+// Only "specification": a package brief moves there when its payment arrives (see advanceAfterPayment). The earlier
+// stages (brief_received, reviewing, awaiting_payment) are before payment, and the email thanks them for paying.
+const WAITING_STAGES = ["specification"];
 
 export type ReminderCandidate = { id: string; reference: string; email: string; name: string; created_at: string; brief: { goals?: unknown[] } | null };
 

@@ -407,23 +407,27 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
   if (customerConfig) {
     const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
     if (payment) {
-      // Their private payment link, in case they close the Stripe page before finishing.
-      const { amounts, reference: offerReference, token } = payment.offer;
-      const message = payLinkEmail(
-        {
-          reference: offerReference,
-          name: details.name,
-          packageName: amounts.packageName,
-          kind: amounts.kind,
-          setupPence: amounts.setupPence,
-          monthlyPence: amounts.monthlyPence,
-          oneOffPence: amounts.oneOffPence,
-          ownershipAfterPayments: OWNERSHIP.ownershipAfterPayments,
-          minimumTermMonths: OWNERSHIP.minimumTermMonths,
-        },
-        `${new URL(request.url).origin}/subscribe/${token}`,
-      );
-      await sendEmail(customerConfig, { to: details.email, subject: message.subject, text: message.text }, "Payment link");
+      // Only when Stripe's page couldn't be opened: then the page tells them a link is on its way. A customer who is
+      // taken to Stripe is paying right now, so a "you didn't finish" email would be wrong for most of them. If they
+      // close the page, Stripe's cancel link brings them back to the same offer.
+      if (!payment.url) {
+        const { amounts, reference: offerReference, token } = payment.offer;
+        const message = payLinkEmail(
+          {
+            reference: offerReference,
+            name: details.name,
+            packageName: amounts.packageName,
+            kind: amounts.kind,
+            setupPence: amounts.setupPence,
+            monthlyPence: amounts.monthlyPence,
+            oneOffPence: amounts.oneOffPence,
+            ownershipAfterPayments: OWNERSHIP.ownershipAfterPayments,
+            minimumTermMonths: OWNERSHIP.minimumTermMonths,
+          },
+          `${new URL(request.url).origin}/subscribe/${token}`,
+        );
+        await sendEmail(customerConfig, { to: details.email, subject: message.subject, text: message.text }, "Payment link");
+      }
     } else {
       const ack = customerAcknowledgement({ reference, details: details, quote, intent: intent === "pay" ? "quote" : intent, siteUrl: site });
       await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Quote acknowledgement");

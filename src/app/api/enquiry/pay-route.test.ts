@@ -74,16 +74,13 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     expect(args.reference).toMatch(/^WNJO-[0-9A-F]{6}$/);
   });
 
-  it("emails the customer their private payment link, and does not email the owner before they have paid", async () => {
-    await post(body());
-    const sent = emails();
-    // Staff hear about it when the payment lands (the Stripe webhook), not when the form is submitted.
-    expect(sent).toHaveLength(1);
-    const [customer] = sent;
-    expect(customer.to).toEqual(["ada@example.com"]);
-    expect(customer.subject).toBe("Your website is waiting [WS-ABC123]");
-    expect(customer.text).toContain(`http://localhost/subscribe/${"t".repeat(43)}`);
-    expect(customer.text).not.toContain("written proposal");
+  it("sends no email at all when the customer is taken to Stripe: staff and the customer hear after they pay", async () => {
+    const res = await post(body());
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ ok: true, paymentStarted: true, pay: { url: "https://checkout.stripe.com/c/pay/cs_test_1" } });
+    // Not the owner's "order is coming", and not the customer's "if you didn't finish" payment link: both would be
+    // wrong for someone who is paying right now. The webhook's welcome and staff emails follow the payment.
+    expect(emails()).toHaveLength(0);
   });
 
   it("still emails the owner when the payment could not be started, so the request is not missed", async () => {
@@ -151,7 +148,11 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     const res = await post(body());
     expect(res.status).toBe(200);
     expect(await res.json()).toMatchObject({ ok: true, pay: null, paymentStarted: true });
-    expect(emails().map((e) => e.subject)).toEqual(["Your website is waiting [WS-ABC123]"]);
+    // Stripe's page could not be opened, so the page promises a link by email: the customer gets it, staff do not yet.
+    const sent = emails();
+    expect(sent.map((e) => e.subject)).toEqual(["Your website is waiting [WS-ABC123]"]);
+    expect(sent[0].to).toEqual(["ada@example.com"]);
+    expect(sent[0].text).toContain(`http://localhost/subscribe/${"t".repeat(43)}`);
   });
 
   it("does nothing about payment for the other next steps", async () => {

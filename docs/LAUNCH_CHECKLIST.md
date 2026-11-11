@@ -58,6 +58,7 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 ### Needs testing (cannot be done from the build environment)
 - [ ] **Test payment:** run a plan through Stripe test mode, including the confirmation page, the account and the owner email. Needs Stripe test keys.
 - [ ] **Owner email after payment:** pay a plan in Stripe test mode and confirm exactly one owner email arrives, after the payment ("New … subscription"), and none when the form is submitted.
+- [ ] **Customer emails after payment:** pay a plan in Stripe test mode and confirm the customer gets only the welcome email, with no "Your website is waiting" email and no "Tell us about your website" reminder for a day or until the goals form is filled in.
 - [ ] **Account form and reminder:** sign in as a customer and check the goals form, uploads and the reminder email.
 - [ ] **Buy-outright request:** submit one end to end and check the proposal route in the staff admin.
 - [ ] **Production builds:** check the production build of `3b554bc` on a phone and a desktop.
