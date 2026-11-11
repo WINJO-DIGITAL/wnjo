@@ -14403,3 +14403,10 @@ body:has(.pv) .site-footer {
 .rf[data-era="second"] .rf__photo {
   background-image: url("/refresh/harbour-second.jpg");
 }
+
+/* After the goals form is saved: the confirmation, then one button to see progress. */
+.details-thanks {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+}

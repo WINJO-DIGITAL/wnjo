@@ -125,6 +125,8 @@ function BuildCard({
   const style = brief.brief.style ? STYLES[brief.brief.style] : null;
   const [tab, setTab] = useState<"overview" | "progress" | "changes">("overview");
   const [allSteps, setAllSteps] = useState(false);
+  // Set once the goals form is saved: the customer sees a confirmation before the page moves on.
+  const [detailsSaved, setDetailsSaved] = useState(false);
   const step = portalStepIndex(brief.stage, lastOnPath);
   // A website paid for through the short checkout has no goals yet: ask for them before anything else.
   const needsDetails = brief.brief.goals.length === 0 && ["brief_received", "reviewing", "awaiting_payment", "specification"].includes(brief.stage);
@@ -210,7 +212,10 @@ function BuildCard({
         {showPreview && tab !== "progress" && <PreviewLink client={client} briefId={brief.id} />}
         {tab === "overview" && (
           <>
-            {needsDetails && <BriefDetailsCard client={client} briefId={brief.id} initial={brief.brief} name={brief.name} businessName={brief.business_name} onChanged={onChanged} />}
+            {needsDetails && !detailsSaved && (
+              <BriefDetailsCard client={client} briefId={brief.id} initial={brief.brief} name={brief.name} businessName={brief.business_name} onSaved={() => setDetailsSaved(true)} />
+            )}
+            {needsDetails && detailsSaved && <DetailsThanks name={brief.name} onContinue={onChanged} />}
             {proposal && <ProposalCard client={client} proposal={proposal} onChanged={onChanged} />}
             {showPay && <PayCard client={client} briefId={brief.id} payNow={proposalPayNowFor(brief.figures.mode === "oneOff" ? "oneOff" : "monthly", accepted)} />}
             {!proposal && !showPay && brief.brief.goals.length > 0 && (
@@ -246,6 +251,23 @@ function BuildCard({
   );
 }
 
+/** What happens after the goals form: a clear confirmation, and a way on to the progress view. */
+function DetailsThanks({ name, onContinue }: { name: string; onContinue: () => void }) {
+  const first = name === UNNAMED || !name.trim() ? "" : name.trim().split(/\s+/)[0];
+  return (
+    <div className="details-thanks">
+      <Confirmation
+        title={first ? `Thanks, ${first}. We've got your details.` : "Thanks. We've got your details."}
+        detail="We're starting on your website now. Each step appears in your progress as it happens."
+        nextStep="We'll email you when the first draft is ready to look at."
+      />
+      <button type="button" className="btn btn--secondary" onClick={onContinue}>
+        See your progress
+      </button>
+    </div>
+  );
+}
+
 /** Goals, pages and design for a website paid for through the short checkout. Saved on the website, then we start drafting. */
 function BriefDetailsCard({
   client,
@@ -253,14 +275,14 @@ function BriefDetailsCard({
   initial,
   name: savedName,
   businessName: savedBusiness,
-  onChanged,
+  onSaved,
 }: {
   client: SupabaseClient;
   briefId: string;
   initial: WebsiteBrief;
   name: string;
   businessName: string;
-  onChanged: () => void;
+  onSaved: () => void;
 }) {
   const [brief, setBrief] = useState<WebsiteBrief>(initial);
   // A short checkout stores "New customer" until they say who they are.
@@ -298,7 +320,8 @@ function BriefDetailsCard({
     const json = (await res?.json().catch(() => null)) as { error?: string } | null;
     setBusy(false);
     if (res?.ok) {
-      onChanged();
+      // Stay on the form's own confirmation. The page reloads when the customer chooses to continue.
+      onSaved();
       return;
     }
     setMessage(json?.error ?? "We couldn't save that just now. Please try again.");
