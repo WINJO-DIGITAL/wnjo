@@ -55,9 +55,9 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 - [ ] **Production builds:** check the production build of `3b554bc` on a phone and a desktop.
 
 ### Known issues, not fixed
-- [ ] **Project package sizes:** the Essential, Professional and Premium cards pass page sizes the price form does not recognise, so they show "up to 5 pages".
-- [ ] **Desktop header:** below 1184 px, "Services" only appears inside the phone menu.
-- [ ] **Cost of `/build`:** a plan-less `/build` link still opens the form at Core £99. Only the site styler links to it. Not blocked yet.
+- [x] **Project package sizes:** the cards now pass the form's own sizes (Essential up to 5, Professional 11 to 15, Premium more than 20 pages), read from the form's size list, with a test.
+- [x] **Desktop header:** the full menu, with Services, now shows from 1024 px (was 1184 px). Checked on one row at 1024, 1100, 1183 and 1280 px.
+- [x] **Cost of `/build`:** a plan-less `/build` now goes to the plans. Plan, project, care, draft and `?full=1` links still open the form. The site styler links to the plans directly.
 
 ### Suggested decisions
 - [ ] **Refresh slider:** keep it as the main refresh visual (suggested).
