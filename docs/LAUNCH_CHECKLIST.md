@@ -37,3 +37,28 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] Privacy note: the 30-day retention of unsent briefs is on the privacy page.
 - [x] Ownership line when due: "Ownership is available to you now. Message us whenever you'd like to talk it through."
 - [x] Ending care: message only.
+
+## Remaining list from the other Claude account (checked at 3b554bc)
+Source: the handover list. Checked against `main` at `3b554bc`, which is the same commit as this branch.
+
+### Needs the owner
+- [ ] **Trust facts:** company number, registered address, VAT number, reviews, team photos and a guarantee. None have been invented.
+- [ ] **Delivery timeline:** the "live in X days" line needs a real figure.
+- [ ] **Real client before and after:** send screenshots to replace the example site in the refresh slider.
+- [ ] **Terms:** the draft notice is on and no solicitor has reviewed the terms. Decide whether to publish them as they are.
+- [ ] **Two tick boxes on the payment screen:** agreeing to the terms and the 14-day start waiver. Keep both unless the owner says otherwise.
+
+### Needs testing (cannot be done from the build environment)
+- [ ] **Test payment:** run a plan through Stripe test mode, including the confirmation page, the account and the owner email. Needs Stripe test keys.
+- [ ] **Account form and reminder:** sign in as a customer and check the goals form, uploads and the reminder email.
+- [ ] **Buy-outright request:** submit one end to end and check the proposal route in the staff admin.
+- [ ] **Production builds:** check the production build of `3b554bc` on a phone and a desktop.
+
+### Known issues, not fixed
+- [ ] **Project package sizes:** the Essential, Professional and Premium cards pass page sizes the price form does not recognise, so they show "up to 5 pages".
+- [ ] **Desktop header:** below 1184 px, "Services" only appears inside the phone menu.
+- [ ] **Cost of `/build`:** a plan-less `/build` link still opens the form at Core £99. Only the site styler links to it. Not blocked yet.
+
+### Suggested decisions
+- [ ] **Refresh slider:** keep it as the main refresh visual (suggested).
+- [ ] **Payment confirmation:** keep "Hi there" in the emails for customers who pay with only an email address (suggested).
