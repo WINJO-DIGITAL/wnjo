@@ -48,9 +48,6 @@ export function Responsibility() {
                 <span>{chore.replace(/^Find a designer$/, "Design your website").replace(/^Find someone to make changes$/, "Make your changes")}</span>
               </li>
             ))}
-            <li className="resp__yours">
-              <span>Run your business</span>
-            </li>
           </ul>
         </div>
       </div>

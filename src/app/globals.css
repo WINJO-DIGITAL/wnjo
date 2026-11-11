@@ -12944,14 +12944,6 @@ body:has(.pv) .site-footer {
   display: block;
   padding-block: 0.2em;
 }
-.resp__yours span {
-  font-family: var(--font-serif);
-  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.6rem);
-  line-height: 1.1;
-}
-.resp__yours {
-  max-height: none !important;
-}
 /* With Winjo: the chores leave your list and appear in ours. */
 .resp[data-ours="true"] .resp__col:first-child li:not(.resp__yours) {
   max-height: 0;
@@ -12972,9 +12964,6 @@ body:has(.pv) .site-footer {
 .resp[data-ours="false"] .resp__col--ours {
   border-style: dashed;
   background: none;
-}
-.resp[data-ours="false"] .resp__yours {
-  color: var(--color-ink-3);
 }
 .resp__col--ours li span {
   position: relative;
@@ -13953,9 +13942,6 @@ body:has(.pv) .site-footer {
   #managed .resp__list li span {
     padding-block: 0.1em;
   }
-  #managed .resp__yours span {
-    font-size: 1.5rem;
-  }
   #managed .resp__switch button {
     min-height: 40px;
   }
@@ -13981,9 +13967,6 @@ body:has(.pv) .site-footer {
   #managed .resp__list li span {
     line-height: 1.35;
     padding-block: 0.2em;
-  }
-  #managed .resp__yours {
-    margin: 0;
   }
 }
 
@@ -14136,18 +14119,6 @@ body:has(.pv) .site-footer {
 }
 .resp__col--ours .resp__list li span {
   font-weight: 600;
-}
-.resp__yours span {
-  padding-left: 0;
-}
-.resp__yours span::before {
-  content: none;
-}
-.resp__col--ours .resp__yours span {
-  padding-left: 0;
-}
-.resp__col--ours .resp__yours span::before {
-  content: none;
 }
 
 /* Phones: everything tappable is at least 44px tall. */
