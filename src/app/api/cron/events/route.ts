@@ -25,18 +25,23 @@ export async function GET(request: NextRequest) {
   }
   const db = serviceClient();
   if (!db) return NextResponse.json({ error: "not_configured" }, { status: 503 });
-  try {
-    const events = await processDueEvents(db);
-    const tasks = await processQueuedTasks(db);
-    if (tasks.hasMore) after(() => kickWorker(1));
-    const notifications = await sendDueNotifications(db);
-    const reminders = await sendQuoteReminders(db);
-    // Any paid website still without its first AI draft (the key was missing, or a call failed) is picked up here.
-    const drafts = await runAutoDrafts(db, providerFromEnv());
-    const briefReminders = await sendBriefDetailsReminders(db);
-    return NextResponse.json({ events, tasks, notifications, reminders, drafts, briefReminders });
-  } catch {
-    console.error("Event sweep failed");
-    return NextResponse.json({ error: "failed" }, { status: 500 });
-  }
+  // Each step runs on its own. One failing used to stop every step after it, including the customer reminders, so a
+  // failure is now logged for that step only and the rest still run.
+  const step = async <T,>(name: string, run: () => Promise<T>): Promise<T | { error: string }> => {
+    try {
+      return await run();
+    } catch (error) {
+      console.error(`Daily job step failed: ${name}: ${error instanceof Error ? error.message : "unknown"}`);
+      return { error: name };
+    }
+  };
+  const events = await step("events", () => processDueEvents(db));
+  const tasks = await step("tasks", () => processQueuedTasks(db));
+  if (tasks && typeof tasks === "object" && "hasMore" in tasks && tasks.hasMore) after(() => kickWorker(1));
+  const notifications = await step("notifications", () => sendDueNotifications(db));
+  const reminders = await step("quote reminders", () => sendQuoteReminders(db));
+  // Any paid website still without its first AI draft (the key was missing, or a call failed) is picked up here.
+  const drafts = await step("drafts", () => runAutoDrafts(db, providerFromEnv()));
+  const briefReminders = await step("brief reminders", () => sendBriefDetailsReminders(db));
+  return NextResponse.json({ events, tasks, notifications, reminders, drafts, briefReminders });
 }
