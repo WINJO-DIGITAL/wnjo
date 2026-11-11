@@ -376,7 +376,7 @@ export function BookingDemo() {
                 setT(STEP_STARTS[i]);
               }}
             >
-              <span>{String(i + 1).padStart(2, "0")}</span> {item.text}
+              {item.text}
             </button>
           </li>
         ))}
