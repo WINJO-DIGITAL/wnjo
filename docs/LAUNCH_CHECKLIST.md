@@ -14,7 +14,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] Staff: builds, approvals (quality, pricing, contract, publication), subscriptions, orders and expected dates.
 - [x] Admin screens on desktop and phone: enquiries, quotes, approvals, projects, orders and subscriptions.
 - [x] 500 automated tests pass; type checks and lint pass.
-- [x] Customer-facing AI wording removed: the planning step reads "Planning your website".
+- [x] Customer-facing AI wording removed: the build step reads "Building your website" (was "Planning your website").
 - [x] Phone menu has a "Client sign-in" link.
 
 ## Done since the handover list (on main)
