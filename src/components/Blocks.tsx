@@ -9,6 +9,7 @@ export function PageHero({
   lede,
   children,
   compact = false,
+  visual,
 }: {
   eyebrow: string;
   title: ReactNode;
@@ -16,25 +17,39 @@ export function PageHero({
   children?: ReactNode;
   /** A tighter top section, for pages where the content below is what the visitor came for (pricing). */
   compact?: boolean;
+  /** A picture or demo beside the text on laptops and up, and below it on phones. */
+  visual?: ReactNode;
 }) {
+  const text = (
+    <>
+      <p className="eyebrow rise">{eyebrow}</p>
+      <h1 className="h1 rise" style={{ "--i": 1, maxWidth: compact ? "26ch" : "20ch" } as React.CSSProperties}>
+        {title}
+      </h1>
+      {lede && (
+        <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
+          {lede}
+        </p>
+      )}
+      {children && (
+        <div className="rise" style={{ "--i": 3 } as React.CSSProperties}>
+          {children}
+        </div>
+      )}
+    </>
+  );
   return (
     <section className={compact ? "page-hero page-hero--compact" : "page-hero"}>
-      <div className="container container--wide">
-        <p className="eyebrow rise">{eyebrow}</p>
-        <h1 className="h1 rise" style={{ "--i": 1, maxWidth: compact ? "26ch" : "20ch" } as React.CSSProperties}>
-          {title}
-        </h1>
-        {lede && (
-          <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
-            {lede}
-          </p>
-        )}
-        {children && (
-          <div className="rise" style={{ "--i": 3 } as React.CSSProperties}>
-            {children}
+      {visual ? (
+        <div className="container container--wide page-hero__split">
+          <div>{text}</div>
+          <div className="page-hero__visual rise" style={{ "--i": 4 } as React.CSSProperties}>
+            {visual}
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="container container--wide">{text}</div>
+      )}
     </section>
   );
 }

@@ -4,7 +4,7 @@ import { BrowserFrame } from "@/components/Devices";
 import { ArrowRight } from "@/components/Icons";
 import { SiteStyler } from "@/components/interactive/SiteStyler";
 import { CareBoard } from "@/components/managed/CareBoard";
-import { Responsibility } from "@/components/managed/Responsibility";
+import { CareHero } from "@/components/managed/CareHero";
 import { RefreshCompare, SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
 import { WebStages } from "@/components/WebStages";
 import { archivo, jost } from "@/lib/fonts";
@@ -28,6 +28,9 @@ const monthly: [string, string][] = [
   ["Support and changes", "One team to ask when something needs changing."],
 ];
 
+// A real website we look after, for the hero picture.
+const heroSite = projects.find((p) => p.slug === "ev-exec") ?? projects[0];
+
 export default function ManagedWebsitesPage() {
   return (
     <>
@@ -35,6 +38,7 @@ export default function ManagedWebsitesPage() {
         eyebrow="Managed websites"
         title={<>Built for your business. Looked after by ours.</>}
         lede="From bespoke design and hosting to maintenance, updates and ongoing improvements, Winjo takes care of everything behind your online presence."
+        visual={<CareHero site={heroSite} />}
       >
         <div className="btn-row">
           <Link href="/pricing" className="btn btn--primary">
@@ -45,13 +49,6 @@ export default function ManagedWebsitesPage() {
           </Link>
         </div>
       </PageHero>
-
-      {/* The difference, in one switch. */}
-      <section className="section--tight" style={{ paddingTop: 0 }} aria-label="Who looks after your website">
-        <div className="container container--wide" data-reveal>
-          <Responsibility />
-        </div>
-      </section>
 
       {/* What you get every month. */}
       <section id="included" className="section section--ruled" aria-labelledby="included-title">

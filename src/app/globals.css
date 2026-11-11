@@ -14180,3 +14180,143 @@ body:has(.pv) .site-footer {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+
+/* Managed websites hero (components/managed/CareHero): one switch drives the picture. On your own the website
+   stalls and its jobs wait; with Winjo it runs and each job is done. */
+.care-hero {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+}
+.care-hero__frame {
+  width: 100%;
+  margin: 0;
+  transition:
+    filter 500ms var(--ease),
+    opacity 500ms var(--ease);
+}
+.care-hero[data-ours="false"] .care-hero__frame {
+  filter: grayscale(0.9) contrast(0.85);
+  opacity: 0.6;
+}
+.care-hero__video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: #0c1220;
+}
+.care-hero__jobs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+.care-hero__jobs li {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+}
+.care-hero__job {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+.care-hero__state {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45em;
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  font-weight: 550;
+  color: var(--color-accent);
+  animation: care-hero-in 400ms var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+.care-hero[data-ours="true"] .care-hero__state {
+  color: var(--color-success);
+}
+/* Status, not decoration: a tick once the job is done. */
+.care-hero[data-ours="true"] .care-hero__state::before {
+  content: "";
+  flex: none;
+  width: 0.9em;
+  height: 0.9em;
+  margin-top: 0.22em;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+@keyframes care-hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@media (max-width: 47.99rem) {
+  .care-hero__jobs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* Laptops and up: the hero sits beside the page title (see .page-hero__split), so the jobs share two columns. */
+@media (min-width: 64rem) {
+  .care-hero__jobs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* A page hero with a picture or demo: below the text on phones and tablets, beside it from laptops up. */
+.page-hero__visual {
+  margin-top: var(--space-7);
+}
+@media (min-width: 64rem) {
+  .page-hero__split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: var(--space-8);
+    align-items: center;
+  }
+  .page-hero__visual {
+    margin-top: 0;
+  }
+}
+/* Phones: the switch spans the width and the jobs swipe sideways instead of stacking. */
+@media (max-width: 39.99rem) {
+  .care-hero .resp__switch {
+    width: 100%;
+  }
+  .care-hero .resp__switch button {
+    flex: 1;
+  }
+  .care-hero__jobs {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: var(--space-2);
+  }
+  .care-hero__jobs::-webkit-scrollbar {
+    display: none;
+  }
+  .care-hero__jobs li {
+    flex: 0 0 56%;
+    padding: var(--space-3) var(--space-4);
+    scroll-snap-align: start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .care-hero__frame {
+    transition: none;
+  }
+  .care-hero__state {
+    animation: none;
+  }
+}
