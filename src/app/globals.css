@@ -14342,5 +14342,62 @@ body:has(.pv) .site-footer {
   }
   .care-hero__state {
     animation: none;
+/* The homepage close: the offer on one panel, with the price and what's included beside the action. */
+.offer-band__grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.offer-band__price {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+}
+
+.offer-band__price b {
+  font-size: var(--text-3xl);
+  font-weight: 500;
+}
+
+.offer-band__price span {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  color: var(--color-inverse-ink-2);
+}
+
+.offer-band__terms {
+  color: var(--color-inverse-ink-2);
+  font-size: var(--text-sm);
+}
+
+.offer-band__panel {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  border: 1px solid var(--color-inverse-line);
+  border-radius: var(--radius-lg);
+}
+
+.offer-band__list {
+  display: grid;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.offer-band__list li {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-inverse-line);
+}
+
+@media (min-width: 56rem) {
+  .offer-band__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .offer-band__list {
+    grid-template-columns: 1fr 1fr;
   }
 }

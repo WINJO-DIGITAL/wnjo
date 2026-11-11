@@ -199,12 +199,11 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
 ];
 
 /**
- * The business telephone number, shown only as a "Call us" button, never as digits. Confirmed by the owner as the
- * work number. The environment value (NEXT_PUBLIC_CONTACT_PHONE) can override it.
+ * The business telephone number, shown only as a "Call us" button, never as digits. It comes from the environment
+ * (NEXT_PUBLIC_CONTACT_PHONE). Until it is set, no call link appears and the contact form is offered instead.
  */
-const CONTACT_PHONE_PLACEHOLDER = "07474 144 600";
 export const contactPhoneHref: string | null = (() => {
-  const raw = process.env.NEXT_PUBLIC_CONTACT_PHONE?.trim() || CONTACT_PHONE_PLACEHOLDER;
+  const raw = process.env.NEXT_PUBLIC_CONTACT_PHONE?.trim() ?? "";
   const digits = raw.replace(/[^\d+]/g, "");
   const international = digits.startsWith("+") ? digits : digits.replace(/^0/, "+44");
   return /^\+\d{8,15}$/.test(international) ? `tel:${international}` : null;

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { CtaBand } from "@/components/Blocks";
 import { ArrowRight } from "@/components/Icons";
 import { HeroShowcase } from "@/components/interactive/HeroShowcase";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
@@ -10,7 +9,7 @@ import { Responsibility } from "@/components/managed/Responsibility";
 import { SubscriptionTerms } from "@/components/managed/Sections";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
 import { ProcessScroll } from "@/components/interactive/ProcessScroll";
-import { ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
@@ -233,25 +232,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      <CtaBand
-        title={<>Hand us your website.</>}
-        body={
-          <>
-            Managed from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, or buy it outright from {formatGBP(ONE_OFF_WEBSITE.from)}.
-            Questions first? <Link href="/faq">Read the FAQ</Link>.
-          </>
-        }
-      >
-        <Link href="/pricing" className="btn btn--primary">
-          Choose a plan
-        </Link>
-        <Link href="/website-projects" className="btn btn--secondary">
-          Buy outright
-        </Link>
-        <Link href="/contact" className="arrow-link">
-          Talk to us first <ArrowRight />
-        </Link>
-      </CtaBand>
+      <section className="section inverse offer-band" aria-labelledby="offer-title" data-cta-hide>
+        <div className="container container--wide offer-band__grid" data-reveal>
+          <div className="stack">
+            <p className="tile__name">Managed website</p>
+            <h2 id="offer-title" className="h1" style={{ maxWidth: "16ch" }}>
+              Hand us <span className="serif-em">your website.</span>
+            </h2>
+            <p className="offer-band__price">
+              From <b>{formatGBP(WEBSITE_PLANS.bronze.monthly)}</b>
+              <span>/month</span>
+            </p>
+            <p className="offer-band__terms">
+              30 days&apos; notice. No minimum term. Nothing is charged until you agree.
+            </p>
+          </div>
+          <div className="offer-band__panel">
+            <ul className="offer-band__list" role="list">
+              <li>Bespoke design</li>
+              <li>Managed hosting and SSL</li>
+              <li>Security monitoring</li>
+              <li>Updates and fixes</li>
+              <li>Small changes made for you</li>
+              <li>A new design every 24 months on {WEBSITE_PLANS.silver.name} and {WEBSITE_PLANS.gold.name}</li>
+            </ul>
+            <div className="btn-row">
+              <Link href="/pricing" className="btn btn--primary">
+                Choose a plan
+              </Link>
+              <Link href="/contact" className="arrow-link">
+                Talk to us first <ArrowRight />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
