@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { mobileNav, primaryNav, type NavItem, type NavLink, type NavMenu, contactPhoneHref } from "@/lib/site";
 import { AccountMenu } from "./account/AccountMenu";
+import { useCustomerSession } from "@/lib/use-customer-session";
 import { DashboardHeader } from "./dashboard/DashboardHeader";
 import { Logo } from "./Logo";
 import { ScrollProgress } from "./ScrollProgress";
@@ -128,6 +129,7 @@ function currentLink(menu: NavMenu, pathname: string, picked: NavLink | null): N
 function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false); // mobile menu
+  const customer = useCustomerSession();
   const [sub, setSub] = useState<number | null>(null); // mobile submenu
   const [lastSub, setLastSub] = useState<number | null>(null);
   // The option whose sub-menu you just came Back from: it keeps the line while the menu is open.
@@ -577,15 +579,32 @@ function SiteHeader() {
               Call us
             </a>
           )}
-          <Link
-            href="/account"
-            className="btn btn--secondary mm-cta"
-            onClick={closeIfSamePage}
-            transitionTypes={NAV}
-            style={{ "--i": mobileItems.length + 3 } as React.CSSProperties}
-          >
-            Client sign-in
-          </Link>
+          {/* Signed out: the sign-in link. Signed in: their websites, with who they are and a way out. Nothing until we know. */}
+          {customer.known && !customer.email && (
+            <Link
+              href="/account"
+              className="btn btn--secondary mm-cta"
+              onClick={closeIfSamePage}
+              transitionTypes={NAV}
+              style={{ "--i": mobileItems.length + 3 } as React.CSSProperties}
+            >
+              Client sign-in
+            </Link>
+          )}
+          {customer.known && customer.email && (
+            <div className="mm-account" style={{ "--i": mobileItems.length + 3 } as React.CSSProperties}>
+              <Link href="/account" className="btn btn--secondary mm-cta" onClick={closeIfSamePage} transitionTypes={NAV}>
+                Your websites
+              </Link>
+              <p className="mm-account__who">
+                Signed in as <span>{customer.email}</span>
+                {" · "}
+                <button type="button" className="linkbtn" onClick={customer.signOut}>
+                  Sign out
+                </button>
+              </p>
+            </div>
+          )}
         </nav>
 
         <div className="mm-pane mm-pane--sub" inert={sub === null} aria-hidden={sub === null}>

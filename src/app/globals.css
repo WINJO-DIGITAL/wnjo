@@ -14410,3 +14410,20 @@ body:has(.pv) .site-footer {
   gap: var(--space-4);
   justify-items: start;
 }
+
+/* The phone menu when someone is signed in: their websites, who they are, and sign out. */
+.mm-account {
+  display: grid;
+  gap: var(--space-3);
+}
+.mm-account__who {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.mm-account__who span {
+  color: var(--color-ink);
+  font-weight: 550;
+}
