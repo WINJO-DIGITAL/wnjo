@@ -23,6 +23,8 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Pricing hero:** "Choose a plan" is the only button; "Compare what each plan includes." is a plain underlined link.
 - [x] **Managed websites hero:** the "On your own / With Winjo" switch drives the EV Exec walkthrough and its four jobs. Swipes on phones.
 - [x] **Wording:** "Buy your website outright" is now "Own your website" in the menus, the project page and the App development link.
+- [x] **Tagline kept:** "Your website. Our responsibility." stays as the brand tagline, in the footer, the metadata and the About page call to action. Decided by the owner.
+- [x] **About page tidied:** the two long paragraphs are now short labelled tick lists, the statement is smaller, and the four engineering standards have three ticks each. Ticks now show on dark sections.
 
 ## Still to do before launch
 - [ ] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data.

@@ -14343,3 +14343,43 @@ body:has(.pv) .site-footer {
     animation: none;
   }
 }
+
+/* Ticks on dark: the round-ended SVG tick takes the light ink (the plain .checks tick is dark ink). */
+.inverse .checks li::before,
+.plan--inverse .checks li::before {
+  background-color: var(--color-inverse-ink);
+}
+.inverse .feature .checks {
+  color: var(--color-inverse-ink-2);
+}
+
+/* About: the lead section is one statement and two short labelled lists, beside the phones. */
+.about-lead .statement {
+  font-size: var(--text-2xl);
+  max-width: 24ch;
+}
+.about-points {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+.about-points__group {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line);
+}
+.about-points__label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+.about-points__note {
+  margin: var(--space-1) 0 0;
+  max-width: 34rem;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}

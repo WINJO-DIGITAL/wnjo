@@ -22,11 +22,19 @@ const beliefs = [
 ];
 
 const standards = [
-  ["Accessible", "Semantic markup, keyboard support, visible focus and sufficient contrast, aiming for WCAG 2.2 AA.", "a11y"],
-  ["Fast", "Lean pages, optimised images and as little JavaScript as the job needs.", "fast"],
-  ["Secure", "Input validated on the server, secrets kept out of the browser, and prices recalculated server-side.", "secure"],
-  ["Maintainable", "Clear structure and shared design tokens, so the next change is as careful as the first.", "tokens"],
+  ["Accessible", ["Semantic markup and keyboard support", "Visible focus and sufficient contrast", "Aiming for WCAG 2.2 AA"], "a11y"],
+  ["Fast", ["Lean pages", "Optimised images", "As little JavaScript as the job needs"], "fast"],
+  ["Secure", ["Input validated on the server", "Secrets kept out of the browser", "Prices recalculated server-side"], "secure"],
+  ["Maintainable", ["Clear structure", "Shared design tokens", "So the next change is as careful as the first"], "tokens"],
 ] as const;
+
+// Why we exist, as two short labelled lists rather than paragraphs. What a website needs, and how we are different.
+const needs = ["Hosting and security", "Updates and changes", "A new design every couple of years"];
+const different = [
+  "Every website looks and works differently, never a template",
+  "Booking systems and software, like the driver and operator apps we developed for EV Exec",
+  "FYStay, the holiday stays platform we run ourselves",
+];
 
 /** A small picture of each standard, drawn in code (decorative: the text says it all). */
 function StandardDemo({ kind }: { kind: (typeof standards)[number][2] }) {
@@ -80,21 +88,32 @@ export default function AboutPage() {
       <section className="section section--ruled">
         <div className="container container--wide">
           <div className="split">
-            <div className="prose">
+            <div className="about-lead">
               <p className="statement">
                 Most websites are built, handed over and left to age. <em>We think the job starts at launch.</em>
               </p>
-              <p className="muted">
-                A website is never finished. It needs hosting, security, updates, changes and, every couple
-                of years, a new design. Most business owners end up organising all of that themselves. We take it on
-                instead, for one predictable monthly payment.
-              </p>
-              <p className="muted">
-                We&apos;re deliberately not competing in the template market. Every website we&apos;ve built looks and
-                works differently, because every business we&apos;ve built for is different. We also build booking
-                systems and software, like the driver and operator apps we developed for EV Exec, and FYStay, the
-                holiday stays platform we run ourselves.
-              </p>
+              <div className="about-points">
+                <div className="about-points__group">
+                  <p className="about-points__label">A website is never finished. It needs</p>
+                  <ul role="list" className="checks">
+                    {needs.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                  <p className="about-points__note">
+                    Most business owners end up organising all of that themselves. We take it on instead, for one
+                    predictable monthly payment.
+                  </p>
+                </div>
+                <div className="about-points__group">
+                  <p className="about-points__label">What we do differently</p>
+                  <ul role="list" className="checks">
+                    {different.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
             <div className="about-phones" aria-label="A selection of our work">
               {projects.map((p) => (
@@ -131,14 +150,18 @@ export default function AboutPage() {
                   <StandardDemo kind={kind} />
                 </div>
                 <h3 className="h3">{title}</h3>
-                <p className="muted">{body}</p>
+                <ul role="list" className="checks">
+                  {body.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <CtaBand tone="light" title={<>Your website is our responsibility.</>}>
+      <CtaBand tone="light" title={<>Your website. Our responsibility.</>}>
         <Link href="/pricing" className="btn btn--primary">
           Choose a plan
         </Link>
