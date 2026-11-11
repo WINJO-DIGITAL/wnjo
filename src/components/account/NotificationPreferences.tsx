@@ -25,7 +25,9 @@ export function NotificationPreferences({ client, userId }: { client: SupabaseCl
     let cancelled = false;
     Promise.all([
       client.from("notification_preferences").select("kind, in_app, email").eq("user_id", userId),
-      client.from("organizations").select("tenant_id").limit(1),
+      // A customer can read their own website briefs (RLS), which carry the tenant. Organizations are staff-only, so
+      // reading them here always came back empty and the choices never showed.
+      client.from("website_briefs").select("tenant_id").limit(1),
     ]).then(([p, o]) => {
       if (cancelled) return;
       setError(p.error ? "Your choices couldn't be loaded." : null);
