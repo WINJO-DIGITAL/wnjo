@@ -117,8 +117,15 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     expect(vi.mocked(startQuotePayment)).not.toHaveBeenCalled();
   });
 
-  it("short plan checkout: with a name and email, the customer is stored under that name", async () => {
+  it("short plan checkout: a business name is required, so a checkout without one is refused", async () => {
     const res = await post(body({ short: true, brief: undefined, draftId: null, details: { ...body().details, businessName: "", industry: "", description: "" } }));
+    expect(res.status).toBe(422);
+    expect(await res.json()).toMatchObject({ fields: { businessName: expect.any(String) } });
+    expect(vi.mocked(startQuotePayment)).not.toHaveBeenCalled();
+  });
+
+  it("short plan checkout: with a name, business and email, the customer is stored under that name", async () => {
+    const res = await post(body({ short: true, brief: undefined, draftId: null, details: { ...body().details, industry: "", description: "" } }));
     expect(res.status).toBe(200);
     expect(vi.mocked(startQuotePayment).mock.calls[0][1]).toMatchObject({ email: "ada@example.com" });
     expect(vi.mocked(startQuotePayment).mock.calls[0][1].name).not.toBe("New customer");

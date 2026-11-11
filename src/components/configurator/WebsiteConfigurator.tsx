@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { LegalDraftNotice } from "@/components/pricing/WebsitePackages";
+import { contactPhoneHref } from "@/lib/site";
 import {
   ADD_ONS,
   CARE_PLANS,
@@ -11,6 +12,8 @@ import {
   OWNERSHIP,
   VAT_NOTE,
   WEBSITE_PAGE_BANDS,
+  DELIVERY,
+  SUBSCRIPTION_TERMS,
   WEBSITE_PLANS,
   formatGBP,
   formatPence,
@@ -1160,8 +1163,28 @@ function PlanCheckout({
           ))}
         </ul>
         <Field id="name" label="Your name" value={details.name} error={errors.name} onChange={(v) => onDetail("name", v)} autoComplete="name" />
+        <Field id="businessName" label="Business name" value={details.businessName} error={errors.businessName} onChange={(v) => onDetail("businessName", v)} autoComplete="organization" />
         <Field id="email" label="Email" type="email" value={details.email} error={errors.email} onChange={(v) => onDetail("email", v)} autoComplete="email" inputMode="email" />
+        <Field id="phone" label="Phone" type="tel" optional value={details.phone} error={errors.phone} onChange={(v) => onDetail("phone", v)} autoComplete="tel" />
         <PayPanel quote={quote} payNow={payNow} agree={agree} onAgree={onAgree} startNow={startNow} onStartNow={onStartNow} />
+        <div className="pay-info">
+          <p className="eyebrow">What happens next</p>
+          <ul role="list" className="checks">
+            <li>
+              <span>We reply within one working day, and your website is live within {DELIVERY.liveWithinDays} days of us having your goals.</span>
+            </li>
+            <li>
+              <span>Cancel with {SUBSCRIPTION_TERMS.noticeDays} days&apos; notice, with no cancellation fee.</span>
+            </li>
+            <li>
+              <span>
+                Questions first? {contactPhoneHref && <a href={contactPhoneHref}>Call us</a>}
+                {contactPhoneHref && " or "}
+                <Link href="/contact">send us a message</Link>.
+              </span>
+            </li>
+          </ul>
+        </div>
         <div className="visually-hidden" aria-hidden="true">
           <label htmlFor="cfg-website">Leave this field empty</label>
           <input id="cfg-website" tabIndex={-1} autoComplete="off" value={honeypot} onChange={(e) => onHoneypot(e.target.value)} />
@@ -1185,7 +1208,7 @@ function PlanCheckout({
           </Link>
         </div>
         <p className="fine">
-          Payment is handled by Stripe. After you&apos;ve paid, we&apos;ll ask for your business, goals, pages and style.{" "}
+          Payment is handled by Stripe. After you&apos;ve paid, we&apos;ll ask for your goals, pages and style.{" "}
           <Link href="/pricing">Change plan</Link>
         </p>
       </form>
@@ -1219,22 +1242,25 @@ function PayPanel({
           ? `${quote.setup > 0 ? "Your setup fee and first month" : "Your first month"}${quote.oneOffTotal ? ", plus one-off extras" : ""}. Then ${formatGBP(quote.monthly)} a month, ${TERM}.`
           : `A 50% deposit on your ${formatGBP(quote.oneOffTotal)} website, as set out in our terms.`}
       </p>
-      <label className="sub-agree">
-        <input type="checkbox" checked={agree} onChange={(e) => onAgree(e.target.checked)} />
-        <span>
-          I agree to the{" "}
-          <Link href="/terms" target="_blank">
-            terms
-          </Link>
-          {monthly && OWNERSHIP.minimumTermMonths > 0 ? ` and the ${OWNERSHIP.minimumTermMonths}-month minimum term` : ""}.
-        </span>
-      </label>
-      <label className="sub-agree">
-        <input type="checkbox" checked={startNow} onChange={(e) => onStartNow(e.target.checked)} />
-        <span>
-          Please start work straight away. I understand that if I cancel within 14 days, I pay for the work already done.
-        </span>
-      </label>
+      <fieldset className="pay-agree">
+        <legend className="eyebrow">Before you pay</legend>
+        <label className="sub-agree">
+          <input type="checkbox" checked={agree} onChange={(e) => onAgree(e.target.checked)} />
+          <span>
+            I agree to the{" "}
+            <Link href="/terms" target="_blank">
+              terms
+            </Link>
+            {monthly && OWNERSHIP.minimumTermMonths > 0 ? ` and the ${OWNERSHIP.minimumTermMonths}-month minimum term` : ""}.
+          </span>
+        </label>
+        <label className="sub-agree">
+          <input type="checkbox" checked={startNow} onChange={(e) => onStartNow(e.target.checked)} />
+          <span>
+            Start my website straight away. If I cancel within 14 days, I pay only for the work already done.
+          </span>
+        </label>
+      </fieldset>
     </div>
   );
 }

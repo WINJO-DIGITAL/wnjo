@@ -2,7 +2,7 @@
  * Emails for website quotes. Plain text, so nothing a visitor typed is ever rendered as HTML. Each one states the
  * first payment and the ongoing payment separately, and says that the final price is confirmed in writing.
  */
-import { LEGAL_REVIEW_PENDING, OWNERSHIP, formatGBP, formatPence } from "./pricing";
+import { DELIVERY, LEGAL_REVIEW_PENDING, OWNERSHIP, formatGBP, formatPence } from "./pricing";
 import { siteUrl } from "./site";
 import { UNNAMED, type Intent, type WebsiteDetails } from "./website-enquiry";
 import type { WebsiteQuote } from "./website-quote";
@@ -204,6 +204,8 @@ export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text
       "",
       "Next, tell us about your website. Sign in with this email address and share your goals, the pages you need and the style you like. It takes a few minutes, and we start designing as soon as we have it:",
       `${(siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "")}/account`,
+      "",
+      `Once we have them, your website is live within ${DELIVERY.liveWithinDays} days.`,
       "",
       "Stripe emails a receipt for every payment.",
       "",

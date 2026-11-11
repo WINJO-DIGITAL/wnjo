@@ -31,6 +31,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **"Own your website" used everywhere:** menu, project page title, home and pricing buttons and headings. "Every £99 plan" is now "every managed plan"; "£99/month" is "£99 a month".
 - [x] **Remaining two-sentence headlines rewritten** on home, managed websites, pricing, booking systems and app development.
 - [x] **Boonma on its own domain:** the case study, the work pages and the "Visit the live site" links now use `boonma.co.uk` (the owner confirmed it; `www.boonma.co.uk` redirects to it).
+- [x] **Checkout details:** the pay screen asks for name, business name, email and an optional phone number. It also shows the 14-day delivery promise, the 30-day cancellation notice, and how to call or message us. The business name is required on the server too.
 - [x] **Confirmation page no longer imports a server-only module** (it pulled Node's crypto into the browser bundle and broke the dev build).
 
 ## Still to do before launch

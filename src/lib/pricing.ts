@@ -134,6 +134,12 @@ export const CARE_PLANS = {
 } as const;
 export type CarePlan = keyof typeof CARE_PLANS;
 
+/**
+ * Our delivery promise for a managed website, shown at checkout and in the welcome email. Counted from the day we have
+ * the customer's goals, pages and style. Set by the owner (November 2026).
+ */
+export const DELIVERY = { liveWithinDays: 14 } as const;
+
 export const TIMING_OPTIONS = {
   flexible: { label: "Flexible", hint: "No fixed deadline." },
   quarter: { label: "Within about 3 months" },

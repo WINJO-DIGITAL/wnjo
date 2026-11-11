@@ -14364,3 +14364,26 @@ body:has(.pv) .site-footer {
   font-size: var(--text-sm);
   color: var(--color-ink-2);
 }
+
+/* Checkout: the agreement is one group under a plain heading, and a short "what happens next" follows the price. */
+.pay-agree {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.pay-agree legend {
+  padding: 0;
+  margin-bottom: var(--space-2);
+}
+.pay-info {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line);
+  font-size: var(--text-sm);
+}
+.pay-info .checks {
+  font-size: var(--text-sm);
+}
