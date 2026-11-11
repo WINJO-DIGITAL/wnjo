@@ -102,6 +102,15 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     expect(vi.mocked(startQuotePayment).mock.calls[0][1].quote.monthly).toBe(149);
   });
 
+  it("short plan checkout: an email address alone is enough, and the customer is stored as New customer", async () => {
+    const res = await post(body({ short: true, brief: undefined, draftId: null, details: { ...body().details, name: "", businessName: "", industry: "", description: "" } }));
+    expect(res.status).toBe(200);
+    const args = vi.mocked(startQuotePayment).mock.calls[0][1];
+    expect(args).toMatchObject({ email: "ada@example.com", name: "New customer" });
+    const [, customer] = emails();
+    expect(customer.text).toContain("Hi there,");
+  });
+
   it("short plan checkout: refuses a project (one-off) and anything that isn't a payment", async () => {
     const short = { short: true, brief: undefined, details: { ...body().details, industry: "", description: "" } };
     const oneOff = await post(body({ ...short, answers: { ...DEFAULT_WEBSITE_ANSWERS, mode: "oneOff", want: "oneOff" } }));

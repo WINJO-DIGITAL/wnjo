@@ -8,6 +8,7 @@ import type { RevisionRow } from "@/lib/build-revisions";
 import { proposalPayNowFor } from "@/lib/pay-now";
 import { GOALS, STYLES, cleanBrief, validateBrief, type BriefErrors, type WebsiteBrief } from "@/lib/website-brief";
 import { DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
+import { DETAIL_LIMITS, UNNAMED } from "@/lib/website-enquiry";
 import { Confirmation } from "./Confirmation";
 import { FeedbackCard } from "./FeedbackCard";
 import { PayCard } from "./PayCard";
@@ -15,6 +16,7 @@ import { PayCard } from "./PayCard";
 type Brief = {
   id: string;
   reference: string;
+  name: string;
   business_name: string;
   route: Route;
   stage: Stage;
@@ -55,7 +57,7 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
   useEffect(() => {
     let cancelled = false;
     void Promise.all([
-      client.from("website_briefs").select("id, reference, business_name, route, stage, brief, figures, expected_by, created_at, updated_at").order("created_at", { ascending: false }),
+      client.from("website_briefs").select("id, reference, name, business_name, route, stage, brief, figures, expected_by, created_at, updated_at").order("created_at", { ascending: false }),
       client.from("website_brief_events").select("brief_id, kind, detail, created_at").order("created_at"),
       client.from("website_proposals").select("id, brief_id, reference, status, summary, lines, setup_pence, monthly_pence, one_off_pence").order("created_at", { ascending: false }),
       client.from("build_revisions").select("id, brief_id, number, status, request, response, created_at, resolved_at").order("number"),
@@ -208,7 +210,7 @@ function BuildCard({
         {showPreview && tab !== "progress" && <PreviewLink client={client} briefId={brief.id} />}
         {tab === "overview" && (
           <>
-            {needsDetails && <BriefDetailsCard client={client} briefId={brief.id} initial={brief.brief} onChanged={onChanged} />}
+            {needsDetails && <BriefDetailsCard client={client} briefId={brief.id} initial={brief.brief} name={brief.name} businessName={brief.business_name} onChanged={onChanged} />}
             {proposal && <ProposalCard client={client} proposal={proposal} onChanged={onChanged} />}
             {showPay && <PayCard client={client} briefId={brief.id} payNow={proposalPayNowFor(brief.figures.mode === "oneOff" ? "oneOff" : "monthly", accepted)} />}
             {!proposal && !showPay && brief.brief.goals.length > 0 && (
@@ -249,14 +251,21 @@ function BriefDetailsCard({
   client,
   briefId,
   initial,
+  name: savedName,
+  businessName: savedBusiness,
   onChanged,
 }: {
   client: SupabaseClient;
   briefId: string;
   initial: WebsiteBrief;
+  name: string;
+  businessName: string;
   onChanged: () => void;
 }) {
   const [brief, setBrief] = useState<WebsiteBrief>(initial);
+  // A short checkout stores "New customer" until they say who they are.
+  const [name, setName] = useState(savedName === UNNAMED ? "" : savedName);
+  const [businessName, setBusinessName] = useState(savedBusiness);
   const [errors, setErrors] = useState<BriefErrors>({});
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -283,7 +292,7 @@ function BriefDetailsCard({
       ? await fetch("/api/briefs/details", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ briefId, draftId, brief: cleaned }),
+          body: JSON.stringify({ briefId, draftId, name, businessName, brief: cleaned }),
         }).catch(() => null)
       : null;
     const json = (await res?.json().catch(() => null)) as { error?: string } | null;
@@ -297,6 +306,14 @@ function BriefDetailsCard({
 
   return (
     <form onSubmit={send} noValidate className="form stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
+      <div className="field">
+        <label htmlFor={`bd-name-${briefId}`}>Your name</label>
+        <input id={`bd-name-${briefId}`} className="input" maxLength={DETAIL_LIMITS.name} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
+      </div>
+      <div className="field">
+        <label htmlFor={`bd-biz-${briefId}`}>Business name</label>
+        <input id={`bd-biz-${briefId}`} className="input" maxLength={DETAIL_LIMITS.businessName} autoComplete="organization" value={businessName} onChange={(e) => setBusinessName(e.target.value)} />
+      </div>
       <GoalsField brief={brief} onChange={update} error={errors.goals} />
       <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} />
       <DesignFields brief={brief} onChange={update} />

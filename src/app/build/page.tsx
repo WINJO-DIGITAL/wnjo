@@ -38,7 +38,7 @@ export default async function BuildPage({
       <PageHero
         eyebrow="Get started"
         title={short ? <>Start your website.</> : <>Let&apos;s get your website started.</>}
-        lede={short ? "Three details, then pay securely. We ask about your design after." : `Choose a plan and tell us about your business. From ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, with no minimum term. Nothing is charged until you agree to go ahead.`}
+        lede={short ? "Enter your email and pay securely. We ask about your business and design after." : `Choose a plan and tell us about your business. From ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, with no minimum term. Nothing is charged until you agree to go ahead.`}
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">

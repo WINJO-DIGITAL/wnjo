@@ -5,6 +5,8 @@ import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { customerFromRequest } from "@/lib/staff-auth";
 import { BRIEF_VERSION, DRAFT_ID_RE, cleanBrief, formatBrief, validateBrief } from "@/lib/website-brief";
 import { confirmBriefFiles } from "@/lib/brief-store";
+import { clean } from "@/lib/enquiry";
+import { DETAIL_LIMITS } from "@/lib/website-enquiry";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -62,7 +64,11 @@ export async function POST(request: NextRequest) {
   const version = ((last as { version: number } | null)?.version ?? 0) + 1;
 
   const saved = { ...brief, schema: BRIEF_VERSION };
-  const { error } = await db.from("website_briefs").update({ brief: saved }).eq("id", row.id).eq("stage", row.stage);
+  // Their name and business name, asked for after payment. Only what they typed replaces what we hold.
+  const name = clean(body.name, DETAIL_LIMITS.name);
+  const businessName = clean(body.businessName, DETAIL_LIMITS.businessName);
+  const who = { ...(name ? { name } : {}), ...(businessName ? { business_name: businessName } : {}) };
+  const { error } = await db.from("website_briefs").update({ brief: saved, ...who }).eq("id", row.id).eq("stage", row.stage);
   if (error) return fail(500, "We couldn't save your brief just now. Please try again.");
 
   const actor = { tenant_id: row.tenant_id, brief_id: row.id, actor_type: "customer", actor_user: customer.userId, actor_email: customer.email };
@@ -80,11 +86,17 @@ export async function POST(request: NextRequest) {
   ]);
   if (v.error || e.error) console.error("Brief details history save failed");
 
+  // The payment record carries the same name, so staff and receipts use it. Best effort: the brief is already saved.
+  if (Object.keys(who).length) {
+    const { error: subError } = await db.from("website_subscriptions").update(who).eq("enquiry_reference", row.reference);
+    if (subError) console.error("Customer name update failed");
+  }
+
   const config = mailConfig();
   if (config) {
     await sendEnquiryEmail(config, {
-      subject: `Brief details from ${row.name} [${row.reference}]`,
-      text: [`${row.name} has told us about their website.`, "", formatBrief(brief)].join("\n"),
+      subject: `Brief details from ${businessName || name || row.name} [${row.reference}]`,
+      text: [`${name || row.name} has told us about their website.`, ...(businessName ? [`Business: ${businessName}`] : []), "", formatBrief(brief)].join("\n"),
       replyTo: customer.email,
     });
   }

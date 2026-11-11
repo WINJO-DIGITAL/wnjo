@@ -32,6 +32,12 @@ export const EMPTY_DETAILS: WebsiteDetails = {
   requirements: "",
 };
 
+/**
+ * The name stored when a customer pays through the short checkout, which asks for an email address only. The database
+ * needs a name on every subscription; emails greet this one as "there", and the account form replaces it after payment.
+ */
+export const UNNAMED = "New customer";
+
 /** What the customer chose to do with their quote (step 8). */
 export const INTENTS = {
   pay: { label: "Pay and start", hint: "Pay securely with Stripe and we start your website." },
@@ -60,12 +66,12 @@ export function cleanDetails(input: unknown): WebsiteDetails {
 
 /**
  * Required: name, business name, email, industry and a short description. Phone is required for a callback.
- * The short plan checkout (`short`) needs only name, business name and email; the rest comes in the brief after payment.
+ * The short plan checkout (`short`) needs only an email address; the rest comes in the brief after payment.
  */
 export function validateDetails(details: WebsiteDetails, intent: Intent, short = false): DetailErrors {
   const errors: DetailErrors = {};
-  if (details.name.length < 2) errors.name = "Please tell us your name.";
-  if (details.businessName.length < 2) errors.businessName = "Please tell us your business name.";
+  if (!short && details.name.length < 2) errors.name = "Please tell us your name.";
+  if (!short && details.businessName.length < 2) errors.businessName = "Please tell us your business name.";
   if (!EMAIL_RE.test(details.email)) errors.email = "Please enter a valid email address, like name@business.co.uk.";
   if (intent === "callback" && !details.phone) errors.phone = "Please add a phone number so we can call you back.";
   else if (details.phone && (!PHONE_RE.test(details.phone) || details.phone.replace(/\D/g, "").length < 10)) {

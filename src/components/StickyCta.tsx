@@ -26,8 +26,22 @@ export function StickyCta() {
     window.addEventListener(PLAN_EVENT, onPlan);
     return () => window.removeEventListener(PLAN_EVENT, onPlan);
   }, []);
+  // The pricing page is where a plan is chosen, so the bar comes up the moment one is picked (and goes when it is
+  // cleared); it steps aside only over the footer. Only the homepage waits for the visitor to scroll.
+  const [footerInView, setFooterInView] = useState(false);
   useEffect(() => {
-    if (HIDDEN_ON.includes(pathname)) return;
+    if (pathname !== "/pricing") return;
+    const footer = document.querySelector(".site-footer");
+    if (!footer) return;
+    const observer = new IntersectionObserver(([entry]) => setFooterInView(entry.isIntersecting));
+    observer.observe(footer);
+    return () => {
+      observer.disconnect();
+      setFooterInView(false);
+    };
+  }, [pathname]);
+  useEffect(() => {
+    if (HIDDEN_ON.includes(pathname) || pathname === "/pricing") return;
     if (pathname === "/") {
       // Homepage: the bar takes over once the hero (which ends with the top "Get started" button) has scrolled away,
       // on every screen size, and steps aside only over the footer.
@@ -108,10 +122,11 @@ export function StickyCta() {
 
   if (HIDDEN_ON.includes(pathname)) return null;
 
+  const visible = pathname === "/pricing" ? Boolean(plan) && !footerInView : show;
   const chosen = plan && plan in WEBSITE_PLANS ? WEBSITE_PLANS[plan as WebsitePlanId] : null;
 
   return (
-    <aside className="sticky-cta" aria-label="Get started" data-show={show} inert={!show}>
+    <aside className="sticky-cta" aria-label="Get started" data-show={visible} inert={!visible}>
       {chosen ? (
         <Link href={`/build?plan=${plan}`} className="btn btn--primary">
           Continue with {chosen.name}

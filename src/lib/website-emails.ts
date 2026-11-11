@@ -3,10 +3,10 @@
  * first payment and the ongoing payment separately, and says that the final price is confirmed in writing.
  */
 import { LEGAL_REVIEW_PENDING, OWNERSHIP, formatGBP, formatPence } from "./pricing";
-import type { Intent, WebsiteDetails } from "./website-enquiry";
+import { UNNAMED, type Intent, type WebsiteDetails } from "./website-enquiry";
 import type { WebsiteQuote } from "./website-quote";
 
-const first = (name: string) => name.trim().split(/\s+/)[0] || "there";
+const first = (name: string) => (name === UNNAMED ? "" : name.trim().split(/\s+/)[0]) || "there";
 
 /** What the first payment is made of, in words: "your first month", or "setup, one-off extras and your first month". */
 export function firstPaymentParts(hasSetup: boolean, hasOneOff: boolean): string {
@@ -107,7 +107,7 @@ export function ownerSubject(details: WebsiteDetails, quote: WebsiteQuote, inten
       ? `${quote.packageName} ${formatGBP(quote.monthly)}/month`
       : `One-off ${quote.hasFromPrices ? "from " : ""}${formatGBP(quote.oneOffTotal)}`;
   const kind = intent === "callback" ? "Callback request" : intent === "pay" ? "Website order (paying now)" : "Website quote";
-  return `${kind} from ${details.businessName || details.name}: ${what} [${reference}]`.replace(/\s+/g, " ").slice(0, 200);
+  return `${kind} from ${details.businessName || (details.name === UNNAMED ? details.email : details.name)}: ${what} [${reference}]`.replace(/\s+/g, " ").slice(0, 200);
 }
 
 /* ------------------------------------------------------------------ */
