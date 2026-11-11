@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { CtaBand } from "@/components/Blocks";
 import { ArrowRight } from "@/components/Icons";
 import { HeroShowcase } from "@/components/interactive/HeroShowcase";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
@@ -9,8 +8,8 @@ import { RefreshTimeline } from "@/components/managed/RefreshTimeline";
 import { Responsibility } from "@/components/managed/Responsibility";
 import { SubscriptionTerms } from "@/components/managed/Sections";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
-import { WebStages } from "@/components/WebStages";
-import { ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { ProcessScroll } from "@/components/interactive/ProcessScroll";
+import { REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
@@ -178,8 +177,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How it works: a real sequence, so it keeps its numbers. */}
-      <section id="process" data-nav="/managed-websites" className="tile home-tile" aria-labelledby="process-title">
+      {/* How it works: one pinned screen that plays the four steps as the visitor scrolls. */}
+      <section id="process" data-nav="/managed-websites" className="tile tile--pinned home-tile" aria-labelledby="process-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">How it works</p>
           <h2 id="process-title" className="tile__title">
@@ -190,7 +189,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="container container--wide apps-tile__body">
-          <WebStages />
+          <ProcessScroll />
         </div>
       </section>
 
@@ -233,25 +232,44 @@ export default function HomePage() {
         </div>
       </section>
 
-      <CtaBand
-        title={<>Hand us your website.</>}
-        body={
-          <>
-            Managed from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, or buy it outright from {formatGBP(ONE_OFF_WEBSITE.from)}.
-            Questions first? <Link href="/faq">Read the FAQ</Link>.
-          </>
-        }
-      >
-        <Link href="/pricing" className="btn btn--primary">
-          Choose a plan
-        </Link>
-        <Link href="/website-projects" className="btn btn--secondary">
-          Buy outright
-        </Link>
-        <Link href="/contact" className="arrow-link">
-          Talk to us first <ArrowRight />
-        </Link>
-      </CtaBand>
+      <section className="section inverse offer-band" aria-labelledby="offer-title" data-cta-hide>
+        <div className="container container--wide offer-band__grid" data-reveal>
+          <div className="stack">
+            <p className="tile__name">Managed website</p>
+            <h2 id="offer-title" className="h1" style={{ maxWidth: "16ch" }}>
+              Hand us <span className="serif-em">your website.</span>
+            </h2>
+            <p className="offer-band__price">
+              From <b>{formatGBP(WEBSITE_PLANS.bronze.monthly)}</b>
+              <span>/month</span>
+            </p>
+            <p className="offer-band__terms">
+              30 days&apos; notice. No minimum term. Nothing is charged until you agree.
+            </p>
+          </div>
+          <div className="offer-band__panel">
+            <ul className="offer-band__list" role="list">
+              <li>Bespoke design</li>
+              <li>Managed hosting and SSL</li>
+              <li>Security monitoring</li>
+              <li>Updates and fixes</li>
+              <li>Small changes made for you</li>
+              <li>A new design every 24 months on {WEBSITE_PLANS.silver.name} and {WEBSITE_PLANS.gold.name}</li>
+            </ul>
+            <div className="btn-row">
+              <Link href="/pricing" className="btn btn--primary">
+                Choose a plan
+              </Link>
+              <Link href="/contact" className="arrow-link">
+                Talk to us first <ArrowRight />
+              </Link>
+              <Link href="/website-projects" className="arrow-link">
+                Own your website <ArrowRight />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
