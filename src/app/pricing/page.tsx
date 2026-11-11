@@ -38,10 +38,10 @@ export default function PricingPage() {
           <Link href="#plans" className="btn btn--primary">
             Choose a plan
           </Link>
-          <Link href="#compare" className="btn btn--secondary">
-            Compare the plans
-          </Link>
         </div>
+        <p className="mt-4">
+          <Link href="#compare">Compare what each plan includes.</Link>
+        </p>
       </PageHero>
 
       {/* 1. The three plans. */}
