@@ -17,6 +17,13 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] Customer-facing AI wording removed: the planning step reads "Planning your website".
 - [x] Phone menu has a "Client sign-in" link.
 
+## Done since the handover list (on main)
+- [x] **Short checkout:** the name is required on the form and the server. The "New customer" stand-in is gone.
+- [x] **Plans swipe on phones:** the pricing page plans swipe sideways, the same as the home page.
+- [x] **Pricing hero:** "Choose a plan" is the only button; "Compare what each plan includes." is a plain underlined link.
+- [x] **Managed websites hero:** the "On your own / With Winjo" switch drives the EV Exec walkthrough and its four jobs. Swipes on phones.
+- [x] **Wording:** "Buy your website outright" is now "Own your website" in the menus, the project page and the App development link.
+
 ## Still to do before launch
 - [ ] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data.
 - [x] **Staff subscriptions:** the staff read rule is unchanged in the database. Confirm by signing in as staff.
