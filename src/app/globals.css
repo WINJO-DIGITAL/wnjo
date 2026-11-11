@@ -12895,6 +12895,16 @@ body:has(.pv) .site-footer {
   align-items: start;
   width: 100%;
 }
+/* One list at a time: "On your own" shows yours, "With Winjo" shows ours, ending on "Run your business". */
+.resp[data-ours="true"] .resp__col:first-child,
+.resp[data-ours="false"] .resp__col--ours {
+  display: none;
+}
+.resp[data-ours="true"] .resp__board,
+.resp[data-ours="false"] .resp__board {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 40rem;
+}
 .resp__col {
   padding: clamp(1.25rem, 1rem + 1.2vw, 2.25rem);
   border: 1px solid var(--color-line-strong);
@@ -14127,6 +14137,12 @@ body:has(.pv) .site-footer {
   padding-left: 0;
 }
 .resp__yours span::before {
+  content: none;
+}
+.resp__col--ours .resp__yours span {
+  padding-left: 0;
+}
+.resp__col--ours .resp__yours span::before {
   content: none;
 }
 

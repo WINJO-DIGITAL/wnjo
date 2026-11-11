@@ -38,9 +38,6 @@ export function Responsibility() {
                 <span>{chore}</span>
               </li>
             ))}
-            <li className="resp__yours">
-              <span>Run your business</span>
-            </li>
           </ul>
         </div>
         <div className="resp__col resp__col--ours" aria-hidden={!ours}>
@@ -51,6 +48,9 @@ export function Responsibility() {
                 <span>{chore.replace(/^Find a designer$/, "Design your website").replace(/^Find someone to make changes$/, "Make your changes")}</span>
               </li>
             ))}
+            <li className="resp__yours">
+              <span>Run your business</span>
+            </li>
           </ul>
         </div>
       </div>
