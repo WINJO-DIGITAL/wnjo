@@ -12919,7 +12919,8 @@ body:has(.pv) .site-footer {
 }
 .resp__list li {
   overflow: hidden;
-  max-height: 2.6em;
+  /* Tall enough for a item that wraps onto two or three lines; the switch still collapses items to 0. */
+  max-height: 6em;
   transition:
     max-height var(--duration-slow) var(--ease) calc(var(--i, 0) * 45ms),
     opacity var(--duration-slow) var(--ease) calc(var(--i, 0) * 45ms);
@@ -12934,7 +12935,7 @@ body:has(.pv) .site-footer {
   line-height: 1.1;
 }
 .resp__yours {
-  max-height: 4em !important;
+  max-height: none !important;
 }
 /* With Winjo: the chores leave your list and appear in ours. */
 .resp[data-ours="true"] .resp__col:first-child li:not(.resp__yours) {
