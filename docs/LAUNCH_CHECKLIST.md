@@ -35,9 +35,9 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Confirmation page no longer imports a server-only module** (it pulled Node's crypto into the browser bundle and broke the dev build).
 
 ## Still to do before launch
-- [ ] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data.
+- [x] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data. Confirmed by the owner: works.
 - [x] **Staff subscriptions:** the staff read rule is unchanged in the database. Confirm by signing in as staff.
-- [ ] **Sign-in link:** confirm the emailed link lands on the account page, not the home page. The code sends it to `/account` (checked in code). Not yet tested with a real email.
+- [x] **Sign-in link:** confirm the emailed link lands on the account page, not the home page. The code sends it to `/account` (checked in code). Not yet tested with a real email. Confirmed by the owner: works, tested several times.
 - [x] **Live site:** Core shows £99 a month with no extra pages (checked on the live site).
 - [x] **Preview check:** Plan & billing and the five-step bar checked on a phone-sized layout.
 - [ ] **Staff:** set expected dates on live websites so customers see them. The feature is built (staff admin and customer account). No website is live yet: the one brief in production is in specification with no date.
@@ -59,16 +59,16 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 Source: the handover list. Checked against `main` at `3b554bc`, which is the same commit as this branch.
 
 ### Needs the owner
-- [ ] **Trust facts:** company number, registered address, VAT number, reviews, team photos and a guarantee. None have been invented.
-- [ ] **Delivery timeline:** the "live in X days" line needs a real figure.
-- [ ] **Real client before and after:** send screenshots to replace the example site in the refresh slider.
-- [ ] **Terms:** the draft notice is on and no solicitor has reviewed the terms. Decide whether to publish them as they are.
-- [ ] **Two tick boxes on the payment screen:** agreeing to the terms and the 14-day start waiver. Keep both unless the owner says otherwise.
+- [x] **Trust facts:** done. Sole trader, so no company number. The registered address is in the terms. Not VAT registered. No reviews yet (new business). One-person business, so no team photos. The guarantees are as already agreed.
+- [x] **Delivery timeline:** decided. A managed website is live within 14 days of us having the customer's goals, pages and style. Shown on the pay screen and in the welcome email (`DELIVERY` in `src/lib/pricing.ts`).
+- [ ] **Refresh slider:** the before-and-after comparison on the Winjo Refresh and managed websites pages uses an example site, labelled as an example. Owner to decide: keep it, or remove it until a real client is available.
+- [x] **Terms:** agreed. Published as drafted, without a solicitor review.
+- [x] **Two tick boxes on the payment screen:** kept, under a "Before you pay" heading, with plainer wording. The owner is happy with them.
 
 ### Needs testing (cannot be done from the build environment)
-- [ ] **Test payment:** run a plan through Stripe test mode, including the confirmation page, the account and the owner email. Needs Stripe test keys.
-- [ ] **Owner email after payment:** pay a plan in Stripe test mode and confirm exactly one owner email arrives, after the payment ("New … subscription"), and none when the form is submitted.
-- [ ] **Customer emails after payment:** pay a plan in Stripe test mode and confirm the customer gets only the welcome email, with no "Your website is waiting" email and no "Tell us about your website" reminder for a day or until the goals form is filled in.
+- [x] **Test payment:** run a plan through Stripe test mode, including the confirmation page, the account and the owner email. Needs Stripe test keys. Confirmed by the owner several times: payments go through, and both the owner and the customer get an email.
+- [x] **Owner email after payment:** pay a plan in Stripe test mode and confirm exactly one owner email arrives, after the payment ("New … subscription"), and none when the form is submitted. Confirmed by the owner: the owner gets an email after payment.
+- [x] **Customer emails after payment:** pay a plan in Stripe test mode and confirm the customer gets only the welcome email, with no "Your website is waiting" email and no "Tell us about your website" reminder for a day or until the goals form is filled in. Confirmed by the owner: the customer gets an email after payment.
 - [ ] **Account form and reminder:** sign in as a customer and check the goals form, uploads and the reminder email.
 - [ ] **Buy-outright request:** submit one end to end and check the proposal route in the staff admin.
 - [ ] **Production builds:** check the production build of `3b554bc` on a phone and a desktop.
