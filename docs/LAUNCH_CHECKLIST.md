@@ -40,7 +40,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Sign-in link:** confirm the emailed link lands on the account page, not the home page. The code sends it to `/account` (checked in code). Not yet tested with a real email. Confirmed by the owner: works, tested several times.
 - [x] **Live site:** Core shows £99 a month with no extra pages (checked on the live site).
 - [x] **Preview check:** Plan & billing and the five-step bar checked on a phone-sized layout.
-- [ ] **Staff:** set an expected date on each website in progress so customers see it. The feature is built (staff admin and customer account). Two websites are in progress with no date: WNJO-D95245 (goals in) and WNJO-D59321 (goals still to come). Set the dates once agreed.
+- [x] **Staff:** expected date set on WNJO-D95245 (20 November, owner confirmed). WNJO-D59321 has no date until its goals arrive, because the 14-day promise counts from then.
 - [x] **Test-mode subscription:** no subscriptions left in the database for the test customer. Confirm in the Stripe test dashboard.
 
 ## Grok switch-on (last step before launch)
