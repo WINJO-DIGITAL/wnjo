@@ -1380,13 +1380,17 @@ button.arrow-link {
   align-items: baseline;
 }
 
+/* The tick: one round-ended stroke, the same shape and weight as the ticks and crosses on the home page lists. */
 .checks li::before {
   content: "";
-  width: 0.7rem;
-  height: 0.4rem;
-  border-left: 1.5px solid var(--color-ink);
-  border-bottom: 1.5px solid var(--color-ink);
-  transform: translateY(-0.2em) rotate(-45deg);
+  align-self: start;
+  justify-self: start;
+  width: 0.95em;
+  height: 0.95em;
+  margin-top: 0.22em;
+  background-color: var(--color-ink);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 .checks--dash li::before {
@@ -14137,9 +14141,9 @@ body:has(.pv) .site-footer {
   content: "";
   position: absolute;
   left: 0;
-  top: 0.45em;
-  width: 0.8em;
-  height: 0.8em;
+  top: 0.3em;
+  width: 0.95em;
+  height: 0.95em;
   background-color: var(--color-ink-3);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
