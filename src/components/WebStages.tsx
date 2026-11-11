@@ -62,14 +62,13 @@ function Screen({ stage }: { stage: (typeof STAGES)[number]["id"] }) {
 export function WebStages() {
   return (
     <ol role="list" className="bs bs--web" tabIndex={0} aria-label="How getting started works, step by step">
-      {STAGES.map((s, i) => (
+      {STAGES.map((s) => (
         <li key={s.id} className="bs__stage" data-stage={s.id}>
           <div className="bs__screen" aria-hidden="true">
             <div className="bs__inner">
               <Screen stage={s.id} />
             </div>
           </div>
-          <span className="bs__num">{String(i + 1).padStart(2, "0")}</span>
           <h3>{s.title}</h3>
           <p>{s.line}</p>
         </li>

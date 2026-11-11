@@ -8034,7 +8034,7 @@ ol.bs {
 }
 
 @media (min-width: 56rem) {
-  .bs--web {
+  ol.bs.bs--web {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
@@ -12892,6 +12892,7 @@ body:has(.pv) .site-footer {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-5);
+  align-items: start;
   width: 100%;
 }
 .resp__col {
@@ -13516,6 +13517,9 @@ body:has(.pv) .site-footer {
 .inverse .rf__caption {
   color: var(--color-inverse-ink-2);
 }
+#refresh .fine {
+  color: var(--color-inverse-ink-2);
+}
 @media (max-width: 29.99rem) {
   .rf__what {
     font-size: var(--text-xs);
@@ -14059,6 +14063,7 @@ body:has(.pv) .site-footer {
   #refresh .rf__caption {
     display: none;
   }
+
   #refresh .rf__stage,
   #refresh .rf__timeline {
     width: 100%;

@@ -235,7 +235,12 @@ export default function HomePage() {
 
       <CtaBand
         title={<>Hand us your website.</>}
-        body={<>Managed from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, or buy it outright from {formatGBP(ONE_OFF_WEBSITE.from)}.</>}
+        body={
+          <>
+            Managed from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month, or buy it outright from {formatGBP(ONE_OFF_WEBSITE.from)}.
+            Questions first? <Link href="/faq">Read the FAQ</Link>.
+          </>
+        }
       >
         <Link href="/pricing" className="btn btn--primary">
           Choose a plan
