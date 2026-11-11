@@ -10,7 +10,7 @@ import { PROJECT_TYPES, estimate, parseAnswers } from "@/lib/pricing";
 import { rateLimited } from "@/lib/rate-limit";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { serviceClient } from "@/lib/quote-store";
-import { INTENTS, UNNAMED, cleanDetails, formatDetails, validateDetails, type Intent } from "@/lib/website-enquiry";
+import { INTENTS, cleanDetails, formatDetails, validateDetails, type Intent } from "@/lib/website-enquiry";
 import { customerAcknowledgement, ownerSubject, payLinkEmail, projectAcknowledgement } from "@/lib/website-emails";
 import { startQuotePayment } from "@/lib/pay-from-quote";
 import { routeFor } from "@/lib/build-journey";
@@ -274,9 +274,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
   if (short && (intent !== "pay" || answers.mode !== "monthly")) {
     return NextResponse.json({ error: "Some of your choices were missing. Please review your plan." }, { status: 422 });
   }
-  // The short checkout asks for an email address only; the name is asked for after payment.
-  const named = short && !details.name ? { ...details, name: UNNAMED } : details;
-  const fieldErrors = validateDetails(named, intent, short);
+  const fieldErrors = validateDetails(details, intent, short);
   if (Object.keys(fieldErrors).length) {
     return NextResponse.json({ error: "Please check the highlighted fields.", fields: fieldErrors }, { status: 422 });
   }
@@ -315,12 +313,12 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
     return NextResponse.json({ error: "That plan needs a written proposal first. Please use the full steps." }, { status: 422 });
   }
   const reference = newReference();
-  const subject = ownerSubject(named, quote, intent, reference);
+  const subject = ownerSubject(details, quote, intent, reference);
   const text = [
     `Reference: ${reference}`,
     `Next step requested: ${INTENTS[intent].label}`,
     "",
-    formatDetails(named),
+    formatDetails(details),
     "",
     formatWebsiteQuote(answers, quote, formatGBP),
   ];
@@ -332,9 +330,9 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
     ? await saveEnquiry({
         reference,
         kind: "brief",
-        name: named.name,
-        email: named.email,
-        company: named.businessName,
+        name: details.name,
+        email: details.email,
+        company: details.businessName,
         topic: intent === "callback" ? "Callback request" : "Website quote",
         subject,
         body: text.join("\n"),
@@ -343,7 +341,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
           version: 1,
           intent,
           answers,
-          details: { phone: named.phone, industry: named.industry, launchDate: named.launchDate },
+          details: { phone: details.phone, industry: details.industry, launchDate: details.launchDate },
           figures: {
             mode: quote.mode,
             package: quote.packageName,
@@ -356,7 +354,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
         },
       })
     : false;
-  const sent = config ? await sendEnquiryEmail(config, { subject, text: text.join("\n"), replyTo: named.email }) : false;
+  const sent = config ? await sendEnquiryEmail(config, { subject, text: text.join("\n"), replyTo: details.email }) : false;
 
   if (!saved && !sent) {
     return NextResponse.json({ error: "We couldn't send your quote just now. Please try again shortly." }, { status: 502 });
@@ -368,9 +366,9 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
       ? await createBrief(db, {
           tenantId: WNJO_TENANT_ID,
           reference,
-          email: named.email,
-          name: named.name,
-          businessName: named.businessName,
+          email: details.email,
+          name: details.name,
+          businessName: details.businessName,
           draftId,
           brief,
           answers,
@@ -387,9 +385,9 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
           tenantId: WNJO_TENANT_ID,
           reference,
           route: created.route,
-          email: named.email,
-          name: named.name,
-          businessName: named.businessName || null,
+          email: details.email,
+          name: details.name,
+          businessName: details.businessName || null,
           answers,
           quote,
           startNow: body.startNow === true,
@@ -406,7 +404,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
       const message = payLinkEmail(
         {
           reference: offerReference,
-          name: named.name,
+          name: details.name,
           packageName: amounts.packageName,
           kind: amounts.kind,
           setupPence: amounts.setupPence,
@@ -417,10 +415,10 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
         },
         `${new URL(request.url).origin}/subscribe/${token}`,
       );
-      await sendEmail(customerConfig, { to: named.email, subject: message.subject, text: message.text }, "Payment link");
+      await sendEmail(customerConfig, { to: details.email, subject: message.subject, text: message.text }, "Payment link");
     } else {
-      const ack = customerAcknowledgement({ reference, details: named, quote, intent: intent === "pay" ? "quote" : intent, siteUrl: site });
-      await sendEmail(customerConfig, { to: named.email, subject: ack.subject, text: ack.text }, "Quote acknowledgement");
+      const ack = customerAcknowledgement({ reference, details: details, quote, intent: intent === "pay" ? "quote" : intent, siteUrl: site });
+      await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Quote acknowledgement");
     }
   }
 

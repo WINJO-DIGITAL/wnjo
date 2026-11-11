@@ -102,13 +102,18 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     expect(vi.mocked(startQuotePayment).mock.calls[0][1].quote.monthly).toBe(149);
   });
 
-  it("short plan checkout: an email address alone is enough, and the customer is stored as New customer", async () => {
+  it("short plan checkout: a name is required, so an email alone is refused", async () => {
     const res = await post(body({ short: true, brief: undefined, draftId: null, details: { ...body().details, name: "", businessName: "", industry: "", description: "" } }));
+    expect(res.status).toBe(422);
+    expect(await res.json()).toMatchObject({ fields: { name: expect.any(String) } });
+    expect(vi.mocked(startQuotePayment)).not.toHaveBeenCalled();
+  });
+
+  it("short plan checkout: with a name and email, the customer is stored under that name", async () => {
+    const res = await post(body({ short: true, brief: undefined, draftId: null, details: { ...body().details, businessName: "", industry: "", description: "" } }));
     expect(res.status).toBe(200);
-    const args = vi.mocked(startQuotePayment).mock.calls[0][1];
-    expect(args).toMatchObject({ email: "ada@example.com", name: "New customer" });
-    const [, customer] = emails();
-    expect(customer.text).toContain("Hi there,");
+    expect(vi.mocked(startQuotePayment).mock.calls[0][1]).toMatchObject({ email: "ada@example.com" });
+    expect(vi.mocked(startQuotePayment).mock.calls[0][1].name).not.toBe("New customer");
   });
 
   it("short plan checkout: refuses a project (one-off) and anything that isn't a payment", async () => {

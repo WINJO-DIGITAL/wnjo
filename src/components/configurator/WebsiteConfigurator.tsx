@@ -1159,6 +1159,7 @@ function PlanCheckout({
             <li key={item}>{item}</li>
           ))}
         </ul>
+        <Field id="name" label="Your name" value={details.name} error={errors.name} onChange={(v) => onDetail("name", v)} autoComplete="name" />
         <Field id="email" label="Email" type="email" value={details.email} error={errors.email} onChange={(v) => onDetail("email", v)} autoComplete="email" inputMode="email" />
         <PayPanel quote={quote} payNow={payNow} agree={agree} onAgree={onAgree} startNow={startNow} onStartNow={onStartNow} />
         <div className="visually-hidden" aria-hidden="true">
@@ -1184,7 +1185,7 @@ function PlanCheckout({
           </Link>
         </div>
         <p className="fine">
-          Payment is handled by Stripe. After you&apos;ve paid, we&apos;ll ask for your name, goals, pages and style.{" "}
+          Payment is handled by Stripe. After you&apos;ve paid, we&apos;ll ask for your business, goals, pages and style.{" "}
           <Link href="/pricing">Change plan</Link>
         </p>
       </form>

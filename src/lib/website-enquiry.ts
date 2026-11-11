@@ -70,7 +70,7 @@ export function cleanDetails(input: unknown): WebsiteDetails {
  */
 export function validateDetails(details: WebsiteDetails, intent: Intent, short = false): DetailErrors {
   const errors: DetailErrors = {};
-  if (!short && details.name.length < 2) errors.name = "Please tell us your name.";
+  if (details.name.length < 2) errors.name = "Please tell us your name.";
   if (!short && details.businessName.length < 2) errors.businessName = "Please tell us your business name.";
   if (!EMAIL_RE.test(details.email)) errors.email = "Please enter a valid email address, like name@business.co.uk.";
   if (intent === "callback" && !details.phone) errors.phone = "Please add a phone number so we can call you back.";
