@@ -128,7 +128,7 @@ export default function AppDevelopmentPage() {
         body={
           <>
             Tap one to start. We&apos;ll take it from there. Need a website only?{" "}
-            <Link href="/website-projects">Buy your website outright</Link>.
+            <Link href="/website-projects">Own your website</Link>.
           </>
         }
       >

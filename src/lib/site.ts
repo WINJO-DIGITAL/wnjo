@@ -55,7 +55,7 @@ export const primaryNav: NavItem[] = [
         { href: "/managed-websites", label: "How it works" },
         { href: "/pricing", label: "Plans and pricing" },
         { href: "/winjo-refresh", label: "Winjo Refresh" },
-        { href: "/website-projects", label: "Buy your website outright" },
+        { href: "/website-projects", label: "Own your website" },
         { href: "/faq", label: "Questions" },
       ],
       groups: [],
@@ -68,7 +68,7 @@ export const primaryNav: NavItem[] = [
     also: ["/booking-software", "/app-development"],
     menu: {
       primary: [
-        { href: "/website-projects", label: "Buy your website outright" },
+        { href: "/website-projects", label: "Own your website" },
         { href: "/booking-software", label: "Booking systems" },
         { href: "/app-development", label: "Apps & software" },
       ],
@@ -111,7 +111,7 @@ export const mobileNav: { label: string; items: NavItem[] }[] = [
             { href: "/managed-websites", label: "How it works" },
             { href: "/pricing", label: "Plans and pricing" },
             { href: "/winjo-refresh", label: "Winjo Refresh" },
-            { href: "/website-projects", label: "Buy your website outright" },
+            { href: "/website-projects", label: "Own your website" },
             { href: "/faq", label: "Questions" },
           ],
           groups: [],

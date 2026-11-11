@@ -5,7 +5,7 @@ import { ONE_OFF_WEBSITE, formatGBP } from "@/lib/pricing";
 
 export const metadata = pageMetadata(
   "/build/project",
-  "Buy your website outright",
+  "Own your website",
   `A bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}, yours on full payment. Tell us what you need and we'll send a written proposal.`,
 );
 
@@ -17,7 +17,7 @@ export default async function ProjectPage({ searchParams }: { searchParams: Prom
     <>
       <PageHero
         eyebrow="Website project"
-        title={<>Buy your website outright.</>}
+        title={<>Own your website.</>}
         lede="A few answers, then a written proposal. Nothing is charged until you accept it."
       />
       <section className="section--tight" style={{ paddingTop: 0 }}>
