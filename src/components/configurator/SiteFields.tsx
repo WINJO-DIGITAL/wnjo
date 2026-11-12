@@ -71,52 +71,41 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
     <>
       <fieldset className={styles.group}>
         <legend className={styles.legend}>What kind of business is it?</legend>
-        {GROUP_ORDER.map((g) => {
-          const inGroup = Object.values(SECTOR_PRESETS).filter((p) => p.group === g);
-          return (
-            <div key={g} className="site-group">
-              <p className="site-group__label">
-                {BUSINESS_GROUPS[g].label} <span className="optional">{BUSINESS_GROUPS[g].hint}</span>
-              </p>
-              <div className={`${styles.choices} ${styles.cols2}`}>
-                {inGroup.map((p) => (
-                  <label key={p.id} className={styles.choice}>
-                    <input type="radio" name={`${id}-sector`} checked={site?.sector === p.id} onChange={() => choose(p.id)} />
-                    <span className={styles.choiceBody}>
-                      <span className={styles.choiceLabel}>{p.label}</span>
-                      <span className={styles.choiceHint}>{SECTOR_HINT[p.id] ?? ""}</span>
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-        <div className="site-group">
-          <div className={`${styles.choices} ${styles.cols2}`}>
-            <label className={styles.choice}>
-              <input type="radio" name={`${id}-sector`} checked={!site && otherMode} onChange={() => (setOtherMode(true), onChange({ site: null }))} />
+        <div className={`${styles.choices} ${styles.cols2}`}>
+          {/* One grid, in group order. Each tile names its group, so the groups stay visible without a half-empty row each. */}
+          {GROUP_ORDER.flatMap((g) => Object.values(SECTOR_PRESETS).filter((p) => p.group === g)).map((p) => (
+            <label key={p.id} className={styles.choice}>
+              <input type="radio" name={`${id}-sector`} checked={site?.sector === p.id} onChange={() => choose(p.id)} />
               <span className={styles.choiceBody}>
-                <span className={styles.choiceLabel}>Another type of business</span>
-                <span className={styles.choiceHint}>Tell us what it is</span>
+                <span className="site-tile__group">{BUSINESS_GROUPS[p.group].label}</span>
+                <span className={styles.choiceLabel}>{p.label}</span>
+                <span className={styles.choiceHint}>{SECTOR_HINT[p.id] ?? ""}</span>
               </span>
             </label>
-          </div>
-          {!site && otherMode && (
-            <div className="field">
-              <label htmlFor={`${id}-other`}>What kind of business is it?</label>
-              <input
-                id={`${id}-other`}
-                className="input"
-                maxLength={80}
-                placeholder="For example: dog grooming, florist, accountant"
-                value={brief.otherBusinessType}
-                onChange={(e) => onChange({ otherBusinessType: e.target.value })}
-              />
-              <p className="field-hint">We&apos;ll plan your pages with you. Nothing is built from this yet.</p>
-            </div>
-          )}
+          ))}
+          <label className={styles.choice}>
+            <input type="radio" name={`${id}-sector`} checked={!site && otherMode} onChange={() => (setOtherMode(true), onChange({ site: null }))} />
+            <span className={styles.choiceBody}>
+              <span className="site-tile__group">Anything else</span>
+              <span className={styles.choiceLabel}>Another type of business</span>
+              <span className={styles.choiceHint}>Tell us what it is</span>
+            </span>
+          </label>
         </div>
+        {!site && otherMode && (
+          <div className="field site-other">
+            <label htmlFor={`${id}-other`}>Tell us the type of business</label>
+            <input
+              id={`${id}-other`}
+              className="input"
+              maxLength={80}
+              placeholder="For example: dog grooming, florist, accountant"
+              value={brief.otherBusinessType}
+              onChange={(e) => onChange({ otherBusinessType: e.target.value })}
+            />
+            <p className="field-hint">We&apos;ll plan your pages with you. Nothing is built from this yet.</p>
+          </div>
+        )}
       </fieldset>
 
       {site && preset && (
