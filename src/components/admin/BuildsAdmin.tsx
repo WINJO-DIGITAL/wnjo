@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   staffStageLabel,
@@ -67,6 +67,11 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<BriefRow[] | null>(null);
   const [error, setError] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  // The detail is shown under the table, so bring it into view when a brief is opened (on a phone it is far below).
+  const detailRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (selected) detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [selected]);
 
   const load = useCallback(() => {
     client
@@ -140,7 +145,11 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
         </tbody>
       </table>
       </div>
-      {current && <BriefDetail key={current.id} client={client} row={current} call={call} onChanged={load} />}
+      {current && (
+        <div id="brief-detail" ref={detailRef}>
+          <BriefDetail key={current.id} client={client} row={current} call={call} onChanged={load} />
+        </div>
+      )}
     </div>
   );
 }
