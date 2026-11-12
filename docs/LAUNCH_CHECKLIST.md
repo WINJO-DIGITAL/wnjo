@@ -37,7 +37,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 
 ## Still to do before launch
 - [x] **Cancellation request:** test cancellation on WS-1C9980 (12 Nov). The customer confirmation gives the end date, 12 December 2026, and the staff alert was delivered. Owner confirmed. Not yet checked: the Stripe cancel-at-period-end flag and the history entry.
-- [ ] **Renewal reminder:** confirm the 14-day reminder email reaches a test customer (no paid website qualifies yet, so use a test subscription).
+- [ ] **Renewal reminder:** test subscription set up (WS-457F22, first payment backdated to 20 May 2026, so the reminder is due 20 November). Coded and on the daily cron. Still open: confirm the email reaches nitisatsirisom@hotmail.co.uk. The first run is 13 November at 07:45 UTC.
 - [x] **Hotmail delivery:** sign-in emails reached Hotmail once Microsoft's outage cleared. Owner confirmed, 12 Nov.
 - [x] **DMARC:** a record is live on winjodigital.co.uk (`_dmarc` points to IONOS, `v=DMARC1; p=none;`), checked 12 Nov. No reporting address (`rua`) is set; adding one is optional.
 - [x] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data. Confirmed by the owner: works.
