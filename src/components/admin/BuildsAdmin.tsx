@@ -17,7 +17,8 @@ import {
   type Stage,
 } from "@/lib/build-journey";
 import { REVISION_STATUSES, isUnfinished, type RevisionRow } from "@/lib/build-revisions";
-import { GOALS, STYLES, type WebsiteBrief } from "@/lib/website-brief";
+import { CUSTOMERS, FIRST_ACTIONS, GOALS, STYLES, TONES, type WebsiteBrief } from "@/lib/website-brief";
+import { SECTOR_PRESETS } from "@/lib/site-template/presets";
 
 type BriefRow = {
   id: string;
@@ -206,6 +207,40 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
           <div>
             <p className="admin-label">Brief</p>
             <dl className="brief-summary">
+              <div><dt>Customer</dt><dd>{row.name || "–"}</dd></div>
+              {(b.site || b.otherBusinessType) && (
+                <div>
+                  <dt>Business type</dt>
+                  <dd>
+                    {b.site ? (SECTOR_PRESETS[b.site.sector]?.label ?? b.site.sector) : b.otherBusinessType}
+                    {!b.site && <span className="acct-meta"> · their words</span>}
+                  </dd>
+                </div>
+              )}
+              {b.site && (
+                <div>
+                  <dt>Template answers</dt>
+                  <dd>
+                    {b.site.answers.servicesText ? <><span className="acct-meta">Services and prices</span><br />{b.site.answers.servicesText}</> : <span className="acct-meta">None given</span>}
+                    {b.site.answers.address && <><br /><span className="acct-meta">Address</span> {b.site.answers.address}</>}
+                    {b.site.answers.areas && <><br /><span className="acct-meta">Areas</span> {b.site.answers.areas}</>}
+                  </dd>
+                </div>
+              )}
+              {!b.site && b.otherBusinessType && (
+                <>
+                  {b.profile.services && <div><dt>Offers</dt><dd style={{ whiteSpace: "pre-line" }}>{b.profile.services}</dd></div>}
+                  {b.profile.email && <div><dt>Email</dt><dd>{b.profile.email}</dd></div>}
+                  {b.profile.phone && <div><dt>Phone</dt><dd>{b.profile.phone}</dd></div>}
+                  {b.profile.differentiator && <div><dt>Different</dt><dd>{b.profile.differentiator}</dd></div>}
+                  {b.profile.customers && <div><dt>Customers</dt><dd>{CUSTOMERS[b.profile.customers]}</dd></div>}
+                  {b.profile.firstActions.length > 0 && <div><dt>First action</dt><dd>{b.profile.firstActions.map((a) => FIRST_ACTIONS[a]).join(", ")}</dd></div>}
+                  {b.profile.areas && <div><dt>Areas</dt><dd>{b.profile.areas}</dd></div>}
+                  {b.profile.hours && <div><dt>Hours</dt><dd>{b.profile.hours}</dd></div>}
+                  {b.profile.proof && <div><dt>Proof</dt><dd>{b.profile.proof}</dd></div>}
+                  {b.profile.tone && <div><dt>Tone</dt><dd>{TONES[b.profile.tone]}</dd></div>}
+                </>
+              )}
               <div><dt>Goals</dt><dd>{b.goals.map((g) => GOALS[g]?.label ?? g).join(", ") || "–"}{b.goalNote && <><br /><span className="acct-meta">{b.goalNote}</span></>}</dd></div>
               <div><dt>Pages</dt><dd>{b.pages.join(", ")}</dd></div>
               <div><dt>Look</dt><dd>{b.style ? STYLES[b.style]?.label : "No preference"}{b.colours && ` · ${b.colours}`}</dd></div>
