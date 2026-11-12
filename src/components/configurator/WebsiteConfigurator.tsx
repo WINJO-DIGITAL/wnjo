@@ -13,7 +13,6 @@ import {
   VAT_NOTE,
   WEBSITE_PAGE_BANDS,
   DELIVERY,
-  SUBSCRIPTION_TERMS,
   WEBSITE_PLANS,
   formatGBP,
   formatPence,
@@ -1174,7 +1173,7 @@ function PlanCheckout({
               <span>We reply within one working day, and your website is live within {DELIVERY.liveWithinDays} days of us having your goals.</span>
             </li>
             <li>
-              <span>Cancel with {SUBSCRIPTION_TERMS.noticeDays} days&apos; notice, with no cancellation fee.</span>
+              <span>Cancel any time, with no notice and no cancellation fee. Your plan ends at the end of the month you have paid for.</span>
             </li>
             <li>
               <span>

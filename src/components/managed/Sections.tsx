@@ -105,7 +105,7 @@ export function SubscriptionTerms() {
       <div>
         <p className="terms-grid__label">If you leave</p>
         <p className="terms-grid__text">
-          Give {SUBSCRIPTION_TERMS.noticeDays} days&apos; notice, with no cancellation fee. We send you your content and
+          Cancel any time, with no notice and no cancellation fee. Your plan ends at the end of the month you have paid for. We send you your content and
           design files within {SUBSCRIPTION_TERMS.handoverDays} days, and keep your site live for{" "}
           {SUBSCRIPTION_TERMS.liveAfterEndDays} days so you can move it. Your domain stays yours.
         </p>

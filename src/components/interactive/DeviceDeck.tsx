@@ -319,7 +319,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
           </span>
         </Link>
         <ul className="deck__bullets" role="list">
-          <li>Cancel with 30 days&apos; notice</li>
+          <li>Cancel any time, with no notice</li>
           <li>No Minimum Term</li>
           <li>Ongoing Support</li>
         </ul>

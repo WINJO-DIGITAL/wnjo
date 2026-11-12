@@ -10,4 +10,4 @@
  * 2026-11-10.3 (draft, awaiting a solicitor's check) redrafts the whole page in full: change allowances, notice to end,
  * handover of content and design files, price changes, non-payment, liability and governing law.
  */
-export const QUOTE_TERMS_VERSION = "2026-11-10.7";
+export const QUOTE_TERMS_VERSION = "2026-11-12.1";

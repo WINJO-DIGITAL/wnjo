@@ -267,7 +267,6 @@ export const LEGAL_REVIEW_PENDING = true;
  */
 export const SUBSCRIPTION_TERMS = {
   /** Days' written notice to end a subscription. No cancellation fee. */
-  noticeDays: 30,
   /** Days' notice of any change to a monthly price. */
   priceChangeNoticeDays: 30,
   /** Days within which we hand over content and design files after a request. */
