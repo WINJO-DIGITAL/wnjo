@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { BUDGETS, TIMELINES } from "@/lib/enquiry";
 import {
   EXTRA_LIMITS,
   JOURNEYS,
@@ -27,7 +28,7 @@ type TextKey = "mainService" | "dontDo" | "existingPages" | "mustFind" | "wordsU
 /**
  * The extra questions, shown on the step they belong to. Each has a plain hint with an example. All are optional.
  */
-export function ExtraFields({ step, brief, onChange }: { step: string; brief: WebsiteBrief; onChange: BriefChange }) {
+export function ExtraFields({ step, brief, onChange, bespoke = false }: { step: string; brief: WebsiteBrief; onChange: BriefChange; bespoke?: boolean }) {
   const id = useId();
   const e = cleanExtras(brief.extras);
   const set = (patch: Partial<BriefExtras>) => onChange({ extras: { ...e, ...patch } });
@@ -116,6 +117,12 @@ export function ExtraFields({ step, brief, onChange }: { step: string; brief: We
   if (step === "goals") {
     return (
       <div className="site-profile">
+        {bespoke && (
+          <>
+            {group("What is your budget?", "A rough range is fine. We use it to quote something that fits.", chips(BUDGETS, e.budget, (v) => set({ budget: v }), "Budget"))}
+            {group("When would you like it by?", "So we can plan the build around your date.", chips(TIMELINES, e.deadline, (v) => set({ deadline: v }), "Deadline"))}
+          </>
+        )}
         {group(
           "How will you know the website is working?",
           "Pick any that apply. We use this to choose what to put first.",

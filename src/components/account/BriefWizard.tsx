@@ -45,6 +45,7 @@ export function BriefWizard({
   typesOn,
   api,
   onSent,
+  bespoke = false,
 }: {
   initial: WebsiteBrief;
   name: string;
@@ -52,6 +53,8 @@ export function BriefWizard({
   typesOn: boolean;
   api: WizardApi;
   onSent: () => void;
+  /** A website bought outright: adds the budget and deadline questions staff quote from. */
+  bespoke?: boolean;
 }) {
   const [brief, setBrief] = useState<WebsiteBrief>(initial);
   const [name, setName] = useState(savedName);
@@ -292,7 +295,7 @@ export function BriefWizard({
             <SummaryRow label="Files" onEdit={() => go("files")}>{brief.files.length ? `${brief.files.length} attached` : "None"}</SummaryRow>
           </dl>
         )}
-        <ExtraFields step={current} brief={brief} onChange={update} />
+        <ExtraFields step={current} brief={brief} onChange={update} bespoke={bespoke} />
       </div>
 
       {message && (

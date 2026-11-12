@@ -1,13 +1,14 @@
 import { BUDGETS, TIMELINES, clean, type Budget, type Timeline } from "./enquiry";
 import { CARE_PLANS, WEBSITE_PAGE_BANDS, type CarePlan, type WebsitePageBand } from "./pricing";
-import { cleanBrief, validateBrief, BRIEF_LIMITS, EMPTY_BRIEF, type BriefErrors, type WebsiteBrief } from "./website-brief";
+import { cleanBrief, BRIEF_LIMITS, EMPTY_BRIEF, type BriefErrors, type WebsiteBrief } from "./website-brief";
 import { cleanDetails, validateDetails, type DetailErrors, type WebsiteDetails } from "./website-enquiry";
 import { DEFAULT_WEBSITE_ANSWERS, websiteQuote, type WebsiteAnswers, type WebsiteQuote } from "./website-quote";
 
 /**
- * The buy-outright request (/build/project): a short form that goes to a written proposal, then a 50% deposit. It has
- * nothing to do with the managed-plan steps. The price is never taken from the browser: the figures are rebuilt here
- * and the build is always routed to a proposal, because a project is priced from what it needs.
+ * The buy-outright request (/build/project): only who is asking (name, business, email). Their goals, pages and style
+ * come from the same steps a monthly customer fills in, in their account, with no payment first and no page limit. It
+ * then goes to a written proposal and a 50% deposit. The price is never taken from the browser: the figures are rebuilt
+ * here and the build is always routed to a proposal, because a project is priced from what it needs.
  */
 
 export const NOTES_LIMIT = 500;
@@ -33,20 +34,16 @@ export function cleanProjectRequest(input: unknown): { ok: true; value: ProjectR
   const care: CarePlan = typeof raw.care === "string" && raw.care in CARE_PLANS ? (raw.care as CarePlan) : "none";
   const notes = clean(raw.notes, NOTES_LIMIT);
 
-  // Their words, then the two numbers staff need first, kept together in the brief note so every screen shows them.
+  // Anything given up front is kept together in the brief note. Budget and deadline are asked in the account steps now.
   const note = [
-    `Budget: ${budget ? BUDGETS[budget] : "not given"}`,
-    `Wanted by: ${timeline ? TIMELINES[timeline] : "not given"}`,
+    ...(budget ? [`Budget: ${BUDGETS[budget]}`] : []),
+    ...(timeline ? [`Wanted by: ${TIMELINES[timeline]}`] : []),
     ...(care !== "none" ? [`Hosting after launch: ${CARE_PLANS[care].label}`] : []),
     ...(notes ? ["", notes] : []),
   ].join("\n");
   const brief = cleanBrief({ ...EMPTY_BRIEF, goals: (raw.goals as unknown[]) ?? [], goalNote: note.slice(0, BRIEF_LIMITS.goalNote) });
 
   const errors: ProjectErrors = { ...validateDetails(details, "quote", true) };
-  const briefErrors = validateBrief(brief);
-  if (briefErrors.goals) errors.goals = briefErrors.goals;
-  if (!budget) errors.budget = "Choose a budget, or Not sure yet.";
-  if (!timeline) errors.timeline = "Choose when you'd like it by.";
   if (Object.keys(errors).length) return { ok: false, errors };
 
   const answers: WebsiteAnswers = { ...DEFAULT_WEBSITE_ANSWERS, want: "oneOff", mode: "oneOff", pages, care };

@@ -4,6 +4,8 @@
  * edited brief can never put unexpected data into the form, the staff page or the writer.
  */
 
+import { BUDGETS, TIMELINES, type Budget, type Timeline } from "./enquiry";
+
 export const ROLES = { owner: "Owner", manager: "Manager", staff: "Staff member", other: "Other" } as const;
 export const PRICING_STYLES = { fixed: "Fixed prices", quotes: "Quotes on request", mixed: "A mix of both" } as const;
 export const JOURNEYS = { call: "A phone call", form: "An online form", walk_in: "Walking in", booking: "An online booking" } as const;
@@ -21,6 +23,9 @@ export type LegalPage = keyof typeof LEGAL;
 export const EXTRA_LIMITS = { short: 120, text: 300, long: 500 } as const;
 
 export type BriefExtras = {
+  /** Asked only of a customer buying a website outright, so staff can quote. */
+  budget: Budget | "";
+  deadline: Timeline | "";
   role: Role | "";
   mainService: string;
   pricingStyle: PricingStyle | "";
@@ -39,6 +44,8 @@ export type BriefExtras = {
 };
 
 export const EMPTY_EXTRAS: BriefExtras = {
+  budget: "",
+  deadline: "",
   role: "",
   mainService: "",
   pricingStyle: "",
@@ -74,6 +81,8 @@ const pickMany = <T extends string>(v: unknown, options: Record<T, string>): T[]
 export function cleanExtras(input: unknown): BriefExtras {
   const o = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
   return {
+    budget: pick<Budget>(o.budget, BUDGETS),
+    deadline: pick<Timeline>(o.deadline, TIMELINES),
     role: pick<Role>(o.role, ROLES),
     mainService: text(o.mainService, EXTRA_LIMITS.short),
     pricingStyle: pick<PricingStyle>(o.pricingStyle, PRICING_STYLES),
@@ -96,6 +105,8 @@ export function cleanExtras(input: unknown): BriefExtras {
 export function extrasRows(input: unknown): [string, string][] {
   const e = cleanExtras(input);
   const rows: [string, string][] = [
+    ["What is your budget?", e.budget ? BUDGETS[e.budget] : ""],
+    ["When would you like it by?", e.deadline ? TIMELINES[e.deadline] : ""],
     ["What is your role in the business?", e.role ? ROLES[e.role] : ""],
     ["Which service should the site lead with?", e.mainService],
     ["How do you price your work?", e.pricingStyle ? PRICING_STYLES[e.pricingStyle] : ""],

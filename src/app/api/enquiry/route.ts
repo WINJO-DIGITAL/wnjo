@@ -207,8 +207,9 @@ async function handleProjectRequest(body: Json, request: NextRequest) {
   const text = [
     `Reference: ${reference}`,
     "Route: buy outright (written proposal, then 50% deposit)",
-    `Budget: ${budget ? BUDGETS[budget] : "not given"}`,
-    `Wanted by: ${timeline ? TIMELINES[timeline] : "not given"}`,
+    ...(budget ? [`Budget: ${BUDGETS[budget]}`] : []),
+    ...(timeline ? [`Wanted by: ${TIMELINES[timeline]}`] : []),
+    "They have only said who they are so far. They now fill in their goals, pages and style in their account, then it's ready to quote.",
     "",
     formatDetails(details),
     "",

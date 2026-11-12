@@ -186,8 +186,13 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     expect(emails().some((e) => e.to.includes("ada@example.com"))).toBe(true);
   });
 
-  it("buy-outright request: refuses one with no budget or goals", async () => {
-    const res = await post({ kind: "project", details: body().details, goals: [], startedAt: Date.now() - 10_000 });
+  it("buy-outright request: needs only who is asking, because goals and pages come from the account steps", async () => {
+    const res = await post({ kind: "project", details: body().details, startedAt: Date.now() - 10_000 });
+    expect(res.status).toBe(200);
+  });
+
+  it("buy-outright request: refuses one without a valid email", async () => {
+    const res = await post({ kind: "project", details: { ...body().details, email: "nope" }, startedAt: Date.now() - 10_000 });
     expect(res.status).toBe(422);
   });
 });

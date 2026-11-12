@@ -35,3 +35,22 @@ describe("extrasRows", () => {
     expect(extrasRows(EMPTY_EXTRAS)).toEqual([]);
   });
 });
+
+describe("budget and deadline for a website bought outright", () => {
+  it("are cleaned to the known choices and shown first on the staff page, under their questions", () => {
+    const e = cleanExtras({ budget: "2k-5k", deadline: "1-3m" });
+    expect(e.budget).toBe("2k-5k");
+    expect(e.deadline).toBe("1-3m");
+    expect(extrasRows({ budget: "2k-5k", deadline: "1-3m", role: "owner" }).slice(0, 3)).toEqual([
+      ["What is your budget?", "£2,000 to £5,000"],
+      ["When would you like it by?", "Within 1 to 3 months"],
+      ["What is your role in the business?", "Owner"],
+    ]);
+  });
+
+  it("drop anything that isn't a known choice, and are left out when empty", () => {
+    expect(cleanExtras({ budget: "a million", deadline: "yesterday" })).toMatchObject({ budget: "", deadline: "" });
+    expect(extrasRows({})).toEqual([]);
+  });
+});
+

@@ -6,9 +6,14 @@ const details = { name: "Ada Lovelace", businessName: "Analytical Engines Ltd", 
 const good = { details, goals: ["bookings"], budget: "2k-5k", timeline: "1-3m", notes: "A site for our workshop." };
 
 describe("buy-outright request", () => {
-  it("needs only name, business, email, a goal, a budget and a deadline", () => {
-    const r = cleanProjectRequest(good);
+  it("needs only name, business and email: the goals come from the account steps", () => {
+    const r = cleanProjectRequest({ details });
     expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    // No goals yet, so the account asks for them with the same steps a monthly customer fills in.
+    expect(r.value.brief.goals).toEqual([]);
+    expect(r.value.brief.goalNote).toBe("");
+    expect(cleanProjectRequest(good).ok).toBe(true);
   });
 
   it("always goes to a written proposal, never to payment", () => {
@@ -28,10 +33,10 @@ describe("buy-outright request", () => {
   });
 
   it("says what is missing", () => {
-    const r = cleanProjectRequest({ details: { ...details, email: "nope" }, goals: [], budget: "x", timeline: null });
+    const r = cleanProjectRequest({ details: { ...details, email: "nope", name: "" } });
     expect(r.ok).toBe(false);
     if (r.ok) return;
-    expect(Object.keys(r.errors).sort()).toEqual(["budget", "email", "goals", "timeline"]);
+    expect(Object.keys(r.errors).sort()).toEqual(["email", "name"]);
   });
 });
 

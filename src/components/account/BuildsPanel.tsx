@@ -220,7 +220,7 @@ function BuildCard({
         {tab === "overview" && (
           <>
             {needsDetails && !detailsSaved && (
-              <BriefDetailsCard client={client} briefId={brief.id} initial={brief.brief} name={brief.name} businessName={brief.business_name} onSaved={() => setDetailsSaved(true)} />
+              <BriefDetailsCard client={client} briefId={brief.id} initial={brief.brief} name={brief.name} businessName={brief.business_name} bespoke={brief.route === "proposal"} onSaved={() => setDetailsSaved(true)} />
             )}
             {needsDetails && detailsSaved && <DetailsThanks name={brief.name} onContinue={onChanged} />}
             {proposal && <ProposalCard client={client} proposal={proposal} mode={brief.figures.mode === "oneOff" ? "oneOff" : "monthly"} onChanged={onChanged} />}
@@ -293,6 +293,7 @@ function BriefDetailsCard({
   initial,
   name: savedName,
   businessName: savedBusiness,
+  bespoke,
   onSaved,
 }: {
   client: SupabaseClient;
@@ -300,6 +301,7 @@ function BriefDetailsCard({
   initial: WebsiteBrief;
   name: string;
   businessName: string;
+  bespoke: boolean;
   onSaved: () => void;
 }) {
   const api = useMemo<WizardApi>(() => {
@@ -338,7 +340,7 @@ function BriefDetailsCard({
     };
   }, [client, briefId]);
 
-  return <BriefWizard initial={initial} name={savedName === UNNAMED ? "" : savedName} businessName={savedBusiness} typesOn={TEMPLATE_SITES_ON} api={api} onSent={onSaved} />;
+  return <BriefWizard initial={initial} name={savedName === UNNAMED ? "" : savedName} businessName={savedBusiness} typesOn={TEMPLATE_SITES_ON} api={api} onSent={onSaved} bespoke={bespoke} />;
 }
 
 /** Opens the customer's private preview in a new tab. The address comes from the server, only for the website's owner. */
