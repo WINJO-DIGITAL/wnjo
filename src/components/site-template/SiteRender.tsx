@@ -44,7 +44,10 @@ const ANCHORS: Partial<Record<Section["kind"], { id: string; label: string }>> =
   faq: { id: "faq", label: "Questions" },
 };
 
-export function SiteRender({ content, heroImage, enquiryAction }: { content: SiteContent; heroImage?: string; enquiryAction?: string }) {
+/** Where the booking form posts, and what happened the last time it did. Without it the form is inactive (a preview). */
+export type EnquiryProps = { action: string; token: string; state?: "sent" | "error" };
+
+export function SiteRender({ content, heroImage, enquiry }: { content: SiteContent; heroImage?: string; enquiry?: EnquiryProps }) {
   const { business, theme } = content;
   const colour = HEX.test(theme.colour) ? theme.colour : "#1a1a1a";
   const style = { "--accent": colour, "--on-accent": onColour(colour) } as CSSProperties;
@@ -163,23 +166,38 @@ export function SiteRender({ content, heroImage, enquiryAction }: { content: Sit
               <section key={i} id="book" className={`${css.section} ${css.book}`}>
                 <h2>{s.heading}</h2>
                 <p className={css.body}>{s.intro}</p>
-                <form className={css.form} action={enquiryAction} method={enquiryAction ? "post" : undefined}>
-                  <label>
-                    Name
-                    <input name="name" autoComplete="name" required />
-                  </label>
-                  <label>
-                    Phone or email
-                    <input name="contact" autoComplete="email" required />
-                  </label>
-                  <label>
-                    When suits you?
-                    <textarea name="message" rows={3} />
-                  </label>
-                  <button className={css.btn} type={enquiryAction ? "submit" : "button"}>
-                    {s.cta}
-                  </button>
-                </form>
+                {enquiry?.state === "sent" ? (
+                  <div className={css.sent} role="status">
+                    <b>Request sent</b>
+                    <span>Thanks. {business.name} has your request and will reply to confirm a time.</span>
+                  </div>
+                ) : (
+                  <form className={css.form} action={enquiry?.action} method={enquiry ? "post" : undefined}>
+                    {enquiry?.state === "error" && (
+                      <p className={css.formError} role="alert">
+                        That didn&apos;t send. Check your phone number or email and try again.
+                      </p>
+                    )}
+                    {enquiry && <input type="hidden" name="token" value={enquiry.token} />}
+                    {/* A field real visitors never see: bots fill it in, and the request is dropped. */}
+                    <input className={css.trap} name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+                    <label>
+                      Name
+                      <input name="name" autoComplete="name" maxLength={80} required />
+                    </label>
+                    <label>
+                      Phone or email
+                      <input name="contact" autoComplete="email" maxLength={120} required />
+                    </label>
+                    <label>
+                      When suits you?
+                      <textarea name="message" rows={3} maxLength={1000} />
+                    </label>
+                    <button className={css.btn} type={enquiry ? "submit" : "button"}>
+                      {s.cta}
+                    </button>
+                  </form>
+                )}
                 {(business.phone || business.email) && (
                   <p className={css.contact}>
                     {business.phone && <a href={telHref(business.phone)}>{business.phone}</a>}

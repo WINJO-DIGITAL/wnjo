@@ -294,6 +294,25 @@
 .form .btn {
   justify-self: start;
 }
+.sent {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.4rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+}
+.formError {
+  color: #a3322a;
+  font-weight: 600;
+}
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
 .site .contact {
   display: flex;
   flex-wrap: wrap;

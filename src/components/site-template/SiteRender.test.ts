@@ -5,9 +5,9 @@ import { checkSite } from "@/lib/site-template/checks";
 import { BARBER_PRESET } from "@/lib/site-template/presets";
 import { SAMPLE_BARBER, SAMPLE_BARBER_FACTS } from "@/lib/site-template/sample";
 import type { SiteContent } from "@/lib/site-template/schema";
-import { SiteRender, safeImage } from "./SiteRender";
+import { SiteRender, safeImage, type EnquiryProps } from "./SiteRender";
 
-const render = (content: SiteContent, props: { heroImage?: string; enquiryAction?: string } = {}) =>
+const render = (content: SiteContent, props: { heroImage?: string; enquiry?: EnquiryProps } = {}) =>
   renderToStaticMarkup(createElement(SiteRender, { content, ...props }));
 
 describe("sample barber", () => {
@@ -69,11 +69,30 @@ describe("SiteRender", () => {
     expect(render(SAMPLE_BARBER)).toContain('data-variant="plain"');
   });
 
-  it("only posts the enquiry form when given somewhere to post", () => {
-    expect(render(SAMPLE_BARBER)).toContain('type="button"');
-    const live = render(SAMPLE_BARBER, { enquiryAction: "/api/site-enquiry" });
-    expect(live).toContain('action="/api/site-enquiry"');
-    expect(live).toContain('type="submit"');
+  it("is inactive in a preview: no action, a button that submits nothing", () => {
+    const html = render(SAMPLE_BARBER);
+    expect(html).toContain('type="button"');
+    expect(html).not.toContain("action=");
+    expect(html).not.toContain('name="token"');
+  });
+
+  it("posts to the enquiry route when the build is live, with its token and a bot trap", () => {
+    const html = render(SAMPLE_BARBER, { enquiry: { action: "/api/site-enquiry", token: "tok123" } });
+    expect(html).toContain('action="/api/site-enquiry"');
+    expect(html).toContain('method="post"');
+    expect(html).toContain('name="token" value="tok123"');
+    expect(html).toContain('name="website"');
+    expect(html).toContain('type="submit"');
+  });
+
+  it("shows a confirmation instead of the form once a request is sent, and an error message when it fails", () => {
+    const sent = render(SAMPLE_BARBER, { enquiry: { action: "/api/site-enquiry", token: "t", state: "sent" } });
+    expect(sent).toContain("Request sent");
+    expect(sent).toContain("Hartley &amp; Sons has your request");
+    expect(sent).not.toContain("<form");
+    const failed = render(SAMPLE_BARBER, { enquiry: { action: "/api/site-enquiry", token: "t", state: "error" } });
+    expect(failed).toContain("That didn&#x27;t send");
+    expect(failed).toContain("<form");
   });
 
   it("links the page's own sections from the nav", () => {
