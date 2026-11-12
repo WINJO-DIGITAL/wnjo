@@ -16,6 +16,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] 500 automated tests pass; type checks and lint pass.
 - [x] Customer-facing AI wording removed: the build step reads "Building your website" (was "Planning your website").
 - [x] Phone menu has a "Client sign-in" link.
+- [x] Sign-in emails send as "WINJO DIGITAL <enquiries@winjodigital.co.uk>" through a Resend key for the verified domain, entered in the Supabase dashboard. Confirmed by the owner, 12 Nov.
 
 ## Done since the handover list (on main)
 - [x] **Short checkout:** the name is required on the form and the server. The "New customer" stand-in is gone.
@@ -35,6 +36,9 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Confirmation page no longer imports a server-only module** (it pulled Node's crypto into the browser bundle and broke the dev build).
 
 ## Still to do before launch
+- [ ] **Cancellation request:** the owner runs one test cancellation on a Stripe test subscription. Check the end date in the email, the staff alert, the Stripe cancel-at-period-end flag and the history entry.
+- [ ] **Renewal reminder:** confirm the 14-day reminder email reaches a test customer (no paid website qualifies yet, so use a test subscription).
+- [ ] **Hotmail delivery:** add the DMARC record on winjodigital.co.uk (`_dmarc` TXT, `v=DMARC1; p=none; rua=mailto:enquiries@winjodigital.co.uk`). Helps Outlook accept our mail.
 - [x] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data. Confirmed by the owner: works.
 - [x] **Staff subscriptions:** the staff read rule is unchanged in the database. Confirm by signing in as staff.
 - [x] **Sign-in link:** confirm the emailed link lands on the account page, not the home page. The code sends it to `/account` (checked in code). Not yet tested with a real email. Confirmed by the owner: works, tested several times.
