@@ -293,3 +293,41 @@ export function oneOffPaidEmail(f: SubscriptionEmailFacts): { subject: string; t
     ].join("\n"),
   };
 }
+
+/** Sent the moment a customer asks to cancel on their account, so they have a clear record of when they asked. */
+export function cancelRequestEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
+  return {
+    subject: `We've received your cancellation request [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `We've received your request to cancel your ${f.packageName} plan (${f.reference}).`,
+      "We'll confirm by email when it will end, and nothing changes until then. Your website stays live.",
+      ...(f.minimumTermMonths > 0 ? [`Your plan has a minimum term of ${f.minimumTermMonths} months, and we'll explain how that applies to you in our reply.`] : []),
+      "",
+      "If you didn't ask to cancel, or you've changed your mind, reply to this email and we'll leave things as they are.",
+      ...sign,
+    ].join("\n"),
+  };
+}
+
+/**
+ * A reminder before a plan's minimum term ends, and every six months after. It says what the customer pays and how to
+ * cancel, so renewing is never a surprise.
+ */
+export function renewalReminderEmail(f: SubscriptionEmailFacts, siteUrl: string, termEnds: string | null): { subject: string; text: string } {
+  const account = `${siteUrl.replace(/\/+$/, "")}/account/billing`;
+  return {
+    subject: `A reminder about your website plan [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `This is a reminder about your ${f.packageName} plan (${f.reference}). It costs ${gbpPence(f.monthlyPence)} a month and renews every month until you cancel.`,
+      ...(termEnds ? [`Your minimum term ends on ${termEnds}. After that, the plan carries on month to month.`] : []),
+      "",
+      `If you'd like to cancel, sign in and choose "Request cancellation": ${account}`,
+      "If you'd like to change your plan instead, reply to this email.",
+      ...sign,
+    ].join("\n"),
+  };
+}

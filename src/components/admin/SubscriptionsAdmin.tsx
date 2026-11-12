@@ -43,9 +43,20 @@ const STATUS: Record<string, string> = {
 export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState(false);
+  const [requests, setRequests] = useState<Record<string, { reason: string; created_at: string }>>({});
   const [history, setHistory] = useState<{ kind: string; reason: string; created_at: string; reference: string; name: string }[] | null>(null);
 
   const load = useCallback(() => {
+    // Customers who have asked to cancel on their account and are waiting for staff.
+    client
+      .from("website_cancellation_requests")
+      .select("subscription_id, reason, created_at")
+      .eq("status", "open")
+      .then(({ data }) => {
+        const map: Record<string, { reason: string; created_at: string }> = {};
+        for (const r of (data as { subscription_id: string; reason: string; created_at: string }[]) ?? []) map[r.subscription_id] = { reason: r.reason, created_at: r.created_at };
+        setRequests(map);
+      });
     // Cancellation history: what Stripe told us, newest first. Written by the webhook only; this only reads.
     client
       .from("website_subscription_events")
@@ -143,7 +154,16 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
                 </td>
                 <td>{r.business_name || r.name}<br /><a href={`mailto:${r.email}`} className="acct-meta">{r.email}</a></td>
                 <td>{r.package_name}</td>
-                <td>{STATUS[r.status] ?? r.status}{r.cancel_at_period_end ? ", ending" : ""}</td>
+                <td>
+                  {STATUS[r.status] ?? r.status}
+                  {r.cancel_at_period_end ? ", ending" : ""}
+                  {requests[r.id] && (
+                    <>
+                      <br />
+                      <strong>Cancel requested</strong> <span className="acct-meta">{new Date(requests[r.id].created_at).toLocaleDateString("en-GB")}{requests[r.id].reason ? ` · ${requests[r.id].reason}` : ""}</span>
+                    </>
+                  )}
+                </td>
                 <td>{r.kind === "subscription" ? money.format(r.monthly_pence / 100) : money.format(r.one_off_pence / 100) + " once"}</td>
                 <td>
                   {r.kind === "subscription"

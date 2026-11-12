@@ -4,7 +4,7 @@
  * into log entries and staff alerts. Pure, apart from the one insert, so it can be tested without Stripe.
  */
 
-export type CancellationKind = "cancel_requested" | "cancel_withdrawn" | "ended" | "payment_failed";
+export type CancellationKind = "cancel_requested" | "cancel_withdrawn" | "ended" | "payment_failed" | "renewal_reminder";
 
 /** The reasons Stripe gives, in words staff can read. Anything unknown is shown as "No reason given". */
 const STRIPE_REASONS: Record<string, string> = {
@@ -47,6 +47,7 @@ export const KIND_LABEL: Record<CancellationKind, string> = {
   cancel_withdrawn: "Cancellation withdrawn",
   ended: "Subscription ended",
   payment_failed: "Payment failed",
+  renewal_reminder: "Renewal reminder sent",
 };
 
 /** Whether this kind needs a person to look at it the day it happens. */

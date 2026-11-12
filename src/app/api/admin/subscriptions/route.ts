@@ -159,6 +159,8 @@ export async function POST(request: NextRequest) {
         });
         if (!res.ok) throw new Error(`Stripe cancel failed with status ${res.status}`);
         await db.from("website_subscriptions").update({ cancel_at_period_end: true, updated_at: new Date().toISOString() }).eq("id", id);
+        // A customer who asked to cancel on their account now has it processed.
+        await db.from("website_cancellation_requests").update({ status: "processed", processed_at: new Date().toISOString() }).eq("subscription_id", id).eq("status", "open");
       }
     } catch (error) {
       console.error(error instanceof Error ? error.message : "Stripe update failed");

@@ -7,6 +7,7 @@ import { sendQuoteReminders } from "@/lib/quote-reminders-job";
 import { providerFromEnv } from "@/lib/ai/agent-runtime";
 import { runAutoDrafts } from "@/lib/ai/website-auto";
 import { sendBriefDetailsReminders } from "@/lib/brief-reminders";
+import { sendRenewalReminders } from "@/lib/renewal-reminders";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,5 +44,7 @@ export async function GET(request: NextRequest) {
   // Any paid website still without its first AI draft (the key was missing, or a call failed) is picked up here.
   const drafts = await step("drafts", () => runAutoDrafts(db, providerFromEnv()));
   const briefReminders = await step("brief reminders", () => sendBriefDetailsReminders(db));
-  return NextResponse.json({ events, tasks, notifications, reminders, drafts, briefReminders });
+  // A reminder before each plan's minimum term ends and every six months after, saying how to cancel.
+  const renewalReminders = await step("renewal reminders", () => sendRenewalReminders(db));
+  return NextResponse.json({ events, tasks, notifications, reminders, drafts, briefReminders, renewalReminders });
 }
