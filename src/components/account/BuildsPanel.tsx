@@ -258,7 +258,9 @@ function BuildCard({
             </button>
             {allSteps && (
               <ol className="build-timeline" role="list" aria-label="All steps">
-                {path.map((s, i) => {
+                {/* Website generation is a staff step; the customer sees the rest of the path. */}
+                {path.filter((s) => s !== "building").map((s) => {
+                  const i = path.indexOf(s);
                   const at = i <= here ? reached(s) : null;
                   return (
                     <li key={s} className={i < here ? "is-done" : i === here ? "is-current" : undefined} aria-current={i === here ? "step" : undefined}>
