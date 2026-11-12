@@ -339,6 +339,32 @@ describe("subscription webhooks", () => {
       expect(tables.website_brief_events[0]).toMatchObject({ kind: "stage", actor_type: "system", detail: { from: "awaiting_payment", to: "specification", note: "Payment received." } });
     });
 
+    it("emails the details form straight after payment when their goals are still missing", async () => {
+      const { db, deps } = withBrief({}, { brief: { goals: [] } });
+      await handleWebsiteSubscriptionEvent(db, completed(24800), deps);
+      expect(deps.emailCustomer).toHaveBeenCalledTimes(1);
+      expect(deps.emailCustomer).toHaveBeenCalledWith("ada@example.com", expect.objectContaining({ subject: expect.stringContaining("tell us about your website") }));
+    });
+
+    it("asks for the form too when there is no brief yet", async () => {
+      const { db, deps } = setup();
+      await handleWebsiteSubscriptionEvent(db, completed(24800), deps);
+      expect(deps.emailCustomer).toHaveBeenCalledWith("ada@example.com", expect.objectContaining({ subject: expect.stringContaining("tell us about your website") }));
+    });
+
+    it("doesn't ask again when their goals are already in", async () => {
+      const { db, deps } = withBrief({}, { brief: { goals: ["bookings"] } });
+      await handleWebsiteSubscriptionEvent(db, completed(24800), deps);
+      expect(deps.emailCustomer).toHaveBeenCalledWith("ada@example.com", expect.objectContaining({ subject: expect.stringContaining("Welcome to WINJO DIGITAL") }));
+    });
+
+    it("a one-off payment asks for the form too, when the goals are missing", async () => {
+      const { db, deps } = withBrief({ kind: "one_off", monthly_pence: 0, setup_pence: 0, one_off_pence: 49950 }, { route: "proposal", brief: { goals: [] } });
+      const paid = { type: "checkout.session.completed", data: { object: { id: "cs_3", payment_status: "paid", amount_total: 49950, currency: "gbp", payment_intent: "pi_3", metadata: { website_subscription_id: "sub-1" } } } };
+      await handleWebsiteSubscriptionEvent(db, paid, deps);
+      expect(deps.emailCustomer).toHaveBeenCalledWith("ada@example.com", expect.objectContaining({ subject: expect.stringContaining("tell us about your website") }));
+    });
+
     it("a paid one-off deposit does the same", async () => {
       const { db, deps, tables } = withBrief({ kind: "one_off", monthly_pence: 0, setup_pence: 0, one_off_pence: 49950 }, { route: "proposal" });
       const paid = { type: "checkout.session.completed", data: { object: { id: "cs_2", payment_status: "paid", amount_total: 49950, currency: "gbp", payment_intent: "pi_1", metadata: { website_subscription_id: "sub-1" } } } };

@@ -87,6 +87,15 @@ function invoiceSubscription(invoice: StripeObject): { id: string | null; metada
   };
 }
 
+/** Whether the customer still needs to fill in their goals. Yes when there is no brief yet, or it has no goals. */
+async function briefNeedsDetails(db: SupabaseClient, tenantId: string, enquiryReference: string | null | undefined): Promise<boolean> {
+  if (!enquiryReference) return true;
+  const { data, error } = await db.from("website_briefs").select("brief").eq("tenant_id", tenantId).eq("reference", enquiryReference).maybeSingle();
+  if (error) return true;
+  const goals = (data as { brief?: { goals?: unknown } } | null)?.brief?.goals;
+  return !(Array.isArray(goals) && goals.length > 0);
+}
+
 async function findRow(db: SupabaseClient, by: { id?: string | null; subscriptionId?: string | null }): Promise<Row | null | "error"> {
   if (by.id) {
     const { data, error } = await db.from("website_subscriptions").select(COLUMNS).eq("id", by.id).maybeSingle();
@@ -187,7 +196,8 @@ export async function handleWebsiteSubscriptionEvent(
         .select("id");
       if (error) return "retry";
       if (Array.isArray(data) && data.length > 0) {
-        await deps.emailCustomer(row.email, welcomeEmail(facts(row)));
+        const needsDetails = await briefNeedsDetails(db, row.tenant_id, row.enquiry_reference);
+        await deps.emailCustomer(row.email, welcomeEmail({ ...facts(row), needsDetails }));
         await advanceAfterPayment(db, row.tenant_id, row.enquiry_reference);
         await deps.alertStaff(
           `New ${row.package_name} subscription`,
@@ -207,7 +217,8 @@ export async function handleWebsiteSubscriptionEvent(
     const counts = await refreshCounts(db, row);
     if (counts === "error") return "retry";
     if (recorded) {
-      await deps.emailCustomer(row.email, oneOffPaidEmail(facts(row)));
+      const needsDetails = await briefNeedsDetails(db, row.tenant_id, row.enquiry_reference);
+      await deps.emailCustomer(row.email, oneOffPaidEmail({ ...facts(row), needsDetails }));
       await advanceAfterPayment(db, row.tenant_id, row.enquiry_reference);
       await deps.alertStaff(`One-off website payment received`, `${row.reference}: ${row.name} paid ${amount / 100} GBP.`);
     }

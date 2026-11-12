@@ -126,6 +126,8 @@ export type SubscriptionEmailFacts = {
   paymentsCount?: number;
   ownershipAfterPayments: number;
   minimumTermMonths: number;
+  /** Whether we still need the customer's goals, pages and style. Unset counts as yes, so nobody is left waiting. */
+  needsDetails?: boolean;
 };
 
 const gbpPence = (p: number) => formatPence(p);
@@ -191,21 +193,33 @@ export function offerEmail(f: SubscriptionEmailFacts, link: string): { subject: 
   };
 }
 
+/** The step that matters after paying: filling in the details form. It leads the email, with the link, and is dropped when we already have their details. */
+function detailsStep(f: SubscriptionEmailFacts): string[] {
+  const account = `${(siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "")}/account`;
+  if (f.needsDetails === false) return [`We already have your details, so we're starting on your website now. Once we have everything, it's live within ${DELIVERY.liveWithinDays} days.`];
+  return [
+    "Your next step is to tell us about your website. We can't start designing until we have it, and it only takes a few minutes.",
+    "",
+    "Sign in with this email address and share your goals, the pages you need and the style you like:",
+    account,
+    "",
+    `We start designing as soon as you send it, and your website is live within ${DELIVERY.liveWithinDays} days of us having it.`,
+  ];
+}
+
 export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
+  const ask = f.needsDetails !== false;
   return {
-    subject: `Welcome to WINJO DIGITAL [${f.reference}]`,
+    subject: ask ? `Thank you. Now tell us about your website [${f.reference}]` : `Welcome to WINJO DIGITAL [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
       "",
       `Thank you. Your first payment for the ${f.packageName} package has been received.`,
       "",
+      ...detailsStep(f),
+      "",
       `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month.`,
       termLine(f.minimumTermMonths),
-      "",
-      "Next, tell us about your website. Sign in with this email address and share your goals, the pages you need and the style you like. It takes a few minutes, and we start designing as soon as we have it:",
-      `${(siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "")}/account`,
-      "",
-      `Once we have them, your website is live within ${DELIVERY.liveWithinDays} days.`,
       "",
       "Stripe emails a receipt for every payment.",
       "",
@@ -283,11 +297,14 @@ export function cancelledEmail(f: SubscriptionEmailFacts): { subject: string; te
 
 export function oneOffPaidEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
   return {
-    subject: `Payment received [${f.reference}]`,
+    subject: f.needsDetails === false ? `Payment received [${f.reference}]` : `Payment received. Now tell us about your website [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
       "",
-      `Your payment of ${gbpPence(f.oneOffPence)} has arrived. We'll be in touch within one working day to begin.`,
+      `Your payment of ${gbpPence(f.oneOffPence)} has arrived.`,
+      "",
+      ...(f.needsDetails === false ? ["We already have your details, and we'll be in touch within one working day to begin."] : detailsStep(f)),
+      "",
       "Stripe emails you a receipt for the payment.",
       ...sign,
     ].join("\n"),
