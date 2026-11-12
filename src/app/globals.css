@@ -14551,3 +14551,19 @@ body:has(.pv, .sitepv) .site-footer {
     justify-self: end;
   }
 }
+
+/* ===== Business type groups in the sector form ===== */
+.site-group {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.site-group__label {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.site-group__label .optional {
+  font-weight: 400;
+  margin-left: 0.4rem;
+}

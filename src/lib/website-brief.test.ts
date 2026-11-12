@@ -131,3 +131,15 @@ describe("the template site answers in a brief", () => {
     expect(text).toContain("Template site: Barber, Hartley & Sons");
   });
 });
+
+describe("the typed business type", () => {
+  it("keeps the customer's words, plain and short", () => {
+    expect(cleanBrief({ otherBusinessType: "  Dog <b>grooming</b>  " }).otherBusinessType).toBe("Dog grooming");
+    expect(cleanBrief({ otherBusinessType: "x".repeat(200) }).otherBusinessType).toHaveLength(80);
+    expect(cleanBrief({}).otherBusinessType).toBe("");
+  });
+
+  it("shows in the plain-text brief", () => {
+    expect(formatBrief({ ...EMPTY_BRIEF, otherBusinessType: "Florist" })).toContain("Business type (their words): Florist");
+  });
+});

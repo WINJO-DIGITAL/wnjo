@@ -93,6 +93,8 @@ export type WebsiteBrief = {
   files: BriefFile[];
   /** The sector questions for a template site. Null when the customer hasn't answered them. */
   site: SiteAnswers | null;
+  /** The customer's own words for their business, when none of our sectors fits. Plain text. */
+  otherBusinessType: string;
 };
 
 export const EMPTY_BRIEF: WebsiteBrief = {
@@ -106,6 +108,7 @@ export const EMPTY_BRIEF: WebsiteBrief = {
   functionality: "",
   files: [],
   site: null,
+  otherBusinessType: "",
 };
 
 /** A random id for this browser's draft. Uploads sit under it until the brief is sent. */
@@ -207,6 +210,7 @@ export function cleanBrief(input: unknown, draftId?: string): WebsiteBrief {
     functionality: text(o.functionality, BRIEF_LIMITS.functionality),
     files,
     site: cleanSiteAnswers(o.site, Object.keys(SECTOR_PRESETS)),
+    otherBusinessType: text(o.otherBusinessType, 80).replace(/<[^>]*>/g, "").trim(),
   };
 }
 
@@ -244,6 +248,7 @@ export function formatBrief(brief: WebsiteBrief): string {
     ...(brief.avoid ? [`Avoid: ${brief.avoid}`] : []),
     ...(brief.functionality ? [`Functionality: ${brief.functionality}`] : []),
     ...(brief.site ? [`Template site: ${SECTOR_PRESETS[brief.site.sector]?.label ?? brief.site.sector}, ${brief.site.answers.businessName || "no name yet"}`] : []),
+    ...(brief.otherBusinessType ? [`Business type (their words): ${brief.otherBusinessType}`] : []),
     `Files: ${brief.files.length ? brief.files.map((f) => `${f.name} (${kb(f.size)})`).join(", ") : "none"}`,
   ];
   return lines.join("\n");

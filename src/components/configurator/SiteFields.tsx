@@ -1,8 +1,8 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useState } from "react";
 import { DAYS, type DayAnswer, type RawAnswers } from "@/lib/site-template/answers";
-import { SECTOR_PRESETS } from "@/lib/site-template/presets";
+import { BUSINESS_GROUPS, SECTOR_PRESETS, type BusinessGroup } from "@/lib/site-template/presets";
 import { LOOKS, type Look } from "@/lib/site-template/schema";
 import type { WebsiteBrief } from "@/lib/website-brief";
 import type { BriefChange } from "./BriefSteps";
@@ -20,12 +20,12 @@ export const SITE_COLOURS = [
   { hex: "#3d3a7a", label: "Indigo" },
 ] as const;
 
-const SECTORS = Object.values(SECTOR_PRESETS);
 const SECTOR_HINT: Record<string, string> = {
   barber: "Services and prices, opening hours, and booking requests",
   cafe: "Menu, opening hours, and table requests",
   electrician: "Services, areas you cover, and quote requests",
 };
+const GROUP_ORDER = Object.keys(BUSINESS_GROUPS) as BusinessGroup[];
 
 const emptyWeek = (): DayAnswer[] => DAYS.map((day) => ({ day, open: "", close: "" }));
 
@@ -39,8 +39,12 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
   const preset = site ? SECTOR_PRESETS[site.sector] : null;
   const answers: RawAnswers = site?.answers ?? {};
 
-  const choose = (sector: string | null) =>
-    onChange({ site: sector ? { sector, answers: { ...(site?.answers ?? {}), hours: site?.answers.hours?.length ? site.answers.hours : emptyWeek(), look: site?.answers.look ?? SECTOR_PRESETS[sector].defaultLook, colour: site?.answers.colour ?? SITE_COLOURS[0].hex } } : null });
+  // "Another type of business" is only selected when the customer picks it. Nothing is pre-selected for them.
+  const [otherMode, setOtherMode] = useState(brief.otherBusinessType !== "");
+  const choose = (sector: string | null) => {
+    setOtherMode(false);
+    onChange({ otherBusinessType: "", site: sector ? { sector, answers: { ...(site?.answers ?? {}), hours: site?.answers.hours?.length ? site.answers.hours : emptyWeek(), look: site?.answers.look ?? SECTOR_PRESETS[sector].defaultLook, colour: site?.answers.colour ?? SITE_COLOURS[0].hex } } : null });
+  };
 
   const set = (patch: Partial<RawAnswers>) => {
     if (!site) return;
@@ -67,23 +71,51 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
     <>
       <fieldset className={styles.group}>
         <legend className={styles.legend}>What kind of business is it?</legend>
-        <div className={`${styles.choices} ${styles.cols2}`}>
-          {SECTORS.map((s) => (
-            <label key={s.id} className={styles.choice}>
-              <input type="radio" name={`${id}-sector`} checked={site?.sector === s.id} onChange={() => choose(s.id)} />
+        {GROUP_ORDER.map((g) => {
+          const inGroup = Object.values(SECTOR_PRESETS).filter((p) => p.group === g);
+          return (
+            <div key={g} className="site-group">
+              <p className="site-group__label">
+                {BUSINESS_GROUPS[g].label} <span className="optional">{BUSINESS_GROUPS[g].hint}</span>
+              </p>
+              <div className={`${styles.choices} ${styles.cols2}`}>
+                {inGroup.map((p) => (
+                  <label key={p.id} className={styles.choice}>
+                    <input type="radio" name={`${id}-sector`} checked={site?.sector === p.id} onChange={() => choose(p.id)} />
+                    <span className={styles.choiceBody}>
+                      <span className={styles.choiceLabel}>{p.label}</span>
+                      <span className={styles.choiceHint}>{SECTOR_HINT[p.id] ?? ""}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+        <div className="site-group">
+          <div className={`${styles.choices} ${styles.cols2}`}>
+            <label className={styles.choice}>
+              <input type="radio" name={`${id}-sector`} checked={!site && otherMode} onChange={() => (setOtherMode(true), onChange({ site: null }))} />
               <span className={styles.choiceBody}>
-                <span className={styles.choiceLabel}>{s.label}</span>
-                <span className={styles.choiceHint}>{SECTOR_HINT[s.id] ?? ""}</span>
+                <span className={styles.choiceLabel}>Another type of business</span>
+                <span className={styles.choiceHint}>Tell us what it is</span>
               </span>
             </label>
-          ))}
-          <label className={styles.choice}>
-            <input type="radio" name={`${id}-sector`} checked={!site} onChange={() => choose(null)} />
-            <span className={styles.choiceBody}>
-              <span className={styles.choiceLabel}>Something else</span>
-              <span className={styles.choiceHint}>We plan the pages with you</span>
-            </span>
-          </label>
+          </div>
+          {!site && otherMode && (
+            <div className="field">
+              <label htmlFor={`${id}-other`}>What kind of business is it?</label>
+              <input
+                id={`${id}-other`}
+                className="input"
+                maxLength={80}
+                placeholder="For example: dog grooming, florist, accountant"
+                value={brief.otherBusinessType}
+                onChange={(e) => onChange({ otherBusinessType: e.target.value })}
+              />
+              <p className="field-hint">We&apos;ll plan your pages with you. Nothing is built from this yet.</p>
+            </div>
+          )}
         </div>
       </fieldset>
 

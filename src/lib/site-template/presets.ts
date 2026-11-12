@@ -15,9 +15,18 @@ export type SectionPreset = {
 /** A fact the customer can tick, shown as one tile in the facts strip. Nothing is shown unless they tick it. */
 export type HighlightOption = { id: string; value: string; label: string };
 
+/** The three groups a customer chooses from. Each sector belongs to one. */
+export const BUSINESS_GROUPS = {
+  booking: { label: "Booking services", hint: "Appointments, bookings and enquiries" },
+  hospitality: { label: "Hospitality", hint: "Food, drink and places to visit" },
+  trades: { label: "Trades", hint: "Work done on site" },
+} as const;
+export type BusinessGroup = keyof typeof BUSINESS_GROUPS;
+
 export type SectorPreset = {
   id: string;
   label: string;
+  group: BusinessGroup;
   defaultLook: Look;
   /** One line on the voice, passed to the writer. */
   voice: string;
@@ -34,6 +43,7 @@ export type SectorPreset = {
 export const BARBER_PRESET: SectorPreset = {
   id: "barber",
   label: "Barber",
+  group: "booking",
   defaultLook: "classic",
   itemsLabel: "Services",
   areaSource: "address",
@@ -61,6 +71,7 @@ export const BARBER_PRESET: SectorPreset = {
 export const CAFE_PRESET: SectorPreset = {
   id: "cafe",
   label: "Café",
+  group: "hospitality",
   defaultLook: "warm",
   itemsLabel: "Menu items",
   areaSource: "address",
@@ -88,6 +99,7 @@ export const CAFE_PRESET: SectorPreset = {
 export const ELECTRICIAN_PRESET: SectorPreset = {
   id: "electrician",
   label: "Electrician",
+  group: "trades",
   defaultLook: "bold",
   itemsLabel: "Services",
   areaSource: "areas",
