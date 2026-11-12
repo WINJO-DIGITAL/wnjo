@@ -180,7 +180,16 @@ function BuildCard({
           )}
         </div>
         {next.action && next.tab && next.cta && (
-          <button type="button" className="btn btn--primary" onClick={() => setTab(next.tab as "overview" | "changes")}>
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={() => {
+              setTab(next.tab as "overview" | "changes");
+              // Already on this tab, so take the customer to the thing the button is about.
+              const target = proposal ? `proposal-${proposal.id}` : `panel-${brief.id}-${next.tab}`;
+              requestAnimationFrame(() => document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+            }}
+          >
             {next.cta}
           </button>
         )}
@@ -224,7 +233,11 @@ function BuildCard({
               <BriefDetailsCard client={client} briefId={brief.id} initial={brief.brief} name={brief.name} businessName={brief.business_name} bespoke={brief.route === "proposal"} onSaved={() => setDetailsSaved(true)} />
             )}
             {needsDetails && detailsSaved && <DetailsThanks name={brief.name} onContinue={onChanged} />}
-            {proposal && <ProposalCard client={client} proposal={proposal} mode={brief.figures.mode === "oneOff" ? "oneOff" : "monthly"} onChanged={onChanged} />}
+            {proposal && (
+              <div id={`proposal-${proposal.id}`}>
+                <ProposalCard client={client} proposal={proposal} mode={brief.figures.mode === "oneOff" ? "oneOff" : "monthly"} onChanged={onChanged} />
+              </div>
+            )}
             {showPay && <PayCard client={client} briefId={brief.id} payNow={proposalPayNowFor(brief.figures.mode === "oneOff" ? "oneOff" : "monthly", accepted)} />}
             {showBalance && accepted && <PayBalanceCard client={client} briefId={brief.id} pence={balancePenceFor(accepted.one_off_pence)} />}
             {outright && brief.balance_paid_at && !brief.handed_over_at && (
