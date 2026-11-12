@@ -3,6 +3,7 @@ import { mailConfig, sendEnquiryEmail } from "@/lib/mailer";
 import { serviceClient } from "@/lib/quote-store";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { customerFromRequest } from "@/lib/staff-auth";
+import { pagesAllowedFor } from "@/lib/ai/website-ai-service";
 import { BRIEF_VERSION, DRAFT_ID_RE, cleanBrief, formatBrief, validateBrief } from "@/lib/website-brief";
 import { confirmBriefFiles } from "@/lib/brief-store";
 import { clean } from "@/lib/enquiry";
@@ -39,10 +40,10 @@ export async function POST(request: NextRequest) {
 
   const { data } = await db
     .from("website_briefs")
-    .select("id, tenant_id, reference, email, name, stage, answers")
+    .select("id, tenant_id, reference, email, name, stage, answers, figures")
     .eq("id", briefId)
     .maybeSingle();
-  const row = data as { id: string; tenant_id: string; reference: string; email: string; name: string; stage: string; answers: unknown } | null;
+  const row = data as { id: string; tenant_id: string; reference: string; email: string; name: string; stage: string; answers: unknown; figures: { package?: string } } | null;
   // Someone else's website looks exactly like a missing one.
   if (!row || row.email.toLowerCase() !== customer.email) return fail(404, "not_found");
   if (!EDITABLE_STAGES.includes(row.stage)) return fail(409, "This brief can't be changed now. Ask for changes on your preview instead.");
@@ -53,6 +54,13 @@ export async function POST(request: NextRequest) {
   if (draftId) brief = await confirmBriefFiles(db, draftId, brief);
   const errors = validateBrief(brief);
   if (Object.keys(errors).length) return fail(422, "Please complete your brief.", { brief: errors });
+
+  // The pages are limited to what the customer's plan covers (or what they bought). The form stops them going over,
+  // and this stops anything sent around the form.
+  const allowed = await pagesAllowedFor(db, row);
+  if (brief.pages.length > allowed) {
+    return fail(422, `Your plan covers up to ${allowed} pages. Remove ${brief.pages.length - allowed} to continue.`, { brief: { pages: `Your plan covers up to ${allowed} pages.` }, allowed });
+  }
 
   const { data: last } = await db
     .from("website_brief_versions")

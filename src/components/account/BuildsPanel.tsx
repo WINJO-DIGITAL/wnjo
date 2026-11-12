@@ -296,6 +296,22 @@ function BriefDetailsCard({
   const [businessName, setBusinessName] = useState(savedBusiness);
   const [errors, setErrors] = useState<BriefErrors>({});
   const [siteErrors, setSiteErrors] = useState<Record<string, string>>({});
+  // How many pages the plan covers, asked of the server (it applies the same number when this is sent).
+  const [allowed, setAllowed] = useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const { data } = await client.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) return;
+      const res = await fetch("/api/briefs/allowance", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ briefId }) }).catch(() => null);
+      const json = (await res?.json().catch(() => null)) as { pages?: number } | null;
+      if (!cancelled && res?.ok && typeof json?.pages === "number") setAllowed(json.pages);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [client, briefId]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   // A folder for this form's uploads. The id is never printed, so the server and browser renders still match.
@@ -323,6 +339,10 @@ function BriefDetailsCard({
     const missing = validateBrief(cleaned);
     if (missing.goals || missing.pages) {
       setErrors(missing);
+      return;
+    }
+    if (!cleaned.site && allowed !== null && cleaned.pages.length > allowed) {
+      setErrors({ pages: `Your plan covers up to ${allowed} pages. Remove ${cleaned.pages.length - allowed} to continue.` });
       return;
     }
     if (cleaned.site) {
@@ -366,7 +386,7 @@ function BriefDetailsCard({
       </div>
       <GoalsField brief={brief} onChange={update} error={errors.goals} />
       {TEMPLATE_SITES_ON && <SiteFields brief={brief} onChange={update} errors={siteErrors} businessName={businessName} />}
-      {!brief.site && <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} />}
+      {!brief.site && <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} hardMax={allowed} />}
       {!brief.site && <DesignFields brief={brief} onChange={update} />}
       <FilesField brief={brief} onChange={update} draftId={draftId} view={viewFile} />
       <FunctionalityField brief={brief} onChange={update} />

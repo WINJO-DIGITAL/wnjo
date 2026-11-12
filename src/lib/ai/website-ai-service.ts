@@ -48,7 +48,7 @@ export async function loadBrief(db: SupabaseClient, staff: Actor, briefId: strin
 }
 
 /** The most pages this website may have: what the customer's quote covered, or the package's own allowance. */
-export async function pagesAllowedFor(db: SupabaseClient, brief: BriefRow): Promise<number> {
+export async function pagesAllowedFor(db: SupabaseClient, brief: Pick<BriefRow, "reference" | "tenant_id" | "figures">): Promise<number> {
   const { data } = await db.from("enquiries").select("answers").eq("reference", brief.reference).eq("tenant_id", brief.tenant_id).maybeSingle();
   const stored = (data as { answers: { type?: string; answers?: unknown } | null } | null)?.answers;
   const answers = stored?.type === "website" ? parseWebsiteAnswers(stored.answers) : null;

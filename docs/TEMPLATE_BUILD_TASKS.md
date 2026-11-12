@@ -22,6 +22,7 @@ Working rules: commit locally; push or merge only when the owner says "push" or 
 - Merged to main (12 Nov, `5fa1f64`). `NEXT_PUBLIC_TEMPLATE_SITES=on` is set in Vercel and redeployed, so customers can see the sector questions.
 - Booking-request endpoint `/api/site-enquiry` (12 Nov): the form posts natively, works without JavaScript, only a released build takes requests, the email goes to the website owner's verified account address (never one from the request), rate limited, with a hidden bot trap and a confirmation or error shown on the page. Draft previews stay inactive.
 - Café and Electrician presets (12 Nov): each with a sample build that passes every check. Café: menu and table requests. Electrician: areas covered (each must appear), optional hours, quote requests, a Call button. Preset-specific labels for the request box.
+- Page limit on the details form (12 Nov bug fix): Core 5, Plus 10, Pro 20 pages (or what a one-off buyer paid for). The server gives the allowance (`/api/briefs/allowance`) and refuses more pages when the details are saved; the form disables extra pages at the limit.
 - Upload list on the details form: thumbnails for files picked this session, a View link (owner-only, 60-second signed link via `/api/briefs/file`), one row per file with wrapping names.
 
 ## Blocked on the owner

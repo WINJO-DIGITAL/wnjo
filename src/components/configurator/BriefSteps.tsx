@@ -72,30 +72,38 @@ export function PagesField({
   onChange,
   error,
   bandMax,
+  hardMax = null,
 }: {
   brief: WebsiteBrief;
   onChange: Change;
   error?: string;
+  /** What the chosen price band covers. A hint only: more pages can be bought. */
   bandMax: number | null;
+  /** The most pages the customer's plan allows. Past it, no more pages can be added. */
+  hardMax?: number | null;
 }) {
   const [custom, setCustom] = useState("");
   const has = (p: string) => brief.pages.some((x) => x.toLowerCase() === p.toLowerCase());
-  const toggle = (p: string) =>
+  const full = hardMax !== null && brief.pages.length >= hardMax;
+  const toggle = (p: string) => {
+    if (!has(p) && full) return;
     onChange({ pages: has(p) ? brief.pages.filter((x) => x.toLowerCase() !== p.toLowerCase()) : [...brief.pages, p] });
+  };
   const add = () => {
     const name = custom.trim().slice(0, BRIEF_LIMITS.pageName);
-    if (!name || has(name) || brief.pages.length >= BRIEF_LIMITS.pages) return;
+    if (full || !name || has(name) || brief.pages.length >= BRIEF_LIMITS.pages) return;
     onChange({ pages: [...brief.pages, name] });
     setCustom("");
   };
   const extras = brief.pages.filter((p) => !SUGGESTED_PAGES.some((s) => s.toLowerCase() === p.toLowerCase()));
-  const over = bandMax !== null && brief.pages.length > bandMax;
+  const overPlan = hardMax !== null && brief.pages.length > hardMax;
+  const over = overPlan || (bandMax !== null && brief.pages.length > bandMax);
   return (
     <fieldset className={styles.group}>
       <legend className={styles.legend}>Your pages</legend>
       <div className="brief-chips" role="group" aria-label="Pages">
         {[...SUGGESTED_PAGES, ...extras].map((p) => (
-          <button key={p} type="button" className="brief-chip" aria-pressed={has(p)} onClick={() => toggle(p)}>
+          <button key={p} type="button" className="brief-chip" aria-pressed={has(p)} disabled={!has(p) && full} onClick={() => toggle(p)}>
             {p}
           </button>
         ))}
@@ -110,6 +118,7 @@ export function PagesField({
           value={custom}
           maxLength={BRIEF_LIMITS.pageName}
           placeholder="Add another page"
+          disabled={full}
           onChange={(e) => setCustom(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -118,14 +127,24 @@ export function PagesField({
             }
           }}
         />
-        <button type="button" className="btn btn--secondary" onClick={add} disabled={!custom.trim()}>
+        <button type="button" className="btn btn--secondary" onClick={add} disabled={full || !custom.trim()}>
           Add
         </button>
       </div>
       <p className={`brief-count${over ? " brief-count--over" : ""}`} aria-live="polite">
-        {brief.pages.length} page{brief.pages.length === 1 ? "" : "s"}
-        {bandMax !== null && ` · your price covers up to ${bandMax}`}
-        {over && ". Choose a larger number of pages above, or remove some."}
+        {hardMax !== null ? (
+          overPlan ? (
+            `${brief.pages.length} pages. Your plan covers up to ${hardMax}. Remove ${brief.pages.length - hardMax} to continue.`
+          ) : (
+            `${brief.pages.length} of ${hardMax} pages in your plan${full ? ". That's your limit." : ""}`
+          )
+        ) : (
+          <>
+            {brief.pages.length} page{brief.pages.length === 1 ? "" : "s"}
+            {bandMax !== null && ` · your price covers up to ${bandMax}`}
+            {over && ". Choose a larger number of pages above, or remove some."}
+          </>
+        )}
       </p>
       {error && (
         <p className="field-error" role="alert">
