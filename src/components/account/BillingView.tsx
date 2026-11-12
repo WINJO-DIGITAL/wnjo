@@ -209,7 +209,7 @@ function CancelRequest({ client, reference }: { client: SupabaseClient; referenc
   if (state === "sent") {
     return (
       <p className="billing-row__note" role="status">
-        You&apos;ve asked to cancel this plan. We&apos;ve emailed you, and we&apos;ll confirm by email when it will end. Nothing changes until then.
+        Your plan is cancelled. We&apos;ve emailed you the date it ends, which is the end of the billing period you&apos;ve already paid for.
       </p>
     );
   }
@@ -245,7 +245,7 @@ function CancelRequest({ client, reference }: { client: SupabaseClient; referenc
         Anything else you&apos;d like us to know (optional)
       </label>
       <textarea id={`cancel-${reference}`} className="textarea" rows={3} maxLength={CANCEL_COMMENT_MAX} value={comment} placeholder="Anything else you'd like us to know (optional)" onChange={(e) => setComment(e.target.value)} />
-      <p className="cancel-request__note">We&apos;ll email you to confirm when it will end. Nothing changes until then, and your website stays live.</p>
+      <p className="cancel-request__note">Your plan ends at the end of the billing period you&apos;ve already paid for. No further payments are taken after that, and your website stays live until then.</p>
       {error && <p className="billing-row__error" role="alert">{error}</p>}
       <div className="btn-row">
         <button type="button" className="btn btn--primary" disabled={busy} onClick={() => void send()}>

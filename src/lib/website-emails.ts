@@ -312,15 +312,16 @@ export function oneOffPaidEmail(f: SubscriptionEmailFacts): { subject: string; t
 }
 
 /** Sent the moment a customer asks to cancel on their account, so they have a clear record of when they asked. */
-export function cancelRequestEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
+export function cancelRequestEmail(f: SubscriptionEmailFacts & { endsOn?: string }): { subject: string; text: string } {
+  const endsOn = f.endsOn ? new Date(f.endsOn).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" }) : null;
   return {
-    subject: `We've received your cancellation request [${f.reference}]`,
+    subject: endsOn ? `Your cancellation is confirmed [${f.reference}]` : `We've received your cancellation request [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
       "",
-      `We've received your request to cancel your ${f.packageName} plan (${f.reference}).`,
-      "We'll confirm by email when it will end, and nothing changes until then. Your website stays live.",
-      ...(f.minimumTermMonths > 0 ? [`Your plan has a minimum term of ${f.minimumTermMonths} months, and we'll explain how that applies to you in our reply.`] : []),
+      endsOn
+        ? `Your ${f.packageName} plan (${f.reference}) is cancelled. It ends on ${endsOn}, the end of the billing period you've already paid for. No further payments will be taken after that, and your website stays live until then.`
+        : `We've received your request to cancel your ${f.packageName} plan (${f.reference}). We'll confirm by email when it will end. Your website stays live until then.`,
       "",
       "If you didn't ask to cancel, or you've changed your mind, reply to this email and we'll leave things as they are.",
       ...sign,
