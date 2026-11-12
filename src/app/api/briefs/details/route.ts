@@ -40,10 +40,10 @@ export async function POST(request: NextRequest) {
 
   const { data } = await db
     .from("website_briefs")
-    .select("id, tenant_id, reference, email, name, stage, answers, figures")
+    .select("id, tenant_id, reference, email, name, stage, answers, figures, route")
     .eq("id", briefId)
     .maybeSingle();
-  const row = data as { id: string; tenant_id: string; reference: string; email: string; name: string; stage: string; answers: unknown; figures: { package?: string } } | null;
+  const row = data as { id: string; tenant_id: string; reference: string; email: string; name: string; stage: string; answers: unknown; figures: { package?: string }; route: string } | null;
   // Someone else's website looks exactly like a missing one.
   if (!row || row.email.toLowerCase() !== customer.email) return fail(404, "not_found");
   if (!EDITABLE_STAGES.includes(row.stage)) return fail(409, "This brief can't be changed now. Ask for changes on your preview instead.");
@@ -106,11 +106,24 @@ export async function POST(request: NextRequest) {
   const { error: progressError } = await db.from("website_brief_progress").delete().eq("brief_id", row.id);
   if (progressError) console.error("Progress clean-up failed");
 
+  // A buy-outright brief is sent before any payment: it is now with staff to quote, so it moves to "under review".
+  const bespoke = row.route === "proposal";
+  if (bespoke && row.stage === "brief_received") {
+    const { data: moved } = await db.from("website_briefs").update({ stage: "reviewing" }).eq("id", row.id).eq("stage", "brief_received").select("id");
+    if (moved?.length) await db.from("website_brief_events").insert({ ...actor, kind: "stage", detail: { from: "brief_received", to: "reviewing", note: "The customer sent their brief." } });
+  }
+
   const config = mailConfig();
   if (config) {
     await sendEnquiryEmail(config, {
-      subject: `Brief details from ${businessName || name || row.name} [${row.reference}]`,
-      text: [`${name || row.name} has told us about their website.`, ...(businessName ? [`Business: ${businessName}`] : []), "", formatBrief(brief)].join("\n"),
+      subject: `${bespoke ? "Ready to quote: brief" : "Brief details"} from ${businessName || name || row.name} [${row.reference}]`,
+      text: [
+        `${name || row.name} has told us about their website.`,
+        ...(bespoke ? ["Next: write the proposal in Admin, Website builds. They have not paid anything yet."] : []),
+        ...(businessName ? [`Business: ${businessName}`] : []),
+        "",
+        formatBrief(brief),
+      ].join("\n"),
       replyTo: customer.email,
     });
   }

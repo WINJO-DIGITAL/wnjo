@@ -53,9 +53,15 @@ describe("customer proposal response", () => {
 
   it("can't answer a proposal twice or before it is sent", async () => {
     proposal = { ...proposal!, status: "accepted" };
-    expect((await post({ decision: "decline" })).status).toBe(409);
+    expect((await post({ decision: "decline", note: "Too much" })).status).toBe(409);
     proposal = { ...proposal!, status: "approved" };
     expect((await post({ decision: "accept" })).status).toBe(409);
+    expect(writes).toEqual([]);
+  });
+
+  it("asking for changes needs a note, so staff know what to revise", async () => {
+    const res = await post({ decision: "decline" });
+    expect(res.status).toBe(422);
     expect(writes).toEqual([]);
   });
 

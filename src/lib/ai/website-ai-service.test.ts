@@ -134,4 +134,8 @@ describe("pages allowed", () => {
   it("falls back to the package's own allowance", async () => {
     expect(await pagesAllowedFor(db, brief as never)).toBe(5);
   });
+
+  it("puts no package limit on a buy-outright brief, which staff quote from what the customer asks for", async () => {
+    expect(await pagesAllowedFor(db, { ...brief, route: "proposal" } as never)).toBe(100);
+  });
 });

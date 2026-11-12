@@ -27,8 +27,8 @@ export async function POST(request: NextRequest) {
   const briefId = typeof body.briefId === "string" && UUID.test(body.briefId) ? body.briefId : null;
   if (!briefId) return fail(422, "invalid");
 
-  const { data } = await db.from("website_briefs").select("email, reference, tenant_id, figures").eq("id", briefId).maybeSingle();
-  const row = data as { email: string; reference: string; tenant_id: string; figures: { package?: string } } | null;
+  const { data } = await db.from("website_briefs").select("email, reference, tenant_id, figures, route").eq("id", briefId).maybeSingle();
+  const row = data as { email: string; reference: string; tenant_id: string; figures: { package?: string }; route: string } | null;
   if (!row || row.email.toLowerCase() !== customer.email) return fail(404, "not_found");
   return NextResponse.json({ pages: await pagesAllowedFor(db, row) });
 }

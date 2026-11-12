@@ -11238,6 +11238,25 @@ body:has(.dash-header) .site-footer {
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
+.build-split {
+  margin: var(--space-3) 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.build-split div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+.build-split dt {
+  color: var(--color-ink-2);
+}
+.build-split dd {
+  margin: 0;
+  font-weight: 600;
+}
 .build-proposal {
   padding-top: var(--space-2);
 }

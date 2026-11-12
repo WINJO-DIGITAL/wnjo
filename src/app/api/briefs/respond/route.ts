@@ -25,6 +25,8 @@ export async function POST(request: NextRequest) {
   const decision = body.decision === "accept" || body.decision === "decline" ? body.decision : null;
   const comment = typeof body.note === "string" ? body.note.trim().slice(0, 2000) : "";
   if (!id || !decision) return NextResponse.json({ error: "invalid" }, { status: 422 });
+  // Not accepting is how a customer asks for changes, so staff need to know what to change before they send a new proposal.
+  if (decision === "decline" && !comment) return NextResponse.json({ error: "Tell us what you'd like changed, so we can send you a new proposal." }, { status: 422 });
 
   const { data } = await db
     .from("website_proposals")
@@ -60,11 +62,13 @@ export async function POST(request: NextRequest) {
   const config = mailConfig();
   if (config) {
     await sendEnquiryEmail(config, {
-      subject: `Proposal ${p.reference} ${decision === "accept" ? "accepted" : "declined"} [${p.website_briefs.reference}]`,
+      subject: `Proposal ${p.reference} ${decision === "accept" ? "accepted" : "needs changes"} [${p.website_briefs.reference}]`,
       text: [
-        `${p.website_briefs.name} has ${decision === "accept" ? "accepted" : "declined"} proposal ${p.reference}.`,
+        decision === "accept" ? `${p.website_briefs.name} has accepted proposal ${p.reference}.` : `${p.website_briefs.name} has asked for changes to proposal ${p.reference}.`,
         comment ? `Their note: ${comment}` : "",
-        decision === "accept" ? "Next: create the payment link from the accepted figures in Admin, Website builds." : "",
+        decision === "accept"
+          ? "Next: they can now pay the 50% deposit from their account. Nothing more to do until it arrives."
+          : "Next: write a new proposal in Admin, Website builds, and send it.",
       ].filter(Boolean).join("\n"),
       replyTo: customer.email,
     });

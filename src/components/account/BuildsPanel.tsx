@@ -217,7 +217,7 @@ function BuildCard({
               <BriefDetailsCard client={client} briefId={brief.id} initial={brief.brief} name={brief.name} businessName={brief.business_name} onSaved={() => setDetailsSaved(true)} />
             )}
             {needsDetails && detailsSaved && <DetailsThanks name={brief.name} onContinue={onChanged} />}
-            {proposal && <ProposalCard client={client} proposal={proposal} onChanged={onChanged} />}
+            {proposal && <ProposalCard client={client} proposal={proposal} mode={brief.figures.mode === "oneOff" ? "oneOff" : "monthly"} onChanged={onChanged} />}
             {showPay && <PayCard client={client} briefId={brief.id} payNow={proposalPayNowFor(brief.figures.mode === "oneOff" ? "oneOff" : "monthly", accepted)} />}
             {!proposal && !showPay && brief.brief.goals.length > 0 && (
               <p className="build-card__meta">Built for {brief.brief.goals.map((g) => GOALS[g]?.label).filter(Boolean).join(", ")}</p>
@@ -362,7 +362,7 @@ function PreviewLink({ client, briefId }: { client: SupabaseClient; briefId: str
   );
 }
 
-function ProposalCard({ client, proposal, onChanged }: { client: SupabaseClient; proposal: Proposal; onChanged: () => void }) {
+function ProposalCard({ client, proposal, mode, onChanged }: { client: SupabaseClient; proposal: Proposal; mode: "monthly" | "oneOff"; onChanged: () => void }) {
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -370,6 +370,11 @@ function ProposalCard({ client, proposal, onChanged }: { client: SupabaseClient;
   const [confirming, setConfirming] = useState<"accept" | "decline" | null>(null);
 
   const respond = async (decision: "accept" | "decline") => {
+    if (decision === "decline" && !note.trim()) {
+      setConfirming(null);
+      setError("Tell us what you'd like changed, so we can send you a new proposal.");
+      return;
+    }
     setBusy(true);
     setError(null);
     const { data } = await client.auth.getSession();
@@ -395,7 +400,7 @@ function ProposalCard({ client, proposal, onChanged }: { client: SupabaseClient;
   if (done) {
     return (
       <Confirmation
-        title={done === "accept" ? "Proposal accepted. We'll send your payment link shortly." : "Proposal declined. We'll be in touch."}
+        title={done === "accept" ? "Proposal accepted. Your payment is shown below." : "Thanks. We'll update your proposal and send you a new one."}
       />
     );
   }
@@ -425,8 +430,20 @@ function ProposalCard({ client, proposal, onChanged }: { client: SupabaseClient;
           </strong>
         )}
       </p>
+      {mode === "oneOff" && proposal.one_off_pence > 0 && (
+        <dl className="build-split">
+          <div>
+            <dt>Deposit to start (50%)</dt>
+            <dd>{money(proposalPayNowFor("oneOff", proposal).pence)}</dd>
+          </div>
+          <div>
+            <dt>Balance, when you approve your website</dt>
+            <dd>{money(proposal.one_off_pence - proposalPayNowFor("oneOff", proposal).pence)}</dd>
+          </div>
+        </dl>
+      )}
       <label htmlFor={`note-${proposal.id}`} className="acct-label">
-        Anything to add? <span className="optional">(optional)</span>
+        Anything to add, or what to change? <span className="optional">(needed if you ask for changes)</span>
       </label>
       <textarea id={`note-${proposal.id}`} className="acct-input" rows={2} maxLength={2000} value={note} onChange={(e) => setNote(e.target.value)} />
       {error && (
@@ -437,7 +454,7 @@ function ProposalCard({ client, proposal, onChanged }: { client: SupabaseClient;
       {confirming ? (
         <div className="btn-row">
           <button type="button" className="btn btn--primary" disabled={busy} onClick={() => void respond(confirming)}>
-            {busy ? "Sending…" : confirming === "accept" ? "Yes, accept" : "Yes, decline"}
+            {busy ? "Sending…" : confirming === "accept" ? "Yes, accept" : "Yes, ask for changes"}
           </button>
           <button type="button" className="btn btn--secondary" disabled={busy} onClick={() => setConfirming(null)}>
             Cancel
@@ -449,11 +466,11 @@ function ProposalCard({ client, proposal, onChanged }: { client: SupabaseClient;
             Accept proposal
           </button>
           <button type="button" className="btn btn--secondary" onClick={() => setConfirming("decline")}>
-            Decline
+            Ask for changes
           </button>
         </div>
       )}
-      <p className="fine">Accepting doesn&apos;t charge you. We send a secure payment link next, with the full terms.</p>
+      <p className="fine">Accepting doesn&apos;t charge you. Your payment comes next, with the full terms.</p>
     </div>
   );
 }
