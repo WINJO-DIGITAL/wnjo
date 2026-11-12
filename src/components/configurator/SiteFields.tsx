@@ -177,7 +177,7 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
             <legend className={styles.legend}>How can people reach you?</legend>
             <div className="cfg-fields">
               <div className="field">
-                <label htmlFor={`${id}-phone`}>Phone</label>
+                <label htmlFor={`${id}-phone`}>Phone <span className="optional">(optional)</span></label>
                 <input id={`${id}-phone`} className="input" type="tel" autoComplete="tel" maxLength={20} value={answers.phone ?? ""} onChange={(e) => set({ phone: e.target.value })} />
                 {err("phone")}
               </div>
@@ -263,7 +263,7 @@ export function ProfileFields({ brief, onChange, errors }: { brief: WebsiteBrief
       </div>
       <div className="cfg-fields">
         <div className="field">
-          <label htmlFor={`${id}-phone`}>Phone</label>
+          <label htmlFor={`${id}-phone`}>Phone <span className="optional">(optional)</span></label>
           <input id={`${id}-phone`} className="input" type="tel" autoComplete="tel" maxLength={PROFILE_LIMITS.phone} value={p.phone} onChange={(e) => set({ phone: e.target.value })} />
         </div>
         <div className="field">

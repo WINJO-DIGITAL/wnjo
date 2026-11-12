@@ -278,8 +278,8 @@ export function validateProfile(brief: WebsiteBrief): Partial<Record<keyof Busin
   const p = brief.profile;
   const errors: Partial<Record<keyof BusinessProfile, string>> = {};
   if (!p.services) errors.services = "Tell us what you offer.";
-  if (!p.phone && !p.email) errors.phone = "Add a phone number or an email address.";
-  if (p.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(p.email)) errors.email = "Check the email address.";
+  if (!p.email) errors.email = "Add an email address we can reply to.";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(p.email)) errors.email = "Check the email address.";
   if (p.phone && !/^\+?[\d\s()-]{9,16}$/.test(p.phone)) errors.phone = "Check the phone number.";
   if (!p.differentiator) errors.differentiator = "Tell us what makes you different.";
   return errors;

@@ -97,12 +97,17 @@ describe("parseAnswers", () => {
   it("asks for what is missing", () => {
     const r = parse({ businessName: "", servicesText: "", phone: "", email: "" });
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(Object.keys(r.errors).sort()).toEqual(["businessName", "contact", "services"]);
+    if (!r.ok) expect(Object.keys(r.errors).sort()).toEqual(["businessName", "email", "services"]);
   });
 
-  it("needs only a phone or an email, not both", () => {
-    expect(parse({ email: "" }).ok).toBe(true);
-    expect(parse({ phone: "" }).ok).toBe(true);
+  it("needs an email, and takes a phone only if given", () => {
+    const noEmail = parse({ email: "", phone: "01632 960123" });
+    expect(noEmail.ok === false && noEmail.errors.email).toBe("Add an email address we can reply to.");
+    const phoneOnly = parse({ email: "", phone: "" });
+    expect(phoneOnly.ok).toBe(false);
+    const emailOnly = parse({ email: "sam@example.com", phone: "" });
+    expect(emailOnly.ok).toBe(true);
+    if (emailOnly.ok) expect(emailOnly.facts.phone).toBeUndefined();
   });
 
   it("rejects a bad phone, email or colour", () => {

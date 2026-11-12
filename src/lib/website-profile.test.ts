@@ -6,7 +6,7 @@ const other: WebsiteBrief = {
   ...EMPTY_BRIEF,
   goals: ["bookings"],
   otherBusinessType: "Airport transfer company",
-  profile: { ...EMPTY_BRIEF.profile, services: "Airport transfer £35\nLong distance by quote", phone: "07700 900123", differentiator: "Fixed prices, meet and greet" },
+  profile: { ...EMPTY_BRIEF.profile, services: "Airport transfer £35\nLong distance by quote", email: "sam@example.com", phone: "07700 900123", differentiator: "Fixed prices, meet and greet" },
 };
 
 describe("the business profile", () => {
@@ -20,11 +20,15 @@ describe("the business profile", () => {
     expect(cleanBrief({}).profile.services).toBe("");
   });
 
-  it("needs what a website can't be written without, and a contact", () => {
+  it("needs what a website can't be written without, and an email address", () => {
     expect(validateProfile(other)).toEqual({});
     const missing = validateProfile({ ...other, profile: { ...EMPTY_BRIEF.profile } });
-    expect(Object.keys(missing).sort()).toEqual(["differentiator", "phone", "services"]);
-    expect(validateProfile({ ...other, profile: { ...other.profile, phone: "", email: "not an email" } }).email).toBe("Check the email address.");
+    expect(Object.keys(missing).sort()).toEqual(["differentiator", "email", "services"]);
+    expect(validateProfile({ ...other, profile: { ...other.profile, email: "not an email" } }).email).toBe("Check the email address.");
+  });
+
+  it("takes a phone number as optional", () => {
+    expect(validateProfile({ ...other, profile: { ...other.profile, phone: "", email: "sam@example.com" } })).toEqual({});
   });
 
   it("is not checked for a brief with a template, or with no other type", () => {
@@ -35,7 +39,7 @@ describe("the business profile", () => {
     const lines = profileLines(other.profile);
     expect(lines).toContain("Phone: 07700 900123");
     expect(lines).toContain("What makes them different: Fixed prices, meet and greet");
-    expect(lines.some((l) => l.startsWith("Email"))).toBe(false);
+    expect(lines).toContain("Email: sam@example.com");
     expect(lines.some((l) => l.startsWith("Hours"))).toBe(false);
   });
 

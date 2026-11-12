@@ -78,7 +78,7 @@ describe("the electrician's areas", () => {
 });
 
 describe("answers by sector", () => {
-  const trade: RawAnswers = { businessName: "Spark & Co", servicesText: "Full rewire\nFuse board upgrade £450", areas: "Leeds, Wakefield\nHarrogate, leeds", phone: "0113 496 0789", hours: blankWeek };
+  const trade: RawAnswers = { businessName: "Spark & Co", servicesText: "Full rewire\nFuse board upgrade £450", areas: "Leeds, Wakefield\nHarrogate, leeds", email: "jobs@sparkandco.example", phone: "0113 496 0789", hours: blankWeek };
   const parse = (r: RawAnswers, preset = ELECTRICIAN_PRESET) => parseAnswers(r, preset, { colour: "#222222" });
 
   it("accepts an electrician with areas and no hours", () => {
@@ -100,13 +100,13 @@ describe("answers by sector", () => {
   it("needs areas for an electrician, and not for a café", () => {
     const missing = parse({ ...trade, areas: "" });
     expect(missing.ok === false && missing.errors.areas).toBe("Add the areas you cover.");
-    const cafe = parse({ businessName: "Harbour", servicesText: "Flat white £3.20", hours: week, phone: "01274 960456" }, CAFE_PRESET);
+    const cafe = parse({ businessName: "Harbour", servicesText: "Flat white £3.20", hours: week, email: "hi@harbour.example" }, CAFE_PRESET);
     expect(cafe.ok).toBe(true);
     if (cafe.ok) expect(cafe.look).toBe("warm");
   });
 
   it("still needs hours for a café, and for a barber", () => {
-    const r = parse({ businessName: "Harbour", servicesText: "Flat white", phone: "01274 960456", hours: blankWeek }, CAFE_PRESET);
+    const r = parse({ businessName: "Harbour", servicesText: "Flat white", email: "hi@harbour.example", hours: blankWeek }, CAFE_PRESET);
     expect(r.ok === false && r.errors.hours).toBeDefined();
     expect(parse({ businessName: "H", servicesText: "Cut", phone: "01632 960123" }, BARBER_PRESET).ok).toBe(false);
   });

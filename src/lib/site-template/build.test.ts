@@ -8,6 +8,7 @@ const answers: RawAnswers = {
   businessName: "Hartley & Sons",
   servicesText: "Cut & style £22\nSkin fade £20\nBeard trim",
   hours: week,
+  email: "book@hartley.example",
   phone: "01632 960123",
   address: "12 High Street, Leeds",
   highlights: ["walk-ins"],

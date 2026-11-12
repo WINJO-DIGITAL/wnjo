@@ -7,13 +7,13 @@ const week = (["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const).map((d
 const barber: WebsiteBrief = {
   ...EMPTY_BRIEF,
   goals: ["bookings"],
-  site: { sector: "barber", answers: { servicesText: "Cut £20", hours: week, phone: "01632 960123" } },
+  site: { sector: "barber", answers: { servicesText: "Cut £20", hours: week, email: "book@hartley.example", phone: "01632 960123" } },
 };
 const other: WebsiteBrief = {
   ...EMPTY_BRIEF,
   goals: ["enquiries"],
   otherBusinessType: "Dog grooming",
-  profile: { ...EMPTY_PROFILE, services: "Full groom", phone: "07700 900123", differentiator: "We come to you" },
+  profile: { ...EMPTY_PROFILE, services: "Full groom", email: "sam@example.com", phone: "07700 900123", differentiator: "We come to you" },
 };
 
 describe("which steps a brief goes through", () => {
@@ -38,9 +38,9 @@ describe("what each step needs", () => {
 
   it("offer: a template site's own answers, or the business questions", () => {
     expect(validateStep("offer", barber, ctx())).toEqual({});
-    expect(Object.keys(validateStep("offer", { ...barber, site: { sector: "barber", answers: {} } }, ctx())).sort()).toEqual(expect.arrayContaining(["services", "hours", "contact"]));
+    expect(Object.keys(validateStep("offer", { ...barber, site: { sector: "barber", answers: {} } }, ctx())).sort()).toEqual(expect.arrayContaining(["services", "hours", "email"]));
     expect(validateStep("offer", other, ctx())).toEqual({});
-    expect(Object.keys(validateStep("offer", { ...other, profile: EMPTY_PROFILE }, ctx())).sort()).toEqual(["differentiator", "phone", "services"]);
+    expect(Object.keys(validateStep("offer", { ...other, profile: EMPTY_PROFILE }, ctx())).sort()).toEqual(["differentiator", "email", "services"]);
   });
 
   it("offer: uses the business name from the first step for a template site", () => {

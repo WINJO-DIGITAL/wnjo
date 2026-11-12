@@ -149,7 +149,7 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
   if (email && !EMAIL.test(email)) errors.email = "Check the email address.";
   if (email.length > ANSWER_LIMITS.email) errors.email = "That email address is too long.";
   if (address.length > ANSWER_LIMITS.address) errors.address = `Keep it under ${ANSWER_LIMITS.address} characters.`;
-  if (!phone && !email) errors.contact = "Add a phone number or an email address.";
+  if (!email) errors.email = "Add an email address we can reply to.";
 
   const ticked = new Set(Array.isArray(raw.highlights) ? raw.highlights : []);
   const highlights = preset.highlights.filter((h) => ticked.has(h.id)).map((h) => ({ value: h.value, label: h.label }));
