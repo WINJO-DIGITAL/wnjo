@@ -1,0 +1,220 @@
+/**
+ * Automatic checks on a template build. A build is usable only if none of these report an issue. The model is never
+ * asked whether it is happy with its own work; these decide. The owner can still override a failure when reviewing.
+ */
+import type { CustomerFacts, Section, SiteContent } from "./schema";
+import { FIELD_LIMITS, LOOKS, SECTION_KINDS } from "./schema";
+import type { SectorPreset } from "./presets";
+
+export type CheckIssue = { code: string; message: string; where?: string };
+export type CheckResult = { ok: boolean; issues: CheckIssue[] };
+
+const PLACEHOLDERS = [
+  /lorem/i,
+  /ipsum/i,
+  /your (headline|business|name|text|tagline|title) here/i,
+  /\[[^\]]*\]/,
+  /\{\{[^}]*\}\}/,
+  /\bTODO\b/,
+  /\bTBC\b/,
+  /\bplaceholder\b/i,
+  /\bsample text\b/i,
+  /\binsert\b.{0,20}\bhere\b/i,
+];
+
+const MARKUP = /<[a-z/!][^>]*>|https?:\/\/|www\./i;
+const PRICE = /£\s?\d[\d,]*(?:\.\d{1,2})?/g;
+const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+const PHONE = /(?:\+44|0)[\d\s()-]{8,14}\d/g;
+
+const digits = (s: string) => s.replace(/\D/g, "");
+const norm = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim();
+const priceKey = (s: string) => s.replace(/[£\s,]/g, "").replace(/\.00$/, "");
+
+/** Every piece of customer-facing text in the content, with where it sits, so checks can look at each one. */
+function textFields(content: SiteContent): { where: string; text: string; limit?: number }[] {
+  const out: { where: string; text: string; limit?: number }[] = [];
+  const add = (where: string, text: string | undefined, limit?: number) => {
+    if (text !== undefined) out.push({ where, text, limit });
+  };
+  const b = content.business;
+  add("business.name", b.name, FIELD_LIMITS.heading);
+  add("business.tagline", b.tagline, FIELD_LIMITS.tagline);
+  content.sections.forEach((s, i) => {
+    const at = `sections[${i}].${s.kind}`;
+    switch (s.kind) {
+      case "hero":
+        add(`${at}.headline`, s.headline, FIELD_LIMITS.headline);
+        add(`${at}.intro`, s.intro, FIELD_LIMITS.intro);
+        add(`${at}.cta`, s.cta, FIELD_LIMITS.cta);
+        break;
+      case "services":
+        add(`${at}.heading`, s.heading, FIELD_LIMITS.heading);
+        s.items.forEach((it, j) => {
+          add(`${at}.items[${j}].name`, it.name, FIELD_LIMITS.itemName);
+          add(`${at}.items[${j}].description`, it.description, FIELD_LIMITS.itemText);
+          add(`${at}.items[${j}].price`, it.price, FIELD_LIMITS.price);
+        });
+        break;
+      case "hours":
+        add(`${at}.heading`, s.heading, FIELD_LIMITS.heading);
+        break;
+      case "gallery":
+        add(`${at}.heading`, s.heading, FIELD_LIMITS.heading);
+        s.images.forEach((im, j) => add(`${at}.images[${j}].alt`, im.alt, FIELD_LIMITS.alt));
+        break;
+      case "facts":
+        s.items.forEach((f, j) => {
+          add(`${at}.items[${j}].value`, f.value, FIELD_LIMITS.factValue);
+          add(`${at}.items[${j}].label`, f.label, FIELD_LIMITS.factLabel);
+        });
+        break;
+      case "area":
+        add(`${at}.heading`, s.heading, FIELD_LIMITS.heading);
+        add(`${at}.text`, s.text, FIELD_LIMITS.body);
+        break;
+      case "enquiry":
+        add(`${at}.heading`, s.heading, FIELD_LIMITS.heading);
+        add(`${at}.intro`, s.intro, FIELD_LIMITS.intro);
+        add(`${at}.cta`, s.cta, FIELD_LIMITS.cta);
+        break;
+      case "faq":
+        add(`${at}.heading`, s.heading, FIELD_LIMITS.heading);
+        s.items.forEach((q, j) => {
+          add(`${at}.items[${j}].question`, q.question, FIELD_LIMITS.question);
+          add(`${at}.items[${j}].answer`, q.answer, FIELD_LIMITS.answer);
+        });
+        break;
+      case "cta":
+        add(`${at}.headline`, s.headline, FIELD_LIMITS.headline);
+        add(`${at}.cta`, s.cta, FIELD_LIMITS.cta);
+        break;
+    }
+  });
+  return out;
+}
+
+/** Whether a section has anything in it. An empty section must not reach the preview. */
+function isFilled(s: Section): boolean {
+  switch (s.kind) {
+    case "hero":
+      return !!s.headline.trim();
+    case "services":
+    case "hours":
+    case "facts":
+    case "faq":
+      return s.items.length > 0;
+    case "gallery":
+      return s.images.length > 0;
+    case "area":
+      return !!s.text.trim();
+    case "enquiry":
+      return !!s.heading.trim() && !!s.cta.trim();
+    case "cta":
+      return !!s.headline.trim() && !!s.cta.trim();
+  }
+}
+
+export function checkSite(content: SiteContent, facts: CustomerFacts, preset: SectorPreset): CheckResult {
+  const issues: CheckIssue[] = [];
+  const flag = (code: string, message: string, where?: string) => issues.push({ code, message, where });
+
+  // Structure: known kinds, only kinds the preset allows, no repeats, in the preset's order.
+  const allowed = preset.sections.map((p) => p.kind);
+  const seen = new Set<string>();
+  let lastIndex = -1;
+  content.sections.forEach((s, i) => {
+    if (!SECTION_KINDS.includes(s.kind)) return flag("unknown-section", `Unknown section "${String(s.kind)}".`, `sections[${i}]`);
+    if (!allowed.includes(s.kind)) return flag("section-not-in-preset", `A ${preset.label} site has no "${s.kind}" section.`, `sections[${i}]`);
+    if (seen.has(s.kind)) return flag("duplicate-section", `The "${s.kind}" section appears twice.`, `sections[${i}]`);
+    seen.add(s.kind);
+    const order = allowed.indexOf(s.kind);
+    if (order < lastIndex) flag("section-order", `The "${s.kind}" section is out of order.`, `sections[${i}]`);
+    lastIndex = Math.max(lastIndex, order);
+    if (!isFilled(s)) flag("empty-section", `The "${s.kind}" section is empty.`, `sections[${i}]`);
+  });
+
+  // Required sections are present.
+  for (const p of preset.sections) {
+    if (p.required && !seen.has(p.kind)) flag("missing-section", `The required "${p.kind}" section is missing.`);
+  }
+
+  if (!(LOOKS as readonly string[]).includes(content.theme.look)) flag("bad-look", `"${content.theme.look}" is not an allowed look.`, "theme.look");
+  if (!/^#[0-9a-f]{6}$/i.test(content.theme.colour)) flag("bad-colour", "The theme colour must be a hex colour such as #1a2b3c.", "theme.colour");
+
+  const fields = textFields(content);
+
+  for (const f of fields) {
+    if (f.limit && f.text.length > f.limit) flag("too-long", `Text is ${f.text.length} characters; the limit is ${f.limit}.`, f.where);
+    if (PLACEHOLDERS.some((re) => re.test(f.text))) flag("placeholder", `Placeholder text left in: "${f.text.slice(0, 40)}".`, f.where);
+    if (MARKUP.test(f.text)) flag("markup", "Text must be plain: no HTML or links.", f.where);
+  }
+  for (const [i, s] of content.sections.entries()) {
+    if (s.kind === "gallery") s.images.forEach((im, j) => !im.alt.trim() && flag("missing-alt", "Image needs a short description.", `sections[${i}].images[${j}]`));
+    if (s.kind === "services" && s.items.length > FIELD_LIMITS.items) flag("too-many-items", `More than ${FIELD_LIMITS.items} services.`, `sections[${i}]`);
+    if (s.kind === "faq" && s.items.length > 4) flag("too-many-items", "More than four FAQ items.", `sections[${i}]`);
+    if (s.kind === "facts" && s.items.length > 4) flag("too-many-items", "More than four facts.", `sections[${i}]`);
+  }
+
+  // The customer's own details appear.
+  const allText = norm(fields.map((f) => f.text).join(" "));
+  if (norm(content.business.name) !== norm(facts.businessName)) {
+    flag("business-name", `The business name should be "${facts.businessName}".`, "business.name");
+  } else if (!allText.includes(norm(facts.businessName))) {
+    flag("business-name", "The business name does not appear.", "business.name");
+  }
+
+  const services = content.sections.find((s) => s.kind === "services");
+  const listed = services && services.kind === "services" ? services.items : [];
+  for (const svc of facts.services) {
+    const match = listed.find((it) => norm(it.name) === norm(svc.name));
+    if (!match) {
+      flag("service-missing", `The service "${svc.name}" is missing.`, "services");
+    } else if (svc.price && priceKey(match.price ?? "") !== priceKey(svc.price)) {
+      flag("price-changed", `"${svc.name}" should cost ${svc.price}.`, "services");
+    } else if (!svc.price && match.price) {
+      flag("price-invented", `No price was given for "${svc.name}".`, "services");
+    }
+  }
+  for (const it of listed) {
+    if (!facts.services.some((s) => norm(s.name) === norm(it.name))) flag("service-invented", `"${it.name}" was not one of the customer's services.`, "services");
+  }
+
+  // Nothing invented: every price, email, phone number and address in the text must come from the customer.
+  const knownPrices = new Set(facts.services.map((s) => s.price).filter(Boolean).map((p) => priceKey(p!)));
+  for (const f of fields) {
+    for (const m of f.text.match(PRICE) ?? []) {
+      if (!knownPrices.has(priceKey(m))) flag("price-invented", `The price ${m} was not given by the customer.`, f.where);
+    }
+    for (const m of f.text.match(EMAIL) ?? []) {
+      if (!facts.email || norm(m) !== norm(facts.email)) flag("email-invented", `The email ${m} was not given by the customer.`, f.where);
+    }
+    for (const m of f.text.match(PHONE) ?? []) {
+      if (!facts.phone || digits(m) !== digits(facts.phone)) flag("phone-invented", `The phone number ${m} was not given by the customer.`, f.where);
+    }
+  }
+  const b = content.business;
+  if (b.phone && (!facts.phone || digits(b.phone) !== digits(facts.phone))) flag("phone-invented", "The phone number does not match the customer's.", "business.phone");
+  if (b.email && (!facts.email || norm(b.email) !== norm(facts.email))) flag("email-invented", "The email does not match the customer's.", "business.email");
+  if (b.address && (!facts.address || norm(b.address) !== norm(facts.address))) flag("address-invented", "The address does not match the customer's.", "business.address");
+
+  // Opening hours must be the customer's, unchanged.
+  const hours = content.sections.find((s) => s.kind === "hours");
+  if (hours && hours.kind === "hours") {
+    if (!facts.hours) {
+      flag("hours-invented", "The customer gave no opening hours.", "hours");
+    } else if (JSON.stringify(hours.items) !== JSON.stringify(facts.hours)) {
+      flag("hours-changed", "Opening hours differ from what the customer gave.", "hours");
+    }
+  }
+
+  // A section about the address needs an address to talk about.
+  if (seen.has("area") && !facts.address) flag("area-without-address", "The customer gave no address, so there is nothing to put in the area section.", "area");
+
+  return { ok: issues.length === 0, issues };
+}
+
+/** The reasons, as one block of text, for retrying a failed build once with the failure reasons. */
+export function describeIssues(result: CheckResult): string {
+  return result.issues.map((i) => `- ${i.where ? `${i.where}: ` : ""}${i.message}`).join("\n");
+}
