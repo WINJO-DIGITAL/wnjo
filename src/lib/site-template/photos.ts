@@ -1,0 +1,54 @@
+/**
+ * The customer's uploaded photos in a template site. The stored content holds only a reference to each private file;
+ * the preview page swaps in short-lived signed links when it is opened, and only for files that belong to that
+ * website's own brief. Pure, so it can be tested without storage.
+ */
+import type { BriefFile } from "@/lib/website-brief";
+import type { GalleryImage, SiteContent } from "./schema";
+
+export const PHOTO_SCHEME = "brief-file:";
+const PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+export const MAX_GALLERY = 6;
+
+export const photoRef = (path: string) => `${PHOTO_SCHEME}${path}`;
+export const isPhotoRef = (src: string) => src.startsWith(PHOTO_SCHEME);
+export const photoPath = (ref: string) => ref.slice(PHOTO_SCHEME.length);
+
+/** Photographs only (not SVG logos, documents, or files named like a logo). The first is the hero, the next few the gallery. */
+export function pickPhotos(files: BriefFile[]): { hero?: string; gallery: GalleryImage[] } {
+  const photos = files.filter((f) => PHOTO_TYPES.has(f.type) && !/logo/i.test(f.name));
+  const [first, ...rest] = photos;
+  return {
+    ...(first ? { hero: photoRef(first.path) } : {}),
+    gallery: rest.slice(0, MAX_GALLERY).map((f) => ({ src: photoRef(f.path), alt: "" })),
+  };
+}
+
+/** The private files a build refers to, so the page knows what to sign. */
+export function photoRefs(content: SiteContent): string[] {
+  const refs: string[] = [];
+  for (const s of content.sections) {
+    if (s.kind === "hero" && s.image && isPhotoRef(s.image)) refs.push(s.image);
+    if (s.kind === "gallery") for (const im of s.images) if (isPhotoRef(im.src)) refs.push(im.src);
+  }
+  return [...new Set(refs)];
+}
+
+/**
+ * Swaps references for the links in `urls`. A reference with no link (missing or not the website's own file) is
+ * dropped: a gallery loses the picture and a hero falls back to plain. Returns the hero link for the renderer.
+ */
+export function resolvePhotos(content: SiteContent, urls: Map<string, string>): { content: SiteContent; heroImage?: string } {
+  let heroImage: string | undefined;
+  const sections = content.sections.map((s) => {
+    if (s.kind === "hero") {
+      heroImage = s.image ? urls.get(s.image) : undefined;
+      return heroImage ? s : { ...s, variant: "plain" as const };
+    }
+    if (s.kind === "gallery") {
+      return { ...s, images: s.images.flatMap((im) => (isPhotoRef(im.src) ? (urls.get(im.src) ? [{ ...im, src: urls.get(im.src)! }] : []) : [im])) };
+    }
+    return s;
+  });
+  return { content: { ...content, sections }, heroImage };
+}

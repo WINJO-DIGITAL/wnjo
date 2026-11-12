@@ -21,7 +21,7 @@ export async function runSiteBuildStep(
   if (!brief) return { ok: false, status: 404, error: "not_found" };
   if (!AI_STAGES.includes(brief.stage)) return { ok: false, status: 409, error: "The site build starts once the customer has paid." };
   const store = new SupabaseSiteBuildStore(db, staff.tenantId, staff.userId);
-  const result = await buildSite({ provider, store, briefId, maxPence: maxPenceFromEnv() }, { ...input, change: input.change?.trim() || undefined });
+  const result = await buildSite({ provider, store, briefId, maxPence: maxPenceFromEnv() }, { ...input, change: input.change?.trim() || undefined, files: brief.brief.files });
   if (!result.ok) {
     await logEvent(db, staff, briefId, "ai", { step: "site", ok: false, reason: result.reason, costPence: result.costPence });
     return { ok: false, status: result.errors ? 422 : 502, error: result.reason };

@@ -4,7 +4,7 @@ import { BARBER_PRESET } from "./presets";
 import { SAMPLE_BARBER_FACTS } from "./sample";
 import { assembleSite, buildCopyPrompt, parseCopy, writeSite, type WriteInput } from "./write";
 
-const input: WriteInput = { preset: BARBER_PRESET, facts: SAMPLE_BARBER_FACTS, look: "classic", colour: "#1f3a34", hasHeroPhoto: true };
+const input: WriteInput = { preset: BARBER_PRESET, facts: SAMPLE_BARBER_FACTS, look: "classic", colour: "#1f3a34", heroPhoto: "brief-file:drafts/x/hero.jpg" };
 
 const copy = (over: Record<string, unknown> = {}) => ({
   tagline: "Barbers in Leeds",
@@ -105,7 +105,7 @@ describe("assembleSite", () => {
   });
 
   it("uses a plain hero without a photo", () => {
-    const site = assembleSite({ ...input, hasHeroPhoto: false }, parsed.copy);
+    const site = assembleSite({ ...input, heroPhoto: undefined }, parsed.copy);
     expect(site.sections[0]).toMatchObject({ kind: "hero", variant: "plain" });
   });
 });

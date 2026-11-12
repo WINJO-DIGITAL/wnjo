@@ -52,6 +52,20 @@ describe("buildSite", () => {
     expect(store.saved[0].content.business.name).toBe("Hartley & Sons");
   });
 
+  it("uses uploaded photographs for the hero and gallery, and leaves logos out", async () => {
+    const store = memoryStore();
+    const files = [
+      { path: "drafts/d/logo.png", name: "logo.png", size: 1, type: "image/png" },
+      { path: "drafts/d/shop.jpg", name: "shop.jpg", size: 1, type: "image/jpeg" },
+      { path: "drafts/d/chair.jpg", name: "chair.jpg", size: 1, type: "image/jpeg" },
+    ];
+    await run(provider([final(copy)]), store, { sector: "barber", answers, files });
+    const sections = store.saved[0].content.sections;
+    expect(sections[0]).toMatchObject({ kind: "hero", variant: "photo", image: "brief-file:drafts/d/shop.jpg" });
+    const gallery = sections.find((s) => s.kind === "gallery");
+    expect(gallery && gallery.kind === "gallery" && gallery.images.map((i) => i.src)).toEqual(["brief-file:drafts/d/chair.jpg"]);
+  });
+
   it("reruns a revision from the last build's answers, with the change note", async () => {
     const store = memoryStore();
     await run(provider([final(copy)]), store, { sector: "barber", answers });

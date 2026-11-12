@@ -37,7 +37,7 @@ export type Fact = { value: string; label: string };
 export type FaqItem = { question: string; answer: string };
 
 export type Section =
-  | { kind: "hero"; variant: "photo" | "video" | "plain"; headline: string; intro: string; cta: string }
+  | { kind: "hero"; variant: "photo" | "video" | "plain"; headline: string; intro: string; cta: string; image?: string }
   | { kind: "services"; heading: string; items: ServiceItem[] }
   | { kind: "hours"; heading: string; items: HoursItem[] }
   | { kind: "gallery"; heading: string; images: GalleryImage[] }

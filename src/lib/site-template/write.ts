@@ -28,8 +28,8 @@ export type WriteInput = {
   look: Look;
   /** Theme colour as #rrggbb. */
   colour: string;
-  /** Whether the customer uploaded a hero photo. Decides a photo or a plain hero. */
-  hasHeroPhoto: boolean;
+  /** A reference to the customer's hero photo, if they uploaded one. Decides a photo or a plain hero. */
+  heroPhoto?: string;
   images?: GalleryImage[];
   /** A change the owner or customer asked for, applied when the site is written again. */
   change?: string;
@@ -146,7 +146,7 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
   for (const p of preset.sections) {
     switch (p.kind) {
       case "hero":
-        sections.push({ kind: "hero", variant: input.hasHeroPhoto ? "photo" : "plain", ...copy.hero });
+        sections.push({ kind: "hero", variant: input.heroPhoto ? "photo" : "plain", ...copy.hero, ...(input.heroPhoto ? { image: input.heroPhoto } : {}) });
         break;
       case "services":
         sections.push({

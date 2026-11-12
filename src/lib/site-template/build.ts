@@ -8,7 +8,9 @@ import type { AiProvider } from "@/lib/ai/provider";
 import { parseAnswers, type RawAnswers } from "./answers";
 import type { CheckIssue } from "./checks";
 import { presetFor } from "./presets";
+import { pickPhotos } from "./photos";
 import type { CustomerFacts, SiteContent } from "./schema";
+import type { BriefFile } from "@/lib/website-brief";
 import { writeSite } from "./write";
 
 export type SiteBuildDraft = {
@@ -36,7 +38,8 @@ export type BuildInput = {
   sector?: string;
   answers?: RawAnswers;
   change?: string;
-  /** Used until template sites can show uploaded photos. */
+  /** The customer's uploads. Images become the hero and gallery; logos and documents are left out. */
+  files?: BriefFile[];
   defaultColour?: string;
 };
 
@@ -63,9 +66,10 @@ export async function buildSite(ctx: { provider: AiProvider; store: SiteBuildSto
   if (!parsed.ok) return { ok: false, reason: Object.values(parsed.errors)[0], errors: parsed.errors, costPence: 0 };
   const facts: CustomerFacts = parsed.facts;
 
+  const photos = pickPhotos(input.files ?? []);
   const written = await writeSite(
     { provider: ctx.provider, spentPence: await ctx.store.spentPence(ctx.briefId), maxPence: ctx.maxPence },
-    { preset, facts, look: parsed.look, colour: parsed.colour, hasHeroPhoto: false, change: input.change?.trim() || undefined },
+    { preset, facts, look: parsed.look, colour: parsed.colour, heroPhoto: photos.hero, images: photos.gallery, change: input.change?.trim() || undefined },
   );
   const content = written.content;
   if (!content) return { ok: false, reason: written.ok ? "No content." : written.reason, costPence: written.costPence };
