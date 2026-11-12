@@ -14435,3 +14435,67 @@ body:has(.pv, .sitepv) .site-footer {
   color: var(--color-ink);
   font-weight: 550;
 }
+
+/* ===== Sector questions in the website form: opening hours grid and colour swatches ===== */
+.site-hours {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 30rem;
+}
+.site-hours__row {
+  display: grid;
+  grid-template-columns: 3rem 5.5rem 1fr 1fr;
+  align-items: center;
+  gap: var(--space-2);
+}
+.site-hours__day {
+  font-weight: 600;
+}
+.site-hours__closed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.site-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+.site-swatch {
+  cursor: pointer;
+}
+.site-swatch span:first-of-type {
+  display: block;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--color-surface-raised);
+  box-shadow: 0 0 0 1px var(--color-line-strong);
+  transition: box-shadow var(--duration-fast) var(--ease);
+}
+.site-swatch input:checked + span {
+  box-shadow: 0 0 0 3px var(--color-ink);
+}
+.site-swatch input:focus-visible + span {
+  box-shadow: 0 0 0 3px var(--color-accent);
+}
+@media (max-width: 30rem) {
+  .site-hours__row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "day closed"
+      "open close";
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .site-hours__day {
+    grid-area: day;
+  }
+  .site-hours__closed {
+    grid-area: closed;
+    justify-self: end;
+  }
+}

@@ -1,0 +1,183 @@
+"use client";
+
+import { useId } from "react";
+import { DAYS, type DayAnswer, type RawAnswers } from "@/lib/site-template/answers";
+import { BARBER_PRESET, SECTOR_PRESETS } from "@/lib/site-template/presets";
+import { LOOKS, type Look } from "@/lib/site-template/schema";
+import type { WebsiteBrief } from "@/lib/website-brief";
+import type { BriefChange } from "./BriefSteps";
+import styles from "./Configurator.module.css";
+
+const LOOK_LABELS: Record<Look, string> = { minimal: "Clean and minimal", warm: "Warm and friendly", bold: "Bold", classic: "Classic" };
+
+/** Theme colours the customer can pick. Dark enough for white text, so every look stays readable. */
+export const SITE_COLOURS = [
+  { hex: "#1f3a34", label: "Forest green" },
+  { hex: "#1d3557", label: "Navy" },
+  { hex: "#6d1f2f", label: "Burgundy" },
+  { hex: "#2b2b2b", label: "Charcoal" },
+  { hex: "#a84a26", label: "Terracotta" },
+  { hex: "#3d3a7a", label: "Indigo" },
+] as const;
+
+const SECTORS = Object.values(SECTOR_PRESETS);
+const SECTOR_HINT: Record<string, string> = { barber: "Services and prices, opening hours, and booking requests" };
+
+const emptyWeek = (): DayAnswer[] => DAYS.map((day) => ({ day, open: "", close: "" }));
+
+/**
+ * The sector questions for a template site: tick boxes first, short text only where nothing else can capture the
+ * answer. Nothing is pre-filled with a guess: opening times start blank, so what is shown is what the customer said.
+ */
+export function SiteFields({ brief, onChange, errors, businessName }: { brief: WebsiteBrief; onChange: BriefChange; errors: Record<string, string>; businessName: string }) {
+  const id = useId();
+  const site = brief.site;
+  const preset = site ? SECTOR_PRESETS[site.sector] : null;
+  const answers: RawAnswers = site?.answers ?? {};
+
+  const choose = (sector: string | null) =>
+    onChange({ site: sector ? { sector, answers: { ...(site?.answers ?? {}), hours: site?.answers.hours?.length ? site.answers.hours : emptyWeek(), look: site?.answers.look ?? SECTOR_PRESETS[sector].defaultLook, colour: site?.answers.colour ?? SITE_COLOURS[0].hex } } : null });
+
+  const set = (patch: Partial<RawAnswers>) => {
+    if (!site) return;
+    onChange({ site: { sector: site.sector, answers: { ...site.answers, ...patch } } });
+  };
+
+  const hours = answers.hours?.length ? answers.hours : emptyWeek();
+  const setDay = (day: DayAnswer["day"], patch: Partial<DayAnswer>) => {
+    const next = hours.map((d) => (d.day === day ? ({ ...d, ...patch } as DayAnswer) : d));
+    set({ hours: next });
+  };
+  const copyMonday = () => {
+    const mon = hours.find((d) => d.day === "Mon");
+    if (!mon) return;
+    set({ hours: hours.map((d) => (["Tue", "Wed", "Thu", "Fri"].includes(d.day) ? { day: d.day, ...(mon.closed ? { closed: true } : { open: mon.open, close: mon.close }) } : d)) });
+  };
+  const ticked = new Set(answers.highlights ?? []);
+  const toggleHighlight = (hid: string) => set({ highlights: ticked.has(hid) ? [...ticked].filter((x) => x !== hid) : [...ticked, hid] });
+  const err = (key: string) => errors[key] && <p className="field-error" role="alert">{errors[key]}</p>;
+
+  return (
+    <>
+      <fieldset className={styles.group}>
+        <legend className={styles.legend}>What kind of business is it?</legend>
+        <div className={`${styles.choices} ${styles.cols2}`}>
+          {SECTORS.map((s) => (
+            <label key={s.id} className={styles.choice}>
+              <input type="radio" name={`${id}-sector`} checked={site?.sector === s.id} onChange={() => choose(s.id)} />
+              <span className={styles.choiceBody}>
+                <span className={styles.choiceLabel}>{s.label}</span>
+                <span className={styles.choiceHint}>{SECTOR_HINT[s.id] ?? ""}</span>
+              </span>
+            </label>
+          ))}
+          <label className={styles.choice}>
+            <input type="radio" name={`${id}-sector`} checked={!site} onChange={() => choose(null)} />
+            <span className={styles.choiceBody}>
+              <span className={styles.choiceLabel}>Something else</span>
+              <span className={styles.choiceHint}>We plan the pages with you</span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      {site && preset && (
+        <>
+          <div className="field">
+            <label htmlFor={`${id}-services`}>Your services and prices</label>
+            <textarea
+              id={`${id}-services`}
+              className="textarea"
+              rows={5}
+              maxLength={2000}
+              value={answers.servicesText ?? ""}
+              placeholder={"Cut & style £22\nSkin fade £20\nBeard trim"}
+              aria-invalid={errors.services ? true : undefined}
+              onChange={(e) => set({ servicesText: e.target.value })}
+            />
+            <p className="field-hint">One per line. Add a price if you want it shown.</p>
+            {err("services")}
+          </div>
+
+          <fieldset className={styles.group}>
+            <legend className={styles.legend}>Opening hours</legend>
+            <div className="site-hours">
+              {hours.map((d) => (
+                <div key={d.day} className="site-hours__row">
+                  <span className="site-hours__day">{d.day}</span>
+                  <label className="site-hours__closed">
+                    <input type="checkbox" checked={Boolean(d.closed)} onChange={(e) => setDay(d.day, e.target.checked ? { closed: true, open: undefined, close: undefined } : { closed: false, open: "", close: "" })} />
+                    Closed
+                  </label>
+                  <input type="time" className="input" aria-label={`${d.day} opens`} disabled={d.closed} value={d.closed ? "" : (d.open ?? "")} onChange={(e) => setDay(d.day, { open: e.target.value })} />
+                  <input type="time" className="input" aria-label={`${d.day} closes`} disabled={d.closed} value={d.closed ? "" : (d.close ?? "")} onChange={(e) => setDay(d.day, { close: e.target.value })} />
+                </div>
+              ))}
+            </div>
+            <button type="button" className="arrow-link" onClick={copyMonday}>
+              Use Monday&apos;s hours for Tuesday to Friday
+            </button>
+            {err("hours")}
+          </fieldset>
+
+          <fieldset className={styles.group}>
+            <legend className={styles.legend}>How can people reach you?</legend>
+            <div className="cfg-fields">
+              <div className="field">
+                <label htmlFor={`${id}-phone`}>Phone <span className="optional">(or email)</span></label>
+                <input id={`${id}-phone`} className="input" type="tel" autoComplete="tel" maxLength={20} value={answers.phone ?? ""} onChange={(e) => set({ phone: e.target.value })} />
+                {err("phone")}
+              </div>
+              <div className="field">
+                <label htmlFor={`${id}-email`}>Email <span className="optional">(or phone)</span></label>
+                <input id={`${id}-email`} className="input" type="email" autoComplete="email" maxLength={120} value={answers.email ?? ""} onChange={(e) => set({ email: e.target.value })} />
+                {err("email")}
+              </div>
+              <div className="field">
+                <label htmlFor={`${id}-address`}>Address <span className="optional">(optional)</span></label>
+                <input id={`${id}-address`} className="input" autoComplete="street-address" maxLength={160} value={answers.address ?? ""} onChange={(e) => set({ address: e.target.value })} />
+                {err("address")}
+              </div>
+            </div>
+            {err("contact")}
+          </fieldset>
+
+          <fieldset className={styles.group}>
+            <legend className={styles.legend}>
+              Tick what is true <span className="optional">(optional)</span>
+            </legend>
+            <div className="brief-chips" role="group" aria-label="Facts about your business">
+              {preset.highlights.map((h) => (
+                <button key={h.id} type="button" className="brief-chip" aria-pressed={ticked.has(h.id)} onClick={() => toggleHighlight(h.id)}>
+                  {h.value}: {h.label.toLowerCase()}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className={styles.group}>
+            <legend className={styles.legend}>Look and colour</legend>
+            <div className="brief-chips" role="group" aria-label="Look">
+              {LOOKS.map((l) => (
+                <button key={l} type="button" className="brief-chip" aria-pressed={(answers.look ?? BARBER_PRESET.defaultLook) === l} onClick={() => set({ look: l })}>
+                  {LOOK_LABELS[l]}
+                </button>
+              ))}
+            </div>
+            <div className="site-swatches" role="radiogroup" aria-label="Colour">
+              {SITE_COLOURS.map((c) => (
+                <label key={c.hex} className="site-swatch" title={c.label}>
+                  <input type="radio" name={`${id}-colour`} className="visually-hidden" checked={(answers.colour ?? SITE_COLOURS[0].hex) === c.hex} onChange={() => set({ colour: c.hex })} />
+                  <span style={{ background: c.hex }} />
+                  <span className="visually-hidden">{c.label}</span>
+                </label>
+              ))}
+            </div>
+            {err("colour")}
+          </fieldset>
+          {err("businessName") || (!businessName.trim() && <p className="field-hint">Add your business name above. It goes at the top of your site.</p>)}
+        </>
+      )}
+    </>
+  );
+}

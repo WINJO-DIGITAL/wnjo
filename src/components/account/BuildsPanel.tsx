@@ -8,6 +8,9 @@ import type { RevisionRow } from "@/lib/build-revisions";
 import { proposalPayNowFor } from "@/lib/pay-now";
 import { GOALS, STYLES, cleanBrief, validateBrief, type BriefErrors, type WebsiteBrief } from "@/lib/website-brief";
 import { DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
+import { SITE_COLOURS, SiteFields } from "@/components/configurator/SiteFields";
+import { parseAnswers } from "@/lib/site-template/answers";
+import { SECTOR_PRESETS } from "@/lib/site-template/presets";
 import { DETAIL_LIMITS, UNNAMED } from "@/lib/website-enquiry";
 import { Confirmation } from "./Confirmation";
 import { FeedbackCard } from "./FeedbackCard";
@@ -289,6 +292,7 @@ function BriefDetailsCard({
   const [name, setName] = useState(savedName === UNNAMED ? "" : savedName);
   const [businessName, setBusinessName] = useState(savedBusiness);
   const [errors, setErrors] = useState<BriefErrors>({});
+  const [siteErrors, setSiteErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   // A folder for this form's uploads. The id is never printed, so the server and browser renders still match.
@@ -296,15 +300,25 @@ function BriefDetailsCard({
   const update: BriefChange = (patch) => {
     setBrief((b) => ({ ...b, ...(typeof patch === "function" ? patch(b) : patch) }));
     setErrors({});
+    setSiteErrors({});
   };
 
   const send = async (event: React.FormEvent) => {
     event.preventDefault();
-    const cleaned = cleanBrief(brief, draftId ?? undefined);
+    // The business name is asked once, above, and goes into the sector answers too.
+    const cleaned = cleanBrief({ ...brief, site: brief.site ? { ...brief.site, answers: { ...brief.site.answers, businessName } } : null }, draftId ?? undefined);
     const missing = validateBrief(cleaned);
     if (missing.goals || missing.pages) {
       setErrors(missing);
       return;
+    }
+    if (cleaned.site) {
+      const parsed = parseAnswers(cleaned.site.answers, SECTOR_PRESETS[cleaned.site.sector], { colour: SITE_COLOURS[0].hex });
+      if (!parsed.ok) {
+        setSiteErrors(parsed.errors);
+        setMessage("A few answers need another look. They are marked above.");
+        return;
+      }
     }
     setBusy(true);
     setMessage(null);
@@ -338,8 +352,9 @@ function BriefDetailsCard({
         <input id={`bd-biz-${briefId}`} className="input" maxLength={DETAIL_LIMITS.businessName} autoComplete="organization" value={businessName} onChange={(e) => setBusinessName(e.target.value)} />
       </div>
       <GoalsField brief={brief} onChange={update} error={errors.goals} />
-      <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} />
-      <DesignFields brief={brief} onChange={update} />
+      <SiteFields brief={brief} onChange={update} errors={siteErrors} businessName={businessName} />
+      {!brief.site && <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} />}
+      {!brief.site && <DesignFields brief={brief} onChange={update} />}
       <FilesField brief={brief} onChange={update} draftId={draftId} />
       <FunctionalityField brief={brief} onChange={update} />
       {message && (
