@@ -225,13 +225,13 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
                   .join("; ");
                 const lookLabel = a.look ? a.look.charAt(0).toUpperCase() + a.look.slice(1) : "";
                 const rows: [string, string][] = [
-                  ["Services and prices", a.servicesText ?? ""],
+                  ["What do you offer? (services and prices)", a.servicesText ?? ""],
                   ["Opening hours", hoursText],
-                  ["Phone", a.phone ?? ""],
-                  ["Email", a.email ?? ""],
+                  ["Phone number (optional)", a.phone ?? ""],
+                  ["Email address (for replies)", a.email ?? ""],
                   ["Address", a.address ?? ""],
                   ["Areas", a.areas ?? ""],
-                  ["Facts ticked", (a.highlights ?? []).map((id) => SECTOR_PRESETS[b.site!.sector]?.highlights.find((h) => h.id === id)?.value ?? id).join(", ")],
+                  ["Facts ticked (what is true of the business)", (a.highlights ?? []).map((id) => SECTOR_PRESETS[b.site!.sector]?.highlights.find((h) => h.id === id)?.value ?? id).join(", ")],
                   ["Look", lookLabel],
                   ["Colour", a.colour ?? ""],
                 ];
@@ -246,17 +246,17 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
               })()}
               {!b.site && b.otherBusinessType && (
                 <>
-                  {b.profile.services && <div><dt>Offers</dt><dd style={{ whiteSpace: "pre-line" }}>{b.profile.services}</dd></div>}
-                  {b.profile.email && <div><dt>Email</dt><dd>{b.profile.email}</dd></div>}
-                  {b.profile.phone && <div><dt>Phone</dt><dd>{b.profile.phone}</dd></div>}
-                  {b.profile.differentiator && <div><dt>Different</dt><dd>{b.profile.differentiator}</dd></div>}
-                  {b.profile.customers && <div><dt>Customers</dt><dd>{CUSTOMERS[b.profile.customers]}</dd></div>}
-                  {b.profile.firstActions.length > 0 && <div><dt>First action</dt><dd>{b.profile.firstActions.map((a) => FIRST_ACTIONS[a]).join(", ")}</dd></div>}
-                  {b.profile.areas && <div><dt>Areas</dt><dd>{b.profile.areas}</dd></div>}
-                  {b.profile.hours && <div><dt>Hours</dt><dd>{b.profile.hours}</dd></div>}
-                  {b.profile.about && <div><dt>About</dt><dd style={{ whiteSpace: "pre-line" }}>{b.profile.about}</dd></div>}
-                  {b.profile.proof && <div><dt>Proof</dt><dd>{b.profile.proof}</dd></div>}
-                  {b.profile.tone && <div><dt>Tone</dt><dd>{TONES[b.profile.tone]}</dd></div>}
+                  {b.profile.services && <div><dt>What do you offer?</dt><dd style={{ whiteSpace: "pre-line" }}>{b.profile.services}</dd></div>}
+                  {b.profile.email && <div><dt>Email address (for replies)</dt><dd>{b.profile.email}</dd></div>}
+                  {b.profile.phone && <div><dt>Phone number (optional)</dt><dd>{b.profile.phone}</dd></div>}
+                  {b.profile.differentiator && <div><dt>What makes you different?</dt><dd>{b.profile.differentiator}</dd></div>}
+                  {b.profile.customers && <div><dt>Who are your customers?</dt><dd>{CUSTOMERS[b.profile.customers]}</dd></div>}
+                  {b.profile.firstActions.length > 0 && <div><dt>What should a visitor do first?</dt><dd>{b.profile.firstActions.map((a) => FIRST_ACTIONS[a]).join(", ")}</dd></div>}
+                  {b.profile.areas && <div><dt>Where do you work?</dt><dd>{b.profile.areas}</dd></div>}
+                  {b.profile.hours && <div><dt>Opening hours or availability</dt><dd>{b.profile.hours}</dd></div>}
+                  {b.profile.about && <div><dt>About you and the business</dt><dd style={{ whiteSpace: "pre-line" }}>{b.profile.about}</dd></div>}
+                  {b.profile.proof && <div><dt>Proof to show</dt><dd>{b.profile.proof}</dd></div>}
+                  {b.profile.tone && <div><dt>How should the site sound?</dt><dd>{TONES[b.profile.tone]}</dd></div>}
                 </>
               )}
               <div><dt>Goals</dt><dd>{b.goals.map((g) => GOALS[g]?.label ?? g).join(", ") || "–"}{b.goalNote && <><br /><span className="acct-meta">{b.goalNote}</span></>}</dd></div>
