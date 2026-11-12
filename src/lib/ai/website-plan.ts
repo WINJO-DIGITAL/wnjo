@@ -3,6 +3,7 @@
  * prompt and the checks are tested without a model. The model only writes text. It is never asked about prices,
  * contracts or publishing, and anything it returns outside the shape below is rejected, not repaired.
  */
+import { extrasRows } from "@/lib/brief-extras";
 import { GOALS, STYLES, profileLines, type WebsiteBrief } from "@/lib/website-brief";
 
 export const PLAN_LIMITS = {
@@ -65,6 +66,7 @@ export function buildPlanPrompt(input: PlanInput): string {
     b.avoid ? `To avoid: ${b.avoid}` : "",
     b.functionality ? `Features needed: ${b.functionality}` : "",
     ...(b.otherBusinessType ? [`Business type: ${b.otherBusinessType}`, ...profileLines(b.profile).map((l) => `Customer's answer. ${l}`)] : []),
+    ...extrasRows(b.extras).map(([label, value]) => `Customer's answer. ${label} ${value}`),
     "",
     `Plan the website. Use at most ${input.pagesAllowed} pages, each with 2 to ${PLAN_LIMITS.sectionsPerPage} sections.`,
     `Reply with JSON in exactly this shape: ${SHAPE}`,

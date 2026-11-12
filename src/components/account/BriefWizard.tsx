@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type TouchEvent } from "react";
+import { ExtraFields } from "@/components/configurator/ExtraFields";
 import { DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
 import { BusinessTypeField, ProfileFields, SiteFields } from "@/components/configurator/SiteFields";
 import { firstIncompleteStep, stepsFor, STEP_TITLES, validateStep, withKnownContact, type KnownContact, type StepContext, type StepErrors, type StepId } from "@/lib/brief-steps";
@@ -291,6 +292,7 @@ export function BriefWizard({
             <SummaryRow label="Files" onEdit={() => go("files")}>{brief.files.length ? `${brief.files.length} attached` : "None"}</SummaryRow>
           </dl>
         )}
+        <ExtraFields step={current} brief={brief} onChange={update} />
       </div>
 
       {message && (

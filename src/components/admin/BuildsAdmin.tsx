@@ -19,6 +19,7 @@ import {
 import { REVISION_STATUSES, isUnfinished, type RevisionRow } from "@/lib/build-revisions";
 import { CUSTOMERS, FIRST_ACTIONS, GOALS, STYLES, TONES, type WebsiteBrief } from "@/lib/website-brief";
 import { SECTOR_PRESETS } from "@/lib/site-template/presets";
+import { extrasRows } from "@/lib/brief-extras";
 
 type BriefRow = {
   id: string;
@@ -208,6 +209,12 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
             <p className="admin-label">Brief</p>
             <dl className="brief-summary">
               <div><dt>Customer</dt><dd>{row.name || "–"}</dd></div>
+              {extrasRows(b.extras).map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd style={{ whiteSpace: "pre-line" }}>{value}</dd>
+                </div>
+              ))}
               {(b.site || b.otherBusinessType) && (
                 <div>
                   <dt>Business type</dt>

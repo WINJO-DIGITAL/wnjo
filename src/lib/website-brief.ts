@@ -7,6 +7,7 @@
  * row in website_briefs, so the history of what the customer asked for is never overwritten.
  */
 
+import { cleanExtras, EMPTY_EXTRAS, extrasRows, type BriefExtras } from "./brief-extras";
 import { cleanSiteAnswers, type SiteAnswers } from "@/lib/site-template/answers";
 import { SECTOR_PRESETS } from "@/lib/site-template/presets";
 
@@ -97,6 +98,8 @@ export type WebsiteBrief = {
   otherBusinessType: string;
   /** What a first website needs for a business with no template. Used only when otherBusinessType is set. */
   profile: BusinessProfile;
+  /** Extra questions for every brief: role, offer, what must be easy to find, look, and what to show. All optional. */
+  extras: BriefExtras;
 };
 
 export const CUSTOMERS = { individuals: "Individuals", businesses: "Businesses", both: "Both" } as const;
@@ -150,6 +153,7 @@ export const EMPTY_BRIEF: WebsiteBrief = {
   site: null,
   otherBusinessType: "",
   profile: EMPTY_PROFILE,
+  extras: EMPTY_EXTRAS,
 };
 
 /** A random id for this browser's draft. Uploads sit under it until the brief is sent. */
@@ -253,6 +257,7 @@ export function cleanBrief(input: unknown, draftId?: string): WebsiteBrief {
     site: cleanSiteAnswers(o.site, Object.keys(SECTOR_PRESETS)),
     otherBusinessType: text(o.otherBusinessType, 80).replace(/<[^>]*>/g, "").trim(),
     profile: cleanProfile(o.profile),
+    extras: cleanExtras(o.extras),
   };
 }
 
@@ -342,6 +347,7 @@ export function formatBrief(brief: WebsiteBrief): string {
     ...(brief.site ? [`Template site: ${SECTOR_PRESETS[brief.site.sector]?.label ?? brief.site.sector}, ${brief.site.answers.businessName || "no name yet"}`] : []),
     ...(brief.otherBusinessType ? [`Business type (their words): ${brief.otherBusinessType}`] : []),
     ...(brief.otherBusinessType ? profileLines(brief.profile) : []),
+    ...extrasRows(brief.extras).map(([label, value]) => `${label} ${value}`),
     `Files: ${brief.files.length ? brief.files.map((f) => `${f.name} (${kb(f.size)})`).join(", ") : "none"}`,
   ];
   return lines.join("\n");
