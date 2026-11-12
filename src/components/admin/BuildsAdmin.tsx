@@ -217,16 +217,33 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
                   </dd>
                 </div>
               )}
-              {b.site && (
-                <div>
-                  <dt>Template answers</dt>
-                  <dd>
-                    {b.site.answers.servicesText ? <><span className="acct-meta">Services and prices</span><br />{b.site.answers.servicesText}</> : <span className="acct-meta">None given</span>}
-                    {b.site.answers.address && <><br /><span className="acct-meta">Address</span> {b.site.answers.address}</>}
-                    {b.site.answers.areas && <><br /><span className="acct-meta">Areas</span> {b.site.answers.areas}</>}
-                  </dd>
-                </div>
-              )}
+              {b.site && (() => {
+                const a = b.site.answers;
+                const hoursText = (a.hours ?? [])
+                  .map((d) => (d.closed ? `${d.day}: closed` : d.open && d.close ? `${d.day}: ${d.open} to ${d.close}` : null))
+                  .filter(Boolean)
+                  .join("; ");
+                const lookLabel = a.look ? a.look.charAt(0).toUpperCase() + a.look.slice(1) : "";
+                const rows: [string, string][] = [
+                  ["Services and prices", a.servicesText ?? ""],
+                  ["Opening hours", hoursText],
+                  ["Phone", a.phone ?? ""],
+                  ["Email", a.email ?? ""],
+                  ["Address", a.address ?? ""],
+                  ["Areas", a.areas ?? ""],
+                  ["Facts ticked", (a.highlights ?? []).map((id) => SECTOR_PRESETS[b.site!.sector]?.highlights.find((h) => h.id === id)?.value ?? id).join(", ")],
+                  ["Look", lookLabel],
+                  ["Colour", a.colour ?? ""],
+                ];
+                return rows
+                  .filter(([, value]) => value)
+                  .map(([label, value]) => (
+                    <div key={label}>
+                      <dt>{label}</dt>
+                      <dd style={{ whiteSpace: "pre-line" }}>{value}</dd>
+                    </div>
+                  ));
+              })()}
               {!b.site && b.otherBusinessType && (
                 <>
                   {b.profile.services && <div><dt>Offers</dt><dd style={{ whiteSpace: "pre-line" }}>{b.profile.services}</dd></div>}
