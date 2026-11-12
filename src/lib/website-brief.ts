@@ -95,6 +95,43 @@ export type WebsiteBrief = {
   site: SiteAnswers | null;
   /** The customer's own words for their business, when none of our sectors fits. Plain text. */
   otherBusinessType: string;
+  /** What a first website needs for a business with no template. Used only when otherBusinessType is set. */
+  profile: BusinessProfile;
+};
+
+export const CUSTOMERS = { individuals: "Individuals", businesses: "Businesses", both: "Both" } as const;
+export const FIRST_ACTIONS = { call: "Call", book: "Book online", quote: "Request a quote", email: "Email", visit: "Visit" } as const;
+export const TONES = { friendly: "Friendly", professional: "Professional", premium: "Premium", straightforward: "Straightforward" } as const;
+export type CustomerType = keyof typeof CUSTOMERS;
+export type FirstAction = keyof typeof FIRST_ACTIONS;
+export type Tone = keyof typeof TONES;
+
+export const PROFILE_LIMITS = { services: 2000, phone: 20, email: 120, areas: 300, differentiator: 200, hours: 300, proof: 300 } as const;
+
+export type BusinessProfile = {
+  services: string;
+  phone: string;
+  email: string;
+  differentiator: string;
+  customers: CustomerType | "";
+  areas: string;
+  firstActions: FirstAction[];
+  hours: string;
+  proof: string;
+  tone: Tone | "";
+};
+
+export const EMPTY_PROFILE: BusinessProfile = {
+  services: "",
+  phone: "",
+  email: "",
+  differentiator: "",
+  customers: "",
+  areas: "",
+  firstActions: [],
+  hours: "",
+  proof: "",
+  tone: "",
 };
 
 export const EMPTY_BRIEF: WebsiteBrief = {
@@ -109,6 +146,7 @@ export const EMPTY_BRIEF: WebsiteBrief = {
   files: [],
   site: null,
   otherBusinessType: "",
+  profile: EMPTY_PROFILE,
 };
 
 /** A random id for this browser's draft. Uploads sit under it until the brief is sent. */
@@ -211,7 +249,40 @@ export function cleanBrief(input: unknown, draftId?: string): WebsiteBrief {
     files,
     site: cleanSiteAnswers(o.site, Object.keys(SECTOR_PRESETS)),
     otherBusinessType: text(o.otherBusinessType, 80).replace(/<[^>]*>/g, "").trim(),
+    profile: cleanProfile(o.profile),
   };
+}
+
+/** Cleans the profile the form sends. Unknown choices are dropped; nothing is judged here. */
+export function cleanProfile(input: unknown): BusinessProfile {
+  const o = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
+  const pick = <T extends string>(v: unknown, options: Record<T, string>): T | "" => (typeof v === "string" && v in options ? (v as T) : "");
+  const phone = text(o.phone, PROFILE_LIMITS.phone);
+  return {
+    services: text(o.services, PROFILE_LIMITS.services),
+    phone,
+    email: text(o.email, PROFILE_LIMITS.email).toLowerCase(),
+    differentiator: text(o.differentiator, PROFILE_LIMITS.differentiator),
+    customers: pick<CustomerType>(o.customers, CUSTOMERS),
+    areas: text(o.areas, PROFILE_LIMITS.areas),
+    firstActions: Array.isArray(o.firstActions) ? [...new Set(o.firstActions.filter((a): a is FirstAction => typeof a === "string" && a in FIRST_ACTIONS))] : [],
+    hours: text(o.hours, PROFILE_LIMITS.hours),
+    proof: text(o.proof, PROFILE_LIMITS.proof),
+    tone: pick<Tone>(o.tone, TONES),
+  };
+}
+
+/** The questions a first website needs, for a business with no template. Required: services, contact, what makes them different. */
+export function validateProfile(brief: WebsiteBrief): Partial<Record<keyof BusinessProfile, string>> {
+  if (!brief.otherBusinessType) return {};
+  const p = brief.profile;
+  const errors: Partial<Record<keyof BusinessProfile, string>> = {};
+  if (!p.services) errors.services = "Tell us what you offer.";
+  if (!p.phone && !p.email) errors.phone = "Add a phone number or an email address.";
+  if (p.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(p.email)) errors.email = "Check the email address.";
+  if (p.phone && !/^\+?[\d\s()-]{9,16}$/.test(p.phone)) errors.phone = "Check the phone number.";
+  if (!p.differentiator) errors.differentiator = "Tell us what makes you different.";
+  return errors;
 }
 
 export type BriefErrors = Partial<Record<"goals" | "pages", string>>;
@@ -235,6 +306,22 @@ export function pagesBeyondBand(brief: WebsiteBrief, bandMax: number | null): nu
 
 const kb = (n: number) => (n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
 
+/** The profile as plain lines, for the email and the admin view. Empty answers are left out. */
+export function profileLines(p: BusinessProfile): string[] {
+  const out: string[] = [];
+  if (p.services) out.push(`Offers: ${p.services.replace(/\n/g, "; ")}`);
+  if (p.phone) out.push(`Phone: ${p.phone}`);
+  if (p.email) out.push(`Email: ${p.email}`);
+  if (p.differentiator) out.push(`What makes them different: ${p.differentiator}`);
+  if (p.customers) out.push(`Customers: ${CUSTOMERS[p.customers]}`);
+  if (p.areas) out.push(`Areas covered: ${p.areas}`);
+  if (p.firstActions.length) out.push(`First action wanted: ${p.firstActions.map((a) => FIRST_ACTIONS[a]).join(", ")}`);
+  if (p.hours) out.push(`Hours or availability: ${p.hours}`);
+  if (p.proof) out.push(`Proof to show: ${p.proof}`);
+  if (p.tone) out.push(`Tone: ${TONES[p.tone]}`);
+  return out;
+}
+
 /** The brief as plain text, for the owner's email and the admin view. */
 export function formatBrief(brief: WebsiteBrief): string {
   const lines = [
@@ -249,6 +336,7 @@ export function formatBrief(brief: WebsiteBrief): string {
     ...(brief.functionality ? [`Functionality: ${brief.functionality}`] : []),
     ...(brief.site ? [`Template site: ${SECTOR_PRESETS[brief.site.sector]?.label ?? brief.site.sector}, ${brief.site.answers.businessName || "no name yet"}`] : []),
     ...(brief.otherBusinessType ? [`Business type (their words): ${brief.otherBusinessType}`] : []),
+    ...(brief.otherBusinessType ? profileLines(brief.profile) : []),
     `Files: ${brief.files.length ? brief.files.map((f) => `${f.name} (${kb(f.size)})`).join(", ") : "none"}`,
   ];
   return lines.join("\n");

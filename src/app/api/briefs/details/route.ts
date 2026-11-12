@@ -4,7 +4,7 @@ import { serviceClient } from "@/lib/quote-store";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { customerFromRequest } from "@/lib/staff-auth";
 import { pagesAllowedFor } from "@/lib/ai/website-ai-service";
-import { BRIEF_VERSION, DRAFT_ID_RE, cleanBrief, formatBrief, validateBrief } from "@/lib/website-brief";
+import { BRIEF_VERSION, DRAFT_ID_RE, cleanBrief, formatBrief, validateBrief, validateProfile } from "@/lib/website-brief";
 import { confirmBriefFiles } from "@/lib/brief-store";
 import { clean } from "@/lib/enquiry";
 import { DETAIL_LIMITS } from "@/lib/website-enquiry";
@@ -54,6 +54,8 @@ export async function POST(request: NextRequest) {
   if (draftId) brief = await confirmBriefFiles(db, draftId, brief);
   const errors = validateBrief(brief);
   if (Object.keys(errors).length) return fail(422, "Please complete your brief.", { brief: errors });
+  const profileErrors = validateProfile(brief);
+  if (Object.keys(profileErrors).length) return fail(422, "Please complete your business details.", { profile: profileErrors });
 
   // The pages are limited to what the customer's plan covers (or what they bought). The form stops them going over,
   // and this stops anything sent around the form.

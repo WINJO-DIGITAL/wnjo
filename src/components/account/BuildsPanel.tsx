@@ -8,7 +8,8 @@ import type { RevisionRow } from "@/lib/build-revisions";
 import { proposalPayNowFor } from "@/lib/pay-now";
 import { GOALS, STYLES, cleanBrief, validateBrief, type BriefErrors, type BriefFile, type WebsiteBrief } from "@/lib/website-brief";
 import { DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
-import { SITE_COLOURS, SiteFields } from "@/components/configurator/SiteFields";
+import { ProfileFields, SITE_COLOURS, SiteFields } from "@/components/configurator/SiteFields";
+import { validateProfile } from "@/lib/website-brief";
 import { parseAnswers } from "@/lib/site-template/answers";
 import { SECTOR_PRESETS } from "@/lib/site-template/presets";
 import { DETAIL_LIMITS, UNNAMED } from "@/lib/website-enquiry";
@@ -341,6 +342,14 @@ function BriefDetailsCard({
       setErrors(missing);
       return;
     }
+    if (cleaned.otherBusinessType) {
+      const profileErrors = validateProfile(cleaned);
+      if (Object.keys(profileErrors).length) {
+        setSiteErrors(profileErrors);
+        setMessage("A few answers need another look. They are marked above.");
+        return;
+      }
+    }
     if (!cleaned.site && allowed !== null && cleaned.pages.length > allowed) {
       setErrors({ pages: `Your plan covers up to ${allowed} pages. Remove ${cleaned.pages.length - allowed} to continue.` });
       return;
@@ -386,6 +395,7 @@ function BriefDetailsCard({
       </div>
       <GoalsField brief={brief} onChange={update} error={errors.goals} />
       {TEMPLATE_SITES_ON && <SiteFields brief={brief} onChange={update} errors={siteErrors} businessName={businessName} />}
+      {brief.otherBusinessType && <ProfileFields brief={brief} onChange={update} errors={siteErrors} />}
       {!brief.site && <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} hardMax={allowed} />}
       {!brief.site && <DesignFields brief={brief} onChange={update} />}
       <FilesField brief={brief} onChange={update} draftId={draftId} view={viewFile} />

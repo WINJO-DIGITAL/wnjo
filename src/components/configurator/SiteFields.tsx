@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import { DAYS, type DayAnswer, type RawAnswers } from "@/lib/site-template/answers";
 import { BUSINESS_GROUPS, SECTOR_PRESETS, type BusinessGroup } from "@/lib/site-template/presets";
 import { LOOKS, type Look } from "@/lib/site-template/schema";
-import type { WebsiteBrief } from "@/lib/website-brief";
+import { CUSTOMERS, FIRST_ACTIONS, PROFILE_LIMITS, TONES, type BusinessProfile, type FirstAction, type WebsiteBrief } from "@/lib/website-brief";
 import type { BriefChange } from "./BriefSteps";
 import styles from "./Configurator.module.css";
 
@@ -219,5 +219,82 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
         </>
       )}
     </>
+  );
+}
+
+/**
+ * The questions a first website needs, for a business with no template. Each answer is a fact the writer can use, so
+ * the customer answers in their own words, and nothing is guessed.
+ */
+export function ProfileFields({ brief, onChange, errors }: { brief: WebsiteBrief; onChange: BriefChange; errors: Partial<Record<keyof BusinessProfile, string>> }) {
+  const id = useId();
+  const p = brief.profile;
+  const set = (patch: Partial<BusinessProfile>) => onChange({ profile: { ...p, ...patch } });
+  const toggleAction = (a: keyof typeof FIRST_ACTIONS) => set({ firstActions: p.firstActions.includes(a) ? p.firstActions.filter((x) => x !== a) : [...p.firstActions, a] });
+  const err = (key: keyof BusinessProfile) => errors[key] && <p className="field-error" role="alert">{errors[key]}</p>;
+  const chips = <K extends string>(options: Record<K, string>, value: K | "", onPick: (v: K | "") => void, label: string) => (
+    <div className="brief-chips" role="group" aria-label={label}>
+      {(Object.keys(options) as K[]).map((k) => (
+        <button key={k} type="button" className="brief-chip" aria-pressed={value === k} onClick={() => onPick(value === k ? "" : k)}>
+          {options[k]}
+        </button>
+      ))}
+    </div>
+  );
+  return (
+    <div className="site-profile">
+      <div className="field">
+        <label htmlFor={`${id}-services`}>What do you offer?</label>
+        <textarea id={`${id}-services`} className="textarea" rows={4} maxLength={PROFILE_LIMITS.services} value={p.services} placeholder={"One per line. Add a price if you want it shown."} aria-invalid={errors.services ? true : undefined} onChange={(e) => set({ services: e.target.value })} />
+        {err("services")}
+      </div>
+      <div className="cfg-fields">
+        <div className="field">
+          <label htmlFor={`${id}-phone`}>Phone <span className="optional">(or email)</span></label>
+          <input id={`${id}-phone`} className="input" type="tel" autoComplete="tel" maxLength={PROFILE_LIMITS.phone} value={p.phone} onChange={(e) => set({ phone: e.target.value })} />
+        </div>
+        <div className="field">
+          <label htmlFor={`${id}-email`}>Email <span className="optional">(or phone)</span></label>
+          <input id={`${id}-email`} className="input" type="email" autoComplete="email" maxLength={PROFILE_LIMITS.email} value={p.email} onChange={(e) => set({ email: e.target.value })} />
+        </div>
+      </div>
+      {err("phone")}
+      {err("email")}
+      <div className="field">
+        <label htmlFor={`${id}-diff`}>What makes you different?</label>
+        <input id={`${id}-diff`} className="input" maxLength={PROFILE_LIMITS.differentiator} value={p.differentiator} placeholder="For example: we come to you, same day, with our own van" aria-invalid={errors.differentiator ? true : undefined} onChange={(e) => set({ differentiator: e.target.value })} />
+        {err("differentiator")}
+      </div>
+      <fieldset className={styles.group}>
+        <legend className={styles.legend}>Who are your customers? <span className="optional">(optional)</span></legend>
+        {chips(CUSTOMERS, p.customers, (v) => set({ customers: v }), "Customers")}
+      </fieldset>
+      <fieldset className={styles.group}>
+        <legend className={styles.legend}>What should a visitor do first? <span className="optional">(optional)</span></legend>
+        <div className="brief-chips" role="group" aria-label="First action">
+          {(Object.keys(FIRST_ACTIONS) as FirstAction[]).map((a) => (
+            <button key={a} type="button" className="brief-chip" aria-pressed={p.firstActions.includes(a)} onClick={() => toggleAction(a)}>
+              {FIRST_ACTIONS[a]}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+      <div className="field">
+        <label htmlFor={`${id}-areas`}>Where do you work? <span className="optional">(optional)</span></label>
+        <input id={`${id}-areas`} className="input" maxLength={PROFILE_LIMITS.areas} value={p.areas} placeholder="For example: Leeds and within 20 miles" onChange={(e) => set({ areas: e.target.value })} />
+      </div>
+      <div className="field">
+        <label htmlFor={`${id}-hours`}>Opening hours or availability <span className="optional">(optional)</span></label>
+        <input id={`${id}-hours`} className="input" maxLength={PROFILE_LIMITS.hours} value={p.hours} placeholder="For example: 7 days, 6am to 10pm, or by arrangement" onChange={(e) => set({ hours: e.target.value })} />
+      </div>
+      <div className="field">
+        <label htmlFor={`${id}-proof`}>Proof to show <span className="optional">(optional, only what is true)</span></label>
+        <input id={`${id}-proof`} className="input" maxLength={PROFILE_LIMITS.proof} value={p.proof} placeholder="For example: 10 years trading, fully licensed" onChange={(e) => set({ proof: e.target.value })} />
+      </div>
+      <fieldset className={styles.group}>
+        <legend className={styles.legend}>How should the site sound? <span className="optional">(optional)</span></legend>
+        {chips(TONES, p.tone, (v) => set({ tone: v }), "Tone")}
+      </fieldset>
+    </div>
   );
 }

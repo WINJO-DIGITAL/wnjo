@@ -14563,3 +14563,12 @@ body:has(.pv, .sitepv) .site-footer {
 .site-other {
   margin-top: var(--space-4);
 }
+
+/* ===== Business profile questions: even spacing between each question ===== */
+.site-profile {
+  display: grid;
+  gap: var(--space-5);
+}
+.site-profile .brief-chips {
+  margin-top: var(--space-2);
+}
