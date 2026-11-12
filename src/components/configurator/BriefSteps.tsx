@@ -1,8 +1,9 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { uploadBriefFile } from "@/lib/brief-upload-client";
 import {
+  type BriefFile,
   BRIEF_LIMITS,
   BRIEF_UPLOAD,
   GOALS,
@@ -250,11 +251,37 @@ export function FunctionalityField({ brief, onChange }: { brief: WebsiteBrief; o
 
 const sizeLabel = (n: number) => (n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
 
-/** Logo, photos and documents. Each file goes straight to private storage; failures are shown per file. */
-export function FilesField({ brief, onChange, draftId }: { brief: WebsiteBrief; onChange: Change; draftId: string | null }) {
+const isImage = (f: BriefFile) => f.type.startsWith("image/") && f.type !== "image/svg+xml";
+const kindLabel = (f: BriefFile) => (f.type.startsWith("image/") && f.type !== "image/svg+xml" ? "IMG" : f.type === "application/pdf" ? "PDF" : f.type === "image/svg+xml" ? "SVG" : f.type.includes("word") ? "DOC" : f.type === "text/plain" ? "TXT" : "FILE");
+
+/**
+ * Logo, photos and documents. Each file goes straight to private storage; failures are shown per file. A file picked
+ * in this session can be looked at straight away, from the copy already in the browser. A file saved earlier is opened
+ * through `view`, which asks the server for a short-lived link (only for the website's owner).
+ */
+export function FilesField({
+  brief,
+  onChange,
+  draftId,
+  view,
+}: {
+  brief: WebsiteBrief;
+  onChange: Change;
+  draftId: string | null;
+  view?: (file: BriefFile) => Promise<string | null>;
+}) {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
+  // Local copies of the files picked in this session, keyed by storage path.
+  const [local, setLocal] = useState<Record<string, string>>({});
+  const [opening, setOpening] = useState<string | null>(null);
+  const localRef = useRef(local);
+  useEffect(() => {
+    localRef.current = local;
+  }, [local]);
+  // Release the browser's copies when the form goes away.
+  useEffect(() => () => Object.values(localRef.current).forEach((u) => URL.revokeObjectURL(u)), []);
 
   const pick = async (list: FileList | null) => {
     if (!list || !draftId) return;
@@ -267,6 +294,7 @@ export function FilesField({ brief, onChange, draftId }: { brief: WebsiteBrief; 
       setBusy((b) => b - 1);
       if (r.ok) {
         const added = r.file;
+        setLocal((l) => ({ ...l, [added.path]: URL.createObjectURL(f) }));
         onChange((current) => ({ files: [...current.files, added].slice(0, BRIEF_LIMITS.files) }));
       }
       else problems.push(`${f.name}: ${r.reason}`);
@@ -274,6 +302,14 @@ export function FilesField({ brief, onChange, draftId }: { brief: WebsiteBrief; 
     setErrors(problems);
     if (input.current) input.current.value = "";
   };
+
+  const open = async (f: BriefFile) => {
+    const url = local[f.path] ?? (view ? await (async () => { setOpening(f.path); try { return await view(f); } finally { setOpening(null); } })() : null);
+    if (url) window.open(url, "_blank", "noopener,noreferrer");
+    else setErrors([`${f.name}: couldn't be opened just now. Please try again.`]);
+  };
+
+  const canOpen = (f: BriefFile) => Boolean(local[f.path] || view);
 
   return (
     <fieldset className={styles.group}>
@@ -297,16 +333,33 @@ export function FilesField({ brief, onChange, draftId }: { brief: WebsiteBrief; 
         <ul className="brief-files" role="list">
           {brief.files.map((f) => (
             <li key={f.path}>
-              <span className="brief-files__name">{f.name}</span>
-              <span className="brief-files__size">{sizeLabel(f.size)}</span>
-              <button
-                type="button"
-                className="brief-files__remove"
-                aria-label={`Remove ${f.name}`}
-                onClick={() => onChange({ files: brief.files.filter((x) => x.path !== f.path) })}
-              >
-                Remove
-              </button>
+              {isImage(f) && local[f.path] ? (
+                <button type="button" className="brief-files__thumb" aria-label={`View ${f.name}`} onClick={() => void open(f)}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- a preview of the file the customer just picked, held in their browser */}
+                  <img src={local[f.path]} alt="" />
+                </button>
+              ) : (
+                <span className="brief-files__kind" aria-hidden="true">{kindLabel(f)}</span>
+              )}
+              <span className="brief-files__info">
+                <span className="brief-files__name">{f.name}</span>
+                <span className="brief-files__size">{sizeLabel(f.size)}</span>
+              </span>
+              <span className="brief-files__actions">
+                {canOpen(f) && (
+                  <button type="button" className="brief-files__btn" disabled={opening === f.path} onClick={() => void open(f)}>
+                    {opening === f.path ? "Opening…" : "View"}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="brief-files__btn"
+                  aria-label={`Remove ${f.name}`}
+                  onClick={() => onChange({ files: brief.files.filter((x) => x.path !== f.path) })}
+                >
+                  Remove
+                </button>
+              </span>
             </li>
           ))}
         </ul>

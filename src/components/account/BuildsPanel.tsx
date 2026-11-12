@@ -6,7 +6,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { STAGES, progressIndex, stagePath, type ProposalLine, type ProposalStatus, type Route, type Stage } from "@/lib/build-journey";
 import type { RevisionRow } from "@/lib/build-revisions";
 import { proposalPayNowFor } from "@/lib/pay-now";
-import { GOALS, STYLES, cleanBrief, validateBrief, type BriefErrors, type WebsiteBrief } from "@/lib/website-brief";
+import { GOALS, STYLES, cleanBrief, validateBrief, type BriefErrors, type BriefFile, type WebsiteBrief } from "@/lib/website-brief";
 import { DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
 import { SITE_COLOURS, SiteFields } from "@/components/configurator/SiteFields";
 import { parseAnswers } from "@/lib/site-template/answers";
@@ -306,6 +306,16 @@ function BriefDetailsCard({
     setSiteErrors({});
   };
 
+  // A short-lived link to a file saved earlier on this website. The server checks it belongs to the signed-in owner.
+  const viewFile = async (file: BriefFile): Promise<string | null> => {
+    const { data } = await client.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) return null;
+    const res = await fetch("/api/briefs/file", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ briefId, path: file.path }) }).catch(() => null);
+    const json = (await res?.json().catch(() => null)) as { url?: string } | null;
+    return res?.ok && json?.url ? json.url : null;
+  };
+
   const send = async (event: React.FormEvent) => {
     event.preventDefault();
     // The business name is asked once, above, and goes into the sector answers too.
@@ -358,7 +368,7 @@ function BriefDetailsCard({
       {TEMPLATE_SITES_ON && <SiteFields brief={brief} onChange={update} errors={siteErrors} businessName={businessName} />}
       {!brief.site && <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} />}
       {!brief.site && <DesignFields brief={brief} onChange={update} />}
-      <FilesField brief={brief} onChange={update} draftId={draftId} />
+      <FilesField brief={brief} onChange={update} draftId={draftId} view={viewFile} />
       <FunctionalityField brief={brief} onChange={update} />
       {message && (
         <p className="field-error" role="alert">
