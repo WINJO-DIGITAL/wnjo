@@ -26,7 +26,7 @@ const fail = (status: number, error: string) => NextResponse.json({ error }, { s
  * - link: the private address of a preview, for staff to review it.
  * - site, site-release, site-withdraw, site-link: the same four for a template build. A build that failed the automatic
  *   checks is released only with `override: true`.
- * Making a plan or a preview needs the Grok key; releasing and withdrawing do not.
+ * Making a plan or a preview needs an AI provider key; releasing and withdrawing do not.
  */
 export async function POST(request: NextRequest) {
   const db = serviceClient();
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const briefId = id("briefId");
     if (!briefId) return fail(422, "invalid");
     const provider = providerFromEnv();
-    if (!provider) return fail(503, "The AI service isn't connected yet. It needs the Grok key.");
+    if (!provider) return fail(503, "The AI service isn't connected yet. It needs a provider key.");
     const change = typeof body.change === "string" ? body.change.slice(0, 1000) : undefined;
     const result = body.action === "plan" ? await runPlanStep(db, staff, provider, briefId) : await runPreviewStep(db, staff, provider, briefId, change);
     return result.ok ? NextResponse.json(result) : fail(result.status, result.error);
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     const briefId = id("briefId");
     if (!briefId) return fail(422, "invalid");
     const provider = providerFromEnv();
-    if (!provider) return fail(503, "The AI service isn't connected yet. It needs the Grok key.");
+    if (!provider) return fail(503, "The AI service isn't connected yet. It needs a provider key.");
     const sector = typeof body.sector === "string" ? body.sector.slice(0, 40) : undefined;
     const answers = body.answers && typeof body.answers === "object" && !Array.isArray(body.answers) ? (body.answers as RawAnswers) : undefined;
     const change = typeof body.change === "string" ? body.change.slice(0, 1000) : undefined;

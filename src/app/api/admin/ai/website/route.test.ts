@@ -40,10 +40,10 @@ describe("AI website steps", () => {
     expect(calls).toEqual([]);
   });
 
-  it("says plainly that the Grok key is missing, and does nothing", async () => {
+  it("says plainly that the AI key is missing, and does nothing", async () => {
     const res = await post({ action: "plan", briefId: ID });
     expect(res.status).toBe(503);
-    expect(((await res.json()) as { error: string }).error).toMatch(/Grok key/);
+    expect(((await res.json()) as { error: string }).error).toMatch(/provider key/);
     expect(calls).toEqual([]);
   });
 

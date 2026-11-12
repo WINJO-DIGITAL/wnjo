@@ -271,6 +271,9 @@ function DetailsThanks({ name, onContinue }: { name: string; onContinue: () => v
   );
 }
 
+/** The template-site questions stay hidden from customers until the owner sets NEXT_PUBLIC_TEMPLATE_SITES to "on". */
+const TEMPLATE_SITES_ON = process.env.NEXT_PUBLIC_TEMPLATE_SITES === "on";
+
 /** Goals, pages and design for a website paid for through the short checkout. Saved on the website, then we start drafting. */
 function BriefDetailsCard({
   client,
@@ -352,7 +355,7 @@ function BriefDetailsCard({
         <input id={`bd-biz-${briefId}`} className="input" maxLength={DETAIL_LIMITS.businessName} autoComplete="organization" value={businessName} onChange={(e) => setBusinessName(e.target.value)} />
       </div>
       <GoalsField brief={brief} onChange={update} error={errors.goals} />
-      <SiteFields brief={brief} onChange={update} errors={siteErrors} businessName={businessName} />
+      {TEMPLATE_SITES_ON && <SiteFields brief={brief} onChange={update} errors={siteErrors} businessName={businessName} />}
       {!brief.site && <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} />}
       {!brief.site && <DesignFields brief={brief} onChange={update} />}
       <FilesField brief={brief} onChange={update} draftId={draftId} />
