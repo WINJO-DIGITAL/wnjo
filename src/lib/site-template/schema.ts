@@ -69,6 +69,8 @@ export type CustomerFacts = {
   businessName: string;
   services: { name: string; price?: string }[];
   hours?: HoursItem[];
+  /** Short facts the customer ticked or typed, such as "Walk-ins welcome". Shown as the facts strip. */
+  highlights?: Fact[];
   phone?: string;
   email?: string;
   address?: string;

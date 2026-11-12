@@ -1,0 +1,237 @@
+/**
+ * The writing step for a template build. Our code assembles every fact (services, prices, hours, contact details,
+ * photos) straight from what the customer gave. The model writes only the wording around them, in a small JSON
+ * reply, so a price or an opening time can't be invented: there is nowhere in the reply to put one. The checks still
+ * run on the finished site, and a build that fails them is tried once more with the reasons, then flagged for review.
+ */
+import { ProviderError, type AiProvider } from "@/lib/ai/provider";
+import { extractJson } from "@/lib/ai/website-plan";
+import { checkSite, describeIssues, type CheckIssue } from "./checks";
+import type { SectorPreset } from "./presets";
+import type { CustomerFacts, GalleryImage, Look, Section, SiteContent } from "./schema";
+import { FIELD_LIMITS } from "./schema";
+
+export type SiteCopy = {
+  tagline: string;
+  hero: { headline: string; intro: string; cta: string };
+  headings: { services: string; hours: string; gallery: string; area: string; enquiry: string; faq: string };
+  descriptions: Record<string, string>;
+  area: string;
+  enquiry: { intro: string; cta: string };
+  faq: { question: string; answer: string }[];
+  closing: { headline: string; cta: string };
+};
+
+export type WriteInput = {
+  preset: SectorPreset;
+  facts: CustomerFacts;
+  look: Look;
+  /** Theme colour as #rrggbb. */
+  colour: string;
+  /** Whether the customer uploaded a hero photo. Decides a photo or a plain hero. */
+  hasHeroPhoto: boolean;
+  images?: GalleryImage[];
+  /** A change the owner or customer asked for, applied when the site is written again. */
+  change?: string;
+};
+
+export const COPY_SYSTEM =
+  "You are a copywriter at WINJO DIGITAL, a UK web design agency. Write the wording for a small business website in " +
+  "plain British English. You are given the business's facts and the sections of its site. Never invent anything: no " +
+  "prices, times, phone numbers, addresses, names, reviews, awards or years in business. Do not quote any price, " +
+  "time or number in your wording; the site shows those itself. No HTML and no links. Reply with one JSON object " +
+  "and nothing else.";
+
+const SHAPE =
+  '{"tagline": string, "hero": {"headline": string, "intro": string, "cta": string}, ' +
+  '"headings": {"services": string, "hours": string, "gallery": string, "area": string, "enquiry": string, "faq": string}, ' +
+  '"descriptions": {"<service name exactly as given>": string}, "area": string, ' +
+  '"enquiry": {"intro": string, "cta": string}, "faq": [{"question": string, "answer": string}], ' +
+  '"closing": {"headline": string, "cta": string}}';
+
+const LOOK_TONE: Record<Look, string> = {
+  minimal: "calm and understated",
+  warm: "warm and friendly",
+  bold: "direct and confident",
+  classic: "traditional and assured",
+};
+
+export function buildCopyPrompt(input: WriteInput, retryIssues?: string): string {
+  const { facts, preset } = input;
+  const wanted = preset.sections.map((s) => `- ${s.kind}${s.required ? "" : " (only if the facts support it)"}: ${s.guidance}`);
+  return [
+    `Business: ${facts.businessName}`,
+    `Sector: ${preset.label}. Voice: ${preset.voice} Tone: ${LOOK_TONE[input.look]}.`,
+    `Services: ${facts.services.map((s) => s.name).join("; ")}`,
+    facts.address ? `Address given: yes (${facts.address})` : "Address given: no. Leave the area text empty.",
+    facts.hours?.length ? "Opening hours given: yes" : "Opening hours given: no",
+    facts.highlights?.length ? `Facts the customer gave: ${facts.highlights.map((h) => `${h.value} ${h.label}`).join("; ")}` : "",
+    "Sections, in order:",
+    ...wanted,
+    "FAQ: at most four questions a new customer would ask, answered only from the facts above. Leave the list empty if the facts don't support any.",
+    "Descriptions: one short line per service, using only the service name. Skip any you can't describe without guessing.",
+    input.change ? `Apply this change: ${input.change.slice(0, 1000)}` : "",
+    retryIssues ? `\nYour last attempt failed these checks:\n${retryIssues}\nFix them.` : "",
+    "",
+    `Reply as JSON in exactly this shape: ${SHAPE}`,
+  ]
+    .filter((line, i, all) => line !== "" || all[i - 1] !== "")
+    .join("\n");
+}
+
+const clean = (value: unknown, max: number): string =>
+  typeof value === "string"
+    ? value
+        .replace(/<[^>]*>/g, "")
+        .replace(/https?:\/\/\S+/gi, "")
+        .replace(/[ \t\r\n]+/g, " ")
+        .trim()
+        .slice(0, max)
+    : "";
+
+const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
+
+export type ParsedCopy = { ok: true; copy: SiteCopy } | { ok: false; reason: string };
+
+export function parseCopy(text: string): ParsedCopy {
+  const raw = extractJson(text);
+  if (!raw || typeof raw !== "object") return { ok: false, reason: "The reply was not JSON." };
+  const r = obj(raw);
+  const hero = obj(r.hero);
+  const h = obj(r.headings);
+  const enquiry = obj(r.enquiry);
+  const closing = obj(r.closing);
+  if (!clean(hero.headline, FIELD_LIMITS.headline)) return { ok: false, reason: "The hero has no headline." };
+
+  const descriptions: Record<string, string> = {};
+  for (const [name, text] of Object.entries(obj(r.descriptions))) {
+    const d = clean(text, FIELD_LIMITS.itemText);
+    if (d) descriptions[name] = d;
+  }
+  const faq = (Array.isArray(r.faq) ? r.faq : [])
+    .map((q) => ({ question: clean(obj(q).question, FIELD_LIMITS.question), answer: clean(obj(q).answer, FIELD_LIMITS.answer) }))
+    .filter((q) => q.question && q.answer)
+    .slice(0, 4);
+
+  return {
+    ok: true,
+    copy: {
+      tagline: clean(r.tagline, FIELD_LIMITS.tagline),
+      hero: { headline: clean(hero.headline, FIELD_LIMITS.headline), intro: clean(hero.intro, FIELD_LIMITS.intro), cta: clean(hero.cta, FIELD_LIMITS.cta) },
+      headings: {
+        services: clean(h.services, FIELD_LIMITS.heading),
+        hours: clean(h.hours, FIELD_LIMITS.heading),
+        gallery: clean(h.gallery, FIELD_LIMITS.heading),
+        area: clean(h.area, FIELD_LIMITS.heading),
+        enquiry: clean(h.enquiry, FIELD_LIMITS.heading),
+        faq: clean(h.faq, FIELD_LIMITS.heading),
+      },
+      descriptions,
+      area: clean(r.area, FIELD_LIMITS.body),
+      enquiry: { intro: clean(enquiry.intro, FIELD_LIMITS.intro), cta: clean(enquiry.cta, FIELD_LIMITS.cta) },
+      faq,
+      closing: { headline: clean(closing.headline, FIELD_LIMITS.headline), cta: clean(closing.cta, FIELD_LIMITS.cta) },
+    },
+  };
+}
+
+const norm = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim();
+
+/** Builds the site: the customer's facts as given, the model's wording in the gaps. Sections without data are left out. */
+export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
+  const { facts, preset } = input;
+  const descriptions = new Map(Object.entries(copy.descriptions).map(([k, v]) => [norm(k), v]));
+  const sections: Section[] = [];
+
+  for (const p of preset.sections) {
+    switch (p.kind) {
+      case "hero":
+        sections.push({ kind: "hero", variant: input.hasHeroPhoto ? "photo" : "plain", ...copy.hero });
+        break;
+      case "services":
+        sections.push({
+          kind: "services",
+          heading: copy.headings.services,
+          items: facts.services.map((s) => ({ name: s.name, ...(descriptions.get(norm(s.name)) ? { description: descriptions.get(norm(s.name)) } : {}), ...(s.price ? { price: s.price } : {}) })),
+        });
+        break;
+      case "hours":
+        if (facts.hours?.length) sections.push({ kind: "hours", heading: copy.headings.hours, items: facts.hours });
+        break;
+      case "gallery":
+        if (input.images?.length) sections.push({ kind: "gallery", heading: copy.headings.gallery, images: input.images.map((im) => ({ src: im.src, alt: im.alt.trim() || `${facts.businessName} photo` })) });
+        break;
+      case "facts":
+        if (facts.highlights?.length) sections.push({ kind: "facts", items: facts.highlights.slice(0, 4) });
+        break;
+      case "area":
+        if (facts.address && copy.area) sections.push({ kind: "area", heading: copy.headings.area, text: copy.area });
+        break;
+      case "enquiry":
+        sections.push({ kind: "enquiry", heading: copy.headings.enquiry, ...copy.enquiry });
+        break;
+      case "faq":
+        if (copy.faq.length) sections.push({ kind: "faq", heading: copy.headings.faq, items: copy.faq });
+        break;
+      case "cta":
+        sections.push({ kind: "cta", ...copy.closing });
+        break;
+    }
+  }
+
+  return {
+    business: {
+      name: facts.businessName,
+      ...(copy.tagline ? { tagline: copy.tagline } : {}),
+      ...(facts.phone ? { phone: facts.phone } : {}),
+      ...(facts.email ? { email: facts.email } : {}),
+      ...(facts.address ? { address: facts.address } : {}),
+    },
+    theme: { colour: input.colour, look: input.look },
+    sections,
+  };
+}
+
+export type WriteContext = { provider: AiProvider; spentPence: number; maxPence: number };
+/**
+ * `content` is present whenever the model's reply could be assembled, even if it failed the checks, so the owner can
+ * look at it and override. `issues` lists what failed.
+ */
+export type WriteResult =
+  | { ok: true; content: SiteContent; costPence: number }
+  | { ok: false; reason: string; content?: SiteContent; issues?: CheckIssue[]; costPence: number };
+
+export async function writeSite(ctx: WriteContext, input: WriteInput): Promise<WriteResult> {
+  let spent = ctx.spentPence;
+  const start = spent;
+  let retryIssues: string | undefined;
+  let last: { content: SiteContent; issues: CheckIssue[] } | undefined;
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    if (spent >= ctx.maxPence) return { ok: false, reason: "The spending limit for this website has been reached.", ...last, costPence: spent - start };
+    let reply;
+    try {
+      reply = await ctx.provider.complete({ system: COPY_SYSTEM, messages: [{ role: "user", content: buildCopyPrompt(input, retryIssues) }], tools: [] });
+    } catch (error) {
+      if (error instanceof ProviderError) {
+        const reason = error.kind === "authentication" ? "The AI service refused our key." : error.kind === "transient" ? "The AI service is busy. Please try again shortly." : "The AI service sent a reply we could not use.";
+        return { ok: false, reason, ...last, costPence: spent - start };
+      }
+      throw error;
+    }
+    spent += reply.usage.costPence;
+    if (reply.kind !== "final") return { ok: false, reason: "The AI service asked for a tool, which this step does not use.", ...last, costPence: spent - start };
+
+    const parsed = parseCopy(reply.text);
+    if (!parsed.ok) {
+      retryIssues = `- ${parsed.reason} Reply with only the JSON.`;
+      continue;
+    }
+    const content = assembleSite(input, parsed.copy);
+    const result = checkSite(content, input.facts, input.preset);
+    if (result.ok) return { ok: true, content, costPence: spent - start };
+    last = { content, issues: result.issues };
+    retryIssues = describeIssues(result);
+  }
+  return { ok: false, reason: last ? "The site did not pass the checks after two tries." : "The AI reply was not in the right shape after two tries.", ...last, costPence: spent - start };
+}
