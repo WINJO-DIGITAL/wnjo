@@ -91,6 +91,24 @@
   outline-offset: 2px;
 }
 
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.btnGhost {
+  display: inline-block;
+  padding: 0.8rem 1.4rem;
+  border: 1px solid currentColor;
+  border-radius: var(--radius);
+  color: inherit;
+  font: 600 0.95rem/1 inherit;
+  text-decoration: none;
+}
+.btnGhost:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
 .nav {
   position: sticky;
   top: 0;

@@ -2,7 +2,7 @@
 
 import { useId } from "react";
 import { DAYS, type DayAnswer, type RawAnswers } from "@/lib/site-template/answers";
-import { BARBER_PRESET, SECTOR_PRESETS } from "@/lib/site-template/presets";
+import { SECTOR_PRESETS } from "@/lib/site-template/presets";
 import { LOOKS, type Look } from "@/lib/site-template/schema";
 import type { WebsiteBrief } from "@/lib/website-brief";
 import type { BriefChange } from "./BriefSteps";
@@ -21,7 +21,11 @@ export const SITE_COLOURS = [
 ] as const;
 
 const SECTORS = Object.values(SECTOR_PRESETS);
-const SECTOR_HINT: Record<string, string> = { barber: "Services and prices, opening hours, and booking requests" };
+const SECTOR_HINT: Record<string, string> = {
+  barber: "Services and prices, opening hours, and booking requests",
+  cafe: "Menu, opening hours, and table requests",
+  electrician: "Services, areas you cover, and quote requests",
+};
 
 const emptyWeek = (): DayAnswer[] => DAYS.map((day) => ({ day, open: "", close: "" }));
 
@@ -43,6 +47,8 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
     onChange({ site: { sector: site.sector, answers: { ...site.answers, ...patch } } });
   };
 
+  const hasHours = Boolean(preset?.sections.some((x) => x.kind === "hours"));
+  const hoursRequired = Boolean(preset?.sections.find((x) => x.kind === "hours")?.required);
   const hours = answers.hours?.length ? answers.hours : emptyWeek();
   const setDay = (day: DayAnswer["day"], patch: Partial<DayAnswer>) => {
     const next = hours.map((d) => (d.day === day ? ({ ...d, ...patch } as DayAnswer) : d));
@@ -84,14 +90,14 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
       {site && preset && (
         <>
           <div className="field">
-            <label htmlFor={`${id}-services`}>Your services and prices</label>
+            <label htmlFor={`${id}-services`}>{preset.itemsLabel === "Menu items" ? "Your menu and prices" : "Your services and prices"}</label>
             <textarea
               id={`${id}-services`}
               className="textarea"
               rows={5}
               maxLength={2000}
               value={answers.servicesText ?? ""}
-              placeholder={"Cut & style £22\nSkin fade £20\nBeard trim"}
+              placeholder={preset.id === "cafe" ? "Flat white £3.20\nBacon roll £5.50\nCake of the day" : preset.id === "electrician" ? "Full rewire\nFuse board upgrade £450\nSmoke alarm testing" : "Cut & style £22\nSkin fade £20\nBeard trim"}
               aria-invalid={errors.services ? true : undefined}
               onChange={(e) => set({ servicesText: e.target.value })}
             />
@@ -99,8 +105,20 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
             {err("services")}
           </div>
 
+          {preset.areaSource === "areas" && (
+            <div className="field">
+              <label htmlFor={`${id}-areas`}>Areas you cover</label>
+              <textarea id={`${id}-areas`} className="textarea" rows={3} maxLength={300} value={answers.areas ?? ""} placeholder={"Leeds, Wakefield, Harrogate"} aria-invalid={errors.areas ? true : undefined} onChange={(e) => set({ areas: e.target.value })} />
+              <p className="field-hint">One place per line, or separated by commas.</p>
+              {err("areas")}
+            </div>
+          )}
+
+          {hasHours && (
           <fieldset className={styles.group}>
-            <legend className={styles.legend}>Opening hours</legend>
+            <legend className={styles.legend}>
+              {preset.id === "electrician" ? "When are you available?" : "Opening hours"} {!hoursRequired && <span className="optional">(optional)</span>}
+            </legend>
             <div className="site-hours">
               {hours.map((d) => (
                 <div key={d.day} className="site-hours__row">
@@ -119,6 +137,7 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
             </button>
             {err("hours")}
           </fieldset>
+          )}
 
           <fieldset className={styles.group}>
             <legend className={styles.legend}>How can people reach you?</legend>
@@ -159,7 +178,7 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
             <legend className={styles.legend}>Look and colour</legend>
             <div className="brief-chips" role="group" aria-label="Look">
               {LOOKS.map((l) => (
-                <button key={l} type="button" className="brief-chip" aria-pressed={(answers.look ?? BARBER_PRESET.defaultLook) === l} onClick={() => set({ look: l })}>
+                <button key={l} type="button" className="brief-chip" aria-pressed={(answers.look ?? preset.defaultLook) === l} onClick={() => set({ look: l })}>
                   {LOOK_LABELS[l]}
                 </button>
               ))}

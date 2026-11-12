@@ -19,13 +19,15 @@ export type RawAnswers = {
   phone?: string;
   email?: string;
   address?: string;
+  /** Places a trade covers, separated by commas or new lines. */
+  areas?: string;
   look?: string;
   colour?: string;
 };
 
 export type ParsedAnswers = { ok: true; facts: CustomerFacts; look: Look; colour: string } | { ok: false; errors: Record<string, string> };
 
-export const ANSWER_LIMITS = { businessName: 60, address: 160, email: 120, phone: 20, servicesText: 2000 } as const;
+export const ANSWER_LIMITS = { businessName: 60, address: 160, email: 120, phone: 20, servicesText: 2000, areasText: 300 } as const;
 
 const text = (v: unknown): string => (typeof v === "string" ? v.replace(/<[^>]*>/g, "").replace(/[ \t]+/g, " ").trim() : "");
 
@@ -52,6 +54,20 @@ export function parseServicesText(input: string): { services: { name: string; pr
   }
   if (services.length > FIELD_LIMITS.items) errors.push(`Add up to ${FIELD_LIMITS.items} services.`);
   return { services: services.slice(0, FIELD_LIMITS.items), errors };
+}
+
+/** The places a trade covers: one per comma or line, each kept as the customer typed it. */
+export function parseAreas(input: string): { areas: string[]; error?: string } {
+  const seen = new Set<string>();
+  const areas: string[] = [];
+  for (const part of input.split(/[,\n]/).map((a) => text(a)).filter(Boolean)) {
+    if (seen.has(part.toLowerCase())) continue;
+    seen.add(part.toLowerCase());
+    areas.push(part);
+  }
+  if (areas.some((a) => a.length > FIELD_LIMITS.area)) return { areas: [], error: `Keep each area under ${FIELD_LIMITS.area} characters.` };
+  if (areas.length > FIELD_LIMITS.areas) return { areas: areas.slice(0, FIELD_LIMITS.areas), error: `Add up to ${FIELD_LIMITS.areas} areas.` };
+  return { areas };
 }
 
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -84,34 +100,47 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
   if (services.length === 0) errors.services = "Add at least one service.";
   else if (serviceErrors.length) errors.services = serviceErrors[0];
 
-  // Hours: every day answered, either closed or with open and close times.
+  // Hours: only for a sector that shows them. Required for a shop; optional for a trade, where blank means none given.
+  const hoursSection = preset.sections.find((x) => x.kind === "hours");
   const days = Array.isArray(raw.hours) ? raw.hours : [];
-  const byDay = new Map(days.map((d) => [d?.day, d]));
+  const untouched = days.every((d) => !d || (!d.closed && !text(d.open) && !text(d.close)));
   const ordered: DayAnswer[] = [];
-  let hoursError = "";
-  for (const day of DAYS) {
-    const d = byDay.get(day);
-    if (!d) {
-      hoursError = `Say whether you are open on ${day}.`;
-      break;
+  if (hoursSection && !(untouched && !hoursSection.required)) {
+    const byDay = new Map(days.map((d) => [d?.day, d]));
+    let hoursError = "";
+    for (const day of DAYS) {
+      const d = byDay.get(day);
+      if (!d) {
+        hoursError = `Say whether you are open on ${day}.`;
+        break;
+      }
+      if (d.closed) {
+        ordered.push({ day, closed: true });
+        continue;
+      }
+      const open = text(d.open);
+      const close = text(d.close);
+      if (!TIME.test(open) || !TIME.test(close)) {
+        hoursError = `Add opening and closing times for ${day}, such as 09:00 and 18:00.`;
+        break;
+      }
+      if (close <= open) {
+        hoursError = `${day} closes before it opens.`;
+        break;
+      }
+      ordered.push({ day, open, close });
     }
-    if (d.closed) {
-      ordered.push({ day, closed: true });
-      continue;
-    }
-    const open = text(d.open);
-    const close = text(d.close);
-    if (!TIME.test(open) || !TIME.test(close)) {
-      hoursError = `Add opening and closing times for ${day}, such as 09:00 and 18:00.`;
-      break;
-    }
-    if (close <= open) {
-      hoursError = `${day} closes before it opens.`;
-      break;
-    }
-    ordered.push({ day, open, close });
+    if (hoursError) errors.hours = hoursError;
   }
-  if (hoursError) errors.hours = hoursError;
+
+  // Areas: a trade says where it works.
+  let areas: string[] = [];
+  if (preset.areaSource === "areas") {
+    const parsedAreas = parseAreas(typeof raw.areas === "string" ? raw.areas.slice(0, ANSWER_LIMITS.areasText) : "");
+    areas = parsedAreas.areas;
+    if (parsedAreas.error) errors.areas = parsedAreas.error;
+    else if (areas.length === 0) errors.areas = "Add the areas you cover.";
+  }
 
   const phone = text(raw.phone);
   const email = text(raw.email).toLowerCase();
@@ -138,7 +167,8 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
     facts: {
       businessName,
       services,
-      hours: groupHours(ordered),
+      ...(ordered.length ? { hours: groupHours(ordered) } : {}),
+      ...(areas.length ? { areas } : {}),
       ...(highlights.length ? { highlights } : {}),
       ...(phone ? { phone } : {}),
       ...(email ? { email } : {}),
@@ -181,6 +211,7 @@ export function cleanSiteAnswers(input: unknown, knownSectors: string[]): SiteAn
       phone: str(a.phone, ANSWER_LIMITS.phone),
       email: str(a.email, ANSWER_LIMITS.email),
       address: str(a.address, ANSWER_LIMITS.address),
+      areas: str(a.areas, ANSWER_LIMITS.areasText),
       look: str(a.look, 20),
       colour: str(a.colour, 7),
     },

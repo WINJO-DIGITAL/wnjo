@@ -83,7 +83,7 @@ describe("buildSite", () => {
 
   it("rejects an unknown sector without calling the model", async () => {
     const p = provider([]);
-    expect(await run(p, memoryStore(), { sector: "cafe", answers })).toMatchObject({ ok: false, reason: expect.stringContaining("cafe") });
+    expect(await run(p, memoryStore(), { sector: "plumber", answers })).toMatchObject({ ok: false, reason: expect.stringContaining("plumber") });
     expect(p.prompts).toHaveLength(0);
   });
 

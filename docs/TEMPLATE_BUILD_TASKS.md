@@ -20,6 +20,8 @@ Working rules: commit locally; push or merge only when the owner says "push" or 
 - The customer's sector questions are hidden until `NEXT_PUBLIC_TEMPLATE_SITES=on` is set in Vercel, so a push cannot expose them.
 - Migration `supabase/migrations/20261112090000_website_site_builds.sql`: applied and checked in the live database (12 Nov).
 - Merged to main (12 Nov, `5fa1f64`). `NEXT_PUBLIC_TEMPLATE_SITES=on` is set in Vercel and redeployed, so customers can see the sector questions.
+- Booking-request endpoint `/api/site-enquiry` (12 Nov): the form posts natively, works without JavaScript, only a released build takes requests, the email goes to the website owner's verified account address (never one from the request), rate limited, with a hidden bot trap and a confirmation or error shown on the page. Draft previews stay inactive.
+- Café and Electrician presets (12 Nov): each with a sample build that passes every check. Café: menu and table requests. Electrician: areas covered (each must appear), optional hours, quote requests, a Call button. Preset-specific labels for the request box.
 - Upload list on the details form: thumbnails for files picked this session, a View link (owner-only, 60-second signed link via `/api/briefs/file`), one row per file with wrapping names.
 
 ## Blocked on the owner
@@ -28,10 +30,9 @@ Working rules: commit locally; push or merge only when the owner says "push" or 
 
 ## Next
 
-1. Endpoint (the questions are live, so do this before releasing any template site) for the template's booking-request form (emails the business owner), then wire `enquiryAction`.
-2. Model comparison on ten builds (Grok against Claude Haiku), once a key is set.
-3. Café and Electrician presets (the renderer and checks are reusable).
-4. Customer-facing wording about the process, only after a real end-to-end test.
+1. Model comparison on ten builds (Grok against Claude Haiku). Needs an AI key.
+2. Customer-facing wording about the process, only after a real end-to-end test with a live model.
+3. More sectors (physio is in the site styler already), each with a sample build that passes every check.
 
 ## Known gaps and risks
 

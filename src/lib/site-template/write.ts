@@ -62,14 +62,15 @@ export function buildCopyPrompt(input: WriteInput, retryIssues?: string): string
   return [
     `Business: ${facts.businessName}`,
     `Sector: ${preset.label}. Voice: ${preset.voice} Tone: ${LOOK_TONE[input.look]}.`,
-    `Services: ${facts.services.map((s) => s.name).join("; ")}`,
-    facts.address ? `Address given: yes (${facts.address})` : "Address given: no. Leave the area text empty.",
+    `${preset.itemsLabel}: ${facts.services.map((s) => s.name).join("; ")}`,
+    facts.areas?.length ? `Areas covered: ${facts.areas.join("; ")}. Name each one exactly as given in the area text, and no others.` : "",
+    facts.address ? `Address given: yes (${facts.address})` : preset.areaSource === "address" ? "Address given: no. Leave the area text empty." : "",
     facts.hours?.length ? "Opening hours given: yes" : "Opening hours given: no",
     facts.highlights?.length ? `Facts the customer gave: ${facts.highlights.map((h) => `${h.value} ${h.label}`).join("; ")}` : "",
     "Sections, in order:",
     ...wanted,
     "FAQ: at most four questions a new customer would ask, answered only from the facts above. Leave the list empty if the facts don't support any.",
-    "Descriptions: one short line per service, using only the service name. Skip any you can't describe without guessing.",
+    `Descriptions: one short line per ${preset.itemsLabel === "Menu items" ? "menu item" : "service"}, using only its name. Skip any you can't describe without guessing.`,
     input.change ? `Apply this change: ${input.change.slice(0, 1000)}` : "",
     retryIssues ? `\nYour last attempt failed these checks:\n${retryIssues}\nFix them.` : "",
     "",
@@ -165,10 +166,10 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
         if (facts.highlights?.length) sections.push({ kind: "facts", items: facts.highlights.slice(0, 4) });
         break;
       case "area":
-        if (facts.address && copy.area) sections.push({ kind: "area", heading: copy.headings.area, text: copy.area });
+        if ((preset.areaSource === "areas" ? facts.areas?.length : facts.address) && copy.area) sections.push({ kind: "area", heading: copy.headings.area, text: copy.area });
         break;
       case "enquiry":
-        sections.push({ kind: "enquiry", heading: copy.headings.enquiry, ...copy.enquiry });
+        sections.push({ kind: "enquiry", heading: copy.headings.enquiry, ...copy.enquiry, prompt: preset.enquiryPrompt });
         break;
       case "faq":
         if (copy.faq.length) sections.push({ kind: "faq", heading: copy.headings.faq, items: copy.faq });

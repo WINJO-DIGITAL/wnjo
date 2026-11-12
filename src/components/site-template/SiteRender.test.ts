@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { checkSite } from "@/lib/site-template/checks";
 import { BARBER_PRESET } from "@/lib/site-template/presets";
-import { SAMPLE_BARBER, SAMPLE_BARBER_FACTS } from "@/lib/site-template/sample";
+import { SAMPLE_BARBER, SAMPLE_BARBER_FACTS, SAMPLE_CAFE, SAMPLE_ELECTRICIAN } from "@/lib/site-template/sample";
 import type { SiteContent } from "@/lib/site-template/schema";
 import { SiteRender, safeImage, type EnquiryProps } from "./SiteRender";
 
@@ -100,5 +100,33 @@ describe("SiteRender", () => {
     expect(html).toContain('href="#services"');
     expect(html).toContain('id="services"');
     expect(html).toContain('id="book"');
+  });
+});
+
+describe("SiteRender for the other sectors", () => {
+  it("shows a Call button in the hero when there is a phone number, and not without one", () => {
+    expect(render(SAMPLE_ELECTRICIAN)).toContain('href="tel:01134960789"');
+    expect(render(SAMPLE_ELECTRICIAN)).toContain("Call 0113 496 0789");
+    const noPhone = structuredClone(SAMPLE_ELECTRICIAN);
+    noPhone.business.phone = undefined;
+    expect(render(noPhone)).not.toContain("Call ");
+  });
+
+  it("names nav links from the section's own heading, and labels the request box for the sector", () => {
+    const cafe = render(SAMPLE_CAFE);
+    expect(cafe).toContain('href="#services">Menu</a>');
+    expect(cafe).toContain("Date, time and how many of you?");
+    expect(render(SAMPLE_ELECTRICIAN)).toContain("What do you need doing?");
+    expect(render(SAMPLE_ELECTRICIAN)).toContain("Areas we cover");
+  });
+
+  it("has no hours section for a trade that gave none", () => {
+    expect(render(SAMPLE_ELECTRICIAN)).not.toContain('id="hours"');
+  });
+
+  it("falls back to a plain word when a heading is too long for the nav", () => {
+    const c = structuredClone(SAMPLE_CAFE);
+    c.sections[1] = { kind: "services", heading: "Everything we bake and brew every day", items: [{ name: "Flat white", price: "£3.20" }] };
+    expect(render(c)).toContain('href="#services">Services</a>');
   });
 });

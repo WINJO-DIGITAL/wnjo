@@ -27,6 +27,9 @@ export const FIELD_LIMITS = {
   factValue: 24,
   factLabel: 60,
   alt: 120,
+  prompt: 60,
+  area: 40,
+  areas: 8,
   items: 12,
 } as const;
 
@@ -43,7 +46,7 @@ export type Section =
   | { kind: "gallery"; heading: string; images: GalleryImage[] }
   | { kind: "facts"; items: Fact[] }
   | { kind: "area"; heading: string; text: string }
-  | { kind: "enquiry"; heading: string; intro: string; cta: string }
+  | { kind: "enquiry"; heading: string; intro: string; cta: string; prompt?: string }
   | { kind: "faq"; heading: string; items: FaqItem[] }
   | { kind: "cta"; headline: string; cta: string };
 
@@ -71,6 +74,8 @@ export type CustomerFacts = {
   hours?: HoursItem[];
   /** Short facts the customer ticked or typed, such as "Walk-ins welcome". Shown as the facts strip. */
   highlights?: Fact[];
+  /** Places a trade covers, each named as the customer gave it. */
+  areas?: string[];
   phone?: string;
   email?: string;
   address?: string;

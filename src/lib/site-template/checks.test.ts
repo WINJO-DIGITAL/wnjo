@@ -216,9 +216,9 @@ describe("describeIssues", () => {
 });
 
 describe("presets", () => {
-  it("looks up the barber preset and nothing else yet", () => {
+  it("looks up the barber preset, and nothing for an unknown sector", () => {
     expect(presetFor("barber")).toBe(BARBER_PRESET);
-    expect(presetFor("cafe")).toBeNull();
+    expect(presetFor("plumber")).toBeNull();
   });
 
   it("leads with the hero and ends with the closing call to action", () => {

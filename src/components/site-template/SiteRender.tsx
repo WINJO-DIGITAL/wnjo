@@ -36,13 +36,21 @@ function find<K extends Section["kind"]>(content: SiteContent, kind: K): Extract
   return content.sections.find((s): s is Extract<Section, { kind: K }> => s.kind === kind);
 }
 
-const ANCHORS: Partial<Record<Section["kind"], { id: string; label: string }>> = {
-  services: { id: "services", label: "Prices" },
-  hours: { id: "hours", label: "Hours" },
-  gallery: { id: "gallery", label: "Gallery" },
-  area: { id: "find-us", label: "Find us" },
-  faq: { id: "faq", label: "Questions" },
+const ANCHOR_IDS: Partial<Record<Section["kind"], { id: string; fallback: string }>> = {
+  services: { id: "services", fallback: "Services" },
+  hours: { id: "hours", fallback: "Hours" },
+  gallery: { id: "gallery", fallback: "Gallery" },
+  area: { id: "find-us", fallback: "Find us" },
+  faq: { id: "faq", fallback: "Questions" },
 };
+
+/** The nav names a section by its own short heading ("Menu", "Prices"), and falls back to a plain word. */
+function navLabel(s: Section): string | null {
+  const a = ANCHOR_IDS[s.kind];
+  if (!a) return null;
+  const heading = "heading" in s ? s.heading.trim() : "";
+  return heading && heading.length <= 16 ? heading : a.fallback;
+}
 
 /** Where the booking form posts, and what happened the last time it did. Without it the form is inactive (a preview). */
 export type EnquiryProps = { action: string; token: string; state?: "sent" | "error" };
@@ -53,7 +61,8 @@ export function SiteRender({ content, heroImage, enquiry }: { content: SiteConte
   const style = { "--accent": colour, "--on-accent": onColour(colour) } as CSSProperties;
   const bookable = find(content, "enquiry");
   const photo = safeImage(heroImage);
-  const nav = content.sections.flatMap((s) => (ANCHORS[s.kind] ? [ANCHORS[s.kind]!] : []));
+  // A section that draws nothing (a gallery with no usable pictures) gets no nav link, so no link points at nothing.
+  const nav = content.sections.flatMap((s) => (ANCHOR_IDS[s.kind] && !(s.kind === "gallery" && !s.images.some((im) => safeImage(im.src))) ? [{ id: ANCHOR_IDS[s.kind]!.id, label: navLabel(s)! }] : []));
 
   return (
     <div className={css.site} data-look={theme.look} style={style}>
@@ -85,9 +94,16 @@ export function SiteRender({ content, heroImage, enquiry }: { content: SiteConte
                 <div className={css.heroCopy}>
                   <h1>{s.headline}</h1>
                   <p>{s.intro}</p>
-                  <a className={css.btn} href="#book">
-                    {s.cta}
-                  </a>
+                  <span className={css.heroActions}>
+                    <a className={css.btn} href="#book">
+                      {s.cta}
+                    </a>
+                    {business.phone && (
+                      <a className={css.btnGhost} href={telHref(business.phone)}>
+                        Call {business.phone}
+                      </a>
+                    )}
+                  </span>
                 </div>
               </section>
             );
@@ -190,7 +206,7 @@ export function SiteRender({ content, heroImage, enquiry }: { content: SiteConte
                       <input name="contact" autoComplete="email" maxLength={120} required />
                     </label>
                     <label>
-                      When suits you?
+                      {s.prompt || "Anything we should know?"}
                       <textarea name="message" rows={3} maxLength={1000} />
                     </label>
                     <button className={css.btn} type={enquiry ? "submit" : "button"}>

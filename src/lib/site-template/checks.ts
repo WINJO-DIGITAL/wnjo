@@ -77,6 +77,7 @@ function textFields(content: SiteContent): { where: string; text: string; limit?
         add(`${at}.heading`, s.heading, FIELD_LIMITS.heading);
         add(`${at}.intro`, s.intro, FIELD_LIMITS.intro);
         add(`${at}.cta`, s.cta, FIELD_LIMITS.cta);
+        add(`${at}.prompt`, s.prompt, FIELD_LIMITS.prompt);
         break;
       case "faq":
         add(`${at}.heading`, s.heading, FIELD_LIMITS.heading);
@@ -208,8 +209,16 @@ export function checkSite(content: SiteContent, facts: CustomerFacts, preset: Se
     }
   }
 
-  // A section about the address needs an address to talk about.
-  if (seen.has("area") && !facts.address) flag("area-without-address", "The customer gave no address, so there is nothing to put in the area section.", "area");
+  // "Find us" needs something true to say: the address for a shop, the areas for a trade.
+  if (seen.has("area")) {
+    if (preset.areaSource === "address" && !facts.address) flag("area-without-address", "The customer gave no address, so there is nothing to put in the area section.", "area");
+    if (preset.areaSource === "areas") {
+      if (!facts.areas?.length) flag("area-without-areas", "The customer gave no areas, so there is nothing to put in the area section.", "area");
+      const areaSection = content.sections.find((s) => s.kind === "area");
+      const areaText = areaSection && areaSection.kind === "area" ? norm(`${areaSection.heading} ${areaSection.text}`) : "";
+      for (const place of facts.areas ?? []) if (!areaText.includes(norm(place))) flag("area-missing", `The area "${place}" is missing.`, "area");
+    }
+  }
 
   return { ok: issues.length === 0, issues };
 }
