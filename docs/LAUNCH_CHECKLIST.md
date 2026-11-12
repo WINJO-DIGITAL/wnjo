@@ -47,7 +47,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] Apply migration `20261109190000_website_ai_plans_and_previews.sql` (applied; tables and rules checked).
 - [x] Customer preview permissions locked down: the secret preview address isn't readable from the browser.
 - [ ] Set `XAI_API_KEY`, `XAI_MODEL`, `XAI_INPUT_PENCE_PER_MILLION_TOKENS` and `XAI_OUTPUT_PENCE_PER_MILLION_TOKENS` in Vercel (optional: `AI_MAX_PENCE_PER_BRIEF`, default 300).
-- [ ] Run one test website end to end: pay in test mode, check the plan and preview appear in Admin, view the draft, release it, and open it from the customer account.
+- [x] Run one test website end to end: pay in test mode, check the plan and preview appear in Admin, view the draft, release it, and open it from the customer account. Confirmed by the owner (already done).
 - [ ] Check the model's reply shape against the live service. The code was only tested against a fake.
 
 ## Decisions needed from the owner
