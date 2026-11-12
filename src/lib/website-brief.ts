@@ -106,7 +106,7 @@ export type CustomerType = keyof typeof CUSTOMERS;
 export type FirstAction = keyof typeof FIRST_ACTIONS;
 export type Tone = keyof typeof TONES;
 
-export const PROFILE_LIMITS = { services: 2000, phone: 20, email: 120, areas: 300, differentiator: 200, hours: 300, proof: 300 } as const;
+export const PROFILE_LIMITS = { services: 2000, phone: 20, email: 120, areas: 300, differentiator: 200, hours: 300, proof: 300, about: 1000 } as const;
 
 export type BusinessProfile = {
   services: string;
@@ -118,6 +118,8 @@ export type BusinessProfile = {
   firstActions: FirstAction[];
   hours: string;
   proof: string;
+  /** A few sentences in the customer's own words: who runs the business and why. Optional. */
+  about: string;
   tone: Tone | "";
 };
 
@@ -131,6 +133,7 @@ export const EMPTY_PROFILE: BusinessProfile = {
   firstActions: [],
   hours: "",
   proof: "",
+  about: "",
   tone: "",
 };
 
@@ -268,6 +271,7 @@ export function cleanProfile(input: unknown): BusinessProfile {
     firstActions: Array.isArray(o.firstActions) ? [...new Set(o.firstActions.filter((a): a is FirstAction => typeof a === "string" && a in FIRST_ACTIONS))] : [],
     hours: text(o.hours, PROFILE_LIMITS.hours),
     proof: text(o.proof, PROFILE_LIMITS.proof),
+    about: text(o.about, PROFILE_LIMITS.about).replace(/<[^>]*>/g, "").trim(),
     tone: pick<Tone>(o.tone, TONES),
   };
 }
@@ -317,6 +321,7 @@ export function profileLines(p: BusinessProfile): string[] {
   if (p.areas) out.push(`Areas covered: ${p.areas}`);
   if (p.firstActions.length) out.push(`First action wanted: ${p.firstActions.map((a) => FIRST_ACTIONS[a]).join(", ")}`);
   if (p.hours) out.push(`Hours or availability: ${p.hours}`);
+  if (p.about) out.push(`About the business, in their words: ${p.about}`);
   if (p.proof) out.push(`Proof to show: ${p.proof}`);
   if (p.tone) out.push(`Tone: ${TONES[p.tone]}`);
   return out;

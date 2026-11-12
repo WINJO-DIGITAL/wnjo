@@ -254,6 +254,7 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
                   {b.profile.firstActions.length > 0 && <div><dt>First action</dt><dd>{b.profile.firstActions.map((a) => FIRST_ACTIONS[a]).join(", ")}</dd></div>}
                   {b.profile.areas && <div><dt>Areas</dt><dd>{b.profile.areas}</dd></div>}
                   {b.profile.hours && <div><dt>Hours</dt><dd>{b.profile.hours}</dd></div>}
+                  {b.profile.about && <div><dt>About</dt><dd style={{ whiteSpace: "pre-line" }}>{b.profile.about}</dd></div>}
                   {b.profile.proof && <div><dt>Proof</dt><dd>{b.profile.proof}</dd></div>}
                   {b.profile.tone && <div><dt>Tone</dt><dd>{TONES[b.profile.tone]}</dd></div>}
                 </>

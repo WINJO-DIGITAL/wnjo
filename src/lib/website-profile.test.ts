@@ -50,3 +50,16 @@ describe("the business profile", () => {
     expect(prompt).toContain("Customer's answer. What makes them different: Fixed prices, meet and greet");
   });
 });
+
+describe("the about answer", () => {
+  it("is kept, trimmed, and optional", () => {
+    expect(cleanProfile({ about: "  <b>Run by Sam</b>, 3 years  " }).about).toBe("Run by Sam, 3 years");
+    expect(validateProfile({ ...other, profile: { ...other.profile, about: "" } })).toEqual({});
+  });
+
+  it("reaches the staff summary and the writer, in the customer's words", () => {
+    const withAbout = { ...other, profile: { ...other.profile, about: "Run by Sam, a former driver." } };
+    expect(profileLines(withAbout.profile)).toContain("About the business, in their words: Run by Sam, a former driver.");
+    expect(buildPlanPrompt({ businessName: "BFW", packageName: "Core", pagesAllowed: 5, brief: withAbout })).toContain("Customer's answer. About the business, in their words: Run by Sam, a former driver.");
+  });
+});

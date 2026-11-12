@@ -301,6 +301,10 @@ export function ProfileFields({ brief, onChange, errors }: { brief: WebsiteBrief
         <input id={`${id}-hours`} className="input" maxLength={PROFILE_LIMITS.hours} value={p.hours} placeholder="For example: 7 days, 6am to 10pm, or by arrangement" onChange={(e) => set({ hours: e.target.value })} />
       </div>
       <div className="field">
+        <label htmlFor={`${id}-about`}>About you and the business <span className="optional">(optional)</span></label>
+        <textarea id={`${id}-about`} className="textarea" rows={4} maxLength={PROFILE_LIMITS.about} value={p.about} placeholder="A few sentences: who runs it, how long you have done this, and why you started" onChange={(e) => set({ about: e.target.value })} />
+      </div>
+      <div className="field">
         <label htmlFor={`${id}-proof`}>Proof to show <span className="optional">(optional, only what is true)</span></label>
         <input id={`${id}-proof`} className="input" maxLength={PROFILE_LIMITS.proof} value={p.proof} placeholder="For example: 10 years trading, fully licensed" onChange={(e) => set({ proof: e.target.value })} />
       </div>
