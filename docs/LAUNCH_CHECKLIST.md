@@ -36,9 +36,10 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Confirmation page no longer imports a server-only module** (it pulled Node's crypto into the browser bundle and broke the dev build).
 
 ## Still to do before launch
-- [ ] **Cancellation request:** the owner runs one test cancellation on a Stripe test subscription. Check the end date in the email, the staff alert, the Stripe cancel-at-period-end flag and the history entry.
+- [x] **Cancellation request:** test cancellation on WS-1C9980 (12 Nov). The customer confirmation gives the end date, 12 December 2026, and the staff alert was delivered. Owner confirmed. Not yet checked: the Stripe cancel-at-period-end flag and the history entry.
 - [ ] **Renewal reminder:** confirm the 14-day reminder email reaches a test customer (no paid website qualifies yet, so use a test subscription).
-- [ ] **Hotmail delivery:** add the DMARC record on winjodigital.co.uk (`_dmarc` TXT, `v=DMARC1; p=none; rua=mailto:enquiries@winjodigital.co.uk`). Helps Outlook accept our mail.
+- [x] **Hotmail delivery:** sign-in emails reached Hotmail once Microsoft's outage cleared. Owner confirmed, 12 Nov.
+- [ ] **DMARC (optional):** add the record on winjodigital.co.uk (`_dmarc` TXT, `v=DMARC1; p=none; rua=mailto:enquiries@winjodigital.co.uk`). Helps Outlook accept our mail. Not added yet.
 - [x] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data. Confirmed by the owner: works.
 - [x] **Staff subscriptions:** the staff read rule is unchanged in the database. Confirm by signing in as staff.
 - [x] **Sign-in link:** confirm the emailed link lands on the account page, not the home page. The code sends it to `/account` (checked in code). Not yet tested with a real email. Confirmed by the owner: works, tested several times.
