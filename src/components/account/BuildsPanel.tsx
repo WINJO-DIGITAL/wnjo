@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { openFileTab } from "@/lib/open-tab";
 import { PORTAL_STEPS, nextStepFor, portalStepIndex } from "@/lib/portal-steps";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { STAGES, progressIndex, stagePath, type ProposalLine, type ProposalStatus, type Route, type Stage } from "@/lib/build-journey";
@@ -351,17 +352,17 @@ function PreviewLink({ client, briefId }: { client: SupabaseClient; briefId: str
   const open = async () => {
     setBusy(true);
     setError(null);
-    const { data } = await client.auth.getSession();
-    const token = data.session?.access_token;
-    const res = token
-      ? await fetch("/api/briefs/preview", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ briefId }) }).catch(() => null)
-      : null;
-    const json = (await res?.json().catch(() => null)) as { url?: string } | null;
+    const opened = await openFileTab(async () => {
+      const { data } = await client.auth.getSession();
+      const token = data.session?.access_token;
+      const res = token
+        ? await fetch("/api/briefs/preview", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ briefId }) }).catch(() => null)
+        : null;
+      const json = (await res?.json().catch(() => null)) as { url?: string } | null;
+      return res?.ok && json?.url ? json.url : null;
+    });
     setBusy(false);
-    if (res?.ok && json?.url) {
-      window.open(json.url, "_blank", "noopener,noreferrer");
-      return;
-    }
+    if (opened) return;
     setError("Your preview isn't ready to view yet. We'll let you know.");
   };
 

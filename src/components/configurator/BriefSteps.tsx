@@ -1,5 +1,6 @@
 "use client";
 
+import { openFileTab } from "@/lib/open-tab";
 import { useEffect, useId, useRef, useState } from "react";
 import { uploadBriefFile } from "@/lib/brief-upload-client";
 import {
@@ -323,9 +324,21 @@ export function FilesField({
   };
 
   const open = async (f: BriefFile) => {
-    const url = local[f.path] ?? (view ? await (async () => { setOpening(f.path); try { return await view(f); } finally { setOpening(null); } })() : null);
-    if (url) window.open(url, "_blank", "noopener,noreferrer");
-    else setErrors([`${f.name}: couldn't be opened just now. Please try again.`]);
+    if (local[f.path]) {
+      window.open(local[f.path], "_blank", "noopener,noreferrer");
+      return;
+    }
+    const opened = view
+      ? await openFileTab(async () => {
+          setOpening(f.path);
+          try {
+            return await view(f);
+          } finally {
+            setOpening(null);
+          }
+        })
+      : false;
+    if (!opened) setErrors([`${f.name}: couldn't be opened just now. Please try again.`]);
   };
 
   const canOpen = (f: BriefFile) => Boolean(local[f.path] || view);

@@ -1,5 +1,6 @@
 "use client";
 
+import { openFileTab } from "@/lib/open-tab";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
@@ -191,9 +192,11 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
   };
 
   const openFile = async (path: string) => {
-    const r = await call({ briefId: row.id, action: "file_link", path });
-    if (r.ok && typeof r.json.url === "string") window.open(r.json.url, "_blank", "noopener");
-    else setMessage({ ok: false, text: "The file couldn't be opened." });
+    const opened = await openFileTab(async () => {
+      const r = await call({ briefId: row.id, action: "file_link", path });
+      return r.ok && typeof r.json.url === "string" ? r.json.url : null;
+    });
+    if (!opened) setMessage({ ok: false, text: "The file couldn't be opened." });
   };
 
   const state = approvalState(approvals);
@@ -757,15 +760,19 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
   };
 
   const openPreview = async (previewId: string) => {
-    const r = await call({ action: "link", previewId }, "/api/admin/ai/website");
-    if (r.ok && typeof r.json.url === "string") window.open(r.json.url, "_blank", "noopener,noreferrer");
-    else setMessage({ ok: false, text: "The preview couldn't be opened." });
+    const opened = await openFileTab(async () => {
+      const r = await call({ action: "link", previewId }, "/api/admin/ai/website");
+      return r.ok && typeof r.json.url === "string" ? r.json.url : null;
+    });
+    if (!opened) setMessage({ ok: false, text: "The preview couldn't be opened." });
   };
 
   const openSiteBuild = async (buildId: string) => {
-    const r = await call({ action: "site-link", buildId }, "/api/admin/ai/website");
-    if (r.ok && typeof r.json.url === "string") window.open(r.json.url, "_blank", "noopener,noreferrer");
-    else setMessage({ ok: false, text: "The build couldn't be opened." });
+    const opened = await openFileTab(async () => {
+      const r = await call({ action: "site-link", buildId }, "/api/admin/ai/website");
+      return r.ok && typeof r.json.url === "string" ? r.json.url : null;
+    });
+    if (!opened) setMessage({ ok: false, text: "The build couldn't be opened." });
   };
 
   const releaseSite = (b: AiSiteBuildRow) => {
