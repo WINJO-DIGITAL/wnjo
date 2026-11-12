@@ -14671,3 +14671,25 @@ body:has(.pv, .sitepv) .site-footer {
     grid-column: 1 / -1;
   }
 }
+
+/* ===== Business questions: room to breathe, and the contact pair side by side on wide screens ===== */
+.site-profile {
+  display: grid;
+  gap: var(--space-6, 2.5rem);
+  max-width: 40rem;
+}
+.site-profile .field-hint {
+  margin: 0.25rem 0 0.5rem;
+  color: var(--color-ink-2);
+  line-height: 1.5;
+}
+.site-profile__contact {
+  display: grid;
+  gap: var(--space-6, 2.5rem);
+}
+@media (min-width: 40rem) {
+  .site-profile__contact {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+  }
+}

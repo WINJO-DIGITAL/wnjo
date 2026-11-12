@@ -236,14 +236,14 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
 }
 
 /**
- * The questions a first website needs, for a business with no template. Each answer is a fact the writer can use, so
- * the customer answers in their own words, and nothing is guessed.
+ * The questions a first website needs, for a business with no template. Each question says what it is for, with an
+ * example, so the customer knows what to write. Each answer is a fact the writer can use, so nothing is guessed.
  */
 export function ProfileFields({ brief, onChange, errors }: { brief: WebsiteBrief; onChange: BriefChange; errors: Partial<Record<keyof BusinessProfile, string>> }) {
   const id = useId();
   const p = brief.profile;
   const set = (patch: Partial<BusinessProfile>) => onChange({ profile: { ...p, ...patch } });
-  const toggleAction = (a: keyof typeof FIRST_ACTIONS) => set({ firstActions: p.firstActions.includes(a) ? p.firstActions.filter((x) => x !== a) : [...p.firstActions, a] });
+  const toggleAction = (a: FirstAction) => set({ firstActions: p.firstActions.includes(a) ? p.firstActions.filter((x) => x !== a) : [...p.firstActions, a] });
   const err = (key: keyof BusinessProfile) => errors[key] && <p className="field-error" role="alert">{errors[key]}</p>;
   const chips = <K extends string>(options: Record<K, string>, value: K | "", onPick: (v: K | "") => void, label: string) => (
     <div className="brief-chips" role="group" aria-label={label}>
@@ -258,32 +258,42 @@ export function ProfileFields({ brief, onChange, errors }: { brief: WebsiteBrief
     <div className="site-profile">
       <div className="field">
         <label htmlFor={`${id}-services`}>What do you offer?</label>
-        <textarea id={`${id}-services`} className="textarea" rows={4} maxLength={PROFILE_LIMITS.services} value={p.services} placeholder={"One per line. Add a price if you want it shown."} aria-invalid={errors.services ? true : undefined} onChange={(e) => set({ services: e.target.value })} />
+        <p className="field-hint">List each service or product on its own line. Add a price only if you want it shown on the site. For example: &quot;Airport transfer £35&quot; or &quot;Long distance, quoted on request&quot;.</p>
+        <textarea id={`${id}-services`} className="textarea" rows={4} maxLength={PROFILE_LIMITS.services} value={p.services} aria-invalid={errors.services ? true : undefined} onChange={(e) => set({ services: e.target.value })} />
         {err("services")}
       </div>
-      <div className="cfg-fields">
+
+      <div className="site-profile__contact">
         <div className="field">
-          <label htmlFor={`${id}-phone`}>Phone <span className="optional">(optional)</span></label>
-          <input id={`${id}-phone`} className="input" type="tel" autoComplete="tel" maxLength={PROFILE_LIMITS.phone} value={p.phone} onChange={(e) => set({ phone: e.target.value })} />
+          <label htmlFor={`${id}-email`}>Email address</label>
+          <p className="field-hint">Required. This is where enquiries and updates about your website reach you.</p>
+          <input id={`${id}-email`} className="input" type="email" autoComplete="email" maxLength={PROFILE_LIMITS.email} value={p.email} aria-invalid={errors.email ? true : undefined} onChange={(e) => set({ email: e.target.value })} />
+          {err("email")}
         </div>
         <div className="field">
-          <label htmlFor={`${id}-email`}>Email</label>
-          <input id={`${id}-email`} className="input" type="email" autoComplete="email" maxLength={PROFILE_LIMITS.email} value={p.email} onChange={(e) => set({ email: e.target.value })} />
+          <label htmlFor={`${id}-phone`}>Phone number <span className="optional">(optional)</span></label>
+          <p className="field-hint">Shown on the site so people can call you. Leave it out if you&apos;d rather not share it.</p>
+          <input id={`${id}-phone`} className="input" type="tel" autoComplete="tel" maxLength={PROFILE_LIMITS.phone} value={p.phone} onChange={(e) => set({ phone: e.target.value })} />
+          {err("phone")}
         </div>
       </div>
-      {err("phone")}
-      {err("email")}
+
       <div className="field">
         <label htmlFor={`${id}-diff`}>What makes you different?</label>
-        <input id={`${id}-diff`} className="input" maxLength={PROFILE_LIMITS.differentiator} value={p.differentiator} placeholder="For example: we come to you, same day, with our own van" aria-invalid={errors.differentiator ? true : undefined} onChange={(e) => set({ differentiator: e.target.value })} />
+        <p className="field-hint">One sentence about what sets you apart from others who do the same thing. For example: fixed prices, same-day service, or your own team.</p>
+        <input id={`${id}-diff`} className="input" maxLength={PROFILE_LIMITS.differentiator} value={p.differentiator} aria-invalid={errors.differentiator ? true : undefined} onChange={(e) => set({ differentiator: e.target.value })} />
         {err("differentiator")}
       </div>
+
       <fieldset className={styles.group}>
         <legend className={styles.legend}>Who are your customers? <span className="optional">(optional)</span></legend>
+        <p className="field-hint">Helps us choose the wording and what to show first. Pick the one that fits best.</p>
         {chips(CUSTOMERS, p.customers, (v) => set({ customers: v }), "Customers")}
       </fieldset>
+
       <fieldset className={styles.group}>
         <legend className={styles.legend}>What should a visitor do first? <span className="optional">(optional)</span></legend>
+        <p className="field-hint">Pick one or more. The first one you pick becomes the main button on the site.</p>
         <div className="brief-chips" role="group" aria-label="First action">
           {(Object.keys(FIRST_ACTIONS) as FirstAction[]).map((a) => (
             <button key={a} type="button" className="brief-chip" aria-pressed={p.firstActions.includes(a)} onClick={() => toggleAction(a)}>
@@ -292,24 +302,34 @@ export function ProfileFields({ brief, onChange, errors }: { brief: WebsiteBrief
           ))}
         </div>
       </fieldset>
+
       <div className="field">
         <label htmlFor={`${id}-areas`}>Where do you work? <span className="optional">(optional)</span></label>
-        <input id={`${id}-areas`} className="input" maxLength={PROFILE_LIMITS.areas} value={p.areas} placeholder="For example: Leeds and within 20 miles" onChange={(e) => set({ areas: e.target.value })} />
+        <p className="field-hint">The places you cover, so people know if you can help them. Separate them with commas. For example: &quot;Leeds, Wakefield and within 20 miles&quot;.</p>
+        <input id={`${id}-areas`} className="input" maxLength={PROFILE_LIMITS.areas} value={p.areas} onChange={(e) => set({ areas: e.target.value })} />
       </div>
+
       <div className="field">
         <label htmlFor={`${id}-hours`}>Opening hours or availability <span className="optional">(optional)</span></label>
-        <input id={`${id}-hours`} className="input" maxLength={PROFILE_LIMITS.hours} value={p.hours} placeholder="For example: 7 days, 6am to 10pm, or by arrangement" onChange={(e) => set({ hours: e.target.value })} />
+        <p className="field-hint">Only what you&apos;re happy to show publicly. For example: &quot;24 hours a day&quot; or &quot;Mon to Fri 9am to 5pm, weekends by arrangement&quot;.</p>
+        <input id={`${id}-hours`} className="input" maxLength={PROFILE_LIMITS.hours} value={p.hours} onChange={(e) => set({ hours: e.target.value })} />
       </div>
+
       <div className="field">
         <label htmlFor={`${id}-about`}>About you and the business <span className="optional">(optional)</span></label>
-        <textarea id={`${id}-about`} className="textarea" rows={4} maxLength={PROFILE_LIMITS.about} value={p.about} placeholder="A few sentences: who runs it, how long you have done this, and why you started" onChange={(e) => set({ about: e.target.value })} />
+        <p className="field-hint">A few sentences in your own words: who runs it, how long you have done this, and what you care about. Only include what is true. We won&apos;t add anything you don&apos;t tell us.</p>
+        <textarea id={`${id}-about`} className="textarea" rows={4} maxLength={PROFILE_LIMITS.about} value={p.about} onChange={(e) => set({ about: e.target.value })} />
       </div>
+
       <div className="field">
-        <label htmlFor={`${id}-proof`}>Proof to show <span className="optional">(optional, only what is true)</span></label>
-        <input id={`${id}-proof`} className="input" maxLength={PROFILE_LIMITS.proof} value={p.proof} placeholder="For example: 10 years trading, fully licensed" onChange={(e) => set({ proof: e.target.value })} />
+        <label htmlFor={`${id}-proof`}>Proof to show <span className="optional">(optional)</span></label>
+        <p className="field-hint">Only facts you can back up, such as years trading, licences or memberships. Leave it blank if none apply.</p>
+        <input id={`${id}-proof`} className="input" maxLength={PROFILE_LIMITS.proof} value={p.proof} onChange={(e) => set({ proof: e.target.value })} />
       </div>
+
       <fieldset className={styles.group}>
         <legend className={styles.legend}>How should the site sound? <span className="optional">(optional)</span></legend>
+        <p className="field-hint">We match the wording to this. Pick the one closest to how you talk to customers.</p>
         {chips(TONES, p.tone, (v) => set({ tone: v }), "Tone")}
       </fieldset>
     </div>
