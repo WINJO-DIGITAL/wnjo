@@ -10,7 +10,7 @@ import {
   PHOTO_STYLES,
   PRICING_STYLES,
   ROLES,
-  cleanExtras,
+  EMPTY_EXTRAS,
   type BriefExtras,
   type Journey,
   type LegalPage,
@@ -30,7 +30,8 @@ type TextKey = "mainService" | "dontDo" | "existingPages" | "mustFind" | "wordsU
  */
 export function ExtraFields({ step, brief, onChange, bespoke = false }: { step: string; brief: WebsiteBrief; onChange: BriefChange; bespoke?: boolean }) {
   const id = useId();
-  const e = cleanExtras(brief.extras);
+  // Show exactly what the customer typed (spaces included). The text is trimmed when it is saved, not while they type.
+  const e: BriefExtras = { ...EMPTY_EXTRAS, ...brief.extras };
   const set = (patch: Partial<BriefExtras>) => onChange({ extras: { ...e, ...patch } });
 
   const chips = <K extends string>(options: Record<K, string>, value: K | "", onPick: (v: K | "") => void, label: string) => (
