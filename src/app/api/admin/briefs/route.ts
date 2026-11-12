@@ -17,7 +17,7 @@ import {
   type Stage,
 } from "@/lib/build-journey";
 import { notificationMailConfig, sendEmail } from "@/lib/mailer";
-import { previewReadyAgainEmail, proposalReadyEmail } from "@/lib/build-emails";
+import { handedOverEmail, previewReadyAgainEmail, proposalReadyEmail } from "@/lib/build-emails";
 import { revisionTransition, stageAfterResolve, type RevisionStatus } from "@/lib/build-revisions";
 import { serviceClient } from "@/lib/quote-store";
 import { staffFromRequest, type Staff } from "@/lib/staff-auth";
@@ -245,6 +245,37 @@ export async function POST(request: NextRequest) {
         const email = proposalReadyEmail({ name: brief.name, reference: proposal.reference, accountUrl: `${site.replace(/\/+$/, "")}/account` });
         await sendEmail(config, { to: brief.email, subject: email.subject, text: email.text }, "Proposal ready");
       }
+    }
+    return NextResponse.json({ ok: true });
+  }
+
+  if (body.action === "handover") {
+    // Handing a website over gives it away, so it needs the same standing as publishing one.
+    if (!canDecide(staff.role, "publication")) return fail(403, "Only an owner or admin can hand a website over.");
+    if (brief.route !== "proposal") return fail(422, "Only a website bought outright is handed over.");
+    const { data: dates } = await db.from("website_briefs").select("balance_paid_at, handed_over_at").eq("id", brief.id).maybeSingle();
+    const d = dates as { balance_paid_at: string | null; handed_over_at: string | null } | null;
+    if (!d?.balance_paid_at) return fail(409, "The final payment hasn't been received yet.");
+    if (d.handed_over_at) return fail(409, "This website has already been handed over.");
+    const message = note(body.note);
+    const { data: changed, error } = await db
+      .from("website_briefs")
+      .update({ handed_over_at: new Date().toISOString() })
+      .eq("id", brief.id)
+      .is("handed_over_at", null)
+      .select("id");
+    if (error || !changed?.length) return fail(409, "This website changed in the meantime. Refresh and try again.");
+    await logEvent(db, staff, brief.id, "note", { handover: "done", note: message });
+    // A website we don't host is finished once it's handed over; one we host goes live through the approvals as usual.
+    if (brief.stage !== "live") {
+      const { error: moveError } = await db.from("website_briefs").update({ stage: "closed" }).eq("id", brief.id).eq("stage", brief.stage);
+      if (!moveError) await logEvent(db, staff, brief.id, "stage", { from: brief.stage, to: "closed", note: "Handed over to the customer." });
+    }
+    const config = notificationMailConfig();
+    if (config) {
+      const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
+      const email = handedOverEmail({ name: brief.name, reference: brief.reference, accountUrl: `${site.replace(/\/+$/, "")}/account`, message });
+      await sendEmail(config, { to: brief.email, subject: email.subject, text: email.text }, "Website handed over");
     }
     return NextResponse.json({ ok: true });
   }

@@ -15,7 +15,7 @@ function builder(table: string) {
     return { data, error: null };
   };
   const b: Record<string, unknown> = {};
-  for (const m of ["select", "eq", "in", "limit", "order", "neq"]) b[m] = () => b;
+  for (const m of ["select", "eq", "in", "limit", "order", "neq", "is"]) b[m] = () => b;
   b.insert = (p: unknown) => ((op = "insert"), (payload = p), b);
   b.update = (p: unknown) => ((op = "update"), (payload = p), b);
   b.maybeSingle = async () => result();
@@ -105,3 +105,42 @@ describe("staff build actions", () => {
     expect(res.status).toBe(403);
   });
 });
+
+describe("handing over a website bought outright", () => {
+  const paid = () => {
+    tables.website_briefs = { ...(tables.website_briefs as object), balance_paid_at: "2026-11-20T10:00:00Z", handed_over_at: null };
+  };
+
+  it("is for an owner or admin only", async () => {
+    paid();
+    expect((await post({ action: "handover" })).status).toBe(403);
+    expect(writes).toEqual([]);
+  });
+
+  it("waits for the final payment", async () => {
+    role = "owner";
+    const res = await post({ action: "handover" });
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toMatch(/final payment/);
+    expect(writes).toEqual([]);
+  });
+
+  it("hands over once, records it, and closes a website we don't host", async () => {
+    role = "owner";
+    paid();
+    expect((await post({ action: "handover", note: "Your files are in the shared folder." })).status).toBe(200);
+    const updates = writes.filter((w) => w.table === "website_briefs" && w.op === "update").map((w) => w.payload as Record<string, unknown>);
+    expect(updates[0]).toHaveProperty("handed_over_at");
+    expect(updates[1]).toEqual({ stage: "closed" });
+    const events = writes.filter((w) => w.table === "website_brief_events").map((w) => w.payload as Record<string, unknown>);
+    expect(events[0]).toMatchObject({ kind: "note", detail: { handover: "done", note: "Your files are in the shared folder." } });
+  });
+
+  it("can't be done twice", async () => {
+    role = "owner";
+    tables.website_briefs = { ...(tables.website_briefs as object), balance_paid_at: "2026-11-20T10:00:00Z", handed_over_at: "2026-11-21T10:00:00Z" };
+    expect((await post({ action: "handover" })).status).toBe(409);
+    expect(writes).toEqual([]);
+  });
+});
+

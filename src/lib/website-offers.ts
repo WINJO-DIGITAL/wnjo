@@ -29,6 +29,8 @@ export type NewOffer = {
   overrides: OfferOverrides;
   /** The staff member who made it, or null when the customer did. */
   createdBy: string | null;
+  /** Names the offer on the receipt and in Stripe when it is not a package, such as the final payment on a one-off website. */
+  packageName?: string;
   /** Recorded in the snapshot when the customer agreed to the terms before paying. */
   consent?: { agreedAt: string; startNow?: boolean };
 };
@@ -50,7 +52,7 @@ export async function createOffer(db: SupabaseClient, input: NewOffer): Promise<
       business_name: input.businessName,
       enquiry_reference: input.enquiryReference,
       package_code: amounts.packageCode,
-      package_name: amounts.packageName,
+      package_name: input.packageName ?? amounts.packageName,
       setup_pence: amounts.setupPence,
       monthly_pence: amounts.monthlyPence,
       one_off_pence: amounts.oneOffPence,
@@ -73,5 +75,5 @@ export async function createOffer(db: SupabaseClient, input: NewOffer): Promise<
     console.error(`Could not create website subscription offer: ${error?.code ?? "unknown"}`);
     return null;
   }
-  return { id: (data as { id: string }).id, reference, token, amounts };
+  return { id: (data as { id: string }).id, reference, token, amounts: input.packageName ? { ...amounts, packageName: input.packageName } : amounts };
 }

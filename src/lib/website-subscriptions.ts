@@ -96,6 +96,7 @@ export function firstPaymentPence(offer: Pick<OfferAmounts, "kind" | "setupPence
 export function checkoutParams(
   offer: OfferAmounts & { id: string; reference: string; email: string },
   urls: { success: string; cancel: string },
+  extraMetadata: Record<string, string> = {},
 ): URLSearchParams {
   const p = new URLSearchParams({
     customer_email: offer.email,
@@ -108,6 +109,8 @@ export function checkoutParams(
     // Every payment is in pounds: no automatic conversion into the customer's own currency.
     "adaptive_pricing[enabled]": "false",
   });
+  // Set by our server only (for example the final payment on a website bought outright), never taken from the browser.
+  for (const [key, value] of Object.entries(extraMetadata)) p.set(`metadata[${key}]`, value);
   if (offer.kind === "subscription") {
     p.set("mode", "subscription");
     p.set("line_items[0][quantity]", "1");

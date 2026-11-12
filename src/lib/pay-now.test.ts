@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { advanceAfterPayment, markAwaitingPayment, PAYABLE_FROM } from "./brief-payment";
 import { payLinkEmail } from "./website-emails";
-import { proposalPayNowFor } from "./pay-now";
+import { balancePenceFor, proposalPayNowFor } from "./pay-now";
 import { DEFAULT_WEBSITE_ANSWERS, websiteQuote } from "./website-quote";
 import { ONE_OFF_DEPOSIT_SHARE, firstPaymentPence, offerFromQuote, payNowFor, proposalOverrides } from "./website-subscriptions";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -150,5 +150,19 @@ describe("every payment is in pounds", () => {
     expect(one.get("adaptive_pricing[enabled]")).toBe("false");
     expect(sub.get("line_items[0][price_data][currency]")).toBe("gbp");
     expect(one.get("line_items[0][price_data][currency]")).toBe("gbp");
+  });
+});
+
+describe("balancePenceFor", () => {
+  it("is the rest of the agreed price after the 50% deposit, so the two parts always add up", () => {
+    for (const total of [100000, 250001, 99999, 1, 123457]) {
+      const deposit = proposalPayNowFor("oneOff", { setup_pence: 0, monthly_pence: 0, one_off_pence: total }).pence;
+      expect(deposit + balancePenceFor(total)).toBe(total);
+    }
+    expect(balancePenceFor(100000)).toBe(50000);
+  });
+
+  it("is never negative", () => {
+    expect(balancePenceFor(0)).toBe(0);
   });
 });

@@ -33,6 +33,8 @@ type BriefRow = {
   brief: WebsiteBrief;
   figures: { package?: string; mode?: string; monthly?: number; setup?: number; oneOffTotal?: number; requiresQuote?: boolean; quoteReasons?: string[] };
   expected_by: string | null;
+  balance_paid_at: string | null;
+  handed_over_at: string | null;
   created_at: string;
 };
 type EventRow = { id: string; kind: string; detail: Record<string, unknown>; actor_type: string; actor_email: string | null; created_at: string };
@@ -69,7 +71,7 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   const load = useCallback(() => {
     client
       .from("website_briefs")
-      .select("id, reference, name, business_name, email, route, stage, version, brief, figures, expected_by, created_at")
+      .select("id, reference, name, business_name, email, route, stage, version, brief, figures, expected_by, balance_paid_at, handed_over_at, created_at")
       .order("created_at", { ascending: false })
       .limit(200)
       .then(({ data, error: err }) => {
@@ -304,6 +306,10 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
             <ProposalPanel key={proposals.map((p) => `${p.id}:${p.status}`).join()} proposals={proposals} busy={busy} act={act} />
           )}
 
+          {row.route === "proposal" && row.figures.mode === "oneOff" && accepted && (
+            <HandoverPanel key={`${row.balance_paid_at ?? ""}:${row.handed_over_at ?? ""}`} row={row} busy={busy} act={act} />
+          )}
+
           {row.stage === "awaiting_payment" && (
             <div>
               <p className="admin-label">Payment link</p>
@@ -334,6 +340,32 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
         </div>
       </div>
     </section>
+  );
+}
+
+function HandoverPanel({ row, busy, act }: { row: BriefRow; busy: boolean; act: (p: Record<string, unknown>, done: string) => Promise<boolean> }) {
+  const [message, setMessage] = useState("");
+  const day = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  return (
+    <div>
+      <p className="admin-label">Final payment and handover</p>
+      {row.handed_over_at ? (
+        <p className="acct-meta">Handed over on {day(row.handed_over_at)}.</p>
+      ) : row.balance_paid_at ? (
+        <>
+          <p className="acct-meta">Final payment received on {day(row.balance_paid_at)}. Add where the files and domain details are, then hand the website over. It emails the customer. Owner or admin only.</p>
+          <label className="acct-label" htmlFor={`handover-${row.id}`}>
+            Message to the customer <span className="optional">(optional)</span>
+          </label>
+          <textarea id={`handover-${row.id}`} className="acct-input" rows={3} maxLength={2000} value={message} onChange={(e) => setMessage(e.target.value)} />
+          <button type="button" className="btn btn--primary" disabled={busy} onClick={() => void act({ action: "handover", note: message }, "Website handed over. The customer has been emailed.")}>
+            Hand over website
+          </button>
+        </>
+      ) : (
+        <p className="acct-meta">Waiting for the customer to approve the website and pay the final 50%.</p>
+      )}
+    </div>
   );
 }
 

@@ -44,6 +44,14 @@ describe("buy-outright acknowledgement", () => {
     expect(m.text).toContain("Nothing is charged until you have read and accepted that proposal.");
     expect(m.text).toContain("50% deposit");
   });
+
+  it("leads with the details form: sign in, no page limit, nothing to pay yet", () => {
+    const m = projectAcknowledgement({ reference: "WNJO-ABC123", details, siteUrl: "https://example.test/" });
+    expect(m.subject).toContain("tell us about your website");
+    expect(m.text).toContain("https://example.test/account");
+    expect(m.text).toContain("no limit on pages");
+    expect(m.text.indexOf("YOUR NEXT STEP")).toBeLessThan(m.text.indexOf("WHAT HAPPENS NEXT"));
+  });
 });
 
 describe("who the reminder looks at", () => {

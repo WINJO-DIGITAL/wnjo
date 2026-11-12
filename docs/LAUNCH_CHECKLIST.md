@@ -76,7 +76,8 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 - [x] **Owner email after payment:** pay a plan in Stripe test mode and confirm exactly one owner email arrives, after the payment ("New … subscription"), and none when the form is submitted. Confirmed by the owner: the owner gets an email after payment.
 - [x] **Customer emails after payment:** pay a plan in Stripe test mode and confirm the customer gets only the welcome email, with no "Your website is waiting" email and no "Tell us about your website" reminder for a day or until the goals form is filled in. Confirmed by the owner: the customer gets an email after payment.
 - [x] **Goals email right after payment:** test payment WS-1C9980 (12 Nov). The "Thank you. Now tell us about your website" email arrived at 19:01, the same minute as the payment. It links to the account page; it doesn't contain a one-time sign-in link. Owner confirmed.
-- [ ] **Buy-outright request:** submit one end to end and check the proposal route in the staff admin.
+- [ ] **Buy-outright flow, rebuilt (12 Nov):** the customer sends a short request, then the account details form (no page limit); staff quote; the customer accepts or asks for changes; 50% deposit by Stripe; two revision rounds; the customer approves the website and pays the balance by Stripe; staff hand it over. Apply migration `20261112200000_website_balance_handover.sql` first. Then test end to end on a Stripe test payment, from the request through to the handover email.
+
 - [x] **Production builds:** checked on the live site for `4a82cb4`. The Winjo Refresh photos and "Own your website" wording are being served. Winjo Refresh and pricing look right on a phone (390px) and a desktop (1280px), with no sideways overflow and no page errors.
 
 ### Known issues, not fixed

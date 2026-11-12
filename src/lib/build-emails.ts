@@ -49,3 +49,23 @@ export function previewReadyEmail(args: { name: string; reference: string; accou
     ].join("\n"),
   };
 }
+
+/** Staff have handed the website over once the final payment was in. `message` is what staff add: where the files are, the domain. */
+export function handedOverEmail(args: { name: string; reference: string; accountUrl: string; message?: string }): { subject: string; text: string } {
+  return {
+    subject: `Your website is handed over [${args.reference}]`,
+    text: [
+      `Hi ${first(args.name)},`,
+      "",
+      "Your final payment is in, and your website is now handed over to you, as set out in our terms.",
+      ...(args.message ? ["", args.message] : []),
+      "",
+      "You own your domain name and the content you gave us, and you can see everything we built in your account:",
+      args.accountUrl,
+      "",
+      "If you'd like us to look after it for you, or you need anything else, just reply to this email.",
+      "",
+      "WINJO DIGITAL",
+    ].join("\n"),
+  };
+}

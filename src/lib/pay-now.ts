@@ -39,3 +39,14 @@ export function proposalPayNowFor(
   if (mode === "monthly") return { kind: "first_payment", pence: agreed.setup_pence + agreed.one_off_pence + agreed.monthly_pence };
   return { kind: "deposit", pence: Math.round(agreed.one_off_pence * ONE_OFF_DEPOSIT_SHARE) };
 }
+
+/**
+ * What is still to pay on a one-off website once the deposit is in: the agreed price minus the deposit, which is
+ * 50% rounded as `proposalPayNowFor` rounds it, so the two parts always add up to the agreed price exactly.
+ */
+export function balancePenceFor(agreedOneOffPence: number): number {
+  return Math.max(0, agreedOneOffPence - Math.round(agreedOneOffPence * ONE_OFF_DEPOSIT_SHARE));
+}
+
+/** The name of the Stripe line and offer row for the final payment, which the webhook and the balance route both use. */
+export const BALANCE_PACKAGE_NAME = "Final payment for your website";

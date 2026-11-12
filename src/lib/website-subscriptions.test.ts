@@ -130,7 +130,7 @@ type Tables = Record<string, Record<string, unknown>[]>;
 /** Just enough of the Supabase query builder for the handler: select/update/upsert with eq/neq filters. */
 function fakeDb(tables: Tables): SupabaseClient {
   class Query {
-    private filters: [string, string, unknown][] = [];
+    private filters: ["eq" | "neq" | "is", string, unknown][] = [];
     private op: "select" | "update" | "upsert" | "insert" = "select";
     private payload: Record<string, unknown> = {};
     private conflict = "";
@@ -164,9 +164,13 @@ function fakeDb(tables: Tables): SupabaseClient {
       this.filters.push(["neq", k, v]);
       return this;
     }
+    is(k: string, v: unknown) {
+      this.filters.push(["is", k, v]);
+      return this;
+    }
     private rows() {
       return (tables[this.table] ??= []).filter((r) =>
-        this.filters.every(([op, k, v]) => (op === "eq" ? r[k] === v : r[k] !== v)),
+        this.filters.every(([op, k, v]) => (op === "eq" ? r[k] === v : op === "is" ? (r[k] ?? null) === v : r[k] !== v)),
       );
     }
     private run(): { data: unknown; error: null } {
@@ -321,6 +325,45 @@ describe("subscription webhooks", () => {
     expect(row.status).toBe("paid");
     expect(tables.website_subscription_payments).toHaveLength(1);
     expect(deps.emailCustomer).toHaveBeenCalledTimes(1);
+  });
+
+  describe("the final payment on a website bought outright", () => {
+    const BALANCE = "Final payment for your website";
+    const balance = () => {
+      const s = setup({ kind: "one_off", monthly_pence: 0, setup_pence: 0, one_off_pence: 125000, package_name: BALANCE, enquiry_reference: "WNJO-ABC123" });
+      s.tables.website_briefs = [{ id: "b1", tenant_id: "t1", reference: "WNJO-ABC123", route: "proposal", stage: "approval" }];
+      s.tables.website_brief_events = [];
+      return s;
+    };
+    const paidBalance = { type: "checkout.session.completed", data: { object: { id: "cs_bal", payment_status: "paid", amount_total: 125000, currency: "gbp", payment_intent: "pi_bal", metadata: { website_subscription_id: "sub-1", payment_part: "balance" } } } };
+
+    it("marks the website's balance paid, tells the customer and staff once, and leaves the stage alone", async () => {
+      const { db, deps, tables, row } = balance();
+      expect(await handleWebsiteSubscriptionEvent(db, paidBalance, deps)).toBe("handled");
+      await handleWebsiteSubscriptionEvent(db, paidBalance, deps);
+      expect(row.status).toBe("paid");
+      expect(tables.website_briefs[0].balance_paid_at).toEqual(expect.any(String));
+      expect(tables.website_briefs[0].stage).toBe("approval");
+      expect(deps.emailCustomer).toHaveBeenCalledTimes(1);
+      expect(deps.emailCustomer).toHaveBeenCalledWith("ada@example.com", expect.objectContaining({ subject: expect.stringContaining("Final payment received") }));
+      expect(deps.alertStaff).toHaveBeenCalledWith("Final payment received", expect.stringContaining("hand the website over"));
+      expect(tables.website_brief_events).toHaveLength(1);
+    });
+
+    it("is not mistaken for the first payment: no details email and no move back to the plan", async () => {
+      const { db, deps, tables } = balance();
+      await handleWebsiteSubscriptionEvent(db, paidBalance, deps);
+      expect(deps.emailCustomer).not.toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ subject: expect.stringContaining("tell us about your website") }));
+      expect(tables.website_briefs[0].stage).toBe("approval");
+    });
+
+    it("refuses a balance that doesn't match the offer", async () => {
+      const { db, deps, tables } = balance();
+      const wrong = { ...paidBalance, data: { object: { ...paidBalance.data.object, amount_total: 100 } } };
+      await handleWebsiteSubscriptionEvent(db, wrong, deps);
+      expect(tables.website_briefs[0].balance_paid_at).toBeUndefined();
+      expect(deps.alertStaff).toHaveBeenCalledWith("Website payment does not match the offer", expect.any(String));
+    });
   });
 
   describe("moving the customer's build on after the first payment", () => {

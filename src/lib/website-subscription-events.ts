@@ -1,6 +1,7 @@
 import { KIND_LABEL, cancelTransition, cancellationReason, logSubscriptionEvent, needsStaffAlert } from "@/lib/subscription-cancellation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  balanceReceivedEmail,
   cancelledEmail,
   oneOffPaidEmail,
   ownershipEmail,
@@ -94,6 +95,27 @@ async function briefNeedsDetails(db: SupabaseClient, tenantId: string, enquiryRe
   if (error) return true;
   const goals = (data as { brief?: { goals?: unknown } } | null)?.brief?.goals;
   return !(Array.isArray(goals) && goals.length > 0);
+}
+
+/**
+ * The final payment on a website bought outright: records the date on the brief, once. Safe to run again for the same
+ * payment. Returns "error" when the database failed, so the webhook asks Stripe to retry.
+ */
+async function markBalancePaid(db: SupabaseClient, row: Row): Promise<"ok" | "error"> {
+  if (!row.enquiry_reference) return "ok";
+  const { data, error } = await db
+    .from("website_briefs")
+    .update({ balance_paid_at: new Date().toISOString() })
+    .eq("tenant_id", row.tenant_id)
+    .eq("reference", row.enquiry_reference)
+    .is("balance_paid_at", null)
+    .select("id");
+  if (error) return "error";
+  const id = (data as { id: string }[] | null)?.[0]?.id;
+  if (id) {
+    await db.from("website_brief_events").insert({ tenant_id: row.tenant_id, brief_id: id, kind: "note", detail: { balance: "paid", reference: row.reference }, actor_type: "system" });
+  }
+  return "ok";
 }
 
 async function findRow(db: SupabaseClient, by: { id?: string | null; subscriptionId?: string | null }): Promise<Row | null | "error"> {
@@ -216,6 +238,19 @@ export async function handleWebsiteSubscriptionEvent(
     if (error) return "retry";
     const counts = await refreshCounts(db, row);
     if (counts === "error") return "retry";
+    // The final payment on a website bought outright. Set by our own checkout, so it can't come from the browser.
+    // It never moves the build's stage and never asks for the goals again.
+    if (str(meta(obj).payment_part) === "balance") {
+      if ((await markBalancePaid(db, row)) === "error") return "retry";
+      if (recorded) {
+        await deps.emailCustomer(row.email, balanceReceivedEmail(facts(row)));
+        await deps.alertStaff(
+          "Final payment received",
+          `${row.reference}: ${row.name} paid the final ${amount / 100} GBP for ${row.enquiry_reference ?? "their website"}. Next: hand the website over in Admin, Website builds.`,
+        );
+      }
+      return "handled";
+    }
     if (recorded) {
       const needsDetails = await briefNeedsDetails(db, row.tenant_id, row.enquiry_reference);
       await deps.emailCustomer(row.email, oneOffPaidEmail({ ...facts(row), needsDetails }));

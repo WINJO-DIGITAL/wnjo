@@ -52,16 +52,21 @@ export function projectAcknowledgement(args: { reference: string; details: Websi
     "",
     `Thank you for asking us to build your website. Your reference is ${reference}.`,
     "",
+    "YOUR NEXT STEP",
+    "Tell us about your website. Sign in with this email address and answer a few questions about your business, the pages you need and the style you like. There's no limit on pages, and nothing to pay yet:",
+    `${siteUrl.replace(/\/+$/, "")}/account`,
+    "",
     "WHAT HAPPENS NEXT",
-    "We'll review what you've told us and reply within one working day with a written proposal and a fixed price.",
+    "We read what you send and write you a fixed-price proposal, in your account and by email.",
     "Nothing is charged until you have read and accepted that proposal.",
-    "When you accept, the first payment is a 50% deposit. The rest is due as set out in the proposal.",
+    "When you accept, the first payment is a 50% deposit and we start building. You can ask for changes as we go.",
+    "When you're happy, you approve your website and pay the rest, and it's yours.",
     "",
     `Questions? Reply to this email, or see ${siteUrl.replace(/\/+$/, "")}/website-projects`,
     "",
     "WINJO DIGITAL",
   ].join("\n");
-  return { subject: `Your website project request [${reference}]`, text };
+  return { subject: `Thank you. Now tell us about your website [${reference}]`, text };
 }
 
 export function customerAcknowledgement(args: {
@@ -304,6 +309,23 @@ export function oneOffPaidEmail(f: SubscriptionEmailFacts): { subject: string; t
       `Your payment of ${gbpPence(f.oneOffPence)} has arrived.`,
       "",
       ...(f.needsDetails === false ? ["We already have your details, and we'll be in touch within one working day to begin."] : detailsStep(f)),
+      "",
+      "Stripe emails you a receipt for the payment.",
+      ...sign,
+    ].join("\n"),
+  };
+}
+
+/** The final payment on a website bought outright has arrived. Handover comes from staff, so it says what happens next. */
+export function balanceReceivedEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
+  return {
+    subject: `Final payment received [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `Your final payment of ${gbpPence(f.oneOffPence)} has arrived. Thank you.`,
+      "",
+      "We'll check everything one last time, then hand your website over to you. We'll email you as soon as it's yours, with what you need to know.",
       "",
       "Stripe emails you a receipt for the payment.",
       ...sign,

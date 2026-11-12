@@ -56,13 +56,21 @@ export function ProjectRequest({ pages, care }: { pages?: string; care?: string 
             Thank you, {details.name.trim().split(/\s+/)[0]}.
           </h2>
           <p className="muted">
-            We&apos;ll email <strong>{details.email}</strong> a written proposal within one working day. Nothing is charged until you accept it.
-            Your reference is <strong>{state.reference}</strong>.
+            Next, tell us about your website. Sign in at <strong>{details.email}</strong> and answer a few questions. There&apos;s no page limit and nothing to pay yet. Your reference is{" "}
+            <strong>{state.reference}</strong>.
           </p>
+          <ol className="steps4" aria-label="What happens next">
+            {["Send your brief", "Review our quote", "Pay 50% and we build", "Approve and pay the rest"].map((label, i) => (
+              <li key={label} className={i === 0 ? "is-current" : undefined}>
+                <span className="steps4__bar" />
+                <span className="steps4__label">{label}</span>
+              </li>
+            ))}
+          </ol>
           <div className="btn-row">
             {state.tracked && (
               <Link href="/account" className="btn btn--primary">
-                Track my website
+                Tell us about your website
               </Link>
             )}
             <Link href="/work" className="btn btn--secondary">
@@ -115,7 +123,7 @@ export function ProjectRequest({ pages, care }: { pages?: string; care?: string 
         )}
         <div className="btn-row">
           <button type="submit" className="btn btn--primary" disabled={state.status === "submitting"}>
-            {state.status === "submitting" ? "Sending…" : "Get my proposal"}
+            {state.status === "submitting" ? "Sending…" : "Send my request"}
           </button>
           <Link href="/contact?topic=website" className="btn btn--secondary">
             Talk to us first

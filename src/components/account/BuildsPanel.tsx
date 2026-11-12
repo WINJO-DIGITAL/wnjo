@@ -5,13 +5,14 @@ import { PORTAL_STEPS, nextStepFor, portalStepIndex } from "@/lib/portal-steps";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { STAGES, progressIndex, stagePath, type ProposalLine, type ProposalStatus, type Route, type Stage } from "@/lib/build-journey";
 import type { RevisionRow } from "@/lib/build-revisions";
-import { proposalPayNowFor } from "@/lib/pay-now";
+import { balancePenceFor, proposalPayNowFor } from "@/lib/pay-now";
 import { GOALS, STYLES, cleanBrief, type WebsiteBrief } from "@/lib/website-brief";
 import type { Progress } from "@/lib/brief-progress";
 import { UNNAMED } from "@/lib/website-enquiry";
 import { BriefWizard, type WizardApi } from "./BriefWizard";
 import { Confirmation } from "./Confirmation";
 import { FeedbackCard } from "./FeedbackCard";
+import { PayBalanceCard } from "./PayBalanceCard";
 import { PayCard } from "./PayCard";
 
 type Brief = {
@@ -24,6 +25,8 @@ type Brief = {
   brief: WebsiteBrief;
   figures: { package?: string; mode?: string };
   expected_by: string | null;
+  balance_paid_at: string | null;
+  handed_over_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -58,7 +61,7 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
   useEffect(() => {
     let cancelled = false;
     void Promise.all([
-      client.from("website_briefs").select("id, reference, name, business_name, route, stage, brief, figures, expected_by, created_at, updated_at").order("created_at", { ascending: false }),
+      client.from("website_briefs").select("id, reference, name, business_name, route, stage, brief, figures, expected_by, balance_paid_at, handed_over_at, created_at, updated_at").order("created_at", { ascending: false }),
       client.from("website_brief_events").select("brief_id, kind, detail, created_at").order("created_at"),
       client.from("website_proposals").select("id, brief_id, reference, status, summary, lines, setup_pence, monthly_pence, one_off_pence").order("created_at", { ascending: false }),
       client.from("build_revisions").select("id, brief_id, number, status, request, response, created_at, resolved_at").order("number"),
@@ -135,6 +138,9 @@ function BuildCard({
     ? { title: "Tell us about your website", body: "Your goals, pages and style. We start designing as soon as you send them.", action: true, tab: "overview" as const, cta: null }
     : nextStepFor({ stage: brief.stage, route: brief.route, proposalSent: Boolean(proposal) });
   const showPay = brief.route === "proposal" && brief.stage === "awaiting_payment" && accepted;
+  // A website bought outright: after the customer approves it, the rest of the price is due, then we hand it over.
+  const outright = brief.route === "proposal" && brief.figures.mode === "oneOff" && Boolean(accepted && accepted.one_off_pence > 0);
+  const showBalance = outright && ["approval", "live"].includes(brief.stage) && !brief.balance_paid_at;
   const canChange = ["preview", "changes", "approval", "live"].includes(brief.stage) || revisions.length > 0;
   const showPreview = ["preview", "changes", "approval"].includes(brief.stage);
   const tabs = [
@@ -219,6 +225,11 @@ function BuildCard({
             {needsDetails && detailsSaved && <DetailsThanks name={brief.name} onContinue={onChanged} />}
             {proposal && <ProposalCard client={client} proposal={proposal} mode={brief.figures.mode === "oneOff" ? "oneOff" : "monthly"} onChanged={onChanged} />}
             {showPay && <PayCard client={client} briefId={brief.id} payNow={proposalPayNowFor(brief.figures.mode === "oneOff" ? "oneOff" : "monthly", accepted)} />}
+            {showBalance && accepted && <PayBalanceCard client={client} briefId={brief.id} pence={balancePenceFor(accepted.one_off_pence)} />}
+            {outright && brief.balance_paid_at && !brief.handed_over_at && (
+              <p className="build-card__meta">Your final payment is in. We&apos;re getting your website ready to hand over to you.</p>
+            )}
+            {outright && brief.handed_over_at && <p className="build-card__meta">Your website has been handed over to you.</p>}
             {!proposal && !showPay && brief.brief.goals.length > 0 && (
               <p className="build-card__meta">Built for {brief.brief.goals.map((g) => GOALS[g]?.label).filter(Boolean).join(", ")}</p>
             )}
