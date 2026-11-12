@@ -52,7 +52,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 
 ## Decisions needed from the owner
 - [x] ICO data protection fee: registered and Direct Debit set up (owner, 12 Nov). Application number C2085772. The ICO sends the registration confirmation within three working days, with the registration number.
-- [ ] Once the ICO registration number arrives, add it to the privacy page (the page currently only names the ICO as where to complain).
+- [x] ICO registration number on the privacy page: done for now. The owner will pass on the number from the ICO's confirmation email, and it goes on the privacy page then.
 - [x] Privacy note: the 30-day retention of unsent briefs is on the privacy page.
 - [x] Ownership line when due: "Ownership is available to you now. Message us whenever you'd like to talk it through."
 - [x] Ending care: message only.
