@@ -29,15 +29,17 @@ export async function POST(request: NextRequest) {
   const owner = brief as { id: string; email: string } | null;
   if (!owner || owner.email.toLowerCase() !== customer.email) return fail(404, "not_found");
 
-  const { data } = await db
-    .from("website_previews")
-    .select("access_token")
-    .eq("brief_id", owner.id)
-    .eq("status", "released")
-    .order("version", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  const token = (data as { access_token: string } | null)?.access_token;
-  if (!token) return fail(404, "not_found");
-  return NextResponse.json({ url: `${new URL(request.url).origin}/preview/${token}` });
+  // The newest released version wins, whether it is a words-only preview or a template build.
+  const latest = (table: "website_previews" | "website_site_builds") =>
+    db.from(table).select("access_token, released_at").eq("brief_id", owner.id).eq("status", "released").order("released_at", { ascending: false }).limit(1).maybeSingle();
+  const [preview, site] = await Promise.all([latest("website_previews"), latest("website_site_builds")]);
+  type Released = { access_token: string; released_at: string | null };
+  const candidates = [
+    preview.data ? { ...(preview.data as Released), path: "preview" } : null,
+    site.data ? { ...(site.data as Released), path: "site-preview" } : null,
+  ].filter((c): c is Released & { path: string } => c !== null);
+  candidates.sort((a, b) => (b.released_at ?? "").localeCompare(a.released_at ?? ""));
+  const pick = candidates[0];
+  if (!pick) return fail(404, "not_found");
+  return NextResponse.json({ url: `${new URL(request.url).origin}/${pick.path}/${pick.access_token}` });
 }

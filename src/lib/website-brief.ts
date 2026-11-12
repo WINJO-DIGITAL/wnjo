@@ -7,6 +7,9 @@
  * row in website_briefs, so the history of what the customer asked for is never overwritten.
  */
 
+import { cleanSiteAnswers, type SiteAnswers } from "@/lib/site-template/answers";
+import { SECTOR_PRESETS } from "@/lib/site-template/presets";
+
 export const BRIEF_VERSION = 1;
 
 /** What the website is for. The customer picks one or more; the first one chosen is treated as the main goal. */
@@ -88,6 +91,8 @@ export type WebsiteBrief = {
   avoid: string;
   functionality: string;
   files: BriefFile[];
+  /** The sector questions for a template site. Null when the customer hasn't answered them. */
+  site: SiteAnswers | null;
 };
 
 export const EMPTY_BRIEF: WebsiteBrief = {
@@ -100,6 +105,7 @@ export const EMPTY_BRIEF: WebsiteBrief = {
   avoid: "",
   functionality: "",
   files: [],
+  site: null,
 };
 
 /** A random id for this browser's draft. Uploads sit under it until the brief is sent. */
@@ -200,6 +206,7 @@ export function cleanBrief(input: unknown, draftId?: string): WebsiteBrief {
     avoid: text(o.avoid, BRIEF_LIMITS.avoid),
     functionality: text(o.functionality, BRIEF_LIMITS.functionality),
     files,
+    site: cleanSiteAnswers(o.site, Object.keys(SECTOR_PRESETS)),
   };
 }
 
@@ -236,6 +243,7 @@ export function formatBrief(brief: WebsiteBrief): string {
     ...(brief.references.length ? [`Websites they like: ${brief.references.join(" , ")}`] : []),
     ...(brief.avoid ? [`Avoid: ${brief.avoid}`] : []),
     ...(brief.functionality ? [`Functionality: ${brief.functionality}`] : []),
+    ...(brief.site ? [`Template site: ${SECTOR_PRESETS[brief.site.sector]?.label ?? brief.site.sector}, ${brief.site.answers.businessName || "no name yet"}`] : []),
     `Files: ${brief.files.length ? brief.files.map((f) => `${f.name} (${kb(f.size)})`).join(", ") : "none"}`,
   ];
   return lines.join("\n");

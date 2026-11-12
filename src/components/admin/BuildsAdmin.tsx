@@ -606,6 +606,7 @@ function ExpectedDate({ row, busy, act }: { row: BriefRow; busy: boolean; act: (
 }
 
 type AiPlanRow = { id: string; version: number; cost_pence: number; model: string; created_at: string };
+type AiSiteBuildRow = { id: string; version: number; status: "draft" | "released" | "withdrawn"; checks_ok: boolean; change_note: string; cost_pence: number; model: string; created_at: string };
 type AiPreviewRow = { id: string; version: number; status: "draft" | "released" | "withdrawn"; change_note: string; cost_pence: number; model: string; created_at: string };
 
 const pence = (n: number) => `£${(n / 100).toFixed(2)}`;
@@ -617,6 +618,8 @@ const pence = (n: number) => `£${(n / 100).toFixed(2)}`;
 function AiPanel({ client, row, revisions, call, onChanged }: { client: SupabaseClient; row: BriefRow; revisions: RevisionRow[]; call: Call; onChanged: () => void }) {
   const [plans, setPlans] = useState<AiPlanRow[]>([]);
   const [previews, setPreviews] = useState<AiPreviewRow[]>([]);
+  const [siteBuilds, setSiteBuilds] = useState<AiSiteBuildRow[]>([]);
+  const [siteChange, setSiteChange] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [change, setChange] = useState("");
@@ -627,10 +630,12 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
     void Promise.all([
       client.from("website_plans").select("id, version, cost_pence, model, created_at").eq("brief_id", row.id).order("version", { ascending: false }),
       client.from("website_previews").select("id, version, status, change_note, cost_pence, model, created_at").eq("brief_id", row.id).order("version", { ascending: false }),
-    ]).then(([p, v]) => {
+      client.from("website_site_builds").select("id, version, status, checks_ok, change_note, cost_pence, model, created_at").eq("brief_id", row.id).order("version", { ascending: false }),
+    ]).then(([p, v, sb]) => {
       if (cancelled) return;
       setPlans((p.data as AiPlanRow[]) ?? []);
       setPreviews((v.data as AiPreviewRow[]) ?? []);
+      setSiteBuilds((sb.data as AiSiteBuildRow[]) ?? []);
     });
     return () => {
       cancelled = true;
@@ -654,6 +659,17 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
     const r = await call({ action: "link", previewId }, "/api/admin/ai/website");
     if (r.ok && typeof r.json.url === "string") window.open(r.json.url, "_blank", "noopener,noreferrer");
     else setMessage({ ok: false, text: "The preview couldn't be opened." });
+  };
+
+  const openSiteBuild = async (buildId: string) => {
+    const r = await call({ action: "site-link", buildId }, "/api/admin/ai/website");
+    if (r.ok && typeof r.json.url === "string") window.open(r.json.url, "_blank", "noopener,noreferrer");
+    else setMessage({ ok: false, text: "The build couldn't be opened." });
+  };
+
+  const releaseSite = (b: AiSiteBuildRow) => {
+    if (!b.checks_ok && !window.confirm("This build failed the automatic checks. Release it to the customer anyway?")) return;
+    void run(`release-site-${b.id}`, { action: "site-release", buildId: b.id, override: !b.checks_ok }, "Released to the customer.");
   };
 
   const openChanges = revisions.filter((r) => r.status === "open" || r.status === "in_progress");
@@ -687,6 +703,46 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
             </label>
           )}
           {latestPlan && <p className="acct-meta">Plan {latestPlan.version} · {pence(latestPlan.cost_pence)} · {latestPlan.model}</p>}
+          {siteBuilds.length > 0 && (
+            <div className="stack" style={{ "--stack": "var(--space-2)" } as React.CSSProperties}>
+              <p className="admin-label">Template site</p>
+              <label className="acct-label">
+                Change for the next version
+                <input className="acct-input" value={siteChange} maxLength={1000} onChange={(e) => setSiteChange(e.target.value)} />
+              </label>
+              <div className="admin-actions">
+                <button type="button" className="btn btn--secondary" disabled={busy !== null} onClick={() => void run("site", { action: "site", briefId: row.id, change: siteChange || undefined }, "Site written again.")}>
+                  {busy === "site" ? "Writing…" : "Write it again"}
+                </button>
+              </div>
+              <ul className="build-revisions" role="list">
+                {siteBuilds.map((b) => (
+                  <li key={b.id}>
+                    <p className="build-revision__head">
+                      <strong>Site {b.version}</strong>
+                      <span className="build-revision__status">{b.status === "released" ? "With the customer" : b.status === "draft" ? "Draft" : "Withdrawn"}</span>
+                      {!b.checks_ok && <span className="build-revision__status">Failed checks</span>}
+                      <span className="acct-meta">{pence(b.cost_pence)}</span>
+                    </p>
+                    {b.change_note && <p className="acct-meta">Change: {b.change_note}</p>}
+                    <div className="admin-actions">
+                      <button type="button" className="linkbtn" onClick={() => void openSiteBuild(b.id)}>View</button>
+                      {b.status === "draft" && (
+                        <button type="button" className="btn btn--secondary" disabled={busy !== null} onClick={() => releaseSite(b)}>
+                          Release to the customer
+                        </button>
+                      )}
+                      {b.status === "released" && (
+                        <button type="button" className="btn btn--secondary" disabled={busy !== null} onClick={() => void run(`withdraw-site-${b.id}`, { action: "site-withdraw", buildId: b.id }, "Taken back.")}>
+                          Withdraw
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {previews.length > 0 && (
             <ul className="build-revisions" role="list">
               {previews.map((p) => (

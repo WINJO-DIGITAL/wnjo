@@ -117,3 +117,17 @@ describe("formatBrief", () => {
     expect(text).toContain("logo.png (2 KB)");
   });
 });
+
+describe("the template site answers in a brief", () => {
+  it("are kept when the sector is known, and dropped when it isn't", () => {
+    const kept = cleanBrief({ goals: ["bookings"], site: { sector: "barber", answers: { businessName: "Hartley & Sons" } } });
+    expect(kept.site).toMatchObject({ sector: "barber", answers: { businessName: "Hartley & Sons" } });
+    expect(cleanBrief({ site: { sector: "plumber", answers: {} } }).site).toBeNull();
+    expect(cleanBrief({}).site).toBeNull();
+  });
+
+  it("show in the plain-text brief", () => {
+    const text = formatBrief({ ...EMPTY_BRIEF, site: { sector: "barber", answers: { businessName: "Hartley & Sons" } } });
+    expect(text).toContain("Template site: Barber, Hartley & Sons");
+  });
+});

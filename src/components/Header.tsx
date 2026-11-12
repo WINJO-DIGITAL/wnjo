@@ -639,7 +639,7 @@ function SiteHeader() {
 export function Header() {
   const pathname = usePathname();
   // A private preview shows the customer's website, not ours.
-  if (pathname.startsWith("/preview/")) return null;
+  if (pathname.startsWith("/preview/") || pathname.startsWith("/site-preview/")) return null;
   if (pathname === "/admin" || pathname.startsWith("/admin/")) return <DashboardHeader variant="staff" />;
   if (pathname === "/account" || pathname.startsWith("/account/")) return <DashboardHeader variant="customer" />;
   return <SiteHeader />;

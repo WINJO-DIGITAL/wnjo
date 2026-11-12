@@ -146,3 +146,43 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
     },
   };
 }
+
+/** What a brief stores for a template site: the sector and the answers, cleaned so the stored copy is always bounded. */
+export type SiteAnswers = { sector: string; answers: RawAnswers };
+
+const str = (v: unknown, max: number): string => (typeof v === "string" ? v.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").slice(0, max) : "");
+
+/**
+ * Keeps only the fields the form can send, at their limits. It does not judge them: `parseAnswers` does that when a
+ * site is built, so a half-finished draft can be saved. Unknown sectors are dropped.
+ */
+export function cleanSiteAnswers(input: unknown, knownSectors: string[]): SiteAnswers | null {
+  if (!input || typeof input !== "object") return null;
+  const o = input as Record<string, unknown>;
+  const sector = typeof o.sector === "string" && knownSectors.includes(o.sector) ? o.sector : null;
+  if (!sector) return null;
+  const a = (o.answers && typeof o.answers === "object" ? o.answers : {}) as Record<string, unknown>;
+  const hours: DayAnswer[] = [];
+  if (Array.isArray(a.hours)) {
+    for (const d of a.hours.slice(0, 7)) {
+      const r = (d && typeof d === "object" ? d : {}) as Record<string, unknown>;
+      const day = DAYS.find((x) => x === r.day);
+      if (!day || hours.some((h) => h.day === day)) continue;
+      hours.push(r.closed === true ? { day, closed: true } : { day, open: str(r.open, 5), close: str(r.close, 5) });
+    }
+  }
+  return {
+    sector,
+    answers: {
+      businessName: str(a.businessName, ANSWER_LIMITS.businessName),
+      servicesText: str(a.servicesText, ANSWER_LIMITS.servicesText),
+      hours,
+      highlights: Array.isArray(a.highlights) ? [...new Set(a.highlights.filter((h): h is string => typeof h === "string").map((h) => h.slice(0, 30)))].slice(0, 8) : [],
+      phone: str(a.phone, ANSWER_LIMITS.phone),
+      email: str(a.email, ANSWER_LIMITS.email),
+      address: str(a.address, ANSWER_LIMITS.address),
+      look: str(a.look, 20),
+      colour: str(a.colour, 7),
+    },
+  };
+}

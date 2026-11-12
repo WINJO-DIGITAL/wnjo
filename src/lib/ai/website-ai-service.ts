@@ -20,7 +20,7 @@ export type Actor = { userId: string | null; email: string | null; tenantId: str
 
 export type ServiceResult<T extends object = object> = ({ ok: true } & T) | { ok: false; status: number; error: string };
 
-type BriefRow = {
+export type BriefRow = {
   id: string;
   tenant_id: string;
   reference: string;
@@ -37,7 +37,7 @@ export const maxPenceFromEnv = (env: Record<string, string | undefined> = proces
   return Number.isFinite(n) && n > 0 ? Math.floor(n) : DEFAULT_MAX_PENCE_PER_BRIEF;
 };
 
-async function loadBrief(db: SupabaseClient, staff: Actor, briefId: string): Promise<BriefRow | null> {
+export async function loadBrief(db: SupabaseClient, staff: Actor, briefId: string): Promise<BriefRow | null> {
   const { data } = await db
     .from("website_briefs")
     .select("id, tenant_id, reference, email, name, business_name, stage, brief, figures")
@@ -57,7 +57,7 @@ export async function pagesAllowedFor(db: SupabaseClient, brief: BriefRow): Prom
   return plan?.pages ?? 5;
 }
 
-async function logEvent(db: SupabaseClient, staff: Actor, briefId: string, kind: string, detail: Record<string, unknown>) {
+export async function logEvent(db: SupabaseClient, staff: Actor, briefId: string, kind: string, detail: Record<string, unknown>) {
   const { error } = await db.from("website_brief_events").insert({
     tenant_id: staff.tenantId,
     brief_id: briefId,
@@ -70,7 +70,7 @@ async function logEvent(db: SupabaseClient, staff: Actor, briefId: string, kind:
   if (error) console.error(`Brief event not recorded: ${error.code ?? "unknown"}`);
 }
 
-async function moveStage(db: SupabaseClient, staff: Actor, brief: BriefRow, from: Stage[], to: Stage, note: string): Promise<Stage> {
+export async function moveStage(db: SupabaseClient, staff: Actor, brief: BriefRow, from: Stage[], to: Stage, note: string): Promise<Stage> {
   if (!from.includes(brief.stage)) return brief.stage;
   const { data, error } = await db.from("website_briefs").update({ stage: to }).eq("id", brief.id).eq("stage", brief.stage).select("id");
   if (error || !((data ?? []) as unknown[]).length) return brief.stage;

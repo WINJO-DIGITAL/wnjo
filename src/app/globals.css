@@ -12128,8 +12128,16 @@ body:has(.dash-header) .site-footer {
 }
 
 /* ===== Private website preview: the customer's words in a simple fixed layout, themed from their chosen look ===== */
-body:has(.pv) .site-footer {
+body:has(.pv, .sitepv) .site-footer {
   display: none;
+}
+.sitepv__banner {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: #1d1b18;
+  color: #f7f5f0;
+  font-size: 0.85rem;
+  text-align: center;
 }
 .pv {
   min-height: 100vh;

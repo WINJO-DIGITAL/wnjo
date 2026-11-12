@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AiProvider } from "./provider";
+import { parseAnswers } from "@/lib/site-template/answers";
+import { runSiteBuildStep } from "@/lib/site-template/build-service";
+import { presetFor } from "@/lib/site-template/presets";
+import type { SiteAnswers } from "@/lib/site-template/answers";
 import { runPlanStep, runPreviewStep, type Actor } from "./website-ai-service";
 
 /**
@@ -15,11 +19,28 @@ export async function runAutoDrafts(db: SupabaseClient, provider: AiProvider | n
     .eq("stage", "specification")
     .order("created_at", { ascending: true })
     .limit(limit * 3);
-  const briefs = (data ?? []) as { id: string; tenant_id: string; brief: { goals?: unknown[] } | null }[];
+  const briefs = (data ?? []) as { id: string; tenant_id: string; brief: { goals?: unknown[]; site?: SiteAnswers | null } | null }[];
   let attempted = 0;
   let drafted = 0;
   for (const brief of briefs) {
     if (attempted >= limit) break;
+    const site = brief.brief?.site;
+    if (site) {
+      // A template site: built from the sector answers once they are complete, and only once.
+      const preset = presetFor(site.sector);
+      if (!preset || !parseAnswers(site.answers, preset, { colour: "#1f3a34" }).ok) continue;
+      const { data: built } = await db.from("website_site_builds").select("id").eq("brief_id", brief.id).limit(1).maybeSingle();
+      if (built) continue;
+      attempted += 1;
+      const actor: Actor = { userId: null, email: null, tenantId: brief.tenant_id, kind: "system" };
+      try {
+        const result = await runSiteBuildStep(db, actor, provider, brief.id, { sector: site.sector, answers: site.answers });
+        if (result.ok) drafted += 1;
+      } catch (error) {
+        console.error(`Automatic site draft failed: ${error instanceof Error ? error.message : "unknown"}`);
+      }
+      continue;
+    }
     // A short checkout pays before the brief is filled in. Nothing is drafted until the customer has told us their goals.
     if (!brief.brief?.goals?.length) continue;
     const { data: existing } = await db.from("website_plans").select("id").eq("brief_id", brief.id).limit(1).maybeSingle();

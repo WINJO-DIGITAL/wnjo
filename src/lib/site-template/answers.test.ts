@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { checkSite } from "./checks";
-import { DAYS, groupHours, parseAnswers, parseServicesText, type DayAnswer, type RawAnswers } from "./answers";
+import { DAYS, cleanSiteAnswers, groupHours, parseAnswers, parseServicesText, type DayAnswer, type RawAnswers } from "./answers";
 import { BARBER_PRESET } from "./presets";
 
 const week = (over: Partial<Record<(typeof DAYS)[number], Partial<DayAnswer>>> = {}): DayAnswer[] =>
@@ -133,5 +133,27 @@ describe("parseAnswers", () => {
   it("copes with junk input without throwing", () => {
     const r = parseAnswers({ hours: [null as never, 5 as never], highlights: "x" as never, servicesText: 7 as never }, BARBER_PRESET, { colour: "#222222" });
     expect(r.ok).toBe(false);
+  });
+});
+
+describe("cleanSiteAnswers", () => {
+  const known = ["barber"];
+
+  it("keeps a half-finished draft, bounded", () => {
+    const r = cleanSiteAnswers({ sector: "barber", answers: { businessName: "x".repeat(200), hours: [{ day: "Mon", open: "09:00", close: "18:00" }, { day: "Mon", closed: true }, { day: "Funday" }], highlights: ["walk-ins", "walk-ins", 5], colour: "#1f3a34" } }, known);
+    expect(r?.sector).toBe("barber");
+    expect(r?.answers.businessName).toHaveLength(60);
+    expect(r?.answers.hours).toEqual([{ day: "Mon", open: "09:00", close: "18:00" }]);
+    expect(r?.answers.highlights).toEqual(["walk-ins"]);
+  });
+
+  it("drops unknown sectors and junk", () => {
+    expect(cleanSiteAnswers({ sector: "plumber", answers: {} }, known)).toBeNull();
+    expect(cleanSiteAnswers(null, known)).toBeNull();
+    expect(cleanSiteAnswers("x", known)).toBeNull();
+  });
+
+  it("strips control characters", () => {
+    expect(cleanSiteAnswers({ sector: "barber", answers: { phone: "01632\u0000 960123" } }, known)?.answers.phone).toBe("01632 960123");
   });
 });
