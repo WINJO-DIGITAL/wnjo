@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { SiteRender } from "@/components/site-template/SiteRender";
 import { BRIEF_BUCKET } from "@/lib/brief-store";
 import { serviceClient } from "@/lib/quote-store";
+import { previewExpired } from "@/lib/preview-access";
 import { photoPath, photoRefs, resolvePhotos } from "@/lib/site-template/photos";
 import type { SiteContent } from "@/lib/site-template/schema";
 import type { WebsiteBrief } from "@/lib/website-brief";
@@ -24,9 +25,10 @@ export default async function SitePreviewPage({ params, searchParams }: { params
   if (!TOKEN.test(token)) notFound();
   const db = serviceClient();
   if (!db) notFound();
-  const { data } = await db.from("website_site_builds").select("status, checks_ok, content, website_briefs(brief)").eq("access_token", token).maybeSingle();
-  const row = data as { status: "draft" | "released" | "withdrawn"; checks_ok: boolean; content: SiteContent; website_briefs: { brief: Pick<WebsiteBrief, "files"> } | null } | null;
+  const { data } = await db.from("website_site_builds").select("status, released_at, checks_ok, content, website_briefs(brief)").eq("access_token", token).maybeSingle();
+  const row = data as { status: "draft" | "released" | "withdrawn"; released_at: string | null; checks_ok: boolean; content: SiteContent; website_briefs: { brief: Pick<WebsiteBrief, "files"> } | null } | null;
   if (!row || row.status === "withdrawn" || !Array.isArray(row.content?.sections)) notFound();
+  if (previewExpired(row.released_at)) notFound();
 
   // Photos are private files. Each one gets a short-lived link, and only if it is one of this website's own uploads.
   const own = new Set((row.website_briefs?.brief?.files ?? []).map((f) => f.path));
@@ -43,7 +45,7 @@ export default async function SitePreviewPage({ params, searchParams }: { params
   const { content, heroImage } = resolvePhotos(row.content, urls);
 
   return (
-    <div className="sitepv">
+    <div className="sitepv preview-mark">
       <p className="sitepv__banner">
         {row.status === "draft" ? "Draft preview. Not shared with the customer yet." : "Private preview of your website."}
         {!row.checks_ok && " Some automatic checks failed, so look closely."}

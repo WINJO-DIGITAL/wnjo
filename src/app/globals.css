@@ -14731,3 +14731,23 @@ body:has(.pv, .sitepv) .site-footer {
   font-size: var(--text-sm);
   color: var(--color-ink-2);
 }
+
+/* A customer's preview is a review copy: marked on every page until the final payment clears. Non-interactive. */
+.preview-mark::after {
+  content: "Preview · not licensed until final payment";
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 50;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: clamp(1rem, 4vw, 1.8rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.09);
+  transform: rotate(-24deg);
+  white-space: nowrap;
+}

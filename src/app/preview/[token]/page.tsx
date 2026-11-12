@@ -5,6 +5,7 @@ import type { PageContent } from "@/lib/ai/website-content";
 import type { WebsitePlan } from "@/lib/ai/website-plan";
 import { serviceClient } from "@/lib/quote-store";
 import { STYLES, type StyleId } from "@/lib/website-brief";
+import { previewExpired } from "@/lib/preview-access";
 
 export const dynamic = "force-dynamic";
 // A private preview: kept out of search, and never sends the address on to other sites.
@@ -14,6 +15,7 @@ const TOKEN = /^[A-Za-z0-9_-]{20,64}$/;
 
 type Row = {
   status: "draft" | "released" | "withdrawn";
+  released_at: string | null;
   pages: PageContent[];
   website_plans: { plan: WebsitePlan } | null;
   website_briefs: { business_name: string | null; name: string; brief: { style?: StyleId | null } } | null;
@@ -31,11 +33,12 @@ export default async function PreviewPage({ params, searchParams }: { params: Pr
   if (!db) notFound();
   const { data } = await db
     .from("website_previews")
-    .select("status, pages, website_plans(plan), website_briefs(business_name, name, brief)")
+    .select("status, released_at, pages, website_plans(plan), website_briefs(business_name, name, brief)")
     .eq("access_token", token)
     .maybeSingle();
   const row = data as unknown as Row | null;
   if (!row || row.status === "withdrawn" || !row.pages?.length) notFound();
+  if (previewExpired(row.released_at)) notFound();
 
   const name = row.website_briefs?.business_name || row.website_briefs?.name || "Your website";
   const style = row.website_briefs?.brief?.style ? STYLES[row.website_briefs.brief.style] : null;
@@ -45,7 +48,7 @@ export default async function PreviewPage({ params, searchParams }: { params: Pr
   const font = style?.font === "serif" ? "var(--font-serif, Georgia, serif)" : "var(--font-sans, system-ui, sans-serif)";
 
   return (
-    <div className="pv" style={{ "--pv-paper": paper, "--pv-ink": ink, "--pv-accent": accent, "--pv-font": font } as React.CSSProperties}>
+    <div className="pv preview-mark" style={{ "--pv-paper": paper, "--pv-ink": ink, "--pv-accent": accent, "--pv-font": font } as React.CSSProperties}>
       <p className="pv__banner">
         {row.status === "draft" ? "Draft preview. Not shared with the customer yet." : "Private preview of your website."} Words only, in a simple layout. The final design comes later.
       </p>

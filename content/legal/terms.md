@@ -198,6 +198,8 @@ We will confirm the date in writing straight away. There is no cancellation fee.
 
 11.6 **Hosting and care.** Hosting and care after launch are optional and priced separately. See section 22.
 
+11.7 **Preview.** We show you the website for review before the final payment. The preview is marked as a preview, is for your review only, and may not be used publicly or copied until the final payment has cleared. It stays available for 30 days after we release it; if you need it again, ask us and we will release it again.
+
 ## 12. Our service standard
 
 12.1 We will perform our services with reasonable care and skill, as required by the Consumer Rights Act 2015 where it applies.
