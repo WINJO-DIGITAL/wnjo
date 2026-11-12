@@ -1,3 +1,4 @@
+import { KIND_LABEL, cancelTransition, cancellationReason, logSubscriptionEvent, needsStaffAlert } from "@/lib/subscription-cancellation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   cancelledEmail,
@@ -32,6 +33,8 @@ export type EventDeps = {
 type Row = {
   id: string;
   tenant_id: string;
+  /** Whether a cancel is already set to take effect at the end of the period. Used to log changes once. */
+  cancel_at_period_end?: boolean | null;
   reference: string;
   kind: "subscription" | "one_off";
   status: string;
@@ -48,10 +51,10 @@ type Row = {
 };
 
 const COLUMNS =
-  "id, tenant_id, reference, kind, status, email, name, package_name, setup_pence, monthly_pence, one_off_pence, minimum_term_months, ownership_after_payments, ownership_eligible_at, enquiry_reference";
+  "id, tenant_id, reference, kind, status, email, name, package_name, setup_pence, monthly_pence, one_off_pence, minimum_term_months, ownership_after_payments, ownership_eligible_at, enquiry_reference, cancel_at_period_end";
 
 type StripeObject = Record<string, unknown>;
-type StripeEvent = { type?: string; livemode?: boolean; data?: { object?: StripeObject } };
+type StripeEvent = { id?: string; type?: string; livemode?: boolean; data?: { object?: StripeObject } };
 
 const str = (v: unknown) => (typeof v === "string" ? v : null);
 const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : null);
@@ -225,6 +228,11 @@ export async function handleWebsiteSubscriptionEvent(
         .eq("id", row.id)
         .neq("status", "cancelled");
       if (error) return "retry";
+      const eventId = str(event.id);
+      if (eventId) {
+        const logged = await logSubscriptionEvent(db, row, "payment_failed", "Payment failed", eventId);
+        if (logged === "error") console.error("Subscription history not recorded");
+      }
       await deps.emailCustomer(row.email, paymentFailedEmail(facts(row), str(obj.hosted_invoice_url)));
       await deps.alertStaff("Website subscription payment failed", `${row.reference}: ${row.name}'s payment failed. Stripe will retry.`);
       return "handled";
@@ -263,6 +271,8 @@ export async function handleWebsiteSubscriptionEvent(
     if (row === "error") return "retry";
     if (!row) return "ignored";
     const deleted = type === "customer.subscription.deleted";
+    // Read before the update changes the row, so a repeated update is recognised as no change.
+    const wasCancelling = row.cancel_at_period_end === true;
     const status = deleted ? "cancelled" : statusFromStripe(str(obj.status) ?? undefined);
     const periodEnd =
       num(obj.current_period_end) ??
@@ -278,9 +288,26 @@ export async function handleWebsiteSubscriptionEvent(
     const query = db.from("website_subscriptions").update(update).eq("id", row.id);
     const { data, error } = deleted ? await query.neq("status", "cancelled").select("id") : await query.select("id");
     if (error) return "retry";
+
+    // Stripe is the source of truth; the log is what staff read. A cancel asked for or withdrawn is logged once, and
+    // the day it's asked for, staff hear about it. The end of a subscription is logged once too.
+    const reason = cancellationReason(obj);
+    const eventId = str(event.id);
+    const transition = deleted ? null : cancelTransition(wasCancelling, obj.cancel_at_period_end === true);
+    // The end is logged only on the change that ends it (the update matched a row that wasn't cancelled yet).
+    const endedNow = deleted && Array.isArray(data) && data.length > 0;
+    if (eventId && (endedNow || transition)) {
+      const kind = endedNow ? "ended" : transition!;
+      const logged = await logSubscriptionEvent(db, row, kind, reason, eventId);
+      // The log is a record for staff, not the source of truth. If it can't be written, say so and carry on, so a
+      // history problem never makes Stripe keep retrying and blocks the subscription itself.
+      if (logged === "error") console.error("Subscription history not recorded");
+      if (logged === true && needsStaffAlert(kind)) {
+        await deps.alertStaff(KIND_LABEL[kind], `${row.reference}: ${row.name}. ${KIND_LABEL[kind]}${reason ? ` (${reason})` : ""}.`);
+      }
+    }
     if (deleted && Array.isArray(data) && data.length > 0) {
       await deps.emailCustomer(row.email, cancelledEmail(facts(row)));
-      await deps.alertStaff("Website subscription ended", `${row.reference}: ${row.name}'s subscription has ended.`);
     }
     return "handled";
   }

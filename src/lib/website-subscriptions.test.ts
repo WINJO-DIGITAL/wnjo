@@ -383,3 +383,55 @@ describe("accepted proposal figures", () => {
     expect(proposalOverrides("oneOff", { setup_pence: 0, monthly_pence: 0, one_off_pence: 250001 })).toEqual({ oneOff: 1250.01 });
   });
 });
+
+describe("tracking a cancellation from Stripe", () => {
+  const updated = (id: string, cancelAtEnd: boolean, extra: Record<string, unknown> = {}) => ({
+    id,
+    type: "customer.subscription.updated",
+    data: { object: { id: "stripe_sub_1", status: "active", cancel_at_period_end: cancelAtEnd, ...extra } },
+  });
+  const deleted = (id: string, extra: Record<string, unknown> = {}) => ({
+    id,
+    type: "customer.subscription.deleted",
+    data: { object: { id: "stripe_sub_1", status: "canceled", ...extra } },
+  });
+
+  it("logs a cancel asked for once, with Stripe's reason, and alerts staff the same day", async () => {
+    const { db, deps, tables } = setup({ status: "active", stripe_subscription_id: "stripe_sub_1", cancel_at_period_end: false });
+    const reason = { cancellation_details: { reason: "cancellation_requested", feedback: "too_expensive" } };
+    await handleWebsiteSubscriptionEvent(db, updated("evt_c1", true, reason), deps);
+    await handleWebsiteSubscriptionEvent(db, updated("evt_c1", true, reason), deps);
+    const events = tables.website_subscription_events ?? [];
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({ kind: "cancel_requested", reason: "Customer asked to cancel · Too expensive", stripe_event_id: "evt_c1" });
+    expect(deps.alertStaff).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not log or alert again when Stripe repeats an update that changed nothing", async () => {
+    const { db, deps, tables } = setup({ status: "active", stripe_subscription_id: "stripe_sub_1", cancel_at_period_end: true });
+    await handleWebsiteSubscriptionEvent(db, updated("evt_n1", true), deps);
+    expect(tables.website_subscription_events ?? []).toHaveLength(0);
+    expect(deps.alertStaff).not.toHaveBeenCalled();
+  });
+
+  it("logs a withdrawn cancel without alerting staff", async () => {
+    const { db, deps, tables } = setup({ status: "active", stripe_subscription_id: "stripe_sub_1", cancel_at_period_end: true });
+    await handleWebsiteSubscriptionEvent(db, updated("evt_w1", false), deps);
+    expect(tables.website_subscription_events).toEqual([expect.objectContaining({ kind: "cancel_withdrawn" })]);
+    expect(deps.alertStaff).not.toHaveBeenCalled();
+  });
+
+  it("logs the end once, and alerts staff once", async () => {
+    const { db, deps, tables } = setup({ status: "active", stripe_subscription_id: "stripe_sub_1", cancel_at_period_end: true });
+    await handleWebsiteSubscriptionEvent(db, deleted("evt_e1"), deps);
+    await handleWebsiteSubscriptionEvent(db, deleted("evt_e2"), deps);
+    expect((tables.website_subscription_events ?? []).filter((e) => e.kind === "ended")).toHaveLength(1);
+    expect(deps.alertStaff).toHaveBeenCalledTimes(1);
+  });
+
+  it("logs a failed payment with a reason", async () => {
+    const { db, deps, tables } = setup({ status: "active", stripe_subscription_id: "stripe_sub_1" });
+    await handleWebsiteSubscriptionEvent(db, { id: "evt_p1", type: "invoice.payment_failed", data: { object: { id: "in_f", subscription: "stripe_sub_1" } } }, deps);
+    expect(tables.website_subscription_events).toEqual([expect.objectContaining({ kind: "payment_failed", reason: "Payment failed" })]);
+  });
+});

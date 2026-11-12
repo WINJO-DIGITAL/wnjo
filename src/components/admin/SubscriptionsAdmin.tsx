@@ -1,5 +1,6 @@
 "use client";
 
+import { KIND_LABEL } from "@/lib/subscription-cancellation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { monthlyRecurringPence } from "@/lib/website-subscription-figures";
@@ -42,8 +43,26 @@ const STATUS: Record<string, string> = {
 export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState(false);
+  const [history, setHistory] = useState<{ kind: string; reason: string; created_at: string; reference: string; name: string }[] | null>(null);
 
   const load = useCallback(() => {
+    // Cancellation history: what Stripe told us, newest first. Written by the webhook only; this only reads.
+    client
+      .from("website_subscription_events")
+      .select("kind, reason, created_at, website_subscriptions(reference, name)")
+      .order("created_at", { ascending: false })
+      .limit(50)
+      .then(({ data }) => {
+        setHistory(
+          ((data as unknown as { kind: string; reason: string; created_at: string; website_subscriptions: { reference: string; name: string } | null }[]) ?? []).map((e) => ({
+            kind: e.kind,
+            reason: e.reason,
+            created_at: e.created_at,
+            reference: e.website_subscriptions?.reference ?? "",
+            name: e.website_subscriptions?.name ?? "",
+          })),
+        );
+      });
     client
       .from("website_subscriptions")
       .select("id, reference, kind, status, name, business_name, email, package_name, setup_pence, monthly_pence, one_off_pence, payments_count, ownership_after_payments, ownership_eligible_at, cancel_at_period_end, livemode, created_at")
@@ -78,6 +97,27 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
 
   return (
     <div className="stack" style={{ "--stack": "var(--space-6)" } as React.CSSProperties}>
+      <section aria-label="Cancellation history">
+        <p className="admin-label">Cancellations and failed payments</p>
+        {history === null ? (
+          <p className="acct-meta">Loading…</p>
+        ) : history.length === 0 ? (
+          <p className="acct-meta">Nothing has been cancelled or failed yet.</p>
+        ) : (
+          <ul className="build-revisions" role="list">
+            {history.map((e, i) => (
+              <li key={i}>
+                <p className="build-revision__head">
+                  <strong>{KIND_LABEL[e.kind as keyof typeof KIND_LABEL] ?? e.kind}</strong>
+                  <span className="acct-meta">{e.reference} · {e.name}</span>
+                  <span className="acct-meta">{new Date(e.created_at).toLocaleDateString("en-GB")}</span>
+                </p>
+                {e.reason && <p className="acct-meta">{e.reason}</p>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
       <div className="dash-stats">
         <div className="dash-stat"><span className="dash-stat__label">Monthly recurring revenue</span><span className="dash-stat__value">{money.format(mrr / 100)}</span><span className="dash-stat__note">Active and overdue</span></div>
         <div className="dash-stat"><span className="dash-stat__label">Active subscriptions</span><span className="dash-stat__value">{active}</span><span className="dash-stat__note">Website packages</span></div>
