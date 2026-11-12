@@ -3,7 +3,8 @@ import Link from "next/link";
 import { serviceClient } from "@/lib/quote-store";
 import { stripeConfig } from "@/lib/stripe";
 import { readCheckout } from "@/lib/website-subscriptions";
-import { PaymentConfirmed, type ConfirmedOrder } from "@/components/PaymentConfirmed";
+import { BALANCE_PACKAGE_NAME } from "@/lib/pay-now";
+import { PaymentConfirmed, type ConfirmedOrder, type PaymentJourney } from "@/components/PaymentConfirmed";
 import { RefreshWhilePending } from "@/components/RefreshWhilePending";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,7 @@ export default async function SubscribeDone({ searchParams }: { searchParams: Pr
   // Stripe has the session but isn't sure of the payment yet: say so calmly and check again, rather than show an error.
   let processing = false;
   let order: ConfirmedOrder | null = null;
+  let journey: PaymentJourney = "plan";
   if (key && typeof sessionId === "string" && /^cs_(test|live)_[A-Za-z0-9]+$/.test(sessionId)) {
     try {
       const s = await readCheckout(key, sessionId);
@@ -32,11 +34,19 @@ export default async function SubscribeDone({ searchParams }: { searchParams: Pr
         const { data } = db
           ? await db
               .from("website_subscriptions")
-              .select("reference, kind, package_name, email, setup_pence, monthly_pence, one_off_pence, minimum_term_months")
+              .select("reference, kind, package_name, email, setup_pence, monthly_pence, one_off_pence, minimum_term_months, enquiry_reference")
               .eq("id", s.clientReferenceId)
               .maybeSingle()
           : { data: null };
         order = (data as ConfirmedOrder | null) ?? null;
+        if (order) {
+          // A bought-outright website: the deposit (at the start) or the final balance (after approval). Anything else is a plan.
+          const { data: brief } = db
+            ? await db.from("website_briefs").select("route").eq("reference", order.enquiry_reference ?? "").maybeSingle()
+            : { data: null };
+          const route = (brief as { route?: string } | null)?.route;
+          journey = order.package_name === BALANCE_PACKAGE_NAME ? "balance" : route === "proposal" && order.kind === "one_off" ? "deposit" : "plan";
+        }
       }
     } catch {
       confirmed = false;
@@ -47,7 +57,7 @@ export default async function SubscribeDone({ searchParams }: { searchParams: Pr
     <section className="section">
       <div className="container sub-page stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
         {confirmed ? (
-          <PaymentConfirmed order={order} />
+          <PaymentConfirmed order={order} journey={journey} />
         ) : processing ? (
           <>
             <RefreshWhilePending />

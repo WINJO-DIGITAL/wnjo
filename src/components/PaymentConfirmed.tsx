@@ -4,7 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatPence } from "@/lib/pricing";
 
+/** Which payment this is: a standard plan, the 50% deposit on a website bought outright, or its final balance. */
+export type PaymentJourney = "plan" | "deposit" | "balance";
+
 export type ConfirmedOrder = {
+  enquiry_reference?: string | null;
   reference: string;
   kind: "subscription" | "one_off";
   package_name: string;
@@ -30,6 +34,23 @@ export const maskEmail = (email: string) => {
   return domain ? `${name.charAt(0)}***@${domain}` : "your email address";
 };
 
+const NEXT_STEPS: Record<PaymentJourney, { title: string; body: string }[]> = {
+  plan: [
+    { title: "Tell us about your website", body: "Sign in to your account and share your goals, pages and style, if you haven't already. We start designing as soon as we have them." },
+    { title: "Check your inbox", body: "Stripe emails a receipt, and we send a welcome message. Keep your confirmation number to hand." },
+    { title: "Follow progress", body: "Sign in to your account with this email address at any time." },
+  ],
+  deposit: [
+    { title: "We start building", body: "Your details are with us, so the build starts now. We'll update your account as it progresses." },
+    { title: "Review and ask for changes", body: "When your website is ready, you'll see it in your account. You get two rounds of changes included." },
+    { title: "Approve and pay the rest", body: "Once you're happy, approve the website in your account and pay the balance. We hand it over once it's paid." },
+  ],
+  balance: [
+    { title: "We hand over your website", body: "We'll check everything one last time, then hand it over to you by email." },
+    { title: "Keep your receipt", body: "Stripe emails a receipt for this payment. Keep your confirmation number to hand." },
+  ],
+};
+
 /** How long the ring takes to fill and the tick to draw before the details appear. */
 const REVEAL_AFTER_MS = 2000;
 
@@ -38,7 +59,7 @@ const REVEAL_AFTER_MS = 2000;
  * turns into a tick, and then the confirmation number, the order and what happens next fade in. People who prefer
  * reduced motion, and visitors without scripts, see the finished page straight away.
  */
-export function PaymentConfirmed({ order, paidOn = new Date() }: { order: ConfirmedOrder | null; paidOn?: Date }) {
+export function PaymentConfirmed({ order, paidOn = new Date(), journey = "plan" }: { order: ConfirmedOrder | null; paidOn?: Date; journey?: PaymentJourney }) {
   const [done, setDone] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -117,18 +138,12 @@ export function PaymentConfirmed({ order, paidOn = new Date() }: { order: Confir
       <section className="pc__next pc__reveal" aria-labelledby="pc-next-title">
         <h2 id="pc-next-title" className="pc__next-title">What happens next</h2>
         <ol className="pc__steps">
-          <li>
-            <strong>Tell us about your website</strong>
-            <p>Sign in to your account and share your goals, pages and style, if you haven&apos;t already. We start designing as soon as we have them.</p>
-          </li>
-          <li>
-            <strong>Check your inbox</strong>
-            <p>Stripe emails a receipt, and we send a welcome message. Keep your confirmation number to hand.</p>
-          </li>
-          <li>
-            <strong>Follow progress</strong>
-            <p>Sign in to your account with this email address at any time.</p>
-          </li>
+          {(NEXT_STEPS[journey] ?? NEXT_STEPS.plan).map((step) => (
+            <li key={step.title}>
+              <strong>{step.title}</strong>
+              <p>{step.body}</p>
+            </li>
+          ))}
         </ol>
       </section>
 
