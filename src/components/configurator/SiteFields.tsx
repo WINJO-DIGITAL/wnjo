@@ -177,12 +177,12 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
             <legend className={styles.legend}>How can people reach you?</legend>
             <div className="cfg-fields">
               <div className="field">
-                <label htmlFor={`${id}-phone`}>Phone <span className="optional">(or email)</span></label>
+                <label htmlFor={`${id}-phone`}>Phone</label>
                 <input id={`${id}-phone`} className="input" type="tel" autoComplete="tel" maxLength={20} value={answers.phone ?? ""} onChange={(e) => set({ phone: e.target.value })} />
                 {err("phone")}
               </div>
               <div className="field">
-                <label htmlFor={`${id}-email`}>Email <span className="optional">(or phone)</span></label>
+                <label htmlFor={`${id}-email`}>Email</label>
                 <input id={`${id}-email`} className="input" type="email" autoComplete="email" maxLength={120} value={answers.email ?? ""} onChange={(e) => set({ email: e.target.value })} />
                 {err("email")}
               </div>
@@ -263,11 +263,11 @@ export function ProfileFields({ brief, onChange, errors }: { brief: WebsiteBrief
       </div>
       <div className="cfg-fields">
         <div className="field">
-          <label htmlFor={`${id}-phone`}>Phone <span className="optional">(or email)</span></label>
+          <label htmlFor={`${id}-phone`}>Phone</label>
           <input id={`${id}-phone`} className="input" type="tel" autoComplete="tel" maxLength={PROFILE_LIMITS.phone} value={p.phone} onChange={(e) => set({ phone: e.target.value })} />
         </div>
         <div className="field">
-          <label htmlFor={`${id}-email`}>Email <span className="optional">(or phone)</span></label>
+          <label htmlFor={`${id}-email`}>Email</label>
           <input id={`${id}-email`} className="input" type="email" autoComplete="email" maxLength={PROFILE_LIMITS.email} value={p.email} onChange={(e) => set({ email: e.target.value })} />
         </div>
       </div>
