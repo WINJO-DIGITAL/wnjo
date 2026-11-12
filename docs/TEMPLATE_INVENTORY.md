@@ -1,0 +1,52 @@
+# Master template: inventory of existing projects
+
+Purpose: find what in the finished client projects can be reused as sections of one master template (see `AI_BUILD_SPEC.md`). Status: first source done (RAENG Fitness). Boonma is still to do.
+
+## Source 1: RAENG Fitness
+
+Repo `WNJOWEB/raengfitness`, read at commit `f2ab687`. Next.js 16.4, React 19.3, Tailwind CSS v4, TypeScript strict, Vitest, Playwright and axe-core for accessibility. Static output on Vercel.
+
+### How it is organised (the useful part)
+
+The site keeps **content** and **components** apart. The components only read typed content files, and nothing in a component is specific to the business. That is the shape a template needs: the AI fills the content files, and the components render them.
+
+Content files (`src/content/`): `site.ts` (business facts, address, social), `services.ts`, `classes.ts` (timetable), `faq.ts`, `journey.ts`, `coaching.ts`, `payments.ts`, and `types.ts` (the typed shapes).
+
+**Every fact that could mislead a customer carries a status, `confirmed` or `provisional`.** Provisional content is hidden on the live site and only shown, with a marker, in preview. This already matches our rule that nothing may be invented: anything the customer hasn't supplied stays hidden.
+
+### Reusable sections (public site)
+
+| Section | What it does | Template use |
+| --- | --- | --- |
+| `PageHeader` | Page title block | Keep |
+| `HeroVideo` | Silent looping hero video with a still poster, a visible pause control, and reduced-motion handling | Keep as one hero variant. Needs a video or a still |
+| `WaysToTrain` | Service cards with points and prices | Keep as the services section |
+| `PriceList` | Shows only publishable prices, or "get in touch" if none | Keep as the prices section |
+| `Timetable` | Weekly timetable with four layouts | Keep for sectors with classes or opening hours |
+| `HowToBook` | Short booking steps | Keep |
+| `Journey` | A process or story in steps | Keep |
+| `Faq` | Questions in native `<details>`, works without JavaScript | Keep |
+| `Location` | Address block with a directions button | Keep |
+| `CtaBand` | Closing call to action | Keep |
+| `JsonLd` | Structured data for search | Keep |
+
+Supporting: `Section` and `SectionHeading`, `ButtonLink`, `Carousel`, `Provisional`, `KeepHyphens`, and the site header, footer, navigation and logo.
+
+### Not reusable as-is
+
+- **Booking** (`BookingWizard`, `AvailabilityCalendar`, `BookingPage`, `OnlineOnboarding`): tied to this business's Supabase tables (`akb_` prefix) and class-capacity rules. The template needs a simpler booking section instead.
+- **Coach portal** (`src/app/coach/`): clients, finances, ledger, refunds, sessions, subscriptions. Specific to one business. Leave out.
+- Business wording, photos and the Instagram alternative component.
+
+## What this means for the template
+
+1. **The template is its own project, not part of this repo.** RAENG uses Tailwind v4 and this repo uses plain CSS. A customer site is the template copied, with its content files written by the AI.
+2. **Sections plus content schema.** One content file per concern, typed, with the confirmed/provisional status kept.
+3. **Sector presets** choose which sections appear, their order and the default look. A barber preset leads with booking and prices, a café with the menu and hours.
+4. **Booking is the one heavy piece.** Start with a "request a booking" form that emails the owner. Add a full booking system later, only for sectors that need it.
+
+## Still to do
+
+- Inventory Boonma (needs its repo name; it isn't in the repos I can see).
+- Decide whether EV Exec and FYStay are worth a look for a menu or gallery section.
+- Choose the content schema, then build the first sector preset (Barber).
