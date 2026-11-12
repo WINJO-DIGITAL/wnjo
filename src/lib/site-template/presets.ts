@@ -12,6 +12,9 @@ export type SectionPreset = {
   guidance: string;
 };
 
+/** A fact the customer can tick, shown as one tile in the facts strip. Nothing is shown unless they tick it. */
+export type HighlightOption = { id: string; value: string; label: string };
+
 export type SectorPreset = {
   id: string;
   label: string;
@@ -19,6 +22,7 @@ export type SectorPreset = {
   /** One line on the voice, passed to the writer. */
   voice: string;
   sections: SectionPreset[];
+  highlights: HighlightOption[];
 };
 
 export const BARBER_PRESET: SectorPreset = {
@@ -26,6 +30,12 @@ export const BARBER_PRESET: SectorPreset = {
   label: "Barber",
   defaultLook: "classic",
   voice: "Confident, friendly and plain. Short sentences. No hype and no slang.",
+  highlights: [
+    { id: "walk-ins", value: "Walk-ins", label: "Always welcome" },
+    { id: "cards", value: "Card", label: "Payments taken" },
+    { id: "kids", value: "Kids", label: "Cuts for children" },
+    { id: "appointments", value: "Appointments", label: "Booked by request" },
+  ],
   sections: [
     { kind: "hero", required: true, guidance: "Say what the shop does and where, in one headline. The call to action is booking." },
     { kind: "services", required: true, guidance: "The cuts and treatments the customer listed, each with their own price if they gave one." },
