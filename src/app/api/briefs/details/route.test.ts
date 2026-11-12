@@ -10,6 +10,7 @@ vi.mock("@/lib/quote-store", () => ({
       for (const m of ["select", "eq", "order", "limit"]) b[m] = () => b;
       b.update = () => ((op = "update"), b);
       b.insert = () => ((op = "insert"), b);
+      b.delete = () => ((op = "delete"), b);
       b.maybeSingle = async () => ({ data: table === "website_briefs" ? state.brief : null, error: null });
       b.then = (res: (v: unknown) => unknown) => {
         if (op !== "select") state.writes.push({ table, op });

@@ -30,42 +30,18 @@ const GROUP_ORDER = Object.keys(BUSINESS_GROUPS) as BusinessGroup[];
 const emptyWeek = (): DayAnswer[] => DAYS.map((day) => ({ day, open: "", close: "" }));
 
 /**
- * The sector questions for a template site: tick boxes first, short text only where nothing else can capture the
- * answer. Nothing is pre-filled with a guess: opening times start blank, so what is shown is what the customer said.
+ * Choosing the kind of business: the templates we have, grouped, and "Another type of business" with a typed box.
+ * Nothing is pre-selected. Choosing a template starts its questions with blank opening times and the sector's look.
  */
-export function SiteFields({ brief, onChange, errors, businessName }: { brief: WebsiteBrief; onChange: BriefChange; errors: Record<string, string>; businessName: string }) {
+export function BusinessTypeField({ brief, onChange }: { brief: WebsiteBrief; onChange: BriefChange }) {
   const id = useId();
   const site = brief.site;
-  const preset = site ? SECTOR_PRESETS[site.sector] : null;
-  const answers: RawAnswers = site?.answers ?? {};
-
   // "Another type of business" is only selected when the customer picks it. Nothing is pre-selected for them.
   const [otherMode, setOtherMode] = useState(brief.otherBusinessType !== "");
   const choose = (sector: string | null) => {
     setOtherMode(false);
     onChange({ otherBusinessType: "", site: sector ? { sector, answers: { ...(site?.answers ?? {}), hours: site?.answers.hours?.length ? site.answers.hours : emptyWeek(), look: site?.answers.look ?? SECTOR_PRESETS[sector].defaultLook, colour: site?.answers.colour ?? SITE_COLOURS[0].hex } } : null });
   };
-
-  const set = (patch: Partial<RawAnswers>) => {
-    if (!site) return;
-    onChange({ site: { sector: site.sector, answers: { ...site.answers, ...patch } } });
-  };
-
-  const hasHours = Boolean(preset?.sections.some((x) => x.kind === "hours"));
-  const hoursRequired = Boolean(preset?.sections.find((x) => x.kind === "hours")?.required);
-  const hours = answers.hours?.length ? answers.hours : emptyWeek();
-  const setDay = (day: DayAnswer["day"], patch: Partial<DayAnswer>) => {
-    const next = hours.map((d) => (d.day === day ? ({ ...d, ...patch } as DayAnswer) : d));
-    set({ hours: next });
-  };
-  const copyMonday = () => {
-    const mon = hours.find((d) => d.day === "Mon");
-    if (!mon) return;
-    set({ hours: hours.map((d) => (["Tue", "Wed", "Thu", "Fri"].includes(d.day) ? { day: d.day, ...(mon.closed ? { closed: true } : { open: mon.open, close: mon.close }) } : d)) });
-  };
-  const ticked = new Set(answers.highlights ?? []);
-  const toggleHighlight = (hid: string) => set({ highlights: ticked.has(hid) ? [...ticked].filter((x) => x !== hid) : [...ticked, hid] });
-  const err = (key: string) => errors[key] && <p className="field-error" role="alert">{errors[key]}</p>;
 
   return (
     <>
@@ -108,6 +84,43 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
         )}
       </fieldset>
 
+    </>
+  );
+}
+
+/**
+ * The sector questions for a template site: tick boxes first, short text only where nothing else can capture the
+ * answer. Nothing is pre-filled with a guess: opening times start blank, so what is shown is what the customer said.
+ */
+export function SiteFields({ brief, onChange, errors, businessName }: { brief: WebsiteBrief; onChange: BriefChange; errors: Record<string, string>; businessName: string }) {
+  const id = useId();
+  const site = brief.site;
+  const preset = site ? SECTOR_PRESETS[site.sector] : null;
+  const answers: RawAnswers = site?.answers ?? {};
+
+  const set = (patch: Partial<RawAnswers>) => {
+    if (!site) return;
+    onChange({ site: { sector: site.sector, answers: { ...site.answers, ...patch } } });
+  };
+
+  const hasHours = Boolean(preset?.sections.some((x) => x.kind === "hours"));
+  const hoursRequired = Boolean(preset?.sections.find((x) => x.kind === "hours")?.required);
+  const hours = answers.hours?.length ? answers.hours : emptyWeek();
+  const setDay = (day: DayAnswer["day"], patch: Partial<DayAnswer>) => {
+    const next = hours.map((d) => (d.day === day ? ({ ...d, ...patch } as DayAnswer) : d));
+    set({ hours: next });
+  };
+  const copyMonday = () => {
+    const mon = hours.find((d) => d.day === "Mon");
+    if (!mon) return;
+    set({ hours: hours.map((d) => (["Tue", "Wed", "Thu", "Fri"].includes(d.day) ? { day: d.day, ...(mon.closed ? { closed: true } : { open: mon.open, close: mon.close }) } : d)) });
+  };
+  const ticked = new Set(answers.highlights ?? []);
+  const toggleHighlight = (hid: string) => set({ highlights: ticked.has(hid) ? [...ticked].filter((x) => x !== hid) : [...ticked, hid] });
+  const err = (key: string) => errors[key] && <p className="field-error" role="alert">{errors[key]}</p>;
+
+  return (
+    <>
       {site && preset && (
         <>
           <div className="field">

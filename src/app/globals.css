@@ -14572,3 +14572,102 @@ body:has(.pv, .sitepv) .site-footer {
 .site-profile .brief-chips {
   margin-top: var(--space-2);
 }
+
+/* ===== The stepped details form ===== */
+.wiz {
+  display: grid;
+  gap: var(--space-5);
+}
+.wiz__head {
+  display: grid;
+  gap: var(--space-2);
+}
+.wiz__step {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+.wiz__step span {
+  margin-left: 0.5rem;
+  color: var(--color-ink);
+}
+.wiz__bar {
+  display: flex;
+  gap: 4px;
+}
+.wiz__bar span {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-line-strong);
+}
+.wiz__bar span[data-state="done"] {
+  background: var(--color-ink-3);
+}
+.wiz__bar span[data-state="now"] {
+  background: var(--color-ink);
+}
+.wiz__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  outline: none;
+}
+.wiz__restored {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-sunken);
+  font-size: var(--text-sm);
+}
+.wiz__nav {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line);
+}
+.wiz__saved {
+  margin: 0;
+  min-height: 1.2em;
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}
+.wiz__buttons {
+  display: flex;
+  gap: var(--space-3);
+}
+.wiz__buttons .btn--primary {
+  flex: 1;
+}
+.wiz__summary {
+  margin: 0;
+  display: grid;
+}
+.wiz__summary > div {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: baseline;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-line);
+}
+.wiz__summary dt {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.wiz__summary dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 30rem) {
+  .wiz__summary > div {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .wiz__summary dt {
+    grid-column: 1 / -1;
+  }
+}

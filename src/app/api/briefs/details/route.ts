@@ -102,6 +102,10 @@ export async function POST(request: NextRequest) {
     if (subError) console.error("Customer name update failed");
   }
 
+  // The details are now sent, so the saved progress is no longer needed. Best effort: the brief is already saved.
+  const { error: progressError } = await db.from("website_brief_progress").delete().eq("brief_id", row.id);
+  if (progressError) console.error("Progress clean-up failed");
+
   const config = mailConfig();
   if (config) {
     await sendEnquiryEmail(config, {

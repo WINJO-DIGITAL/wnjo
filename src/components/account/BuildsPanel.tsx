@@ -1,18 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PORTAL_STEPS, nextStepFor, portalStepIndex } from "@/lib/portal-steps";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { STAGES, progressIndex, stagePath, type ProposalLine, type ProposalStatus, type Route, type Stage } from "@/lib/build-journey";
 import type { RevisionRow } from "@/lib/build-revisions";
 import { proposalPayNowFor } from "@/lib/pay-now";
-import { GOALS, STYLES, cleanBrief, validateBrief, type BriefErrors, type BriefFile, type WebsiteBrief } from "@/lib/website-brief";
-import { DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
-import { ProfileFields, SITE_COLOURS, SiteFields } from "@/components/configurator/SiteFields";
-import { validateProfile } from "@/lib/website-brief";
-import { parseAnswers } from "@/lib/site-template/answers";
-import { SECTOR_PRESETS } from "@/lib/site-template/presets";
-import { DETAIL_LIMITS, UNNAMED } from "@/lib/website-enquiry";
+import { GOALS, STYLES, cleanBrief, type WebsiteBrief } from "@/lib/website-brief";
+import type { Progress } from "@/lib/brief-progress";
+import { UNNAMED } from "@/lib/website-enquiry";
+import { BriefWizard, type WizardApi } from "./BriefWizard";
 import { Confirmation } from "./Confirmation";
 import { FeedbackCard } from "./FeedbackCard";
 import { PayCard } from "./PayCard";
@@ -275,7 +272,10 @@ function DetailsThanks({ name, onContinue }: { name: string; onContinue: () => v
 /** The template-site questions stay hidden from customers until the owner sets NEXT_PUBLIC_TEMPLATE_SITES to "on". */
 const TEMPLATE_SITES_ON = process.env.NEXT_PUBLIC_TEMPLATE_SITES === "on";
 
-/** Goals, pages and design for a website paid for through the short checkout. Saved on the website, then we start drafting. */
+/**
+ * The details form for a website paid for through the short checkout, one short step at a time. Progress is saved on
+ * the server as they go; sending the details to the team happens only on the last step.
+ */
 function BriefDetailsCard({
   client,
   briefId,
@@ -291,125 +291,39 @@ function BriefDetailsCard({
   businessName: string;
   onSaved: () => void;
 }) {
-  const [brief, setBrief] = useState<WebsiteBrief>(initial);
-  // A short checkout stores "New customer" until they say who they are.
-  const [name, setName] = useState(savedName === UNNAMED ? "" : savedName);
-  const [businessName, setBusinessName] = useState(savedBusiness);
-  const [errors, setErrors] = useState<BriefErrors>({});
-  const [siteErrors, setSiteErrors] = useState<Record<string, string>>({});
-  // How many pages the plan covers, asked of the server (it applies the same number when this is sent).
-  const [allowed, setAllowed] = useState<number | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
+  const api = useMemo<WizardApi>(() => {
+    // One place for the signed-in call, so every request is made the same way.
+    const call = async (path: string, body: unknown): Promise<{ ok: boolean; json: Record<string, unknown> | null } | null> => {
       const { data } = await client.auth.getSession();
       const token = data.session?.access_token;
-      if (!token) return;
-      const res = await fetch("/api/briefs/allowance", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ briefId }) }).catch(() => null);
-      const json = (await res?.json().catch(() => null)) as { pages?: number } | null;
-      if (!cancelled && res?.ok && typeof json?.pages === "number") setAllowed(json.pages);
-    })();
-    return () => {
-      cancelled = true;
+      if (!token) return null;
+      const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }).catch(() => null);
+      if (!res) return null;
+      return { ok: res.ok, json: (await res.json().catch(() => null)) as Record<string, unknown> | null };
+    };
+    return {
+      loadAllowance: async () => {
+        const r = await call("/api/briefs/allowance", { briefId });
+        return r?.ok && typeof r.json?.pages === "number" ? r.json.pages : null;
+      },
+      loadProgress: async () => {
+        const r = await call("/api/briefs/progress", { briefId, action: "load" });
+        return r?.ok ? ((r.json?.progress as Progress | null) ?? null) : null;
+      },
+      saveProgress: async (progress) => Boolean((await call("/api/briefs/progress", { briefId, action: "save", progress }))?.ok),
+      viewFile: async (file) => {
+        const r = await call("/api/briefs/file", { briefId, path: file.path });
+        return r?.ok && typeof r.json?.url === "string" ? r.json.url : null;
+      },
+      send: async ({ name, businessName, brief, draftId }) => {
+        const r = await call("/api/briefs/details", { briefId, draftId, name, businessName, brief: cleanBrief(brief, draftId ?? undefined) });
+        if (r?.ok) return { ok: true };
+        return { ok: false, error: typeof r?.json?.error === "string" ? r.json.error : "We couldn't save that just now. Please try again." };
+      },
     };
   }, [client, briefId]);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  // A folder for this form's uploads. The id is never printed, so the server and browser renders still match.
-  const [draftId] = useState<string | null>(() => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : null));
-  const update: BriefChange = (patch) => {
-    setBrief((b) => ({ ...b, ...(typeof patch === "function" ? patch(b) : patch) }));
-    setErrors({});
-    setSiteErrors({});
-  };
 
-  // A short-lived link to a file saved earlier on this website. The server checks it belongs to the signed-in owner.
-  const viewFile = async (file: BriefFile): Promise<string | null> => {
-    const { data } = await client.auth.getSession();
-    const token = data.session?.access_token;
-    if (!token) return null;
-    const res = await fetch("/api/briefs/file", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ briefId, path: file.path }) }).catch(() => null);
-    const json = (await res?.json().catch(() => null)) as { url?: string } | null;
-    return res?.ok && json?.url ? json.url : null;
-  };
-
-  const send = async (event: React.FormEvent) => {
-    event.preventDefault();
-    // The business name is asked once, above, and goes into the sector answers too.
-    const cleaned = cleanBrief({ ...brief, site: brief.site ? { ...brief.site, answers: { ...brief.site.answers, businessName } } : null }, draftId ?? undefined);
-    const missing = validateBrief(cleaned);
-    if (missing.goals || missing.pages) {
-      setErrors(missing);
-      return;
-    }
-    if (cleaned.otherBusinessType) {
-      const profileErrors = validateProfile(cleaned);
-      if (Object.keys(profileErrors).length) {
-        setSiteErrors(profileErrors);
-        setMessage("A few answers need another look. They are marked above.");
-        return;
-      }
-    }
-    if (!cleaned.site && allowed !== null && cleaned.pages.length > allowed) {
-      setErrors({ pages: `Your plan covers up to ${allowed} pages. Remove ${cleaned.pages.length - allowed} to continue.` });
-      return;
-    }
-    if (cleaned.site) {
-      const parsed = parseAnswers(cleaned.site.answers, SECTOR_PRESETS[cleaned.site.sector], { colour: SITE_COLOURS[0].hex });
-      if (!parsed.ok) {
-        setSiteErrors(parsed.errors);
-        setMessage("A few answers need another look. They are marked above.");
-        return;
-      }
-    }
-    setBusy(true);
-    setMessage(null);
-    const { data } = await client.auth.getSession();
-    const token = data.session?.access_token;
-    const res = token
-      ? await fetch("/api/briefs/details", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ briefId, draftId, name, businessName, brief: cleaned }),
-        }).catch(() => null)
-      : null;
-    const json = (await res?.json().catch(() => null)) as { error?: string } | null;
-    setBusy(false);
-    if (res?.ok) {
-      // Stay on the form's own confirmation. The page reloads when the customer chooses to continue.
-      onSaved();
-      return;
-    }
-    setMessage(json?.error ?? "We couldn't save that just now. Please try again.");
-  };
-
-  return (
-    <form onSubmit={send} noValidate className="form stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
-      <div className="field">
-        <label htmlFor={`bd-name-${briefId}`}>Your name</label>
-        <input id={`bd-name-${briefId}`} className="input" maxLength={DETAIL_LIMITS.name} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
-      </div>
-      <div className="field">
-        <label htmlFor={`bd-biz-${briefId}`}>Business name</label>
-        <input id={`bd-biz-${briefId}`} className="input" maxLength={DETAIL_LIMITS.businessName} autoComplete="organization" value={businessName} onChange={(e) => setBusinessName(e.target.value)} />
-      </div>
-      <GoalsField brief={brief} onChange={update} error={errors.goals} />
-      {TEMPLATE_SITES_ON && <SiteFields brief={brief} onChange={update} errors={siteErrors} businessName={businessName} />}
-      {brief.otherBusinessType && <ProfileFields brief={brief} onChange={update} errors={siteErrors} />}
-      {!brief.site && <PagesField brief={brief} onChange={update} error={errors.pages} bandMax={null} hardMax={allowed} />}
-      {!brief.site && <DesignFields brief={brief} onChange={update} />}
-      <FilesField brief={brief} onChange={update} draftId={draftId} view={viewFile} />
-      <FunctionalityField brief={brief} onChange={update} />
-      {message && (
-        <p className="field-error" role="alert">
-          {message}
-        </p>
-      )}
-      <button type="submit" className="btn btn--primary" disabled={busy}>
-        {busy ? "Sending…" : "Send to the team"}
-      </button>
-    </form>
-  );
+  return <BriefWizard initial={initial} name={savedName === UNNAMED ? "" : savedName} businessName={savedBusiness} typesOn={TEMPLATE_SITES_ON} api={api} onSent={onSaved} />;
 }
 
 /** Opens the customer's private preview in a new tab. The address comes from the server, only for the website's owner. */
