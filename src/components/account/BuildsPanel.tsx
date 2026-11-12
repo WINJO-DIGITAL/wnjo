@@ -310,6 +310,10 @@ function BriefDetailsCard({
         const r = await call("/api/briefs/progress", { briefId, action: "load" });
         return r?.ok ? ((r.json?.progress as Progress | null) ?? null) : null;
       },
+      loadKnown: async () => {
+        const r = await call("/api/briefs/known", { briefId });
+        return r?.ok && typeof r.json?.email === "string" ? { email: r.json.email, phone: typeof r.json.phone === "string" ? r.json.phone : "" } : null;
+      },
       saveProgress: async (progress) => Boolean((await call("/api/briefs/progress", { briefId, action: "save", progress }))?.ok),
       viewFile: async (file) => {
         const r = await call("/api/briefs/file", { briefId, path: file.path });

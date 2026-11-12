@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { firstIncompleteStep, stepsFor, validateStep, type StepContext } from "./brief-steps";
+import { firstIncompleteStep, stepsFor, validateStep, withKnownContact, type StepContext } from "./brief-steps";
 import { EMPTY_BRIEF, EMPTY_PROFILE, type WebsiteBrief } from "./website-brief";
 
 const ctx = (over: Partial<StepContext> = {}): StepContext => ({ typesOn: true, allowedPages: 5, name: "Sam", businessName: "Hartley & Sons", ...over });
@@ -73,5 +73,35 @@ describe("firstIncompleteStep", () => {
   it("is null when everything is complete", () => {
     expect(firstIncompleteStep(other, ctx())).toBeNull();
     expect(firstIncompleteStep(barber, ctx())).toBeNull();
+  });
+});
+
+describe("withKnownContact", () => {
+  const known = { email: "owner@shop.co.uk", phone: "07700 900123" };
+  const blank = { ...EMPTY_BRIEF, otherBusinessType: "Florist" };
+
+  it("fills an empty email and phone from the sign-up details", () => {
+    const r = withKnownContact(blank, known);
+    expect(r.changed).toBe(true);
+    expect(r.brief.profile).toMatchObject({ email: "owner@shop.co.uk", phone: "07700 900123" });
+  });
+
+  it("fills a template site's answers instead", () => {
+    const r = withKnownContact({ ...EMPTY_BRIEF, site: { sector: "barber", answers: {} } }, known);
+    expect(r.brief.site?.answers).toMatchObject({ email: "owner@shop.co.uk", phone: "07700 900123" });
+  });
+
+  it("never overwrites what the customer typed, and fills only the gaps", () => {
+    const typed = { ...blank, profile: { ...blank.profile, email: "me@mine.example" } };
+    const r = withKnownContact(typed, known);
+    expect(r.brief.profile.email).toBe("me@mine.example");
+    expect(r.brief.profile.phone).toBe("07700 900123");
+  });
+
+  it("returns the same brief when there is nothing to fill or nothing known", () => {
+    const full = { ...blank, profile: { ...blank.profile, email: "a@b.example", phone: "0113 496 0000" } };
+    expect(withKnownContact(full, known)).toEqual({ brief: full, changed: false });
+    expect(withKnownContact(blank, null)).toEqual({ brief: blank, changed: false });
+    expect(withKnownContact(blank, { email: "", phone: "" })).toEqual({ brief: blank, changed: false });
   });
 });

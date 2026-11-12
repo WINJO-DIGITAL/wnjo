@@ -81,3 +81,20 @@ export function firstIncompleteStep(brief: WebsiteBrief, ctx: StepContext): { st
   }
   return null;
 }
+
+export type KnownContact = { email: string; phone: string };
+
+/**
+ * Fills the contact fields the customer hasn't answered with what they gave at sign-up, so the form doesn't ask for it
+ * again. Anything already typed is kept as it is. Returns the same brief, unchanged, when there is nothing to fill.
+ */
+export function withKnownContact(brief: WebsiteBrief, known: KnownContact | null): { brief: WebsiteBrief; changed: boolean } {
+  if (!known) return { brief, changed: false };
+  const current = brief.site ? { email: brief.site.answers.email ?? "", phone: brief.site.answers.phone ?? "" } : { email: brief.profile.email, phone: brief.profile.phone };
+  const fill = { ...(current.email || !known.email ? {} : { email: known.email }), ...(current.phone || !known.phone ? {} : { phone: known.phone }) };
+  if (!Object.keys(fill).length) return { brief, changed: false };
+  return {
+    changed: true,
+    brief: brief.site ? { ...brief, site: { ...brief.site, answers: { ...brief.site.answers, ...fill } } } : { ...brief, profile: { ...brief.profile, ...fill } },
+  };
+}

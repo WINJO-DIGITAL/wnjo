@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type TouchEvent } from "react";
 import { DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
 import { BusinessTypeField, ProfileFields, SiteFields } from "@/components/configurator/SiteFields";
-import { firstIncompleteStep, stepsFor, STEP_TITLES, validateStep, type StepContext, type StepErrors, type StepId } from "@/lib/brief-steps";
+import { firstIncompleteStep, stepsFor, STEP_TITLES, validateStep, withKnownContact, type KnownContact, type StepContext, type StepErrors, type StepId } from "@/lib/brief-steps";
 import type { Progress } from "@/lib/brief-progress";
 import { SECTOR_PRESETS } from "@/lib/site-template/presets";
 import { GOALS, STYLES, type BriefFile, type WebsiteBrief } from "@/lib/website-brief";
@@ -12,6 +12,8 @@ import { GOALS, STYLES, type BriefFile, type WebsiteBrief } from "@/lib/website-
 export type WizardApi = {
   loadAllowance(): Promise<number | null>;
   loadProgress(): Promise<Progress | null>;
+  /** What the customer gave at sign-up, so the form doesn't ask again. */
+  loadKnown(): Promise<KnownContact | null>;
   saveProgress(progress: Progress): Promise<boolean>;
   viewFile(file: BriefFile): Promise<string | null>;
   send(input: { name: string; businessName: string; brief: WebsiteBrief; draftId: string | null }): Promise<{ ok: true } | { ok: false; error: string }>;
@@ -57,6 +59,9 @@ export function BriefWizard({
   const [allowed, setAllowed] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [restored, setRestored] = useState(false);
+  const [known, setKnown] = useState<KnownContact | null>(null);
+  // Set once the contact fields were filled from the sign-up details, so a note can say why.
+  const [filledFromSignup, setFilledFromSignup] = useState(false);
   const [errors, setErrors] = useState<StepErrors>({});
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -76,11 +81,13 @@ export function BriefWizard({
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const [pages, saved] = await Promise.all([api.loadAllowance().catch(() => null), api.loadProgress().catch(() => null)]);
+      const [pages, saved, knownContact] = await Promise.all([api.loadAllowance().catch(() => null), api.loadProgress().catch(() => null), api.loadKnown().catch(() => null)]);
       if (cancelled) return;
       setAllowed(pages);
+      setKnown(knownContact);
       if (saved) {
-        setBrief(saved.brief);
+        // Coming back to the step that asks for contact details: fill any gap there too.
+        setBrief(saved.step === "offer" ? withKnownContact(saved.brief, knownContact).brief : saved.brief);
         setName(saved.name || savedName);
         setBusinessName(saved.businessName || savedBusiness);
         setStep(saved.step);
@@ -135,6 +142,14 @@ export function BriefWizard({
   const go = (to: StepId) => {
     dirty.current = true;
     setRestored(false);
+    // Reaching the step that asks for contact details: use what they gave at sign-up, never what they typed.
+    if (to === "offer") {
+      const filled = withKnownContact(brief, known);
+      if (filled.changed) {
+        setBrief(filled.brief);
+        setFilledFromSignup(true);
+      }
+    }
     setErrors({});
     setMessage(null);
     setStep(to);
@@ -216,6 +231,9 @@ export function BriefWizard({
       <div className="wiz__body stack" style={{ "--stack": "var(--space-5)" } as CSSProperties}>
         {current === "about" && (
           <>
+            {(savedName || savedBusiness) && (
+              <p className="wiz__restored">We&apos;ve kept the details you gave when you signed up. Check they&apos;re still right.</p>
+            )}
             <div className="field">
               <label htmlFor="wiz-name">Your name</label>
               <input id="wiz-name" className="input" maxLength={100} autoComplete="name" value={name} onChange={(e) => (touched(), setName(e.target.value))} />
@@ -233,6 +251,8 @@ export function BriefWizard({
             )}
           </>
         )}
+
+        {current === "offer" && filledFromSignup && <p className="wiz__restored">We&apos;ve filled in the contact details you gave when you signed up. Change them if they&apos;re not right.</p>}
 
         {current === "offer" && (brief.site ? <SiteFields brief={brief} onChange={update} errors={errors} businessName={businessName} /> : <ProfileFields brief={brief} onChange={update} errors={errors} />)}
 
