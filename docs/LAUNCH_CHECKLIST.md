@@ -37,7 +37,6 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 
 ## Still to do before launch
 - [x] **Cancellation request:** test cancellation on WS-1C9980 (12 Nov). The customer confirmation gives the end date, 12 December 2026, and the staff alert was delivered. Owner confirmed. Not yet checked: the Stripe cancel-at-period-end flag and the history entry.
-- [ ] **Renewal reminder:** test subscription set up (WS-457F22, first payment backdated to 20 May 2026, so the reminder is due 20 November). Coded and on the daily cron. Still open: confirm the email reaches nitisatsirisom@hotmail.co.uk. The first run is 13 November at 07:45 UTC.
 - [x] **Hotmail delivery:** sign-in emails reached Hotmail once Microsoft's outage cleared. Owner confirmed, 12 Nov.
 - [x] **DMARC:** a record is live on winjodigital.co.uk (`_dmarc` points to IONOS, `v=DMARC1; p=none;`), checked 12 Nov. No reporting address (`rua`) is set; adding one is optional.
 - [x] **Plan & billing:** test as a signed-in customer with a test plan (the plan list and Manage billing button). Not yet checked against production data. Confirmed by the owner: works.
@@ -77,7 +76,6 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 - [x] **Owner email after payment:** pay a plan in Stripe test mode and confirm exactly one owner email arrives, after the payment ("New … subscription"), and none when the form is submitted. Confirmed by the owner: the owner gets an email after payment.
 - [x] **Customer emails after payment:** pay a plan in Stripe test mode and confirm the customer gets only the welcome email, with no "Your website is waiting" email and no "Tell us about your website" reminder for a day or until the goals form is filled in. Confirmed by the owner: the customer gets an email after payment.
 - [x] **Goals email right after payment:** test payment WS-1C9980 (12 Nov). The "Thank you. Now tell us about your website" email arrived at 19:01, the same minute as the payment. It links to the account page; it doesn't contain a one-time sign-in link. Owner confirmed.
-- [ ] **Account form and reminder:** goals form checked on WNJO-DEMO02 from a screen recording (11 Nov, 15:48): goals and pages saved, and the status moved to "We're building your website". Uploads were checked on WNJO-DEMO03 (owner, 12 Nov); the owner then found the file list messy with no way to view a file, now fixed (thumbnail, View link, tidier rows; checked on the live site by the owner, 12 Nov: thumbnails and View links work). Goal reminder set up: a daily reminder goes to a paid website with no goals, a day after payment, once only. Coded and scheduled. The first reminders are due on 14 November (WNJO-BA103F and WNJO-05ECFB). Still open: confirm that the email arrives.
 - [ ] **Buy-outright request:** submit one end to end and check the proposal route in the staff admin.
 - [x] **Production builds:** checked on the live site for `4a82cb4`. The Winjo Refresh photos and "Own your website" wording are being served. Winjo Refresh and pricing look right on a phone (390px) and a desktop (1280px), with no sideways overflow and no page errors.
 
