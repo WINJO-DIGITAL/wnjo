@@ -35,6 +35,19 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Checkout details:** the pay screen asks for name, business name, email and an optional phone number. It also shows the 14-day delivery promise, the 30-day cancellation notice, and how to call or message us. The business name is required on the server too.
 - [x] **Confirmation page no longer imports a server-only module** (it pulled Node's crypto into the browser bundle and broke the dev build).
 
+## Done since 12 November (on main)
+- [x] **Physio template:** a fourth sector, with treatments, hours, address and appointment requests. It can't promise results or cures, and only mentions a registration if the customer ticks it. Sample build passes every check.
+- [x] **Own your website tiers:** Essential from £999, Professional from £1,999 and Premium from £2,999 (owner, 14 November). Each card lists what's included, and the page size carries into the proposal form.
+- [x] **Services page flow:** choose a tier, then hosting (with the managed-plan upsell beside it), then continue to the proposal.
+- [x] **Proposal form:** asks for an optional phone number, as the mobile form does.
+- [x] **Menu on the proposal page:** highlights Services, not Managed websites, and the breadcrumb reads Home > Website projects > Own your website.
+- [x] **Pricing on tablets:** the chosen plan reads "Core selected", and the bar says "Continue with Core".
+- [x] **Managed websites examples:** a swipeable carousel of all five sites (FYStay included), headed "Five sites, five identities."
+
+## Not started
+- [ ] **Hosting-only path:** choose hosting first, then "do you have a website?" Needs a new order type on the server.
+- [ ] **Desktop and phone consistency audit:** page by page, for missing buttons and calls to action.
+
 ## Still to do before launch
 - [x] **Cancellation request:** test cancellation on WS-1C9980 (12 Nov). The customer confirmation gives the end date, 12 December 2026, and the staff alert was delivered. Owner confirmed. Not yet checked: the Stripe cancel-at-period-end flag and the history entry.
 - [x] **Hotmail delivery:** sign-in emails reached Hotmail once Microsoft's outage cleared. Owner confirmed, 12 Nov.
