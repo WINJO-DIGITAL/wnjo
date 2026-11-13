@@ -85,6 +85,7 @@ export function ProjectRequest({ pages, care }: { pages?: string; care?: string 
         <TextField id="name" label="Your name" value={details.name} error={errors.name} onChange={(v) => setDetail("name", v)} autoComplete="name" />
         <TextField id="businessName" label="Business name" value={details.businessName} error={errors.businessName} onChange={(v) => setDetail("businessName", v)} autoComplete="organization" />
         <TextField id="email" label="Email" type="email" value={details.email} error={errors.email} onChange={(v) => setDetail("email", v)} autoComplete="email" />
+        <TextField id="phone" label="Phone (optional)" type="tel" value={details.phone} error={errors.phone} onChange={(v) => setDetail("phone", v)} autoComplete="tel" />
 
         <div className="visually-hidden" aria-hidden="true">
           <label htmlFor="project-website">Leave this field empty</label>

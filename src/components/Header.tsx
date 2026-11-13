@@ -12,7 +12,9 @@ import { ScrollProgress } from "./ScrollProgress";
 
 const isActive = (pathname: string, href: string) => pathname === href || pathname.startsWith(`${href}/`);
 const isCurrent = (pathname: string, item: NavItem) =>
-  isActive(pathname, item.href) || (item.also ?? []).some((href) => isActive(pathname, href));
+  (item.not ?? []).some((href) => isActive(pathname, href))
+    ? false
+    : isActive(pathname, item.href) || (item.also ?? []).some((href) => isActive(pathname, href));
 
 function Chevron({ dir = "down", size = 10 }: { dir?: "down" | "right" | "left"; size?: number }) {
   const rotate = { down: 0, right: -90, left: 90 }[dir];

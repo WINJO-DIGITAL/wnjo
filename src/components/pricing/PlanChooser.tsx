@@ -37,11 +37,11 @@ export function PlanChooser() {
               </ul>
               <button
                 type="button"
-                className={`btn pkg-card__cta ${isSelected ? "btn--primary" : "btn--secondary"}`}
+                className={`btn pkg-card__cta ${isSelected ? "btn--primary pkg-card__cta--selected" : "btn--secondary"}`}
                 aria-pressed={isSelected}
                 onClick={() => setSelected(id)}
               >
-                Choose {plan.name}
+                {isSelected ? `${plan.name} selected` : `Choose ${plan.name}`}
               </button>
             </li>
           );

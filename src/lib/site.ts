@@ -41,6 +41,8 @@ export type NavItem = NavLink & {
   menu?: NavMenu;
   /** Other paths that belong to this section, for the current-section indicator. */
   also?: string[];
+  /** Paths that belong to a different section even though `also` would match them. */
+  not?: string[];
   /** Kept off the desktop bar so it stays uncrowded; the phone menu and the footer still list it. */
   mobileOnly?: boolean;
 };
@@ -50,6 +52,7 @@ export const primaryNav: NavItem[] = [
     href: "/managed-websites",
     label: "Managed websites",
     also: ["/build", "/winjo-refresh"],
+    not: ["/build/project"],
     menu: {
       primary: [
         { href: "/managed-websites", label: "How it works" },
@@ -65,7 +68,7 @@ export const primaryNav: NavItem[] = [
   {
     href: "/website-projects",
     label: "Services",
-    also: ["/booking-software", "/app-development"],
+    also: ["/booking-software", "/app-development", "/build/project"],
     menu: {
       primary: [
         { href: "/website-projects", label: "Own your website" },
@@ -90,7 +93,7 @@ export const primaryNav: NavItem[] = [
     },
   },
   { href: "/about", label: "About" },
-  { href: "/website-projects", label: "Website projects", mobileOnly: true },
+  { href: "/website-projects", label: "Website projects", also: ["/build/project"], mobileOnly: true },
   { href: "/contact", label: "Contact", mobileOnly: true },
 ];
 
@@ -106,6 +109,7 @@ export const mobileNav: { label: string; items: NavItem[] }[] = [
         href: "/managed-websites",
         label: "Websites",
         also: ["/build", "/winjo-refresh", "/pricing"],
+        not: ["/build/project"],
         menu: {
           primary: [
             { href: "/managed-websites", label: "How it works" },

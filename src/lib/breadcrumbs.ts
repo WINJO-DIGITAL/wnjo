@@ -29,6 +29,8 @@ export type Crumb = { href: string; label: string };
 export function breadcrumbTrail(path: string, extra: Record<string, string> = {}): Crumb[] | null {
   const clean = path.split(/[?#]/)[0].replace(/\/+$/, "") || "/";
   if (clean === "/") return null;
+  // The buy-outright form sits under Website projects, not under the plan flow.
+  if (clean === "/build/project") return [{ href: "/", label: "Home" }, { href: "/website-projects", label: "Website projects" }, { href: clean, label: "Own your website" }];
   const labels = { ...LABELS, ...extra };
   const parts = clean.split("/").filter(Boolean);
   const trail: Crumb[] = [{ href: "/", label: "Home" }];

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CtaBand, PageHero, SectionHead } from "@/components/Blocks";
-import { BrowserFrame } from "@/components/Devices";
 import { ArrowRight } from "@/components/Icons";
+import { WorkCarousel } from "@/components/interactive/WorkCarousel";
 import { SiteStyler } from "@/components/interactive/SiteStyler";
 import { CareBoard } from "@/components/managed/CareBoard";
 import { CareHero } from "@/components/managed/CareHero";
@@ -144,30 +144,11 @@ export default function ManagedWebsitesPage() {
       {/* Evidence. */}
       <section className="section section--ruled" aria-labelledby="examples-title">
         <div className="container container--wide">
-          <SectionHead eyebrow="Our work" title={<span id="examples-title">Three clients, three identities.</span>} split>
+          <SectionHead eyebrow="Our work" title={<span id="examples-title">Five sites, five identities.</span>} split>
             <p>The same standards underneath, a different face on top.</p>
           </SectionHead>
-          <div className="site-strip">
-            {projects
-              .filter((p) => p.kind === "client")
-              .map((p) => (
-                <Link key={p.slug} href={`/work#${p.slug}`}>
-                  <div>
-                    <BrowserFrame
-                      src={p.desktop}
-                      host={p.host}
-                      alt={`The ${p.name} website`}
-                      sizes="(min-width: 48rem) 420px, 90vw"
-                    />
-                  </div>
-                  <p>
-                    <strong>{p.name}</strong>
-                    <span>{p.sector}</span>
-                  </p>
-                </Link>
-              ))}
-          </div>
         </div>
+        <WorkCarousel items={projects} />
       </section>
 
       <CtaBand
