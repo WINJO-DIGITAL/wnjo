@@ -45,9 +45,9 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Managed websites examples:** a swipeable carousel of all five sites (FYStay included), headed "Five sites, five identities."
 - [x] **Desktop and phone consistency audit (14 November):** every public page compared at desktop, iPad and phone size. Fixed the sideways scroll on pricing on phones, the missing Continue bar after choosing a plan on desktop, and the homepage section links hidden on phones. Signed-in account and admin screens were not covered.
 - [x] **Hosting-only request flow (14 November):** new page `/build/hosting`, linked from the services and pricing pages. Choose Hosting, Care or Care Plus, say where the website is up to, give details. The price comes from the plan on the server. Tested.
+- [x] **Hosting-only, online payment (14 November):** `/build/hosting` takes payment through Stripe. Database change applied (package codes `hosting`, `care`, `care_plus`). Tested on the live site in Stripe test mode: Care Plus hosting reached Stripe at £220 a month, the payment returned to the hosting confirmation page, the webhook activated the plan (one payment, no ownership milestone) and the owner got one alert after payment and none before. The customer welcome email was attempted but Resend refuses `example.com` test addresses, so its wording is covered by tests only.
 
 ## Not started
-- [ ] **Hosting-only, online payment:** built (`/build/hosting`): choose a plan, say whether you have a website, agree to the terms, then pay through Stripe. Needs one database change first (migration `20261114120000_hosting_subscription_packages.sql`, run in the Supabase SQL editor), then one test payment on the live site. Until the SQL is run, requests are still recorded and the customer is told a link will follow.
 
 ## Still to do before launch
 - [x] **Cancellation request:** test cancellation on WS-1C9980 (12 Nov). The customer confirmation gives the end date, 12 December 2026, and the staff alert was delivered. Owner confirmed. Not yet checked: the Stripe cancel-at-period-end flag and the history entry.
