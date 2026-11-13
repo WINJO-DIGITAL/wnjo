@@ -10,6 +10,8 @@ export function reminderEmail(input: { name: string; quoteReference: string; sit
     text: [
       `Hi ${first},`,
       "",
+      `Reference: ${input.quoteReference}`,
+      "",
       `Just a reminder that quote ${input.quoteReference} is still waiting for you.`,
       "",
       `To see it in full and accept it, sign in at ${site}/account with this email address.`,

@@ -8,6 +8,8 @@ export function quoteEmail(input: { name: string; quoteReference: string; low: n
     text: [
       `Hi ${first},`,
       "",
+      `Reference: ${input.quoteReference}`,
+      "",
       `Thanks for your brief. Your quote is ready: ${gbp(input.low)} to ${gbp(input.high)}. No VAT is added.`,
       "",
       `To see the full quote and accept it, sign in at ${site}/account with this email address.`,

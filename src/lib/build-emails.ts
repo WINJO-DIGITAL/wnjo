@@ -8,6 +8,8 @@ export function proposalReadyEmail(args: { name: string; reference: string; acco
     text: [
       `Hi ${first(args.name)},`,
       "",
+      `Reference: ${args.reference}`,
+      "",
       "We've put your proposal together. Sign in to read it and let us know what you think:",
       args.accountUrl,
       "",
@@ -23,6 +25,8 @@ export function previewReadyAgainEmail(args: { name: string; reference: string; 
     subject: `Your changes are done [${args.reference}]`,
     text: [
       `Hi ${first(args.name)},`,
+      "",
+      `Reference: ${args.reference}`,
       "",
       "We've made the changes you asked for. Sign in to your account to take another look, or ask for anything else:",
       args.accountUrl,
@@ -40,6 +44,8 @@ export function previewReadyEmail(args: { name: string; reference: string; accou
     text: [
       `Hi ${first(args.name)},`,
       "",
+      `Reference: ${args.reference}`,
+      "",
       "We've finished the first version of your website. Sign in to your account to take a look:",
       args.accountUrl,
       "",
@@ -56,6 +62,8 @@ export function handedOverEmail(args: { name: string; reference: string; account
     subject: `Your website is handed over [${args.reference}]`,
     text: [
       `Hi ${first(args.name)},`,
+      "",
+      `Reference: ${args.reference}`,
       "",
       "Your final payment is in, and your website is now handed over to you, as set out in our terms.",
       ...(args.message ? ["", args.message] : []),
