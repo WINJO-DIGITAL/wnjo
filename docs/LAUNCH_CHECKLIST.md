@@ -50,6 +50,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 ## Grok switch-on (last step before launch)
 - [x] Apply migration `20261109190000_website_ai_plans_and_previews.sql` (applied; tables and rules checked).
 - [x] Customer preview permissions locked down: the secret preview address isn't readable from the browser.
+- [x] **Stripe test setup (13 Nov):** the WINJO Digital test account is set up, with the test key and webhook on production and preview. A test order on the site was paid and processed by the webhook. Test customers and subscriptions were removed, and the test product is switched off.
 - [ ] Set `XAI_API_KEY`, `XAI_MODEL`, `XAI_INPUT_PENCE_PER_MILLION_TOKENS` and `XAI_OUTPUT_PENCE_PER_MILLION_TOKENS` in Vercel (optional: `AI_MAX_PENCE_PER_BRIEF`, default 300).
 - [x] Run one test website end to end: pay in test mode, check the plan and preview appear in Admin, view the draft, release it, and open it from the customer account. Confirmed by the owner (already done).
 - [ ] Check the model's reply shape against the live service. The code was only tested against a fake.
