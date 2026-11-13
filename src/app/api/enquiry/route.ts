@@ -11,16 +11,17 @@ import { rateLimited } from "@/lib/rate-limit";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { serviceClient } from "@/lib/quote-store";
 import { INTENTS, cleanDetails, formatDetails, validateDetails, type Intent } from "@/lib/website-enquiry";
-import { customerAcknowledgement, ownerSubject, payLinkEmail, projectAcknowledgement } from "@/lib/website-emails";
+import { customerAcknowledgement, hostingAcknowledgement, ownerSubject, payLinkEmail, projectAcknowledgement } from "@/lib/website-emails";
 import { startQuotePayment } from "@/lib/pay-from-quote";
 import { routeFor } from "@/lib/build-journey";
 import { payNowFor } from "@/lib/pay-now";
-import { OWNERSHIP } from "@/lib/pricing";
+import { CARE_PLANS, OWNERSHIP } from "@/lib/pricing";
 import { ROUTED_WANTS, formatWebsiteQuote, parseWebsiteAnswers, websiteQuote } from "@/lib/website-quote";
 import { formatGBP } from "@/lib/pricing";
 import { confirmBriefFiles, createBrief } from "@/lib/brief-store";
 import { WNJO_TENANT_ID } from "@/lib/enquiry-store";
 import { cleanProjectRequest } from "@/lib/project-request";
+import { WEBSITE_STATUS, cleanHostingRequest } from "@/lib/hosting-request";
 import { DRAFT_ID_RE, cleanBrief, formatBrief as formatWebsiteBrief, validateBrief } from "@/lib/website-brief";
 
 export const runtime = "nodejs";
@@ -74,6 +75,8 @@ export async function POST(request: NextRequest) {
   if (body.kind === "website" && !fromForm) return handleWebsiteQuote(body, request);
   // The buy-outright request (/build/project): a short brief that goes to a written proposal.
   if (body.kind === "project" && !fromForm) return handleProjectRequest(body, request);
+  // The hosting-only request (/build/hosting): a plan and where their website is up to, then a payment link from us.
+  if (body.kind === "hosting" && !fromForm) return handleHostingRequest(body, request);
 
   const kind = body.kind === "brief" ? "brief" : "contact";
   // Budget and timeline help, but are optional everywhere, so nobody is stopped for not knowing yet.
@@ -246,6 +249,58 @@ async function handleProjectRequest(body: Json, request: NextRequest) {
     await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Project request acknowledgement");
   }
   return NextResponse.json({ ok: true, reference, route: created?.route ?? null, tracked: Boolean(created), pay: null, paymentStarted: false });
+}
+
+/**
+ * A request for hosting on its own. Saved as an enquiry (so it shows in Admin and survives an email failure), emailed to
+ * the owner, and acknowledged to the customer. The plan and its price come from the one price list here, never the browser.
+ */
+async function handleHostingRequest(body: Json, request: NextRequest) {
+  const parsed = cleanHostingRequest(body);
+  if (!parsed.ok) return NextResponse.json({ error: "Please check the highlighted fields.", fields: parsed.errors }, { status: 422 });
+  const { plan, status, details } = parsed.value;
+
+  const config = mailConfig();
+  const storeOn = enquiryStoreConfigured();
+  if (!config && !storeOn) {
+    return NextResponse.json({ error: "Online enquiries aren't connected yet, so this request has not been sent.", code: "not_configured" }, { status: 503 });
+  }
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const shared = LIMITS_PER_ROUTE.enquiry;
+  if (rateLimited(ip) || (await sharedRateLimited(serviceClient(), "enquiry", ip, shared.max, shared.windowSeconds))) {
+    return NextResponse.json({ error: "Too many submissions from this connection. Please try again in a few minutes." }, { status: 429 });
+  }
+
+  const reference = newReference();
+  const subject = `Hosting request from ${details.businessName || details.name} [${reference}]`;
+  const text = [
+    `Reference: ${reference}`,
+    "Route: hosting only (send them a secure payment link to start the plan)",
+    `Plan: ${CARE_PLANS[plan].label}, ${formatGBP(CARE_PLANS[plan].monthly)} a month`,
+    `Their website: ${WEBSITE_STATUS[status]}`,
+    ...(status === "need" ? ["They were shown a bespoke website from £999 and a managed plan from £99 a month, and chose to continue with hosting."] : []),
+    "",
+    `Name: ${details.name}`,
+    `Business: ${details.businessName}`,
+    `Email: ${details.email}`,
+    ...(details.phone ? [`Phone: ${details.phone}`] : []),
+    ...(details.existingWebsite ? [`Website address: ${details.existingWebsite}`] : []),
+  ].join("\n");
+  const saved = storeOn
+    ? await saveEnquiry({ reference, kind: "contact", name: details.name, email: details.email, company: details.businessName, topic: "Hosting request", subject, body: text })
+    : false;
+  const sent = config ? await sendEnquiryEmail(config, { subject, text, replyTo: details.email }) : false;
+  if (!saved && !sent) {
+    return NextResponse.json({ error: "We couldn't send your request just now. Please try again shortly." }, { status: 502 });
+  }
+
+  const customerConfig = notificationMailConfig();
+  if (customerConfig) {
+    const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
+    const ack = hostingAcknowledgement({ reference, details, plan, status, siteUrl: site });
+    await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Hosting request acknowledgement");
+  }
+  return NextResponse.json({ ok: true, reference, route: null, tracked: false, pay: null, paymentStarted: false });
 }
 
 /**

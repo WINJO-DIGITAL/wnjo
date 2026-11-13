@@ -83,7 +83,7 @@ export default function PricingPage() {
             <p>
               Every managed plan already includes all of this, so you only have to run your business. If you buy your website
               outright, add hosting and care below. Rolling monthly, with 30 days&apos; notice to end.{" "}
-              <a href="#plans">See the monthly plans</a>.
+              <a href="#plans">See the monthly plans</a>, or <Link href="/build/hosting">get hosting only</Link>.
             </p>
           </SectionHead>
           <div className="included-panel" data-reveal>

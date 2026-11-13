@@ -8,7 +8,7 @@ import { PLAN_EVENT } from "@/lib/plan-selection";
 import { WEBSITE_PLANS, type WebsitePlanId } from "@/lib/pricing";
 
 /** Pages that already are the next step, so the bar would only get in the way. */
-const HIDDEN_ON = ["/contact", "/build", "/build/project", "/account", "/admin"];
+const HIDDEN_ON = ["/contact", "/build", "/build/project", "/build/hosting", "/account", "/admin"];
 
 /**
  * Phones and tablets: once the visitor has scrolled past the opening screen, a slim bar

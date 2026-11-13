@@ -5,6 +5,7 @@ const LABELS: Record<string, string> = {
   "/website-projects": "Website projects",
   "/build": "Get started",
   "/build/project": "Own your website",
+  "/build/hosting": "Hosting only",
   "/booking-software": "Booking software",
   "/app-development": "App development",
   "/work": "Our work",
@@ -30,7 +31,7 @@ export function breadcrumbTrail(path: string, extra: Record<string, string> = {}
   const clean = path.split(/[?#]/)[0].replace(/\/+$/, "") || "/";
   if (clean === "/") return null;
   // The buy-outright form sits under Website projects, not under the plan flow.
-  if (clean === "/build/project") return [{ href: "/", label: "Home" }, { href: "/website-projects", label: "Website projects" }, { href: clean, label: "Own your website" }];
+  if (clean === "/build/project" || clean === "/build/hosting") return [{ href: "/", label: "Home" }, { href: "/website-projects", label: "Website projects" }, { href: clean, label: LABELS[clean] }];
   const labels = { ...LABELS, ...extra };
   const parts = clean.split("/").filter(Boolean);
   const trail: Crumb[] = [{ href: "/", label: "Home" }];

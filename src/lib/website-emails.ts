@@ -2,7 +2,8 @@
  * Emails for website quotes. Plain text, so nothing a visitor typed is ever rendered as HTML. Each one states the
  * first payment and the ongoing payment separately, and says that the final price is confirmed in writing.
  */
-import { DELIVERY, LEGAL_REVIEW_PENDING, OWNERSHIP, formatGBP, formatPence } from "./pricing";
+import { CARE_PLANS, DELIVERY, LEGAL_REVIEW_PENDING, OWNERSHIP, formatGBP, formatPence } from "./pricing";
+import { WEBSITE_STATUS, type HostingPlan, type WebsiteStatus } from "./hosting-request";
 import { siteUrl } from "./site";
 import { UNNAMED, type Intent, type WebsiteDetails } from "./website-enquiry";
 import type { WebsiteQuote } from "./website-quote";
@@ -67,6 +68,40 @@ export function projectAcknowledgement(args: { reference: string; details: Websi
     "WINJO DIGITAL",
   ].join("\n");
   return { subject: `Thank you. Now tell us about your website [${reference}]`, text };
+}
+
+/**
+ * The acknowledgement for a hosting-only request. Nothing is charged yet: the owner sends a secure payment link, so
+ * this says what to expect and what happens next, without promising a start date.
+ */
+export function hostingAcknowledgement(args: { reference: string; details: WebsiteDetails; plan: HostingPlan; status: WebsiteStatus; siteUrl: string }): { subject: string; text: string } {
+  const { reference, details, plan, status, siteUrl } = args;
+  const site = siteUrl.replace(/\/+$/, "");
+  const next =
+    status === "have"
+      ? `We'll check ${details.existingWebsite} and connect it to your hosting.`
+      : status === "need"
+        ? `You told us you need a website too. We'll include what we can offer, a bespoke website from ${formatGBP(999)} or a managed plan from ${formatGBP(99)} a month that includes hosting.`
+        : "When your website is ready, we'll connect it to your hosting.";
+  const text = [
+    `Hi ${first(details.name)},`,
+    "",
+    `Thank you for choosing hosting with us. Your reference is ${reference}.`,
+    "",
+    "YOUR REQUEST",
+    `Plan: ${CARE_PLANS[plan].label}, ${formatGBP(CARE_PLANS[plan].monthly)} a month`,
+    `Your website: ${WEBSITE_STATUS[status]}`,
+    "",
+    "WHAT HAPPENS NEXT",
+    "We reply within one working day with a secure link to start your plan.",
+    next,
+    "Nothing is charged until you use that link. Rolling monthly, with 30 days' notice to end.",
+    "",
+    `Questions? Reply to this email, or see ${site}/website-projects`,
+    "",
+    "WINJO DIGITAL",
+  ].join("\n");
+  return { subject: `Thank you for choosing hosting [${reference}]`, text };
 }
 
 export function customerAcknowledgement(args: {

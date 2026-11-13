@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CtaBand, PageHero, SectionHead } from "@/components/Blocks";
+import { ArrowRight } from "@/components/Icons";
 import { HostingPicker, PackagePicker, PlanFlow } from "@/components/interactive/PlanFlow";
 import { pageMetadata } from "@/lib/metadata";
 import { ONE_OFF_WEBSITE, SCOPED_FROM, SUBSCRIPTIONS, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
@@ -26,6 +27,11 @@ export default function WebsiteProjectsPage() {
             Talk to us
           </Link>
         </div>
+        <p className="mt-4">
+          <Link href="/build/hosting" className="arrow-link">
+            Just need hosting? Get hosting only <ArrowRight />
+          </Link>
+        </p>
       </PageHero>
 
       {/* Pick a tier, then hosting; the bar along the bottom carries the choice into the proposal. */}
@@ -52,6 +58,10 @@ export default function WebsiteProjectsPage() {
             <HostingPicker />
           </div>
           <div className="container container--wide mt-6">
+            <p className="plans-note">
+              Just need hosting for a website you already have?{" "}
+              <Link href="/build/hosting">Get hosting only</Link>.
+            </p>
             <p className="plans-note">
               Prefer us to run everything? A <Link href="/pricing#plans">managed website</Link> includes the design, hosting,
               maintenance and updates from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month.
