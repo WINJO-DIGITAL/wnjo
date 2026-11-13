@@ -17,6 +17,11 @@ import raengTablet from "../../public/work/raeng-tablet.webp";
 import raengPage from "../../public/work/raeng-page.webp";
 import raengLogo from "../../public/work/logos/raeng-fitness.png";
 import boonmaLogo from "../../public/work/logos/boonma.png";
+import duratekDesktop from "../../public/work/duratek-desktop.webp";
+import duratekMobile from "../../public/work/duratek-mobile.webp";
+import duratekPage from "../../public/work/duratek-page.webp";
+import duratekTablet from "../../public/work/duratek-tablet.webp";
+import duratekLogo from "../../public/work/logos/duratek.png";
 import evexecLogo from "../../public/work/logos/ev-exec.png";
 import fystayLogo from "../../public/work/logos/fystay.png";
 
@@ -162,6 +167,39 @@ export const projects: Project[] = [
       poster: "/work/raeng-walkthrough.webp",
     },
     identity: "Heavy uppercase sans on black training photography, with cream for the light areas.",
+  },
+  {
+    slug: "duratek",
+    name: "Duratek",
+    kind: "client",
+    sector: "Flooring wholesaler",
+    industry: "other",
+    location: "Northwest UK",
+    summary: "A flooring wholesaler selling waterproof click flooring, with fifteen finishes and free samples posted to the customer.",
+    challenge:
+      "A flooring wholesaler needed its range to be easy to browse, and customers to see how each finish looks in their own room before they buy.",
+    solution:
+      "A clean, product-led website: each finish is shown on its own page, plank sizes are drawn to scale, and customers can order up to three free samples.",
+    built: [
+      "Fifteen finishes, light to dark, with a compare slider",
+      "Standard and extra-long plank sizes, drawn to scale",
+      "A five-layer explainer showing how the floor is built",
+      "Free samples: customers choose up to three, posted to them",
+      "Where to buy and trade pages",
+    ],
+    url: "https://duratek.vercel.app",
+    host: "duratek.vercel.app",
+    desktop: duratekDesktop,
+    mobile: duratekMobile,
+    tablet: duratekTablet,
+    logo: duratekLogo,
+    page: duratekPage,
+    walkthrough: {
+      mp4: "/work/duratek-walkthrough.mp4",
+      webm: "/work/duratek-walkthrough.webm",
+      poster: "/work/duratek-walkthrough.webp",
+    },
+    identity: "Clean and natural, with oak finishes and a calm grey palette.",
   },
   {
     slug: "fystay",

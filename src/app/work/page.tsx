@@ -12,7 +12,7 @@ import { PortfolioFilter } from "@/components/interactive/PortfolioFilter";
 export const metadata = pageMetadata(
   "/work",
   "Our work",
-  "Bespoke websites we designed, built and look after: EV Exec, Boonma, RAENG Fitness and our own platform, FYStay.",
+  "Bespoke websites we designed, built and look after: EV Exec, Boonma, RAENG Fitness, Duratek and our own platform, FYStay.",
 );
 
 export default function WorkPage() {
