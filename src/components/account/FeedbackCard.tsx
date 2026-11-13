@@ -121,7 +121,8 @@ export function FeedbackCard({
               {busy && !confirming ? "Sending…" : "Send changes"}
             </button>
             {stage === "preview" && unfinished === 0 && !confirming && (
-              <button type="button" className="btn btn--secondary" disabled={busy} onClick={() => setConfirming(true)}>
+              // Filled, like the main action, so it reads as available even when the change box is empty.
+              <button type="button" className="btn btn--primary" disabled={busy} onClick={() => setConfirming(true)}>
                 Approve this preview
               </button>
             )}
