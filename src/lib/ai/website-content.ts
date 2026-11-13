@@ -2,7 +2,8 @@
  * The words for one page of the website. Grok writes text only: no HTML, no scripts, no links. Our own code lays the
  * text out in a fixed design when the preview is shown, so nothing the model writes can run in a visitor's browser.
  */
-import type { WebsiteBrief } from "@/lib/website-brief";
+import { extrasRows } from "@/lib/brief-extras";
+import { profileLines, type WebsiteBrief } from "@/lib/website-brief";
 import { extractJson, PLAN_LIMITS, type PlanPage, type WebsitePlan } from "./website-plan";
 
 export const CONTENT_LIMITS = { headline: 120, intro: 500, heading: 80, body: 900, bullet: 160, bullets: 8, cta: 40 } as const;
@@ -25,6 +26,10 @@ export function buildContentPrompt(input: { businessName: string; brief: Website
     `Business: ${input.businessName}`,
     `Tone: ${plan.tone || "Friendly and professional"}`,
     brief.goalNote ? `About the goal: ${brief.goalNote}` : "",
+    brief.avoid ? `To avoid: ${brief.avoid}` : "",
+    brief.functionality ? `Features needed: ${brief.functionality}` : "",
+    ...(brief.otherBusinessType ? profileLines(brief.profile).map((l) => `Customer's answer. ${l}`) : []),
+    ...extrasRows(brief.extras).map(([label, value]) => `Customer's answer. ${label} ${value}`),
     `Page: ${page.title} (${page.purpose || "no purpose given"})`,
     "Sections, in order:",
     ...page.sections.map((s) => `- ${s.kind}: ${s.heading}${s.points.length ? ` (${s.points.join("; ")})` : ""}`),

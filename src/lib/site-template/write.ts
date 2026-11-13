@@ -65,7 +65,10 @@ export function buildCopyPrompt(input: WriteInput, retryIssues?: string): string
     `${preset.itemsLabel}: ${facts.services.map((s) => s.name).join("; ")}`,
     facts.areas?.length ? `Areas covered: ${facts.areas.join("; ")}. Name each one exactly as given in the area text, and no others.` : "",
     facts.address ? `Address given: yes (${facts.address})` : preset.areaSource === "address" ? "Address given: no. Leave the area text empty." : "",
-    facts.hours?.length ? "Opening hours given: yes" : "Opening hours given: no",
+    facts.hours?.length
+      ? `Opening hours: ${facts.hours.map((h) => (h.closed ? `${h.day} closed` : `${h.day} ${h.open} to ${h.close}`)).join("; ")}`
+      : "Opening hours given: no",
+
     facts.highlights?.length ? `Facts the customer gave: ${facts.highlights.map((h) => `${h.value} ${h.label}`).join("; ")}` : "",
     "Sections, in order:",
     ...wanted,
