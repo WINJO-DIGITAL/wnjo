@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { HOSTING_PLANS, WEBSITE_STATUS, type HostingErrors, type HostingPlan, type WebsiteStatus } from "@/lib/hosting-request";
+import { HOSTING_NAME, HOSTING_PLANS, WEBSITE_STATUS, type HostingErrors, type HostingPlan, type WebsiteStatus } from "@/lib/hosting-request";
 import { CARE_PLANS, ONE_OFF_TIERS, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { DETAIL_LIMITS, EMPTY_DETAILS, type WebsiteDetails } from "@/lib/website-enquiry";
 import { useEnquirySubmit } from "../useEnquirySubmit";
@@ -69,27 +69,68 @@ export function HostingRequest() {
   }
 
   if (state.status === "success" && plan) {
+    // The same confirmation look as the payment screen after Stripe, so the whole journey reads as one.
+    const first = details.name.trim().split(/\s+/)[0];
     return (
-      <div className={styles.done}>
-        <div className="card card--raised stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
-          <h2 className="h2" tabIndex={-1} ref={(el) => el?.focus()}>
-            Thank you, {details.name.trim().split(/\s+/)[0]}.
-          </h2>
-          <p className="muted">
-            {state.paymentStarted
-              ? <>We couldn&apos;t open the payment page just now, so we&apos;ve emailed a secure link to <strong>{details.email}</strong> to finish your {CARE_PLANS[plan].label} plan. Nothing is charged until you use it.</>
-              : <>We&apos;ll reply to <strong>{details.email}</strong> within one working day with a secure link to start your {CARE_PLANS[plan].label} plan. Nothing is charged until you use it.</>}{" "}
-            Your reference is <strong>{state.reference}</strong>.
-          </p>
-          <div className="btn-row">
-            <Link href="/website-projects" className="btn btn--primary">
-              Back to services
-            </Link>
-            <Link href="/work" className="btn btn--secondary">
-              See our work
-            </Link>
-          </div>
+      <div className="pc" data-stage="done">
+        <div className="pc__head">
+          <svg className="pc__badge" width="96" height="96" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+            <circle className="pc__ring-track" cx="48" cy="48" r="44" />
+            <circle className="pc__ring" cx="48" cy="48" r="44" />
+            <path className="pc__tick" d="M30 49.5 42.5 62 67 36" />
+          </svg>
+          <p className="pc__status" role="status" aria-live="polite">Request received</p>
+          <h1 className="pc__title" tabIndex={-1} ref={(el) => el?.focus()}>Thank you, {first}.</h1>
         </div>
+
+        <section className="pc__card pc__reveal" aria-labelledby="hosting-number-label">
+          <div className="pc__number-row">
+            <div>
+              <p className="pc__label" id="hosting-number-label">Confirmation number</p>
+              <p className="pc__number">{state.reference}</p>
+            </div>
+          </div>
+          <dl className="pc__rows">
+            <div>
+              <dt>Plan</dt>
+              <dd>{HOSTING_NAME[plan]}, {formatGBP(CARE_PLANS[plan].monthly)} a month</dd>
+            </div>
+            <div>
+              <dt>Sent to</dt>
+              <dd>{details.email}</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section className="pc__next pc__reveal" aria-labelledby="hosting-next-title">
+          <h2 id="hosting-next-title" className="pc__next-title">What happens next</h2>
+          <ol className="pc__steps">
+            <li>
+              <strong>{state.paymentStarted ? "Use your secure link" : "Check your inbox"}</strong>
+              <p>
+                {state.paymentStarted
+                  ? <>We couldn&apos;t open the payment page just now, so we&apos;ve emailed a link to finish your plan. Nothing is charged until you use it.</>
+                  : <>We&apos;ll reply within one working day with a secure link to start your plan. Nothing is charged until you use it.</>}
+              </p>
+            </li>
+            <li>
+              <strong>We connect your hosting</strong>
+              <p>Once your plan is started, we connect it to your website and confirm by email.</p>
+            </li>
+            <li>
+              <strong>Manage your plan</strong>
+              <p>Sign in to your account with this email address to see your plan and billing at any time.</p>
+            </li>
+          </ol>
+        </section>
+
+        <div className="pc__actions pc__reveal">
+          <Link href="/website-projects" className="btn btn--primary">Back to services</Link>
+          <Link href="/work" className="pc__home">See our work</Link>
+        </div>
+        <p className="fine pc__reveal">
+          Questions? Reply to your email or <Link href="/contact">contact us</Link> and quote {state.reference}.
+        </p>
       </div>
     );
   }

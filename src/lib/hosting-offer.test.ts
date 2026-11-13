@@ -39,10 +39,10 @@ describe("hosting emails", () => {
     expect(m.text).not.toMatch(/goals|pages and style|ownership/i);
   });
 
-  it("offers the ways to get a website to someone who needs one", () => {
+  it("offers a way to get a website to someone who needs one", () => {
     const m = welcomeEmail({ ...base, hosting: { siteUrl: "", websiteStatus: "need" } });
-    expect(m.text).toContain("from £999");
-    expect(m.text).toContain("from £99 a month");
+    expect(m.text).toContain("Need a website as well?");
+    expect(m.text).toContain("/website-projects");
   });
 
   it("still welcomes a website plan customer as before", () => {

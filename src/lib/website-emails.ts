@@ -3,7 +3,7 @@
  * first payment and the ongoing payment separately, and says that the final price is confirmed in writing.
  */
 import { CARE_PLANS, DELIVERY, LEGAL_REVIEW_PENDING, OWNERSHIP, formatGBP, formatPence } from "./pricing";
-import { WEBSITE_STATUS, type HostingPlan, type WebsiteStatus } from "./hosting-request";
+import { HOSTING_NAME, type HostingPlan, type WebsiteStatus } from "./hosting-request";
 import { siteUrl } from "./site";
 import { UNNAMED, type Intent, type WebsiteDetails } from "./website-enquiry";
 import type { WebsiteQuote } from "./website-quote";
@@ -74,6 +74,12 @@ export function projectAcknowledgement(args: { reference: string; details: Websi
  * The acknowledgement for a hosting-only request. Nothing is charged yet: the owner sends a secure payment link, so
  * this says what to expect and what happens next, without promising a start date.
  */
+const WEBSITE_SUMMARY: Record<WebsiteStatus, string> = {
+  have: "Already built, to connect to hosting",
+  need: "Still to be built",
+  other: "Being built by someone else",
+};
+
 export function hostingAcknowledgement(args: { reference: string; details: WebsiteDetails; plan: HostingPlan; status: WebsiteStatus; siteUrl: string }): { subject: string; text: string } {
   const { reference, details, plan, status, siteUrl } = args;
   const site = siteUrl.replace(/\/+$/, "");
@@ -81,16 +87,18 @@ export function hostingAcknowledgement(args: { reference: string; details: Websi
     status === "have"
       ? `We'll check ${details.existingWebsite} and connect it to your hosting.`
       : status === "need"
-        ? `You told us you need a website too. We'll include what we can offer, a bespoke website from ${formatGBP(999)} or a managed plan from ${formatGBP(99)} a month that includes hosting.`
+        ? `Need a website as well? We can build one: a bespoke website from ${formatGBP(999)}, or a managed website from ${formatGBP(99)} a month with hosting included.`
         : "When your website is ready, we'll connect it to your hosting.";
   const text = [
     `Hi ${first(details.name)},`,
     "",
-    `Thank you for choosing hosting with us. Your reference is ${reference}.`,
+    "Thank you for choosing hosting with us.",
     "",
     "YOUR REQUEST",
-    `Plan: ${CARE_PLANS[plan].label}, ${formatGBP(CARE_PLANS[plan].monthly)} a month`,
-    `Your website: ${WEBSITE_STATUS[status]}`,
+    `Reference: ${reference}`,
+    `Plan: ${HOSTING_NAME[plan]}`,
+    `Monthly payment: ${formatGBP(CARE_PLANS[plan].monthly)}, taken automatically each month`,
+    `Your website: ${WEBSITE_SUMMARY[status]}`,
     "",
     "WHAT HAPPENS NEXT",
     "We reply within one working day with a secure link to start your plan.",
@@ -249,41 +257,36 @@ function detailsStep(f: SubscriptionEmailFacts): string[] {
   ];
 }
 
-/** The next step for hosting, by where the customer's website stands. */
-function hostingNext(h: NonNullable<SubscriptionEmailFacts["hosting"]>): string[] {
-  const site = (siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "");
-  if (h.websiteStatus === "have") {
-    return [`We'll connect your hosting to ${h.siteUrl || "your website"}. We'll email you within one working day to confirm it, and ask for anything we need.`];
-  }
-  if (h.websiteStatus === "need") {
-    return [
-      "You told us you need a website too. Reply to this email and we'll talk it through, or see the options:",
-      `A bespoke website from ${formatGBP(999)}: ${site}/website-projects`,
-      `A managed website from ${formatGBP(99)} a month, hosting included: ${site}/pricing`,
-    ];
-  }
-  return ["When your website is ready, reply to this email with the details and we'll connect it to your hosting."];
-}
-
 /** Hosting is rolling monthly with 30 days' notice to end, as the pricing page says. */
 const HOSTING_TERM = "Rolling monthly, with 30 days' notice to end.";
 
 function hostingWelcome(f: SubscriptionEmailFacts, h: NonNullable<SubscriptionEmailFacts["hosting"]>): { subject: string; text: string } {
-  const account = `${(siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "")}/account`;
+  const site = (siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "");
+  const next =
+    h.websiteStatus === "have"
+      ? `We'll connect your hosting to ${h.siteUrl || "your website"} and email you within one working day to confirm.`
+      : h.websiteStatus === "need"
+        ? "We'll email you within one working day to confirm, and we'll talk through your website with you."
+        : "When your website is ready, reply to this email with its address and we'll connect it to your hosting.";
   return {
     subject: `Your hosting is active [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
       "",
-      `Thank you. Your first payment for ${f.packageName} has been received, and your hosting is now active.`,
+      `Thank you. Your hosting is now active. You can see your plan and billing any time in your account:`,
+      `${site}/account`,
+      "",
+      `Reference: ${f.reference}`,
+      `Plan: ${f.packageName}`,
+      `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month`,
       "",
       "WHAT HAPPENS NEXT",
-      ...hostingNext(h),
+      next,
+      ...(h.websiteStatus === "need"
+        ? [`Need a website as well? Reply to this email, or see what we can build: ${site}/website-projects`]
+        : []),
+      `${HOSTING_TERM} Stripe emails a receipt for every payment.`,
       "",
-      `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month. ${HOSTING_TERM}`,
-      "Stripe emails a receipt for every payment.",
-      "",
-      `You can see your plan and manage your billing any time: ${account}`,
       ...sign,
     ].join("\n"),
   };
@@ -300,7 +303,7 @@ export function hostingPayLinkEmail(f: SubscriptionEmailFacts, link: string): { 
       link,
       "",
       `Plan: ${f.packageName}`,
-      `First payment: ${gbpPence(f.monthlyPence)}, then ${gbpPence(f.monthlyPence)} a month. ${HOSTING_TERM}`,
+      `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month. ${HOSTING_TERM}`,
       "",
       "If you have already paid, you don't need to do anything.",
       "The link works for 30 days. Please don't share it.",
@@ -341,7 +344,7 @@ export function paymentReceivedEmail(f: SubscriptionEmailFacts, amountPence: num
   if (f.ownershipAfterPayments <= 0) {
     return {
       subject: `Payment received [${f.reference}]`,
-      text: [`Hi ${first(f.name)},`, "", `We've received your ${gbpPence(amountPence)} payment. Thank you.`, ...sign].join("\n"),
+      text: [`Hi ${first(f.name)},`, "", `We've received your ${gbpPence(amountPence)} payment. Thank you.`, "", `Reference: ${f.reference}`, `Package: ${f.packageName}`, "", ...sign].join("\n"),
     };
   }
   const left = Math.max(0, f.ownershipAfterPayments - count);
@@ -364,6 +367,9 @@ export function paymentFailedEmail(f: SubscriptionEmailFacts, manageLink: string
       `Hi ${first(f.name)},`,
       "",
       `We couldn't take this month's ${gbpPence(f.monthlyPence)}. No action is needed yet: Stripe will try again over the next few days.`,
+      "",
+      `Reference: ${f.reference}`,
+      "",
       manageLink ? `To update your card now, use your billing link: ${manageLink}` : "Reply to this email and we'll help you update your card.",
       "Your website stays live while this is sorted.",
       ...sign,
@@ -376,6 +382,8 @@ export function ownershipEmail(f: SubscriptionEmailFacts): { subject: string; te
     subject: `Your website is now yours [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
+      "",
+      `Reference: ${f.reference}`,
       "",
       `Thank you for ${f.ownershipAfterPayments} successful payments. Ownership of your agreed website deliverables now transfers to you, as set out in your agreement.`,
       "",
@@ -392,6 +400,9 @@ export function cancelledEmail(f: SubscriptionEmailFacts): { subject: string; te
       `Hi ${first(f.name)},`,
       "",
       `Your ${f.packageName} subscription has ended. No further payments will be taken.`,
+      "",
+      `Reference: ${f.reference}`,
+      "",
       "If this isn't what you expected, reply to this email and we'll look into it straight away.",
       ...sign,
     ].join("\n"),
