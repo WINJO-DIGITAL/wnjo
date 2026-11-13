@@ -7,7 +7,7 @@ import { ONE_OFF_WEBSITE, SCOPED_FROM, SUBSCRIPTIONS, WEBSITE_PLANS, formatGBP }
 
 export const metadata = pageMetadata(
   "/website-projects",
-  "Website projects",
+  `Bespoke website design from ${formatGBP(ONE_OFF_WEBSITE.from)}`,
   `Own your website: a bespoke website project from ${formatGBP(ONE_OFF_WEBSITE.from)}, yours on full payment, with optional hosting and care.`,
 );
 

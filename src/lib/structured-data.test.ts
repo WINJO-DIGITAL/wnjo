@@ -9,7 +9,7 @@ describe("businessSchema", () => {
     expect(business.url).toBe("https://winjodigital.co.uk");
     expect(business.priceRange).toBe("From £99 a month");
     const offers = business.makesOffer ?? [];
-    expect(offers.flatMap((o) => (o.priceSpecification ? [o.priceSpecification.price] : []))).toEqual([99, 149, 199, 999, 49]);
+    expect(offers.flatMap((o) => (o.priceSpecification ? [o.priceSpecification.price] : []))).toEqual([99, 149, 199, 999, 1999, 2999, 49]);
     expect(offers.slice(0, 3).map((o) => o.name)).toEqual([
       "Core managed website subscription",
       "Plus managed website subscription",
@@ -33,5 +33,14 @@ describe("businessSchema", () => {
 
   it("links the website to the business", () => {
     expect(website.publisher).toEqual({ "@id": "https://winjodigital.co.uk/#business" });
+  });
+});
+
+describe("faqSchema", () => {
+  it("pairs each question with its answer as FAQPage data", async () => {
+    const { faqSchema } = await import("./structured-data");
+    const schema = faqSchema([{ q: "What does Core cost?", a: "£99 a month." }]);
+    expect(schema["@type"]).toBe("FAQPage");
+    expect(schema.mainEntity).toEqual([{ "@type": "Question", name: "What does Core cost?", acceptedAnswer: { "@type": "Answer", text: "£99 a month." } }]);
   });
 });

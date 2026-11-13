@@ -1,4 +1,4 @@
-import { CARE_PLANS, ONE_OFF_WEBSITE, WEBSITE_PLANS } from "@/lib/pricing";
+import { CARE_PLANS, ONE_OFF_TIERS, WEBSITE_PLANS } from "@/lib/pricing";
 import { site } from "@/lib/site";
 
 /**
@@ -43,11 +43,12 @@ export function businessSchema(baseUrl: string) {
         })),
         { "@type": "Offer", name: "Booking system development" },
         { "@type": "Offer", name: "Custom software and app development" },
-        {
+        ...(["essential", "professional", "premium"] as const).map((id) => ({
           "@type": "Offer",
-          name: "Bespoke website design and build",
-          priceSpecification: { "@type": "PriceSpecification", price: ONE_OFF_WEBSITE.from, minPrice: ONE_OFF_WEBSITE.from, priceCurrency: "GBP" },
-        },
+          name: `${ONE_OFF_TIERS[id].name} bespoke website, bought outright`,
+          description: `${ONE_OFF_TIERS[id].summary} Up to ${ONE_OFF_TIERS[id].pageLimit} pages.`,
+          priceSpecification: { "@type": "PriceSpecification", price: ONE_OFF_TIERS[id].from, minPrice: ONE_OFF_TIERS[id].from, priceCurrency: "GBP" },
+        })),
         {
           "@type": "Offer",
           name: "Managed hosting",
@@ -69,4 +70,17 @@ export function businessSchema(baseUrl: string) {
       publisher: { "@id": `${url}/#business` },
     },
   ];
+}
+
+/** The questions page as FAQPage data, so search and answer engines can quote each answer with its question. */
+export function faqSchema(items: { q: string; a: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  };
 }
