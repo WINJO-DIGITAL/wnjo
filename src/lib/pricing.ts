@@ -259,7 +259,7 @@ export const OWNERSHIP = {
   minimumTermMonths: 0,
   ownershipAfterPayments: 0,
 } as const;
-export const LEGAL_REVIEW_PENDING = true;
+export const LEGAL_REVIEW_PENDING = false;
 
 /**
  * Subscription rules the customer relies on (decided 10 November 2026, to match common UK managed-service practice).
