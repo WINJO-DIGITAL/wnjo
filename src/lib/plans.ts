@@ -24,6 +24,18 @@ export const carePlanCards: PlanCard[] = careOrder.map((id) => ({
   cta: `Choose ${CARE_PLANS[id].label}`,
 }));
 
+/** Hosting the website yourself, as a card beside the hosting plans, so it is as easy to pick as they are. */
+export const ownHostingCard: PlanCard = {
+  id: "none",
+  name: "I'll host it myself",
+  summary: CARE_PLANS.none.summary,
+  price: formatGBP(0),
+  suffix: "a month",
+  includes: ["Your website files handed over", "Hosted wherever you choose", "Add a plan later if you'd like"],
+  href: "/build/project?care=none",
+  cta: "Host it myself",
+};
+
 const packageOrder: PackageId[] = ["essential", "professional", "premium"];
 /**
  * The smallest page size on the price form that holds each package's pages (Essential 5, Professional 12, Premium 25).

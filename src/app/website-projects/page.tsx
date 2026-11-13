@@ -20,8 +20,8 @@ export default function WebsiteProjectsPage() {
         lede={`A bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}, paid up front and yours on full payment.`}
       >
         <div className="btn-row">
-          <Link href="/build/project" className="btn btn--primary">
-            Get my proposal
+          <Link href="#one-off" className="btn btn--primary">
+            Choose your website
           </Link>
           <Link href="/contact?topic=website" className="btn btn--secondary">
             Talk to us

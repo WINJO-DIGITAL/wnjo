@@ -13,6 +13,7 @@ import {
 } from "@/lib/pricing";
 import {
   carePlanCards,
+  ownHostingCard,
   packagePages,
   packagePlanCards,
 } from "@/lib/plans";
@@ -80,30 +81,15 @@ export function PackagePicker() {
 /** The hosting cards, plus an option to host the site yourself. */
 export function HostingPicker() {
   const { care, setCare } = useFlow();
-  const selectedCard = care && care !== "none" ? care : null;
   return (
-    <>
-      <PlanSwiper
-        plans={carePlanCards}
-        label="Hosting and care plans"
-        selectedId={selectedCard}
-        onSelect={(id) => {
-          if (isCare(id)) setCare(id);
-        }}
-      />
-      <div className="container container--wide mt-6">
-        <button
-          type="button"
-          className="btn btn--secondary"
-          aria-pressed={care === "none"}
-          onClick={() => setCare(care === "none" ? null : "none")}
-        >
-          {care === "none"
-            ? "Hosting it myself (selected)"
-            : "I'll host it myself"}
-        </button>
-      </div>
-    </>
+    <PlanSwiper
+      plans={[...carePlanCards, ownHostingCard]}
+      label="Hosting and care plans"
+      selectedId={care}
+      onSelect={(id) => {
+        if (isCare(id)) setCare(id);
+      }}
+    />
   );
 }
 

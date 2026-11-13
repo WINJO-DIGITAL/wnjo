@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { ProjectErrors } from "@/lib/project-request";
-import { ONE_OFF_WEBSITE, formatGBP } from "@/lib/pricing";
+import { CARE_PLANS, ONE_OFF_TIERS, WEBSITE_PAGE_BANDS, formatGBP, tierForPages, type CarePlan, type WebsitePageBand } from "@/lib/pricing";
 import { DETAIL_LIMITS, EMPTY_DETAILS, type WebsiteDetails } from "@/lib/website-enquiry";
 import { useEnquirySubmit } from "../useEnquirySubmit";
 import styles from "./Configurator.module.css";
@@ -19,6 +19,9 @@ export function ProjectRequest({ pages, care }: { pages?: string; care?: string 
   const [honeypot, setHoneypot] = useState("");
   const [startedAt] = useState(() => Date.now());
   const { state, submit } = useEnquirySubmit();
+  // What was chosen on the services page. An address without a choice starts from Essential with no hosting.
+  const tier = ONE_OFF_TIERS[tierForPages(pages && pages in WEBSITE_PAGE_BANDS ? (pages as WebsitePageBand) : "4-5")];
+  const hosting: CarePlan = care && care in CARE_PLANS ? (care as CarePlan) : "none";
 
   const setDetail = (key: keyof WebsiteDetails, value: string) => {
     setDetails((d) => ({ ...d, [key]: value }));
@@ -77,8 +80,14 @@ export function ProjectRequest({ pages, care }: { pages?: string; care?: string 
     <div className={styles.done}>
       <form onSubmit={onSubmit} noValidate className="card card--raised stack form" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
         <div>
-          <p className="eyebrow">{ONE_OFF_WEBSITE.name}</p>
-          <h2 className="h2">From {formatGBP(ONE_OFF_WEBSITE.from)}</h2>
+          <p className="eyebrow">{tier.name} website</p>
+          <h2 className="h2">From {formatGBP(tier.from)}</h2>
+          {care && care in CARE_PLANS && (
+            <p className="muted">
+              {hosting === "none" ? "Hosted by you." : `With ${CARE_PLANS[hosting].label}, ${formatGBP(CARE_PLANS[hosting].monthly)} a month.`}{" "}
+              <Link href="/website-projects#one-off">Change</Link>
+            </p>
+          )}
           <p className="muted">Tell us who you are, then answer a few questions about your website. Nothing to pay yet.</p>
         </div>
 
