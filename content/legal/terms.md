@@ -40,6 +40,8 @@ Booking systems, custom software and other individually scoped services are cove
 
 3.4 Subscriptions are rolling monthly. There is no minimum contract term. Your subscription continues until it is ended under section 8.
 
+3.5 **No ownership on a managed subscription.** A managed website subscription is a service, not a sale. You do not own the website, its code, our framework or our tools at any point while you subscribe, and monthly payments never transfer ownership of them to you. We host and maintain the website for you, and we license you to use it while your subscription is active. Section 9 explains what you receive when your subscription ends.
+
 ## 4. Changes, support and response times
 
 4.1 **What counts as a small change.** A small change is a change to existing text, images, contact details, opening hours, prices or a single existing page layout that can be made in the time allowed. Examples: updating a price, a photo, a menu item, or a line of text.
