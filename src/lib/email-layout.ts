@@ -121,7 +121,7 @@ function renderBlock(block: Block, mainLink: boolean): string {
       if (!isWebUrl(block.url)) return `<p style="margin:0 0 16px;font-family:${SANS};font-size:15px;color:${COLOR.ink2};">${escapeHtml(block.url)}</p>`;
       const href = escapeHtml(block.url);
       if (mainLink) {
-        return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 20px;"><tr><td style="border-radius:999px;background:${COLOR.ink};"><a href="${href}" style="display:inline-block;padding:14px 26px;font-family:${SANS};font-size:15px;font-weight:600;color:${COLOR.card};text-decoration:none;border-radius:999px;">${escapeHtml(buttonLabel(block.url))}</a></td></tr></table><p style="margin:0 0 16px;font-family:${SANS};font-size:13px;line-height:19px;color:${COLOR.ink3};word-break:break-all;">${href}</p>`;
+        return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 20px;"><tr><td style="border-radius:999px;background:${COLOR.ink};"><a href="${href}" style="display:inline-block;padding:14px 26px;font-family:${SANS};font-size:15px;font-weight:600;color:${COLOR.card};text-decoration:none;border-radius:999px;">${escapeHtml(buttonLabel(block.url))}</a></td></tr></table><p style="margin:0 0 16px;font-family:${SANS};font-size:13px;line-height:19px;color:${COLOR.ink3};word-break:break-all;"><a href="${href}" style="color:${COLOR.ink3};text-decoration:none;">${href}</a></p>`;
       }
       return `<p style="margin:0 0 16px;font-family:${SANS};font-size:15px;line-height:22px;"><a href="${href}" style="color:${COLOR.accent};text-decoration:underline;word-break:break-all;">${href}</a></p>`;
     }
