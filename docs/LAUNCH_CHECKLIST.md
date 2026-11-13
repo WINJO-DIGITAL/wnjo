@@ -43,10 +43,10 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Menu on the proposal page:** highlights Services, not Managed websites, and the breadcrumb reads Home > Website projects > Own your website.
 - [x] **Pricing on tablets:** the chosen plan reads "Core selected", and the bar says "Continue with Core".
 - [x] **Managed websites examples:** a swipeable carousel of all five sites (FYStay included), headed "Five sites, five identities."
+- [x] **Desktop and phone consistency audit (14 November):** every public page compared at desktop, iPad and phone size. Fixed the sideways scroll on pricing on phones, the missing Continue bar after choosing a plan on desktop, and the homepage section links hidden on phones. Signed-in account and admin screens were not covered.
 
 ## Not started
 - [ ] **Hosting-only path:** choose hosting first, then "do you have a website?" Needs a new order type on the server.
-- [ ] **Desktop and phone consistency audit:** page by page, for missing buttons and calls to action.
 
 ## Still to do before launch
 - [x] **Cancellation request:** test cancellation on WS-1C9980 (12 Nov). The customer confirmation gives the end date, 12 December 2026, and the staff alert was delivered. Owner confirmed. Not yet checked: the Stripe cancel-at-period-end flag and the history entry.
