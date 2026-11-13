@@ -59,17 +59,20 @@ Booking systems, custom software and other individually scoped services are cove
 
 ## 5. Winjo Refresh
 
-5.1 Plus and Pro include Winjo Refresh: a planned refresh of your website's design and experience **every 24 months**, counted from the start of your subscription. We will agree the date with you at least 30 days in advance.
+5.1 Every managed website plan includes a planned refresh of your website every **24 months**, counted from the start of your subscription. The level depends on your plan:
+- **Visual refresh (Core):** updates the design, colours, typography and images of your existing pages.
+- **Enhanced refresh (Plus):** the visual refresh, plus a review of layout and content and new copy for up to three existing pages.
+- **Complete refresh (Pro):** the enhanced refresh, plus a review of each page's purpose and content, with copy updated across all your existing pages.
+
+We will agree the date with you at least 30 days in advance.
 
 5.2 **Eligibility.** The refresh is available only while your subscription is active on the refresh date.
 
 5.3 **Cancelling before a refresh.** If you end your subscription before a refresh is due, you do not receive it.
 
-5.4 **What a refresh includes:** updating the visual design and experience of your existing pages, reflecting changes in your business, improving layout and navigation, and refreshing images and copy within your existing pages.
+5.4 **What a refresh does not include:** new pages beyond your plan's page limit, new features or integrations, new booking or payment functions, unlimited redevelopment, or a different website. Those are quoted separately.
 
-5.5 **What a refresh does not include:** new pages, new features or integrations, new booking or payment functions, unlimited redevelopment, or a different website. Those are quoted separately.
-
-5.6 The refresh is included in your monthly price, has no separate charge, and cannot be taken as a cash payment or transferred to another website.
+5.5 The refresh is included in your monthly price, has no separate charge, and cannot be taken as a cash payment or transferred to another website.
 
 ## 6. Price changes and changing plan
 

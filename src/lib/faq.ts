@@ -59,8 +59,8 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
   {
     q: "What is Winjo Refresh?",
     category: "website",
-    short: `A redesign every ${REFRESH.everyMonths} months`,
-    a: `A planned refresh of your website's design and experience every ${REFRESH.everyMonths} months, included in ${pro.name} and ${plus.name}. It modernises how your website looks, improves how it works for visitors, and reflects changes in your business while staying true to your brand. It is a defined refresh service, not unlimited redevelopment or an unlimited number of new pages and features.`,
+    short: `A refresh every ${REFRESH.everyMonths} months, on every plan`,
+    a: `Every managed plan includes a planned refresh of your website every ${REFRESH.everyMonths} months. ${core.name} gets a visual refresh of your design, colours and images. ${plus.name} gets an enhanced refresh, which adds a review of layout and content and new copy for up to three pages. ${pro.name} gets a complete refresh, with copy reviewed across all your pages. Refreshes are a defined service, not unlimited redevelopment or new pages beyond your plan.`,
   },
   {
     q: "Is a managed website a template?",

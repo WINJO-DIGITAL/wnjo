@@ -120,7 +120,7 @@ export function RefreshCompare() {
     <div className="rf-compare">
       <RefreshSlider />
       <p className="rf-compare__line">
-        We plan it, design it and include it every {REFRESH.everyMonths} months in {PRO} and {PLUS}.
+        We plan it, design it and include it every {REFRESH.everyMonths} months on every plan, at the level that fits your site.
       </p>
     </div>
   );

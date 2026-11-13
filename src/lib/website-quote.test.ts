@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ADD_ONS, CARE_PLANS, EXTRA_PAGE, ONE_OFF_WEBSITE, OWNERSHIP, WEBSITE_PLANS, formatGBP } from "./pricing";
+import { ADD_ONS, CARE_PLANS, EXTRA_PAGE, ONE_OFF_WEBSITE, OWNERSHIP, REFRESH, WEBSITE_PLANS, formatGBP } from "./pricing";
 import {
   DEFAULT_WEBSITE_ANSWERS,
   bandForPlan,
@@ -44,8 +44,9 @@ describe("monthly packages", () => {
     expect(Object.entries(WEBSITE_PLANS).filter(([, p]) => p.popular).map(([id]) => id)).toEqual(["silver"]);
   });
 
-  it("includes Winjo Refresh in Plus and Pro, and not in Core", () => {
-    expect(Object.entries(WEBSITE_PLANS).filter(([, p]) => p.refresh).map(([id]) => id)).toEqual(["silver", "gold"]);
+  it("includes a Winjo Refresh on every monthly plan, at the level for that plan", () => {
+    expect(Object.entries(WEBSITE_PLANS).filter(([, p]) => p.refresh).map(([id]) => id)).toEqual(["bronze", "silver", "gold"]);
+    expect(Object.keys(REFRESH.levels)).toEqual(["bronze", "silver", "gold"]);
   });
 
   it("never adds hosting or care to a monthly package, which already includes them", () => {
