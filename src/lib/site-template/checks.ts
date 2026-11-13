@@ -157,6 +157,16 @@ export function checkSite(content: SiteContent, facts: CustomerFacts, preset: Se
     if (s.kind === "facts" && s.items.length > 4) flag("too-many-items", "More than four facts.", `sections[${i}]`);
   }
 
+  // Regulated or risky wording for this sector. Facts the customer ticked themselves are theirs to claim.
+  for (const claim of preset.restrictedClaims ?? []) {
+    if (claim.unless?.(facts)) continue;
+    for (const f of fields) {
+      if (f.where.includes(".facts.")) continue;
+      const hit = f.text.match(claim.pattern);
+      if (hit) flag("restricted-claim", `${claim.reason} ("${hit[0]}")`, f.where);
+    }
+  }
+
   // The customer's own details appear.
   const allText = norm(fields.map((f) => f.text).join(" "));
   if (norm(content.business.name) !== norm(facts.businessName)) {

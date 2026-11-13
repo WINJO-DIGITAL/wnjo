@@ -2,7 +2,7 @@
  * A sector preset says which sections a sector's site has, in what order, which are required, and what the writer
  * should aim for in each. Barber is the first. A new sector is a new preset on the same sections.
  */
-import type { Look, SectionKind } from "./schema";
+import type { CustomerFacts, Look, SectionKind } from "./schema";
 
 export type SectionPreset = {
   kind: SectionKind;
@@ -23,6 +23,12 @@ export const BUSINESS_GROUPS = {
 } as const;
 export type BusinessGroup = keyof typeof BUSINESS_GROUPS;
 
+/**
+ * Wording a sector's site must never use. The check looks at everything the writer produces except the facts the
+ * customer ticked themselves. `unless` lets a customer's own tick permit a claim (for example a registration).
+ */
+export type RestrictedClaim = { pattern: RegExp; reason: string; unless?: (facts: CustomerFacts) => boolean };
+
 export type SectorPreset = {
   id: string;
   label: string;
@@ -38,6 +44,8 @@ export type SectorPreset = {
   areaSource: "address" | "areas";
   /** The label on the free-text box of the request form. */
   enquiryPrompt: string;
+  /** For a sector where some claims are regulated or risky: wording the site may not use. */
+  restrictedClaims?: RestrictedClaim[];
 };
 
 export const BARBER_PRESET: SectorPreset = {
@@ -124,10 +132,47 @@ export const ELECTRICIAN_PRESET: SectorPreset = {
   ],
 };
 
+export const PHYSIO_PRESET: SectorPreset = {
+  id: "physio",
+  label: "Physio",
+  group: "booking",
+  defaultLook: "minimal",
+  itemsLabel: "Treatments",
+  areaSource: "address",
+  enquiryPrompt: "What would you like help with?",
+  voice: "Calm, clear and reassuring. Short sentences. Say what a treatment involves, and never promise a result or a cure.",
+  restrictedClaims: [
+    { pattern: /\b(cure[sd]?|curing|guarantee[sd]?|heal(?:s|ed|ing)?|miracle|permanent(?:ly)?|risk[- ]free|100%)\b/i, reason: "A physio site must not promise a result or a cure." },
+    {
+      pattern: /\b(HCPC|registered|chartered|qualified|accredited|member of)\b/i,
+      reason: "A registration or qualification can only be mentioned if the customer ticked it.",
+      unless: (facts) => Boolean(facts.highlights?.some((h) => h.value === "HCPC")),
+    },
+  ],
+  highlights: [
+    { id: "same-week", value: "Same week", label: "Appointments available" },
+    { id: "evenings", value: "Evening", label: "Slots available" },
+    { id: "home-visits", value: "Home visits", label: "Available" },
+    { id: "hcpc", value: "HCPC", label: "Registered physiotherapist" },
+  ],
+  sections: [
+    { kind: "hero", required: true, guidance: "Say what the clinic offers and where, in one headline. The call to action is requesting an appointment. Never promise a result." },
+    { kind: "services", required: true, guidance: "The treatments the customer listed, each with their own price if they gave one. The heading should say treatments." },
+    { kind: "hours", required: true, guidance: "Opening hours exactly as the customer gave them." },
+    { kind: "gallery", required: false, guidance: "Photos the customer uploaded, such as the clinic, with short plain captions." },
+    { kind: "facts", required: false, guidance: "Up to four short facts the customer told us, such as same-week appointments. Never invent one, and never claim a registration or qualification." },
+    { kind: "area", required: false, guidance: "Where the clinic is and how to find it, from the address the customer gave." },
+    { kind: "enquiry", required: true, guidance: "A request-an-appointment form: the customer says what they need help with and when suits, and the clinic replies." },
+    { kind: "faq", required: false, guidance: "Up to four questions a new patient asks, answered only from facts the customer gave. Never give medical advice." },
+    { kind: "cta", required: true, guidance: "A closing line that points back to requesting an appointment." },
+  ],
+};
+
 export const SECTOR_PRESETS: Record<string, SectorPreset> = {
   [BARBER_PRESET.id]: BARBER_PRESET,
   [CAFE_PRESET.id]: CAFE_PRESET,
   [ELECTRICIAN_PRESET.id]: ELECTRICIAN_PRESET,
+  [PHYSIO_PRESET.id]: PHYSIO_PRESET,
 };
 
 export function presetFor(sector: string): SectorPreset | null {

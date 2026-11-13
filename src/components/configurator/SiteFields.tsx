@@ -24,6 +24,7 @@ const SECTOR_HINT: Record<string, string> = {
   barber: "Services and prices, opening hours, and booking requests",
   cafe: "Menu, opening hours, and table requests",
   electrician: "Services, areas you cover, and quote requests",
+  physio: "Treatments and prices, opening hours, and appointment requests",
 };
 const GROUP_ORDER = Object.keys(BUSINESS_GROUPS) as BusinessGroup[];
 

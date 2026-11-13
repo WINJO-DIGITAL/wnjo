@@ -112,9 +112,55 @@ export const SAMPLE_ELECTRICIAN: SiteContent = {
   ],
 };
 
+const physioHours = [
+  { day: "Mon to Thu", open: "08:00", close: "19:00" },
+  { day: "Fri", open: "08:00", close: "17:00" },
+  { day: "Sat", open: "09:00", close: "13:00" },
+  { day: "Sun", closed: true },
+];
+
+export const SAMPLE_PHYSIO_FACTS: CustomerFacts = {
+  businessName: "Calm Physio",
+  services: [
+    { name: "Initial assessment", price: "£60" },
+    { name: "Follow-up session", price: "£45" },
+    { name: "Sports injury treatment" },
+    { name: "Rehabilitation plan" },
+  ],
+  hours: physioHours,
+  highlights: [{ value: "Same week", label: "Appointments available" }, { value: "Evening", label: "Slots available" }],
+  phone: "0117 496 0321",
+  email: "appointments@calmphysio.example",
+  address: "8 Park Row, Bristol",
+};
+
+export const SAMPLE_PHYSIO: SiteContent = {
+  business: { name: "Calm Physio", tagline: "Physiotherapy in Bristol", phone: "0117 496 0321", email: "appointments@calmphysio.example", address: "8 Park Row, Bristol" },
+  theme: { colour: "#3d3a7a", look: "minimal" },
+  sections: [
+    { kind: "hero", variant: "plain", headline: "Physiotherapy on Park Row", intro: "Assessment, treatment and rehabilitation at Calm Physio, Bristol.", cta: "Request an appointment" },
+    {
+      kind: "services",
+      heading: "Treatments",
+      items: [
+        { name: "Initial assessment", price: "£60" },
+        { name: "Follow-up session", price: "£45" },
+        { name: "Sports injury treatment" },
+        { name: "Rehabilitation plan" },
+      ],
+    },
+    { kind: "hours", heading: "Opening hours", items: physioHours },
+    { kind: "facts", items: [{ value: "Same week", label: "Appointments available" }, { value: "Evening", label: "Slots available" }] },
+    { kind: "area", heading: "Find us", text: "We are at 8 Park Row, Bristol." },
+    { kind: "enquiry", heading: "Request an appointment", intro: "Tell us what you need help with and when suits, and we will reply.", cta: "Send request", prompt: "What would you like help with?" },
+    { kind: "cta", headline: "Ready to book an assessment?", cta: "Request an appointment" },
+  ],
+};
+
 /** Every sector's sample build, with the facts it was written from. */
 export const SAMPLES: Record<string, { content: SiteContent; facts: CustomerFacts }> = {
   barber: { content: SAMPLE_BARBER, facts: SAMPLE_BARBER_FACTS },
   cafe: { content: SAMPLE_CAFE, facts: SAMPLE_CAFE_FACTS },
   electrician: { content: SAMPLE_ELECTRICIAN, facts: SAMPLE_ELECTRICIAN_FACTS },
+  physio: { content: SAMPLE_PHYSIO, facts: SAMPLE_PHYSIO_FACTS },
 };

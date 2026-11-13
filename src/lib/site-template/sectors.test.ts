@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseAnswers, parseAreas, type RawAnswers } from "./answers";
 import { checkSite } from "./checks";
-import { BARBER_PRESET, CAFE_PRESET, ELECTRICIAN_PRESET, SECTOR_PRESETS, presetFor } from "./presets";
+import { BARBER_PRESET, CAFE_PRESET, ELECTRICIAN_PRESET, PHYSIO_PRESET, SECTOR_PRESETS, presetFor } from "./presets";
 import { SAMPLES } from "./sample";
 import { assembleSite, buildCopyPrompt, parseCopy, type WriteInput } from "./write";
 
@@ -20,6 +20,7 @@ describe("every sector has a sample build that passes every check", () => {
   it("and each sector is registered", () => {
     expect(presetFor("cafe")).toBe(CAFE_PRESET);
     expect(presetFor("electrician")).toBe(ELECTRICIAN_PRESET);
+    expect(presetFor("physio")).toBe(PHYSIO_PRESET);
     expect(presetFor("plumber")).toBeNull();
   });
 
@@ -74,6 +75,29 @@ describe("the electrician's areas", () => {
     expect(p).toContain("Areas covered: Leeds; Wakefield; Harrogate");
     expect(p).toContain("Services: Full rewire");
     expect(buildCopyPrompt({ preset: CAFE_PRESET, facts: SAMPLES.cafe.facts, look: "warm", colour: "#a84a26" })).toContain("Menu items: Flat white");
+  });
+});
+
+describe("the physio template", () => {
+  const sample = SAMPLES.physio;
+  const withText = (text: string) => ({ ...sample.content, sections: sample.content.sections.map((x) => (x.kind === "hero" ? { ...x, intro: text } : x)) });
+  const issues = (text: string, facts = sample.facts) => checkSite(withText(text), facts, PHYSIO_PRESET).issues.map((i) => i.code);
+
+  it("books by request, with treatments, hours and an address", () => {
+    expect(PHYSIO_PRESET.group).toBe("booking");
+    expect(PHYSIO_PRESET.sections.filter((x) => x.required).map((x) => x.kind)).toEqual(["hero", "services", "hours", "enquiry", "cta"]);
+  });
+
+  it("never promises a result or a cure", () => {
+    expect(issues("We guarantee a full recovery.")).toContain("restricted-claim");
+    expect(issues("Our treatment will cure your back pain.")).toContain("restricted-claim");
+    expect(issues("Assessment and treatment in Bristol.")).not.toContain("restricted-claim");
+  });
+
+  it("claims a registration only when the customer ticked it", () => {
+    expect(issues("HCPC registered physiotherapists.")).toContain("restricted-claim");
+    const ticked = { ...sample.facts, highlights: [...(sample.facts.highlights ?? []), { value: "HCPC", label: "Registered physiotherapist" }] };
+    expect(issues("HCPC registered physiotherapists.", ticked)).not.toContain("restricted-claim");
   });
 });
 
