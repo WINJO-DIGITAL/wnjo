@@ -21,8 +21,9 @@ export const metadata: Metadata = siteUrl()
   : {};
 
 const fystay = projectBySlug("fystay")!;
-/** The three client projects, then our own platform. */
-const work = [...heroProjects, fystay];
+const duratek = projectBySlug("duratek")!;
+/** The four client projects, then our own platform. */
+const work = [...heroProjects, duratek, fystay];
 
 export default function HomePage() {
   const schema = businessSchema(siteUrl() ?? "https://winjodigital.co.uk");
@@ -124,7 +125,7 @@ export default function HomePage() {
           <div className="tile__aside">
             <p className="tile__line">
               Your website shouldn&apos;t become outdated, and keeping it current shouldn&apos;t be another expense to
-              organise. Included in {WEBSITE_PLANS.silver.name} and {WEBSITE_PLANS.gold.name}.
+              organise. Included in every plan.
             </p>
             <p className="tile__more">
               <Link href="/winjo-refresh" className="arrow-link">

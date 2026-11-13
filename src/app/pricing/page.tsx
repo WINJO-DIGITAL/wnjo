@@ -101,11 +101,11 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* 3. WINJO Refresh: the reason to choose Pro or Plus. */}
+      {/* 3. WINJO Refresh: included in every plan. */}
       <section id="refresh" className="section inverse" aria-labelledby="refresh-title">
         <div className="container container--wide">
           <SectionHead
-            eyebrow={`Included in ${pro.name} and ${plus.name}`}
+            eyebrow="Included in every plan"
             title={<span id="refresh-title">WINJO Refresh: a design refresh every {REFRESH.everyMonths} months.</span>}
             split
           >

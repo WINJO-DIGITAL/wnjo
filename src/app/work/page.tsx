@@ -22,7 +22,7 @@ export default function WorkPage() {
       <PageHero
         eyebrow="Our work"
         title={<>Bespoke, every time.</>}
-        lede="Three client businesses and our own platform. Each one designed around the business it serves, and live today."
+        lede="Four client businesses and our own platform. Each one designed around the business it serves, and live today."
       />
 
       <section className="section--tight" style={{ paddingTop: 0 }}>

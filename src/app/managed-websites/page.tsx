@@ -93,7 +93,7 @@ export default function ManagedWebsitesPage() {
             split
           >
             <p>
-              Included in {WEBSITE_PLANS.silver.name} and {WEBSITE_PLANS.gold.name}.
+              Included in every plan.
             </p>
             <p className="mt-4">
               <Link href="/winjo-refresh" className="arrow-link">
