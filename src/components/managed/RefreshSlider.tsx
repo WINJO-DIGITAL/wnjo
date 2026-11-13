@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { RefreshBrowser } from "./RefreshTimeline";
 
 /**
- * Winjo Refresh, shown as a before and after: the same example website at month 24 and after its refresh, with a
+ * WINJO Refresh, shown as a before and after: the same example website at month 24 and after its refresh, with a
  * handle to drag between them. Drag with a mouse, finger or the arrow keys. It sweeps once when it first scrolls into
  * view so the visitor sees it move, unless they prefer less motion or have already taken over. The site is an
  * illustration drawn in CSS; it claims nothing about a real client.

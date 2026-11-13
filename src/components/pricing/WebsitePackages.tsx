@@ -78,7 +78,7 @@ export function PackageCards({ compact = false }: { compact?: boolean }) {
             </ul>
             {plan.refresh && (
               <p className="pkg-card__refresh">
-                <Link href="/winjo-refresh">Winjo Refresh</Link> every {REFRESH.everyMonths} months
+                <Link href="/winjo-refresh">WINJO Refresh</Link> every {REFRESH.everyMonths} months
               </p>
             )}
             <Link
@@ -134,7 +134,7 @@ export function PackageComparison() {
         ["Uptime monitoring and fault resolution", () => true],
         ["Support", (id) => WEBSITE_PLANS[id].support],
         ["Changes to your website", (id) => WEBSITE_PLANS[id].changes],
-        [`Winjo Refresh every ${REFRESH.everyMonths} months`, (id) => WEBSITE_PLANS[id].refresh],
+        [`WINJO Refresh every ${REFRESH.everyMonths} months`, (id) => WEBSITE_PLANS[id].refresh],
       ],
     },
     {

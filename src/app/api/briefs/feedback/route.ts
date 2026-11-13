@@ -20,7 +20,7 @@ type Brief = { id: string; tenant_id: string; reference: string; email: string; 
  * verified email is on the brief can do either, and only while the preview is with them.
  *
  * - request_changes: saves a numbered request, and moves the build to "changes requested" if it was waiting for review.
- * - approve_preview: sends the build on for Winjo's own approvals. It is not one of the four approvals: the quality,
+ * - approve_preview: sends the build on for WINJO's own approvals. It is not one of the four approvals: the quality,
  *   pricing, contract and publication decisions stay with staff, and nothing is made public by this.
  */
 export async function POST(request: NextRequest) {

@@ -30,7 +30,7 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "What does each plan cost?",
     category: "pricing",
     short: `From ${formatGBP(core.monthly)} a month`,
-    a: `${core.name} is ${formatGBP(core.monthly)} a month for a bespoke website of up to ${core.pages} pages. ${pro.name} is ${formatGBP(pro.monthly)} for up to ${pro.pages} pages and ${plus.name} is ${formatGBP(plus.monthly)} for up to ${plus.pages}. Every plan includes hosting, an SSL certificate, security monitoring, maintenance and support. ${pro.name} and ${plus.name} add search work, performance reporting, monthly time for changes and Winjo Refresh.`,
+    a: `${core.name} is ${formatGBP(core.monthly)} a month for a bespoke website of up to ${core.pages} pages. ${pro.name} is ${formatGBP(pro.monthly)} for up to ${pro.pages} pages and ${plus.name} is ${formatGBP(plus.monthly)} for up to ${plus.pages}. Every plan includes hosting, an SSL certificate, security monitoring, maintenance and support. ${pro.name} and ${plus.name} add search work, performance reporting, monthly time for changes and WINJO Refresh.`,
   },
   {
     q: "How do payments work?",
@@ -54,10 +54,10 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "Who owns what?",
     category: "ongoing",
     short: "Domain and content: you",
-    a: "You own your domain name and the business content you supply. Winjo keeps ownership of its own code and framework, subject to your agreed service terms. A website project bought outright is yours on full payment.",
+    a: "You own your domain name and the business content you supply. WINJO keeps ownership of its own code and framework, subject to your agreed service terms. A website project bought outright is yours on full payment.",
   },
   {
-    q: "What is Winjo Refresh?",
+    q: "What is WINJO Refresh?",
     category: "website",
     short: `A refresh every ${REFRESH.everyMonths} months, on every plan`,
     a: `Every managed plan includes a planned refresh of your website every ${REFRESH.everyMonths} months. ${core.name} gets a visual refresh of your design, colours and images. ${plus.name} gets an enhanced refresh, which adds a review of layout and content and new copy for up to three pages. ${pro.name} gets a complete refresh, with copy reviewed across all your pages. Refreshes are a defined service, not unlimited redevelopment or new pages beyond your plan.`,

@@ -57,7 +57,7 @@ export const primaryNav: NavItem[] = [
       primary: [
         { href: "/managed-websites", label: "How it works" },
         { href: "/pricing", label: "Plans and pricing" },
-        { href: "/winjo-refresh", label: "Winjo Refresh" },
+        { href: "/winjo-refresh", label: "WINJO Refresh" },
         { href: "/website-projects", label: "Own your website" },
         { href: "/faq", label: "Questions" },
       ],
@@ -114,7 +114,7 @@ export const mobileNav: { label: string; items: NavItem[] }[] = [
           primary: [
             { href: "/managed-websites", label: "How it works" },
             { href: "/pricing", label: "Plans and pricing" },
-            { href: "/winjo-refresh", label: "Winjo Refresh" },
+            { href: "/winjo-refresh", label: "WINJO Refresh" },
             { href: "/website-projects", label: "Own your website" },
             { href: "/faq", label: "Questions" },
           ],
@@ -146,7 +146,7 @@ export const mobileNav: { label: string; items: NavItem[] }[] = [
     ],
   },
   {
-    label: "Discover Winjo",
+    label: "Discover WINJO",
     items: [
       {
         href: "/work",
@@ -175,7 +175,7 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
     links: [
       { href: "/managed-websites", label: "How it works" },
       { href: "/pricing", label: "Pricing" },
-      { href: "/winjo-refresh", label: "Winjo Refresh" },
+      { href: "/winjo-refresh", label: "WINJO Refresh" },
       { href: "/work", label: "Our work" },
     ],
   },

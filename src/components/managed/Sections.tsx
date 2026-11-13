@@ -129,7 +129,7 @@ export function RefreshCompare() {
 export function RefreshLink() {
   return (
     <Link href="/winjo-refresh" className="arrow-link">
-      How Winjo Refresh works <ArrowRight />
+      How WINJO Refresh works <ArrowRight />
     </Link>
   );
 }

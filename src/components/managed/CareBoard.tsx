@@ -15,7 +15,7 @@ export function CareBoard() {
     <div className="care" aria-hidden="true">
       <div className="care__bar">
         <span className="care__url">yourbusiness.co.uk</span>
-        <span className="care__state">Looked after by Winjo</span>
+        <span className="care__state">Looked after by WINJO</span>
       </div>
       <ul role="list" className="care__rows">
         {CHECKS.map(([name, state], i) => (

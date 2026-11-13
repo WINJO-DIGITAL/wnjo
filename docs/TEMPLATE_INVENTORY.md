@@ -1,6 +1,6 @@
 # Master template: inventory of existing projects
 
-Purpose: find what in the finished projects can be reused as sections of one master template (see `AI_BUILD_SPEC.md`). Sources: RAENG Fitness (done), Duratek (done, read at commit `c65a567`), Winjo Digital (this repo, done). Boonma is still to do.
+Purpose: find what in the finished projects can be reused as sections of one master template (see `AI_BUILD_SPEC.md`). Sources: RAENG Fitness (done), Duratek (done, read at commit `c65a567`), WINJO Digital (this repo, done). Boonma is still to do.
 
 ## Source 1: RAENG Fitness
 
@@ -67,7 +67,7 @@ Repo `WNJOWEB/duratek`, read at commit `c65a567`. Next.js 16.4, React 19.3, Supa
 - The range and inspiration pages are specific to flooring. Leave out.
 - Supabase catalogue and sample tables are specific to the product.
 
-## Source 3: Winjo Digital (this repo)
+## Source 3: WINJO Digital (this repo)
 
 This repo is the agency's own site, not a client site. Its useful parts are the designs and the interaction patterns, not its content.
 
@@ -88,7 +88,7 @@ This repo is the agency's own site, not a client site. Its useful parts are the 
 | Enquiry or booking request | Duratek `SampleRequest` (request form), RAENG `HowToBook` |
 | FAQ | RAENG `Faq` |
 | Closing call to action | RAENG `CtaBand`, Duratek `ClosingCta` |
-| Sector designs | Winjo `SiteStyler` presets |
+| Sector designs | WINJO `SiteStyler` presets |
 
 ## Still to do
 

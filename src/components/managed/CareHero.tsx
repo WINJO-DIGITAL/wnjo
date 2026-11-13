@@ -6,7 +6,7 @@ import styles from "../Devices.module.css";
 
 /**
  * The managed-websites hero picture, driven by one switch. "On your own": a real client website, stalled, with the
- * jobs waiting on its owner. "With Winjo": the same website running, with each job done. The jobs are parts of every
+ * jobs waiting on its owner. "With WINJO": the same website running, with each job done. The jobs are parts of every
  * plan (hosting and SSL, security and updates, monitoring and fixes, changes); nothing here promises more than that.
  */
 const JOBS = [
@@ -31,7 +31,7 @@ export function CareHero({ site }: { site: Pick<Project, "name" | "host" | "walk
   );
   const video = useRef<HTMLVideoElement>(null);
 
-  // With Winjo the website runs (while on screen); on your own it stalls. Never moves on its own with reduced motion.
+  // With WINJO the website runs (while on screen); on your own it stalls. Never moves on its own with reduced motion.
   useEffect(() => {
     const v = video.current;
     if (!v) return;
@@ -57,7 +57,7 @@ export function CareHero({ site }: { site: Pick<Project, "name" | "host" | "walk
           On your own
         </button>
         <button type="button" aria-pressed={ours} onClick={() => setOurs(true)}>
-          With Winjo
+          With WINJO
         </button>
       </div>
 
@@ -87,7 +87,7 @@ export function CareHero({ site }: { site: Pick<Project, "name" | "host" | "walk
       </figure>
 
       {/* Swipes sideways on phones; one row on larger screens. */}
-      <ul role="list" className="care-hero__jobs" aria-label={ours ? "With Winjo" : "On your own"}>
+      <ul role="list" className="care-hero__jobs" aria-label={ours ? "With WINJO" : "On your own"}>
         {JOBS.map((j, i) => (
           <li key={j.job} style={{ "--i": i } as React.CSSProperties}>
             <span className="care-hero__job">{j.job}</span>
@@ -100,7 +100,7 @@ export function CareHero({ site }: { site: Pick<Project, "name" | "host" | "walk
 
       <p className="visually-hidden" role="status">
         {ours
-          ? "With Winjo: your certificate, updates, monitoring and changes are done for you."
+          ? "With WINJO: your certificate, updates, monitoring and changes are done for you."
           : "On your own: every one of these jobs is waiting on you."}
       </p>
     </div>

@@ -18,7 +18,7 @@ export const STAGES = {
   building: { label: "Website generation", customer: "Your website is being generated." },
   preview: { label: "Awaiting customer review", customer: "Your private preview is ready for you to review." },
   changes: { label: "Changes requested", customer: "We're making the changes you asked for." },
-  approval: { label: "Awaiting Winjo approval", customer: "Our team is checking the website before launch." },
+  approval: { label: "Awaiting WINJO approval", customer: "Our team is checking the website before launch." },
   live: { label: "Live", customer: "Your website is live." },
   on_hold: { label: "On hold", customer: "Paused. We'll be in touch." },
   closed: { label: "Closed", customer: "This brief is closed." },

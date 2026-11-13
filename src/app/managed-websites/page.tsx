@@ -37,7 +37,7 @@ export default function ManagedWebsitesPage() {
       <PageHero
         eyebrow="Managed websites"
         title={<>A website built for your business, looked after by us.</>}
-        lede="From bespoke design and hosting to maintenance, updates and ongoing improvements, Winjo takes care of everything behind your online presence."
+        lede="From bespoke design and hosting to maintenance, updates and ongoing improvements, WINJO takes care of everything behind your online presence."
         visual={<CareHero site={heroSite} />}
       >
         <div className="btn-row">
@@ -84,11 +84,11 @@ export default function ManagedWebsitesPage() {
         </div>
       </section>
 
-      {/* Winjo Refresh. */}
+      {/* WINJO Refresh. */}
       <section id="refresh" className="section inverse" aria-labelledby="refresh-title">
         <div className="container container--wide">
           <SectionHead
-            eyebrow="Winjo Refresh"
+            eyebrow="WINJO Refresh"
             title={<span id="refresh-title">Refreshed every {REFRESH.everyMonths} months, without the bill for a new redesign.</span>}
             split
           >
@@ -97,7 +97,7 @@ export default function ManagedWebsitesPage() {
             </p>
             <p className="mt-4">
               <Link href="/winjo-refresh" className="arrow-link">
-                How Winjo Refresh works <ArrowRight />
+                How WINJO Refresh works <ArrowRight />
               </Link>
             </p>
           </SectionHead>

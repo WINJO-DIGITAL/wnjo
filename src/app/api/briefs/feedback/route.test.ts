@@ -122,7 +122,7 @@ describe("customer asks for changes", () => {
 });
 
 describe("customer approves the preview", () => {
-  it("sends the build on for Winjo's approvals, and approves nothing itself", async () => {
+  it("sends the build on for WINJO's approvals, and approves nothing itself", async () => {
     const res = await post({ action: "approve_preview" });
     expect(res.status).toBe(200);
     expect(writesTo("website_briefs")[0].payload).toEqual({ stage: "approval" });

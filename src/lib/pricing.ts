@@ -281,14 +281,14 @@ export const SUBSCRIPTION_TERMS = {
   changeMinutes: { bronze: 30, silver: 60, gold: 180 },
 } as const;
 
-/** Winjo Refresh: a planned design and experience refresh, included in the packages listed. */
+/** WINJO Refresh: a planned design and experience refresh, included in the packages listed. */
 export const REFRESH = {
   everyMonths: 24,
   plans: ["bronze", "silver", "gold"] as string[],
   levels: {
-    bronze: { name: "Visual refresh", line: "Winjo Visual Refresh every 24 months" },
-    silver: { name: "Enhanced refresh", line: "Winjo Enhanced Refresh every 24 months" },
-    gold: { name: "Complete refresh", line: "Winjo Complete Refresh every 24 months" },
+    bronze: { name: "Visual refresh", line: "WINJO Visual Refresh every 24 months" },
+    silver: { name: "Enhanced refresh", line: "WINJO Enhanced Refresh every 24 months" },
+    gold: { name: "Complete refresh", line: "WINJO Complete Refresh every 24 months" },
   },
 } as const;
 
@@ -352,7 +352,7 @@ export const WEBSITE_PLANS = {
     includes: [
       "Bespoke website design",
       "Up to 5 pages",
-      "Winjo Visual Refresh every 24 months",
+      "WINJO Visual Refresh every 24 months",
       "Managed hosting",
       "SSL certificate",
       "Security monitoring",
@@ -391,7 +391,7 @@ export const WEBSITE_PLANS = {
       "Monthly website performance snapshot",
       "One hour of monthly content changes",
       "Priority support",
-      "Winjo Enhanced Refresh every 24 months",
+      "WINJO Enhanced Refresh every 24 months",
     ],
     includedAddOns: ["localSeo"] as AddOnId[],
   },
@@ -420,7 +420,7 @@ export const WEBSITE_PLANS = {
       "Quarterly performance reviews",
       "Three hours of monthly content and agreed development changes",
       "Enhanced priority support",
-      "Winjo Complete Refresh every 24 months",
+      "WINJO Complete Refresh every 24 months",
     ],
     includedAddOns: ["localSeo"] as AddOnId[],
   },

@@ -12869,10 +12869,10 @@ body:has(.pv, .sitepv) .site-footer {
 
 /* ==========================================================================
    Managed websites (the subscription model): the responsibility switch, the
-   care board, the Winjo Refresh timeline, plan details and ownership terms.
+   care board, the WINJO Refresh timeline, plan details and ownership terms.
    ========================================================================== */
 
-/* Plan cards: the line under the price, and the Winjo Refresh row. */
+/* Plan cards: the line under the price, and the WINJO Refresh row. */
 .pkg-card__tagline {
   margin: 0;
   font-weight: 500;
@@ -12963,7 +12963,7 @@ body:has(.pv, .sitepv) .site-footer {
   align-items: start;
   width: 100%;
 }
-/* One list at a time: "On your own" shows yours, "With Winjo" shows ours, ending on "Run your business". */
+/* One list at a time: "On your own" shows yours, "With WINJO" shows ours, ending on "Run your business". */
 .resp[data-ours="true"] .resp__col:first-child,
 .resp[data-ours="false"] .resp__col--ours {
   display: none;
@@ -13025,7 +13025,7 @@ body:has(.pv, .sitepv) .site-footer {
   display: block;
   padding-block: 0.2em;
 }
-/* With Winjo: the chores leave your list and appear in ours. */
+/* With WINJO: the chores leave your list and appear in ours. */
 .resp[data-ours="true"] .resp__col:first-child li:not(.resp__yours) {
   max-height: 0;
   opacity: 0;
@@ -13260,7 +13260,7 @@ body:has(.pv, .sitepv) .site-footer {
   margin: 0;
 }
 
-/* Winjo Refresh before and after: the same example website, with a handle to drag between the two. */
+/* WINJO Refresh before and after: the same example website, with a handle to drag between the two. */
 .rf-compare {
   display: grid;
   gap: var(--space-5);
@@ -13380,7 +13380,7 @@ body:has(.pv, .sitepv) .site-footer {
   color: var(--color-inverse-ink-2);
 }
 
-/* Winjo Refresh timeline: one example website, three eras. */
+/* WINJO Refresh timeline: one example website, three eras. */
 .rf {
   display: grid;
   gap: var(--space-5);
@@ -14189,7 +14189,7 @@ body:has(.pv, .sitepv) .site-footer {
   }
 }
 
-/* The two lists tell their story at a glance: "On your own" has crosses and a quieter, lighter type; "With Winjo" has
+/* The two lists tell their story at a glance: "On your own" has crosses and a quieter, lighter type; "With WINJO" has
    ticks and a firmer weight. Sizes stay the same. */
 .resp__col:not(.resp__col--ours) .resp__list li:not(.resp__yours) span {
   position: relative;
@@ -14265,7 +14265,7 @@ body:has(.pv, .sitepv) .site-footer {
 }
 
 /* Managed websites hero (components/managed/CareHero): one switch drives the picture. On your own the website
-   stalls and its jobs wait; with Winjo it runs and each job is done. */
+   stalls and its jobs wait; with WINJO it runs and each job is done. */
 .care-hero {
   display: grid;
   gap: var(--space-5);
@@ -14467,7 +14467,7 @@ body:has(.pv, .sitepv) .site-footer {
   font-size: var(--text-sm);
 }
 
-/* Winjo Refresh example: the Harbour Kitchen photos, one per stage (see public/refresh). The example is labelled as
+/* WINJO Refresh example: the Harbour Kitchen photos, one per stage (see public/refresh). The example is labelled as
    an example on the page. Each stage keeps its own frame; only the picture changes. */
 .rf__photo {
   background-size: cover;

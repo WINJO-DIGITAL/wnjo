@@ -114,10 +114,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Winjo Refresh: the same website at launch and after each planned refresh. */}
+      {/* WINJO Refresh: the same website at launch and after each planned refresh. */}
       <section id="refresh" className="tile inverse home-tile" data-nav="/winjo-refresh" aria-labelledby="refresh-title">
         <div className="container container--wide tile__head" data-reveal>
-          <p className="tile__name">Winjo Refresh</p>
+          <p className="tile__name">WINJO Refresh</p>
           <h2 id="refresh-title" className="tile__title">
             A design refresh <span className="serif-em">every {REFRESH.everyMonths} months.</span>
           </h2>
@@ -128,7 +128,7 @@ export default function HomePage() {
             </p>
             <p className="tile__more">
               <Link href="/winjo-refresh" className="arrow-link">
-                How Winjo Refresh works <ArrowRight />
+                How WINJO Refresh works <ArrowRight />
               </Link>
             </p>
           </div>

@@ -9,8 +9,8 @@ const { silver: pro, gold: plus } = WEBSITE_PLANS;
 
 export const metadata = pageMetadata(
   "/winjo-refresh",
-  "Winjo Refresh",
-  `Winjo Refresh is a planned website design and experience refresh every ${REFRESH.everyMonths} months, included in the ${pro.name} and ${plus.name} managed website plans. Your website stays current without another redesign to organise.`,
+  "WINJO Refresh",
+  `WINJO Refresh is a planned website design and experience refresh every ${REFRESH.everyMonths} months, included in the ${pro.name} and ${plus.name} managed website plans. Your website stays current without another redesign to organise.`,
 );
 
 // What a refresh covers, as the owner has defined it.
@@ -26,7 +26,7 @@ export default function WinjoRefreshPage() {
   return (
     <>
       <PageHero
-        eyebrow="Winjo Refresh"
+        eyebrow="WINJO Refresh"
         title={<>Your website shouldn&apos;t become outdated.</>}
         lede={`And keeping it current shouldn't become another expense to organise. Every ${REFRESH.everyMonths} months, we redesign it for you.`}
       >
@@ -50,7 +50,7 @@ export default function WinjoRefreshPage() {
           <SectionHead eyebrow="Why it matters" title={<span id="why-title">The redesign you never have to organise.</span>} split>
             <p>
               Every website dates. Normally that means finding a designer, paying for a redesign and managing the
-              project yourself. With Winjo Refresh, it&apos;s already planned and already paid for.
+              project yourself. With WINJO Refresh, it&apos;s already planned and already paid for.
             </p>
           </SectionHead>
           <div data-reveal>
@@ -81,7 +81,7 @@ export default function WinjoRefreshPage() {
         <div className="container container--wide">
           <SectionHead eyebrow="Good to know" title={<span id="scope-title">A defined service, clearly scoped.</span>} split>
             <p>
-              Winjo Refresh is a refresh of your website&apos;s design and experience. It isn&apos;t unlimited
+              WINJO Refresh is a refresh of your website&apos;s design and experience. It isn&apos;t unlimited
               redevelopment, or an unlimited number of new pages and features: those are quoted separately. What your
               refresh covers is set out in your written agreement.
             </p>
@@ -114,7 +114,7 @@ export default function WinjoRefreshPage() {
       <CtaBand
         tone="light"
         title={<>A website that stays current.</>}
-        body={`Winjo Refresh is included in ${pro.name} and ${plus.name}, from ${formatGBP(pro.monthly)} a month with no minimum term.`}
+        body={`WINJO Refresh is included in ${pro.name} and ${plus.name}, from ${formatGBP(pro.monthly)} a month with no minimum term.`}
       >
         <Link href={`/build?plan=silver`} className="btn btn--primary">
           Choose {pro.name}

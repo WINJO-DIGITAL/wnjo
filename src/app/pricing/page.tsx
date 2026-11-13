@@ -101,12 +101,12 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* 3. Winjo Refresh: the reason to choose Pro or Plus. */}
+      {/* 3. WINJO Refresh: the reason to choose Pro or Plus. */}
       <section id="refresh" className="section inverse" aria-labelledby="refresh-title">
         <div className="container container--wide">
           <SectionHead
             eyebrow={`Included in ${pro.name} and ${plus.name}`}
-            title={<span id="refresh-title">Winjo Refresh: a design refresh every {REFRESH.everyMonths} months.</span>}
+            title={<span id="refresh-title">WINJO Refresh: a design refresh every {REFRESH.everyMonths} months.</span>}
             split
           >
             <p>
@@ -115,7 +115,7 @@ export default function PricingPage() {
             </p>
             <p className="mt-4">
               <Link href="/winjo-refresh" className="arrow-link">
-                How Winjo Refresh works <ArrowRight />
+                How WINJO Refresh works <ArrowRight />
               </Link>
             </p>
           </SectionHead>

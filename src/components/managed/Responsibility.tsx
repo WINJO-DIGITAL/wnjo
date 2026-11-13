@@ -42,7 +42,7 @@ export function Responsibility() {
           On your own
         </button>
         <button type="button" aria-pressed={ours} onClick={() => setOurs(true)}>
-          With Winjo
+          With WINJO
         </button>
       </div>
       <div className="resp__board">
@@ -69,7 +69,7 @@ export function Responsibility() {
       </div>
       <p className="visually-hidden" role="status">
         {ours
-          ? "With Winjo: we design, host, secure, monitor, fix and change your website. You run your business."
+          ? "With WINJO: we design, host, secure, monitor, fix and change your website. You run your business."
           : "On your own: every one of these jobs is yours to organise."}
       </p>
     </div>

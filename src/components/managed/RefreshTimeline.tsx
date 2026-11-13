@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { REFRESH } from "@/lib/pricing";
 
 /**
- * Winjo Refresh, shown rather than explained: one example business, and the same website at launch and after each
+ * WINJO Refresh, shown rather than explained: one example business, and the same website at launch and after each
  * planned refresh. Pick a point on the timeline (or swipe the screen) and the design moves on while the business
  * stays recognisably itself. The site is an illustration drawn in CSS; it claims nothing about a real client.
  */

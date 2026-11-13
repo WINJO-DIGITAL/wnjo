@@ -44,7 +44,7 @@ describe("monthly packages", () => {
     expect(Object.entries(WEBSITE_PLANS).filter(([, p]) => p.popular).map(([id]) => id)).toEqual(["silver"]);
   });
 
-  it("includes a Winjo Refresh on every monthly plan, at the level for that plan", () => {
+  it("includes a WINJO Refresh on every monthly plan, at the level for that plan", () => {
     expect(Object.entries(WEBSITE_PLANS).filter(([, p]) => p.refresh).map(([id]) => id)).toEqual(["bronze", "silver", "gold"]);
     expect(Object.keys(REFRESH.levels)).toEqual(["bronze", "silver", "gold"]);
   });

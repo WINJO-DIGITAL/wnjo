@@ -59,7 +59,7 @@ Booking systems, custom software and other individually scoped services are cove
 
 4.6 **Response times.** We reply to support messages within 2 working days on Core and within 1 working day on Plus and Pro. We monitor your website and work to fix faults as quickly as we reasonably can. We do not promise a particular percentage of uptime, because hosting depends partly on third-party providers.
 
-## 5. Winjo Refresh
+## 5. WINJO Refresh
 
 5.1 Every managed website plan includes a planned refresh of your website every **24 months**, counted from the start of your subscription. The level depends on your plan:
 - **Visual refresh (Core):** updates the design, colours, typography and images of your existing pages.

@@ -22,7 +22,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Short checkout:** the name is required on the form and the server. The "New customer" stand-in is gone.
 - [x] **Plans swipe on phones:** the pricing page plans swipe sideways, the same as the home page.
 - [x] **Pricing hero:** "Choose a plan" is the only button; "Compare what each plan includes." is a plain underlined link.
-- [x] **Managed websites hero:** the "On your own / With Winjo" switch drives the EV Exec walkthrough and its four jobs. Swipes on phones.
+- [x] **Managed websites hero:** the "On your own / With WINJO" switch drives the EV Exec walkthrough and its four jobs. Swipes on phones.
 - [x] **Wording:** "Buy your website outright" is now "Own your website" in the menus, the project page and the App development link.
 - [x] **Tagline kept:** "Your website. Our responsibility." stays as the brand tagline, in the footer, the metadata and the About page call to action. Decided by the owner.
 - [x] **About page tidied:** the two long paragraphs are now short labelled tick lists, the statement is smaller, and the four engineering standards have three ticks each. Ticks now show on dark sections.
@@ -92,7 +92,7 @@ Source: the handover list. Checked against `main` at `3b554bc`, which is the sam
 - [x] **Goals email right after payment:** test payment WS-1C9980 (12 Nov). The "Thank you. Now tell us about your website" email arrived at 19:01, the same minute as the payment. It links to the account page; it doesn't contain a one-time sign-in link. Owner confirmed.
 - [x] **Buy-outright flow, rebuilt (12 Nov):** tested end to end. Run 1 (WNJO-240065): request, six steps, quote, deposit, preview approval, balance, handover and the handover email all passed. Run 2 (WNJO-8B11E9): proposal sent and accepted, deposit paid, preview approved by the customer, four approvals done. Handover was not repeated on run 2.
 
-- [x] **Production builds:** checked on the live site for `4a82cb4`. The Winjo Refresh photos and "Own your website" wording are being served. Winjo Refresh and pricing look right on a phone (390px) and a desktop (1280px), with no sideways overflow and no page errors.
+- [x] **Production builds:** checked on the live site for `4a82cb4`. The WINJO Refresh photos and "Own your website" wording are being served. WINJO Refresh and pricing look right on a phone (390px) and a desktop (1280px), with no sideways overflow and no page errors.
 
 ### Known issues, not fixed
 - [x] **Project package sizes:** the cards now pass the form's own sizes (Essential up to 5, Professional 11 to 15, Premium more than 20 pages), read from the form's size list, with a test.
