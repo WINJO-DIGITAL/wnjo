@@ -1,5 +1,6 @@
 "use client";
 
+import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight } from "../Icons";
@@ -20,6 +21,8 @@ export type PlanCard = {
   variant?: "inverse";
   /** false means the card shows its details but can't be picked (default true). */
   selectable?: boolean;
+  /** A screenshot of one of our own sites at the top of the card, with the name of the site it shows. */
+  shot?: { src: StaticImageData; alt: string; site: string };
 };
 
 const canSpotlight = () =>
@@ -108,6 +111,12 @@ export function PlanSwiper({
                 <p className="plan__tag" aria-hidden={!isSelected}>
                   Selected
                 </p>
+                {plan.shot && (
+                  <figure className="plan__shot">
+                    <Image src={plan.shot.src} alt={plan.shot.alt} sizes="(min-width: 64rem) 360px, 80vw" placeholder="blur" draggable={false} />
+                    <figcaption>Example of our work: {plan.shot.site}</figcaption>
+                  </figure>
+                )}
                 <h3 className="plan__name">{plan.name}</h3>
                 <p className="plan__summary">{plan.summary}</p>
                 <p className="plan__price">

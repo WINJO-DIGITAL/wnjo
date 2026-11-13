@@ -23,8 +23,8 @@ one commit each, and tick them off here as they land.
 - [ ] Biggest drop-off: after the details form, the customer must open an email and sign in before the six steps. Consider letting them start the questions straight away.
 
 ## Visual
-- [ ] `/website-projects`: tier cards are text only. Add a real example site to each tier, to sell visually.
-- [ ] Homepage "One less thing to worry about": the right half is empty beside the list.
+- [x] `/website-projects`: tier cards are text only. Add a real example site to each tier, to sell visually.
+- [x] Homepage "One less thing to worry about": the right half is empty beside the list.
 
 ## SEO and AEO
 - [x] `/faq`: no FAQPage structured data. Add it, since AI answer engines use it most.
@@ -32,7 +32,8 @@ one commit each, and tick them off here as they land.
 - [x] No `llms.txt`. Done as a generated route (`src/app/llms.txt/route.ts`), built from the price list so it stays in step.
 - [x] `/sitemap.xml` lists `/build`, which redirects. Remove it from `src/lib/routes.ts`.
 - [x] Page titles are generic on some pages ("Website projects", "Questions"). Use buyer wording, e.g. "Bespoke website design from £999".
-- [ ] Speed: performance 79 on a phone. The largest image takes 3.5 seconds to appear. Check the hero image size and loading priority.
+- [x] Speed (partly): on a normal connection the main image appears in about 1.5 seconds and weighs 13 KB. The slow Lighthouse score comes mostly from JavaScript work (blocking time 480 ms). The phone hero image is now preloaded. Cutting JavaScript is a bigger job, not done.
+  (original note) Speed: performance 79 on a phone. The largest image takes 3.5 seconds to appear. Check the hero image size and loading priority.
 
 ## Not covered by this audit
 - Live forms and payments (the site now takes real money). Not submitted.

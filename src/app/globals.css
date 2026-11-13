@@ -3811,6 +3811,31 @@ body:has(.plan-bar) .sticky-cta {
   background: var(--color-accent);
 }
 
+/* A screenshot of one of our sites at the top of a tier card. */
+.plan__shot {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.plan__shot img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+.plan__shot figcaption {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-3);
+}
+.plan--inverse .plan__shot figcaption {
+  color: var(--color-inverse-ink-2);
+}
+
 .plan__name {
   font-size: var(--text-xl);
   font-weight: 600;
@@ -14746,4 +14771,30 @@ body:has(.pv, .sitepv) .site-footer {
   color: rgba(0, 0, 0, 0.09);
   transform: rotate(-24deg);
   white-space: nowrap;
+}
+
+/* The homepage's managed-websites section: the list of jobs, with one of our sites beside it on a desktop. */
+.managed-split {
+  display: grid;
+  gap: var(--space-7);
+}
+.managed-split__shot {
+  display: none;
+  margin: 0;
+}
+.managed-split__shot figcaption {
+  margin-top: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-3);
+}
+@media (min-width: 64rem) {
+  .managed-split {
+    grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+    align-items: center;
+  }
+  .managed-split__shot {
+    display: block;
+  }
 }

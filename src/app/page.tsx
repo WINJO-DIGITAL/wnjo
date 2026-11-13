@@ -8,6 +8,7 @@ import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
 import { RefreshTimeline } from "@/components/managed/RefreshTimeline";
 import { Responsibility } from "@/components/managed/Responsibility";
 import { SubscriptionTerms } from "@/components/managed/Sections";
+import { BrowserFrame } from "@/components/Devices";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
 import { WebStages } from "@/components/WebStages";
 import { ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
@@ -21,6 +22,7 @@ export const metadata: Metadata = siteUrl()
   : {};
 
 const fystay = projectBySlug("fystay")!;
+const evexec = projectBySlug("ev-exec")!;
 const duratek = projectBySlug("duratek")!;
 /** The four client projects, then our own platform. */
 const work = [...heroProjects, duratek, fystay];
@@ -87,8 +89,13 @@ export default function HomePage() {
             </p>
           </div>
         </div>
-        <div className="container container--wide tile__visual" data-reveal>
+        <div className="container container--wide tile__visual managed-split" data-reveal>
           <Responsibility />
+          {/* Desktop only: one of the sites we look after, beside the list of jobs we take on. */}
+          <figure className="managed-split__shot">
+            <BrowserFrame src={evexec.desktop} host={evexec.host} alt={`The ${evexec.name} website, looked after by WINJO`} sizes="(min-width: 64rem) 640px, 0px" />
+            <figcaption>Looked after by WINJO: {evexec.name}</figcaption>
+          </figure>
         </div>
       </section>
 

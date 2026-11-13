@@ -1,4 +1,5 @@
 import type { PlanCard } from "@/components/interactive/PlanSwiper";
+import { projectBySlug } from "./projects";
 import {
   CARE_PLANS,
   ONE_OFF_TIERS,
@@ -52,6 +53,9 @@ export const packagePages = Object.fromEntries(
   }),
 ) as Record<PackageId, WebsitePageBand>;
 
+/** One of our own sites on each tier's card, so a buyer sees the kind of work, not just a list. */
+const TIER_EXAMPLE: Record<PackageId, string> = { essential: "boonma", professional: "raeng-fitness", premium: "ev-exec" };
+
 /** The three bespoke tiers as selectable cards with their full inclusions. */
 export const packagePlanCards: PlanCard[] = packageOrder.map((id) => ({
   id,
@@ -63,6 +67,10 @@ export const packagePlanCards: PlanCard[] = packageOrder.map((id) => ({
   includes: ONE_OFF_TIERS[id].includes,
   href: `/build/project?pages=${packagePages[id]}`,
   cta: `Choose ${ONE_OFF_TIERS[id].name}`,
+  shot: (() => {
+    const p = projectBySlug(TIER_EXAMPLE[id])!;
+    return { src: p.desktop, alt: `The ${p.name} website`, site: p.name };
+  })(),
 }));
 
 /** App development, priced after scoping. It is not a website package, so it can't be picked in the flow. */
