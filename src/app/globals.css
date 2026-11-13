@@ -1454,6 +1454,8 @@ button.arrow-link {
 
 /* Tables */
 .table-wrap {
+  /* Positioned, so the hidden "Included" labels inside a wide table are clipped with it instead of widening the page. */
+  position: relative;
   overflow-x: auto;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
@@ -4875,9 +4877,10 @@ main #process ol.steps li::after {
   background: transparent;
 }
 
-/* The full menu (with its own Start a Project button) shows from 64rem. */
+/* The full menu (with its own Start a Project button) shows from 64rem, so on a desktop the bar only appears once a
+   plan has been chosen: it is what carries that choice on to the next step. */
 @media (min-width: 64rem) {
-  .sticky-cta {
+  .sticky-cta:not([data-chosen]) {
     display: none;
   }
 }
@@ -14035,9 +14038,6 @@ body:has(.pv, .sitepv) .site-footer {
   #managed {
     padding-bottom: 2.5rem;
   }
-  #managed .tile__more {
-    display: none;
-  }
   #managed .resp {
     gap: var(--space-3);
   }
@@ -14129,13 +14129,9 @@ body:has(.pv, .sitepv) .site-footer {
   }
 }
 
-/* Phones: the home page sections are one screen each. The header menu keeps every page one tap away, so the
-   inline "learn more" links step aside here, and the step screens are shorter. */
+/* Phones: the home page sections are one screen each, with shorter step screens. Every section keeps its link to the
+   page behind it, so a visitor on a phone can always go further, the same as on a desktop. */
 @media (max-width: 39.99rem) {
-  main > .home-tile .tile__more,
-  main > .tile.inverse .tile__more {
-    display: none;
-  }
   main > .home-tile .tile__head {
     row-gap: var(--space-2);
   }
@@ -14160,8 +14156,8 @@ body:has(.pv, .sitepv) .site-footer {
 
 /* Phones: Plans and Ownership show their headline and the content, with the intro line and taglines stepping aside. */
 @media (max-width: 39.99rem) {
-  #packages .tile__aside,
-  #ownership .tile__aside {
+  #packages .tile__aside .tile__line,
+  #ownership .tile__aside .tile__line {
     display: none;
   }
   #packages .pkg-card__tagline {

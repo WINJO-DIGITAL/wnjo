@@ -126,7 +126,7 @@ export function StickyCta() {
   const chosen = plan && plan in WEBSITE_PLANS ? WEBSITE_PLANS[plan as WebsitePlanId] : null;
 
   return (
-    <aside className="sticky-cta" aria-label="Get started" data-show={visible} inert={!visible}>
+    <aside className="sticky-cta" aria-label="Get started" data-show={visible} data-chosen={chosen ? true : undefined} inert={!visible}>
       {chosen ? (
         <Link href={`/build?plan=${plan}`} className="btn btn--primary">
           Continue with {chosen.name}
