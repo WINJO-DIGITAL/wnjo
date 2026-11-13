@@ -249,6 +249,47 @@ const invoice = (id: string, reason = "subscription_cycle", amount = 14900) => (
   data: { object: { id, amount_paid: amount, billing_reason: reason, subscription: "stripe_sub_1" } },
 });
 
+describe("a hosting plan's webhooks", () => {
+  const hostingRow = { package_code: "care", package_name: "Care hosting", setup_pence: 0, monthly_pence: 9500, minimum_term_months: 0, ownership_after_payments: 0, enquiry_reference: "WNJO-ABC123", quote_snapshot: { hosting: { plan: "care", websiteStatus: "have", siteUrl: "riverscafe.co.uk" } } };
+
+  it("activates on the first month's payment and welcomes the customer with a hosting email", async () => {
+    const { db, deps, row } = setup(hostingRow);
+    expect(await handleWebsiteSubscriptionEvent(db, completed(9500), deps)).toBe("handled");
+    expect(row).toMatchObject({ status: "active", stripe_subscription_id: "stripe_sub_1" });
+    expect(deps.emailCustomer).toHaveBeenCalledTimes(1);
+    const [, message] = deps.emailCustomer.mock.calls[0] as unknown as [string, { subject: string; text: string }];
+    expect(message.subject).toBe("Your hosting is active [WS-ABC123]");
+    expect(message.text).toContain("riverscafe.co.uk");
+    expect(message.text).not.toMatch(/goals|ownership/i);
+  });
+
+  it("tells the owner what to connect, once, and not again on a retry", async () => {
+    const { db, deps } = setup(hostingRow);
+    await handleWebsiteSubscriptionEvent(db, completed(9500), deps);
+    await handleWebsiteSubscriptionEvent(db, completed(9500), deps);
+    expect(deps.alertStaff).toHaveBeenCalledTimes(1);
+    const [subject, detail] = deps.alertStaff.mock.calls[0] as unknown as [string, string];
+    expect(subject).toBe("New Care hosting subscription");
+    expect(detail).toContain("riverscafe.co.uk");
+    expect(detail).toContain("Next: connect their hosting.");
+  });
+
+  it("refuses to activate when Stripe charged something other than the plan's price", async () => {
+    const { db, deps, row } = setup(hostingRow);
+    await handleWebsiteSubscriptionEvent(db, completed(100), deps);
+    expect(row.status).toBe("offered");
+    expect(deps.emailCustomer).not.toHaveBeenCalled();
+  });
+
+  it("keeps recording the monthly payments as a plain receipt, with no ownership milestone", async () => {
+    const { db, deps, row } = setup({ ...hostingRow, status: "active", stripe_subscription_id: "stripe_sub_1" });
+    for (let i = 1; i <= 13; i++) await handleWebsiteSubscriptionEvent(db, invoice(`in_h${i}`, i === 1 ? "subscription_create" : "subscription_cycle", 9500), deps);
+    expect(row.payments_count).toBe(13);
+    expect(row.ownership_eligible_at ?? null).toBeNull();
+    expect(deps.alertStaff).not.toHaveBeenCalled();
+  });
+});
+
 describe("subscription webhooks", () => {
   it("activates on a matching first payment and welcomes the customer once", async () => {
     const { db, deps, row } = setup();

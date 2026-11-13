@@ -6,7 +6,7 @@ import { CARE_PLANS, formatGBP } from "@/lib/pricing";
 export const metadata = pageMetadata(
   "/build/hosting",
   "Hosting only",
-  `Managed hosting for your website from ${formatGBP(CARE_PLANS.hosting.monthly)} a month. Tell us where your website is up to and we'll send a secure link to start.`,
+  `Managed hosting for your website from ${formatGBP(CARE_PLANS.hosting.monthly)} a month. Choose a plan, tell us where your website is up to and start online.`,
 );
 
 export default function HostingPage() {

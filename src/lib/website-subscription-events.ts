@@ -11,6 +11,7 @@ import {
   type SubscriptionEmailFacts,
 } from "./website-emails";
 import { advanceAfterPayment } from "./brief-payment";
+import { isHostingCode, type WebsiteStatus } from "./hosting-request";
 import { firstPaymentPence, ownershipDue, statusFromStripe } from "./website-subscriptions";
 
 /**
@@ -49,10 +50,12 @@ type Row = {
   ownership_after_payments: number;
   ownership_eligible_at: string | null;
   enquiry_reference?: string | null;
+  package_code?: string | null;
+  quote_snapshot?: { hosting?: { siteUrl?: unknown; websiteStatus?: unknown } } | null;
 };
 
 const COLUMNS =
-  "id, tenant_id, reference, kind, status, email, name, package_name, setup_pence, monthly_pence, one_off_pence, minimum_term_months, ownership_after_payments, ownership_eligible_at, enquiry_reference, cancel_at_period_end";
+  "id, tenant_id, reference, kind, status, email, name, package_name, setup_pence, monthly_pence, one_off_pence, minimum_term_months, ownership_after_payments, ownership_eligible_at, enquiry_reference, cancel_at_period_end, package_code, quote_snapshot";
 
 type StripeObject = Record<string, unknown>;
 type StripeEvent = { id?: string; type?: string; livemode?: boolean; data?: { object?: StripeObject } };
@@ -61,8 +64,21 @@ const str = (v: unknown) => (typeof v === "string" ? v : null);
 const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : null);
 const meta = (o: unknown) => ((o && typeof o === "object" ? (o as { metadata?: unknown }).metadata : null) ?? {}) as Record<string, unknown>;
 
-function facts(row: Row, paymentsCount?: number): SubscriptionEmailFacts {
+/** What a hosting-only plan was bought for, or null for anything else. */
+function hostingOf(row: Row): { siteUrl: string; websiteStatus: WebsiteStatus } | null {
+  if (!row.package_code || !isHostingCode(row.package_code)) return null;
+  const h = row.quote_snapshot?.hosting;
+  const status = h?.websiteStatus;
   return {
+    siteUrl: typeof h?.siteUrl === "string" ? h.siteUrl : "",
+    websiteStatus: status === "have" || status === "need" || status === "other" ? status : "other",
+  };
+}
+
+function facts(row: Row, paymentsCount?: number): SubscriptionEmailFacts {
+  const hosting = hostingOf(row);
+  return {
+    ...(hosting ? { hosting } : {}),
     reference: row.reference,
     name: row.name,
     packageName: row.package_name,
@@ -218,6 +234,16 @@ export async function handleWebsiteSubscriptionEvent(
         .select("id");
       if (error) return "retry";
       if (Array.isArray(data) && data.length > 0) {
+        const hosting = hostingOf(row);
+        if (hosting) {
+          // Hosting on its own has no website build behind it: no goals to collect and no build to move on.
+          await deps.emailCustomer(row.email, welcomeEmail(facts(row)));
+          await deps.alertStaff(
+            `New ${row.package_name} subscription`,
+            `${row.reference}: ${row.name} subscribed to ${row.package_name}. First payment ${amount / 100} GBP, then ${row.monthly_pence / 100} GBP a month. Their website: ${hosting.websiteStatus === "have" ? hosting.siteUrl || "(address not given)" : hosting.websiteStatus === "need" ? "they need one built" : "someone else is building it"}. Next: connect their hosting.`,
+          );
+          return "handled";
+        }
         const needsDetails = await briefNeedsDetails(db, row.tenant_id, row.enquiry_reference);
         await deps.emailCustomer(row.email, welcomeEmail({ ...facts(row), needsDetails }));
         await advanceAfterPayment(db, row.tenant_id, row.enquiry_reference);

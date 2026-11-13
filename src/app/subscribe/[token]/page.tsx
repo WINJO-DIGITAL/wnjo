@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LegalDraftNotice } from "@/components/pricing/WebsitePackages";
 import { SubscribeActions } from "@/components/SubscribeActions";
+import { isHostingCode } from "@/lib/hosting-request";
 import { formatPence } from "@/lib/pricing";
 import { serviceClient } from "@/lib/quote-store";
 import { OFFER_TOKEN_RE, firstPaymentPence, hashOfferToken } from "@/lib/website-subscriptions";
@@ -11,6 +12,7 @@ export const metadata: Metadata = { title: "Your payment link", robots: { index:
 type Row = {
   reference: string;
   kind: "subscription" | "one_off";
+  package_code?: string;
   status: string;
   name: string;
   business_name: string | null;
@@ -35,7 +37,7 @@ async function load(token: string): Promise<{ row: Row | null; expired: boolean 
   if (!OFFER_TOKEN_RE.test(token) || !db) return { row: null, expired: false };
   const { data } = await db
     .from("website_subscriptions")
-    .select("reference, kind, status, name, business_name, package_name, setup_pence, monthly_pence, one_off_pence, minimum_term_months, ownership_after_payments, payments_count, ownership_eligible_at, offer_expires_at, cancel_at_period_end")
+    .select("reference, kind, package_code, status, name, business_name, package_name, setup_pence, monthly_pence, one_off_pence, minimum_term_months, ownership_after_payments, payments_count, ownership_eligible_at, offer_expires_at, cancel_at_period_end")
     .eq("offer_token_hash", hashOfferToken(token))
     .maybeSingle();
   const row = data as Row | null;
@@ -79,7 +81,7 @@ function Offer({ row, token }: { row: Row; token: string }) {
     <div className="stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
       <p className="eyebrow">{row.reference}</p>
       <h1 className="h1">
-        {sub ? `Your ${row.package_name} website package.` : `Your ${row.package_name}.`}
+        {sub ? (isHostingCode(row.package_code ?? "") ? `Your ${row.package_name} plan.` : `Your ${row.package_name} website package.`) : `Your ${row.package_name}.`}
       </h1>
       <p className="lede">Hi {row.name.split(/\s+/)[0]}. Here&apos;s what you&apos;re agreeing to before you pay.</p>
       <div className="cfg-totals">
@@ -120,7 +122,7 @@ function Offer({ row, token }: { row: Row; token: string }) {
           ) : (
             <li>Your domain name and the content you give us stay yours. We keep ownership of our own code and framework.</li>
           )}
-          <li>Hosting, maintenance and support in your package are included while you subscribe.</li>
+          <li>{isHostingCode(row.package_code ?? "") ? "Managed hosting and technical support in your plan are included while you subscribe." : "Hosting, maintenance and support in your package are included while you subscribe."}</li>
         </ul>
       )}
       <LegalDraftNotice />

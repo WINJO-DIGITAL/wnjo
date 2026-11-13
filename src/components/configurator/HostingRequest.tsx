@@ -21,6 +21,8 @@ export function HostingRequest() {
   const [status, setStatus] = useState<WebsiteStatus | null>(null);
   const [details, setDetails] = useState<WebsiteDetails>(EMPTY_DETAILS);
   const [errors, setErrors] = useState<HostingErrors>({});
+  const [agree, setAgree] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [startedAt] = useState(() => Date.now());
   const { state, submit } = useEnquirySubmit();
@@ -41,13 +43,30 @@ export function HostingRequest() {
     if (details.businessName.trim().length < 2) found.businessName = "Please tell us your business name.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(details.email.trim())) found.email = "Please enter a valid email address.";
     if (status === "have" && !details.existingWebsite.trim()) found.existingWebsite = "Please add your website address so we can connect your hosting.";
+    if (!agree) found.agree = "Please agree to the terms before you pay.";
     if (Object.keys(found).length) {
       setErrors(found);
       return;
     }
-    const result = await submit({ kind: "hosting", plan, status, details, website: honeypot, startedAt });
+    const result = await submit({ kind: "hosting", plan, status, details, agree, website: honeypot, startedAt });
     if (result?.status === "error" && result.fields) setErrors(result.fields as HostingErrors);
+    // Straight on to Stripe's secure page. If it couldn't be opened, the page below says a link is on its way.
+    if (result?.status === "success" && result.pay?.url) {
+      setRedirecting(true);
+      window.location.assign(result.pay.url);
+    }
   };
+
+  if (redirecting) {
+    return (
+      <div className={styles.done}>
+        <div className="card card--raised stack" style={{ "--stack": "var(--space-4)" } as React.CSSProperties}>
+          <h2 className="h2" role="status">Taking you to our secure payment page…</h2>
+          <p className="muted">Payments are taken by Stripe. If nothing happens, check your connection and try again.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (state.status === "success" && plan) {
     return (
@@ -57,8 +76,10 @@ export function HostingRequest() {
             Thank you, {details.name.trim().split(/\s+/)[0]}.
           </h2>
           <p className="muted">
-            We&apos;ll reply to <strong>{details.email}</strong> within one working day with a secure link to start your {CARE_PLANS[plan].label} plan. Nothing is charged until you use it. Your reference is{" "}
-            <strong>{state.reference}</strong>.
+            {state.paymentStarted
+              ? <>We couldn&apos;t open the payment page just now, so we&apos;ve emailed a secure link to <strong>{details.email}</strong> to finish your {CARE_PLANS[plan].label} plan. Nothing is charged until you use it.</>
+              : <>We&apos;ll reply to <strong>{details.email}</strong> within one working day with a secure link to start your {CARE_PLANS[plan].label} plan. Nothing is charged until you use it.</>}{" "}
+            Your reference is <strong>{state.reference}</strong>.
           </p>
           <div className="btn-row">
             <Link href="/website-projects" className="btn btn--primary">
@@ -187,7 +208,7 @@ export function HostingRequest() {
             <div>
               <p className="eyebrow">{CARE_PLANS[plan].label}, {formatGBP(CARE_PLANS[plan].monthly)} a month</p>
               <h2 className="h2">Your details</h2>
-              <p className="muted">We reply within one working day with a secure link to start. Nothing to pay yet.</p>
+              <p className="muted">Next you pay securely through Stripe. Nothing is charged until you do.</p>
             </div>
             <TextField id="name" label="Your name" value={details.name} error={errors.name} onChange={(v) => setDetail("name", v)} autoComplete="name" />
             <TextField id="businessName" label="Business name" value={details.businessName} error={errors.businessName} onChange={(v) => setDetail("businessName", v)} autoComplete="organization" />
@@ -196,6 +217,30 @@ export function HostingRequest() {
             {status === "have" && (
               <TextField id="existingWebsite" label="Your website address" value={details.existingWebsite} error={errors.existingWebsite} onChange={(v) => setDetail("existingWebsite", v)} placeholder="yourbusiness.co.uk" inputMode="url" />
             )}
+
+            <div className={styles.pay}>
+              <p className="eyebrow">First payment</p>
+              <p className={styles.payAmount}>{formatGBP(CARE_PLANS[plan].monthly)}</p>
+              <p className="muted">Your first month. Then {formatGBP(CARE_PLANS[plan].monthly)} a month, taken automatically. Rolling monthly, with 30 days&apos; notice to end.</p>
+              <fieldset className="pay-agree">
+                <legend className="eyebrow">Before you pay</legend>
+                <label className="sub-agree">
+                  <input type="checkbox" checked={agree} onChange={(e) => (setAgree(e.target.checked), setErrors((x) => ({ ...x, agree: undefined })))} aria-invalid={errors.agree ? true : undefined} />
+                  <span>
+                    I agree to the{" "}
+                    <Link href="/terms" target="_blank">
+                      terms
+                    </Link>
+                    .
+                  </span>
+                </label>
+                {errors.agree && (
+                  <p className="field-error" role="alert">
+                    {errors.agree}
+                  </p>
+                )}
+              </fieldset>
+            </div>
 
             <div className="visually-hidden" aria-hidden="true">
               <label htmlFor="hosting-website">Leave this field empty</label>
@@ -213,7 +258,7 @@ export function HostingRequest() {
             )}
             <div className="btn-row">
               <button type="submit" className="btn btn--primary" disabled={state.status === "submitting"}>
-                {state.status === "submitting" ? "Sending…" : "Send my request"}
+                {state.status === "submitting" ? "Opening payment…" : `Continue to payment, ${formatGBP(CARE_PLANS[plan].monthly)}`}
               </button>
               <button type="button" className="btn btn--secondary" onClick={() => setStep(status === "need" ? "offer" : "website")}>
                 Back

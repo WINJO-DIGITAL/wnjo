@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { stripeConfig } from "@/lib/stripe";
-import { OFFER_TOKEN_RE, checkoutParams, createOfferCheckout, hashOfferToken } from "@/lib/website-subscriptions";
+import { OFFER_TOKEN_RE, checkoutParams, createOfferCheckout, hashOfferToken, type OfferAmounts } from "@/lib/website-subscriptions";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     kind: "subscription" | "one_off";
     status: string;
     email: string;
-    package_code: "bronze" | "silver" | "gold" | "one_off";
+    package_code: OfferAmounts["packageCode"];
     package_name: string;
     setup_pence: number;
     monthly_pence: number;

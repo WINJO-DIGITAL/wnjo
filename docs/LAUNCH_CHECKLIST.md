@@ -47,7 +47,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Hosting-only request flow (14 November):** new page `/build/hosting`, linked from the services and pricing pages. Choose Hosting, Care or Care Plus, say where the website is up to, give details. The price comes from the plan on the server. Tested.
 
 ## Not started
-- [ ] **Hosting-only, online payment:** the request flow is built (`/build/hosting`): plan, then "do you have a website?", with the website and managed-plan offer for anyone who needs one. Requests reach the owner and the customer is acknowledged; the owner sends a payment link. Paying online straight from the flow needs a database change (a hosting package type in `website_subscriptions.package_code`) and webhook work.
+- [ ] **Hosting-only, online payment:** built (`/build/hosting`): choose a plan, say whether you have a website, agree to the terms, then pay through Stripe. Needs one database change first (migration `20261114120000_hosting_subscription_packages.sql`, run in the Supabase SQL editor), then one test payment on the live site. Until the SQL is run, requests are still recorded and the customer is told a link will follow.
 
 ## Still to do before launch
 - [x] **Cancellation request:** test cancellation on WS-1C9980 (12 Nov). The customer confirmation gives the end date, 12 December 2026, and the staff alert was delivered. Owner confirmed. Not yet checked: the Stripe cancel-at-period-end flag and the history entry.

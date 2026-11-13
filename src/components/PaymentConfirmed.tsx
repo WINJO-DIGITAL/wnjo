@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatPence } from "@/lib/pricing";
 
-/** Which payment this is: a standard plan, the 50% deposit on a website bought outright, or its final balance. */
-export type PaymentJourney = "plan" | "deposit" | "balance";
+/** Which payment this is: a standard plan, the 50% deposit on a website bought outright, its final balance, or hosting on its own. */
+export type PaymentJourney = "plan" | "deposit" | "balance" | "hosting";
 
 export type ConfirmedOrder = {
   enquiry_reference?: string | null;
@@ -44,6 +44,11 @@ const NEXT_STEPS: Record<PaymentJourney, { title: string; body: string }[]> = {
     { title: "We start building", body: "Your details are with us, so the build starts now. We'll update your account as it progresses." },
     { title: "Review and ask for changes", body: "When your website is ready, you'll see it in your account. You get two rounds of changes included." },
     { title: "Approve and pay the rest", body: "Once you're happy, approve the website in your account and pay the balance. We hand it over once it's paid." },
+  ],
+  hosting: [
+    { title: "We connect your hosting", body: "We'll connect your hosting to your website and email you within one working day. If you don't have a website yet, reply to your welcome email and we'll talk it through." },
+    { title: "Check your inbox", body: "Stripe emails a receipt, and we send a welcome message. Keep your confirmation number to hand." },
+    { title: "Manage your plan", body: "Sign in to your account with this email address to see your plan and billing at any time." },
   ],
   balance: [
     { title: "We hand over your website", body: "We'll check everything one last time, then hand it over to you by email." },

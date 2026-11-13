@@ -4,6 +4,7 @@ import { serviceClient } from "@/lib/quote-store";
 import { stripeConfig } from "@/lib/stripe";
 import { readCheckout } from "@/lib/website-subscriptions";
 import { BALANCE_PACKAGE_NAME } from "@/lib/pay-now";
+import { isHostingCode } from "@/lib/hosting-request";
 import { PaymentConfirmed, type ConfirmedOrder, type PaymentJourney } from "@/components/PaymentConfirmed";
 import { RefreshWhilePending } from "@/components/RefreshWhilePending";
 
@@ -34,7 +35,7 @@ export default async function SubscribeDone({ searchParams }: { searchParams: Pr
         const { data } = db
           ? await db
               .from("website_subscriptions")
-              .select("reference, kind, package_name, email, setup_pence, monthly_pence, one_off_pence, minimum_term_months, enquiry_reference")
+              .select("reference, kind, package_code, package_name, email, setup_pence, monthly_pence, one_off_pence, minimum_term_months, enquiry_reference")
               .eq("id", s.clientReferenceId)
               .maybeSingle()
           : { data: null };
@@ -45,7 +46,9 @@ export default async function SubscribeDone({ searchParams }: { searchParams: Pr
             ? await db.from("website_briefs").select("route").eq("reference", order.enquiry_reference ?? "").maybeSingle()
             : { data: null };
           const route = (brief as { route?: string } | null)?.route;
-          journey = order.package_name === BALANCE_PACKAGE_NAME ? "balance" : route === "proposal" && order.kind === "one_off" ? "deposit" : "plan";
+          journey = isHostingCode(String((order as { package_code?: string }).package_code ?? ""))
+            ? "hosting"
+            : order.package_name === BALANCE_PACKAGE_NAME ? "balance" : route === "proposal" && order.kind === "one_off" ? "deposit" : "plan";
         }
       }
     } catch {

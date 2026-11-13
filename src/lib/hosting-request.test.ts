@@ -44,3 +44,14 @@ describe("a hosting-only request", () => {
     expect(r.ok === false && r.errors.status).toBeDefined();
   });
 });
+
+describe("hosting package codes", () => {
+  it("gives each plan its own code and name", async () => {
+    const { HOSTING_CODE, HOSTING_NAME, isHostingCode } = await import("./hosting-request");
+    expect(HOSTING_CODE).toEqual({ hosting: "hosting", care: "care", carePlus: "care_plus" });
+    expect(HOSTING_NAME).toEqual({ hosting: "Hosting", care: "Care hosting", carePlus: "Care Plus hosting" });
+    expect(isHostingCode("care_plus")).toBe(true);
+    expect(isHostingCode("bronze")).toBe(false);
+    expect(isHostingCode("one_off")).toBe(false);
+  });
+});

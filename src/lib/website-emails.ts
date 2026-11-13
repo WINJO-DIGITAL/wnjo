@@ -168,6 +168,8 @@ export type SubscriptionEmailFacts = {
   minimumTermMonths: number;
   /** Whether we still need the customer's goals, pages and style. Unset counts as yes, so nobody is left waiting. */
   needsDetails?: boolean;
+  /** Set for a hosting-only plan, which has no website build behind it. */
+  hosting?: { siteUrl: string; websiteStatus: WebsiteStatus };
 };
 
 const gbpPence = (p: number) => formatPence(p);
@@ -247,7 +249,68 @@ function detailsStep(f: SubscriptionEmailFacts): string[] {
   ];
 }
 
+/** The next step for hosting, by where the customer's website stands. */
+function hostingNext(h: NonNullable<SubscriptionEmailFacts["hosting"]>): string[] {
+  const site = (siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "");
+  if (h.websiteStatus === "have") {
+    return [`We'll connect your hosting to ${h.siteUrl || "your website"}. We'll email you within one working day to confirm it, and ask for anything we need.`];
+  }
+  if (h.websiteStatus === "need") {
+    return [
+      "You told us you need a website too. Reply to this email and we'll talk it through, or see the options:",
+      `A bespoke website from ${formatGBP(999)}: ${site}/website-projects`,
+      `A managed website from ${formatGBP(99)} a month, hosting included: ${site}/pricing`,
+    ];
+  }
+  return ["When your website is ready, reply to this email with the details and we'll connect it to your hosting."];
+}
+
+/** Hosting is rolling monthly with 30 days' notice to end, as the pricing page says. */
+const HOSTING_TERM = "Rolling monthly, with 30 days' notice to end.";
+
+function hostingWelcome(f: SubscriptionEmailFacts, h: NonNullable<SubscriptionEmailFacts["hosting"]>): { subject: string; text: string } {
+  const account = `${(siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "")}/account`;
+  return {
+    subject: `Your hosting is active [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `Thank you. Your first payment for ${f.packageName} has been received, and your hosting is now active.`,
+      "",
+      "WHAT HAPPENS NEXT",
+      ...hostingNext(h),
+      "",
+      `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month. ${HOSTING_TERM}`,
+      "Stripe emails a receipt for every payment.",
+      "",
+      `You can see your plan and manage your billing any time: ${account}`,
+      ...sign,
+    ].join("\n"),
+  };
+}
+
+/** The payment link for hosting, sent only when Stripe's page couldn't be opened for the customer. */
+export function hostingPayLinkEmail(f: SubscriptionEmailFacts, link: string): { subject: string; text: string } {
+  return {
+    subject: `Your hosting is waiting [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      "Thanks for choosing hosting with us. If you didn't finish, this link picks up where you left off:",
+      link,
+      "",
+      `Plan: ${f.packageName}`,
+      `First payment: ${gbpPence(f.monthlyPence)}, then ${gbpPence(f.monthlyPence)} a month. ${HOSTING_TERM}`,
+      "",
+      "If you have already paid, you don't need to do anything.",
+      "The link works for 30 days. Please don't share it.",
+      ...sign,
+    ].join("\n"),
+  };
+}
+
 export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text: string } {
+  if (f.hosting) return hostingWelcome(f, f.hosting);
   const ask = f.needsDetails !== false;
   return {
     subject: ask ? `Thank you. Now tell us about your website [${f.reference}]` : `Welcome to WINJO DIGITAL [${f.reference}]`,

@@ -19,12 +19,18 @@ export const WEBSITE_STATUS = {
 } as const;
 export type WebsiteStatus = keyof typeof WEBSITE_STATUS;
 
+/** The code stored with each hosting subscription, and the name shown on the receipt and in Stripe. */
+export const HOSTING_CODE = { hosting: "hosting", care: "care", carePlus: "care_plus" } as const satisfies Record<HostingPlan, string>;
+export type HostingCode = (typeof HOSTING_CODE)[HostingPlan];
+export const HOSTING_NAME = { hosting: "Hosting", care: "Care hosting", carePlus: "Care Plus hosting" } as const satisfies Record<HostingPlan, string>;
+export const isHostingCode = (code: string): code is HostingCode => (Object.values(HOSTING_CODE) as string[]).includes(code);
+
 export type HostingRequest = {
   plan: HostingPlan;
   status: WebsiteStatus;
   details: WebsiteDetails;
 };
-export type HostingErrors = DetailErrors & { plan?: string; status?: string };
+export type HostingErrors = DetailErrors & { plan?: string; status?: string; agree?: string };
 
 const isPlan = (v: unknown): v is HostingPlan => typeof v === "string" && (HOSTING_PLANS as readonly string[]).includes(v);
 const isStatus = (v: unknown): v is WebsiteStatus => typeof v === "string" && v in WEBSITE_STATUS;

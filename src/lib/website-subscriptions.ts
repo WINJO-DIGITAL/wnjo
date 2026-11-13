@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { isHostingCode, type HostingCode } from "./hosting-request";
 import { OWNERSHIP } from "./pricing";
 import { ONE_OFF_DEPOSIT_SHARE } from "./pay-now";
 import { STRIPE_API } from "./stripe";
@@ -37,7 +38,7 @@ export const OFFER_TOKEN_RE = /^[A-Za-z0-9_-]{43}$/;
 
 export type OfferAmounts = {
   kind: "subscription" | "one_off";
-  packageCode: "bronze" | "silver" | "gold" | "one_off";
+  packageCode: "bronze" | "silver" | "gold" | "one_off" | HostingCode;
   packageName: string;
   setupPence: number;
   monthlyPence: number;
@@ -117,7 +118,9 @@ export function checkoutParams(
     p.set("line_items[0][price_data][currency]", "gbp");
     p.set("line_items[0][price_data][unit_amount]", String(offer.monthlyPence));
     p.set("line_items[0][price_data][recurring][interval]", "month");
-    p.set("line_items[0][price_data][product_data][name]", `${offer.packageName} website package`);
+    // A hosting plan is not a website package, so the receipt and Stripe say so.
+    const hosting = isHostingCode(offer.packageCode);
+    p.set("line_items[0][price_data][product_data][name]", hosting ? `${offer.packageName} plan` : `${offer.packageName} website package`);
     const upfront = offer.setupPence + offer.oneOffPence;
     if (upfront > 0) {
       // A one-time price in subscription mode is charged once, on the first invoice, with the first month.
@@ -131,7 +134,7 @@ export function checkoutParams(
     }
     p.set("subscription_data[metadata][website_subscription_id]", offer.id);
     p.set("subscription_data[metadata][reference]", offer.reference);
-    p.set("subscription_data[description]", `${offer.packageName} website package (${offer.reference})`);
+    p.set("subscription_data[description]", hosting ? `${offer.packageName} plan (${offer.reference})` : `${offer.packageName} website package (${offer.reference})`);
   } else {
     p.set("mode", "payment");
     p.set("line_items[0][quantity]", "1");
