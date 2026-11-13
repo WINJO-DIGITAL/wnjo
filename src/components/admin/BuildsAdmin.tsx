@@ -709,7 +709,7 @@ function ExpectedDate({ row, busy, act }: { row: BriefRow; busy: boolean; act: (
   );
 }
 
-type AiPlanRow = { id: string; version: number; cost_pence: number; model: string; created_at: string };
+type AiPlanRow = { id: string; version: number; cost_pence: number; model: string; created_at: string; plan?: { assumptions?: string[]; questions?: string[] } | null };
 type AiSiteBuildRow = { id: string; version: number; status: "draft" | "released" | "withdrawn"; checks_ok: boolean; change_note: string; cost_pence: number; model: string; created_at: string };
 type AiPreviewRow = { id: string; version: number; status: "draft" | "released" | "withdrawn"; change_note: string; cost_pence: number; model: string; created_at: string };
 
@@ -732,7 +732,7 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
   useEffect(() => {
     let cancelled = false;
     void Promise.all([
-      client.from("website_plans").select("id, version, cost_pence, model, created_at").eq("brief_id", row.id).order("version", { ascending: false }),
+      client.from("website_plans").select("id, version, cost_pence, model, created_at, plan").eq("brief_id", row.id).order("version", { ascending: false }),
       client.from("website_previews").select("id, version, status, change_note, cost_pence, model, created_at").eq("brief_id", row.id).order("version", { ascending: false }),
       client.from("website_site_builds").select("id, version, status, checks_ok, change_note, cost_pence, model, created_at").eq("brief_id", row.id).order("version", { ascending: false }),
     ]).then(([p, v, sb]) => {
@@ -791,6 +791,31 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
         <p className="acct-meta">Starts once the customer has paid.</p>
       ) : (
         <div className="stack" style={{ "--stack": "var(--space-3)" } as React.CSSProperties}>
+          {latestPlan?.plan?.questions && latestPlan.plan.questions.length > 0 && (
+            <div>
+              <p className="admin-label">Questions for you</p>
+              <p className="acct-meta">The writer couldn&apos;t answer these from the customer&apos;s answers. Decide them before you write the preview.</p>
+              <ul className="build-lines" role="list">
+                {latestPlan.plan.questions.map((q, i) => (
+                  <li key={i}>
+                    <span>{q}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {latestPlan?.plan?.assumptions && latestPlan.plan.assumptions.length > 0 && (
+            <div>
+              <p className="admin-label">Assumptions made</p>
+              <ul className="build-lines" role="list">
+                {latestPlan.plan.assumptions.map((a, i) => (
+                  <li key={i}>
+                    <span>{a}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="admin-actions">
             <button type="button" className="btn btn--secondary" disabled={busy !== null} onClick={() => void run("plan", { action: "plan", briefId: row.id }, "Plan drafted.")}>
               {busy === "plan" ? "Planning…" : latestPlan ? "Make a new plan" : "Make the plan"}
