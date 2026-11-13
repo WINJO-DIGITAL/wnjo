@@ -15,10 +15,12 @@ import {
   ADD_ONS,
   CARE_PLANS,
   EXTRA_PAGE,
+  ONE_OFF_TIERS,
   ONE_OFF_WEBSITE,
   OWNERSHIP,
   WEBSITE_PAGE_BANDS,
   WEBSITE_PLANS,
+  tierForPages,
   type AddOnId,
   type CarePlan,
   type WebsitePageBand,
@@ -142,7 +144,9 @@ export function websiteQuote(answers: WebsiteAnswers): WebsiteQuote {
   const monthlyMode = answers.mode === "monthly";
   const plan = WEBSITE_PLANS[answers.plan];
   const included = new Set<AddOnId>(monthlyMode ? plan.includedAddOns : ONE_OFF_WEBSITE.includedAddOns);
-  const pagesIncluded = monthlyMode ? plan.pages : ONE_OFF_WEBSITE.pages;
+  // A one-off website is priced from the tier that fits the pages asked for, so the price matches the tier on the site.
+  const tier = ONE_OFF_TIERS[tierForPages(answers.pages)];
+  const pagesIncluded = monthlyMode ? plan.pages : tier.pageLimit;
   const band = WEBSITE_PAGE_BANDS[answers.pages];
   const pagesRequested = band.max;
   const extraPages = pagesRequested === null ? 0 : Math.max(0, pagesRequested - pagesIncluded);
@@ -156,7 +160,7 @@ export function websiteQuote(answers: WebsiteAnswers): WebsiteQuote {
   lines.push(
     monthlyMode
       ? { label: `${plan.name} plan`, monthly: plan.monthly }
-      : { label: ONE_OFF_WEBSITE.name, oneOff: ONE_OFF_WEBSITE.from, status: "from" },
+      : { label: `${tier.name} website`, oneOff: tier.from, status: "from" },
   );
   if (!monthlyMode) hasFromPrices = true;
 
@@ -227,7 +231,7 @@ export function websiteQuote(answers: WebsiteAnswers): WebsiteQuote {
 
   return {
     mode: answers.mode,
-    packageName: monthlyMode ? plan.name : ONE_OFF_WEBSITE.name,
+    packageName: monthlyMode ? plan.name : `${tier.name} website`,
     pagesIncluded,
     pagesRequested,
     extraPages,

@@ -80,10 +80,23 @@ describe("pages", () => {
     expect(silver.monthly).toBe(149 + 50);
   });
 
-  it("charges £75 per page beyond the one-off website's five", () => {
-    const q = websiteQuote(oneOff({ pages: "6-10" }));
-    expect(q.extraPages).toBe(5);
-    expect(q.oneOffTotal).toBe(999 + 5 * EXTRA_PAGE.oneOff);
+  it("prices a one-off website from the tier that fits the pages, the same price the website shows", () => {
+    const priced = (pages: "4-5" | "6-10" | "11-15" | "16-20" | "20+") => websiteQuote(oneOff({ pages }));
+    expect([priced("4-5").oneOffTotal, priced("4-5").packageName]).toEqual([999, "Essential website"]);
+    expect([priced("6-10").oneOffTotal, priced("6-10").packageName]).toEqual([1999, "Professional website"]);
+    expect([priced("16-20").oneOffTotal, priced("16-20").packageName]).toEqual([2999, "Premium website"]);
+  });
+
+  it("never adds extra-page charges to a tier whose pages fit, and moves up a tier when they don't", () => {
+    for (const pages of ["4-5", "6-10", "16-20"] as const) expect(websiteQuote(oneOff({ pages })).extraPages).toBe(0);
+    // 11 to 15 pages is more than Professional's ten, so it is priced from Premium.
+    expect(websiteQuote(oneOff({ pages: "11-15" })).oneOffTotal).toBe(2999);
+  });
+
+  it("prices more than 20 pages from Premium and asks for a quote for the rest", () => {
+    const q = websiteQuote(oneOff({ pages: "20+" }));
+    expect(q.oneOffTotal).toBe(2999);
+    expect(q.requiresQuote).toBe(true);
   });
 
   it("asks for a custom quote above 20 pages instead of pricing it", () => {

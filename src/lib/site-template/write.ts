@@ -56,6 +56,12 @@ const LOOK_TONE: Record<Look, string> = {
   classic: "traditional and assured",
 };
 
+/** The sector's own rules (for example, no promised cures), stated up front so a draft doesn't break them. A claim the customer ticked is theirs to make, so its rule is left out. */
+function sectorRules(input: WriteInput): string[] {
+  const rules = (input.preset.restrictedClaims ?? []).filter((c) => !c.unless?.(input.facts)).map((c) => `- ${c.reason}`);
+  return rules.length ? ["Rules for this sector (a draft that breaks one is rejected):", ...rules] : [];
+}
+
 export function buildCopyPrompt(input: WriteInput, retryIssues?: string): string {
   const { facts, preset } = input;
   const wanted = preset.sections.map((s) => `- ${s.kind}${s.required ? "" : " (only if the facts support it)"}: ${s.guidance}`);
@@ -70,6 +76,7 @@ export function buildCopyPrompt(input: WriteInput, retryIssues?: string): string
       : "Opening hours given: no",
 
     facts.highlights?.length ? `Facts the customer gave: ${facts.highlights.map((h) => `${h.value} ${h.label}`).join("; ")}` : "",
+    ...sectorRules(input),
     "Sections, in order:",
     ...wanted,
     "FAQ: at most four questions a new customer would ask, answered only from the facts above. Leave the list empty if the facts don't support any.",

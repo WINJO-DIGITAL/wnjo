@@ -93,7 +93,7 @@ describe("POST /api/enquiry (website brief)", () => {
     expect(saved.draftId).toBe(DRAFT);
     expect(saved.brief.files.map((f) => f.name)).toEqual(["logo.png"]);
     expect(saved.brief.references).toEqual(["https://example.com/"]);
-    expect(saved.quote.oneOffTotal).toBe(999 + 5 * 75);
+    expect(saved.quote.oneOffTotal).toBe(1999);
   });
 
   it("puts the brief in the owner's email", async () => {

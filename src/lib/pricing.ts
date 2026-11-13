@@ -152,6 +152,23 @@ export type TimingOption = keyof typeof TIMING_OPTIONS;
 /* Packages                                                            */
 /* ------------------------------------------------------------------ */
 
+/**
+ * The bespoke tiers' starting prices and page limits, in one place so the legacy estimate, the website quote and the
+ * tier cards can never disagree. Set by the owner (14 November 2026): Essential from £999, Professional from £1,999,
+ * Premium from £2,999. The page limits match the managed plans' 5, 10 and 20 pages, and each lines up with one of the
+ * price form's page sizes, so choosing a tier never adds extra-page charges.
+ */
+const TIER_BASE = {
+  essential: { from: 999, pageLimit: 5 },
+  professional: { from: 1999, pageLimit: 10 },
+  premium: { from: 2999, pageLimit: 20 },
+} as const;
+
+/**
+ * The original bespoke packages, kept for the older instant-quote calculator and its stored price list in the database
+ * (the tests keep the two in step). No customer page uses these prices any more: the website shows ONE_OFF_TIERS, and
+ * the website quote is priced from those. Don't read the figures here as what the website sells.
+ */
 export const PACKAGES = {
   essential: {
     name: "Essential",
@@ -435,8 +452,8 @@ export type WebsitePlanId = keyof typeof WEBSITE_PLANS;
 export const ONE_OFF_TIERS = {
   essential: {
     name: "Essential",
-    from: 999,
-    pageLimit: 5,
+    from: TIER_BASE.essential.from,
+    pageLimit: TIER_BASE.essential.pageLimit,
     summary: "A polished, professional web presence.",
     includes: [
       "Up to 5 pages",
@@ -451,12 +468,12 @@ export const ONE_OFF_TIERS = {
   },
   professional: {
     name: "Professional",
-    from: 1999,
-    pageLimit: 12,
+    from: TIER_BASE.professional.from,
+    pageLimit: TIER_BASE.professional.pageLimit,
     summary: "A fuller site that presents your work and wins enquiries.",
     includes: [
       "Everything in Essential",
-      "Up to 12 pages",
+      "Up to 10 pages",
       "Custom layouts for your key pages",
       "Image gallery and testimonials",
       "Advanced enquiry forms",
@@ -466,12 +483,12 @@ export const ONE_OFF_TIERS = {
   },
   premium: {
     name: "Premium",
-    from: 2999,
-    pageLimit: 25,
+    from: TIER_BASE.premium.from,
+    pageLimit: TIER_BASE.premium.pageLimit,
     summary: "A distinctive experience or more advanced functionality.",
     includes: [
       "Everything in Professional",
-      "Up to 25 pages",
+      "Up to 20 pages",
       "Extensive custom design and interaction",
       "Blog and WhatsApp integration",
       "Integration planning for booking, payments or a shop",
@@ -479,6 +496,17 @@ export const ONE_OFF_TIERS = {
     ],
   },
 } as const satisfies Record<PackageId, { name: string; from: number; pageLimit: number; summary: string; includes: readonly string[] }>;
+
+/**
+ * The tier a one-off website is priced from: the smallest tier whose page limit holds the chosen page size. A size with
+ * no upper limit (more than 20 pages) is priced from Premium and the extra pages are quoted individually.
+ */
+export function tierForPages(band: WebsitePageBand): PackageId {
+  const max = WEBSITE_PAGE_BANDS[band].max;
+  if (max === null) return "premium";
+  const order: PackageId[] = ["essential", "professional", "premium"];
+  return order.find((id) => ONE_OFF_TIERS[id].pageLimit >= max) ?? "premium";
+}
 
 /** The one-off bespoke website, paid up front. Hosting and care are separate and optional. */
 export const ONE_OFF_WEBSITE = {

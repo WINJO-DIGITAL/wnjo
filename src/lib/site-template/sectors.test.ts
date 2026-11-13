@@ -88,6 +88,17 @@ describe("the physio template", () => {
     expect(PHYSIO_PRESET.sections.filter((x) => x.required).map((x) => x.kind)).toEqual(["hero", "services", "hours", "enquiry", "cta"]);
   });
 
+  it("tells the writer the sector's rules up front, and leaves out a rule the customer's tick has lifted", () => {
+    const base = { preset: PHYSIO_PRESET, look: "minimal" as const, colour: "#3d3a7a" };
+    const plain = buildCopyPrompt({ ...base, facts: sample.facts });
+    expect(plain).toContain("Rules for this sector");
+    expect(plain).toContain("must not promise a result or a cure");
+    expect(plain).toContain("registration or qualification can only be mentioned if the customer ticked it");
+    const ticked = buildCopyPrompt({ ...base, facts: { ...sample.facts, highlights: [...(sample.facts.highlights ?? []), { value: "HCPC", label: "Registered physiotherapist" }] } });
+    expect(ticked).toContain("must not promise a result or a cure");
+    expect(ticked).not.toContain("registration or qualification can only be mentioned");
+  });
+
   it("never promises a result or a cure", () => {
     expect(issues("We guarantee a full recovery.")).toContain("restricted-claim");
     expect(issues("Our treatment will cure your back pain.")).toContain("restricted-claim");
