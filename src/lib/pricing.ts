@@ -427,11 +427,64 @@ export const WEBSITE_PLANS = {
 } as const;
 export type WebsitePlanId = keyof typeof WEBSITE_PLANS;
 
+/**
+ * The three bespoke website tiers for buying outright, with the starting prices the owner set (14 November 2026). Each is
+ * a starting point: a written proposal confirms the price for what the website needs. The page limits are the same as
+ * the original packages so the project form's page sizes still line up.
+ */
+export const ONE_OFF_TIERS = {
+  essential: {
+    name: "Essential",
+    from: 999,
+    pageLimit: 5,
+    summary: "A polished, professional web presence.",
+    includes: [
+      "Up to 5 pages",
+      "Bespoke design",
+      "Mobile responsive",
+      "Contact form",
+      "SEO foundations",
+      "Analytics setup",
+      "Launch support",
+      "Website ownership following full payment",
+    ],
+  },
+  professional: {
+    name: "Professional",
+    from: 1999,
+    pageLimit: 12,
+    summary: "A fuller site that presents your work and wins enquiries.",
+    includes: [
+      "Everything in Essential",
+      "Up to 12 pages",
+      "Custom layouts for your key pages",
+      "Image gallery and testimonials",
+      "Advanced enquiry forms",
+      "Content management",
+      "Local SEO setup",
+    ],
+  },
+  premium: {
+    name: "Premium",
+    from: 2999,
+    pageLimit: 25,
+    summary: "A distinctive experience or more advanced functionality.",
+    includes: [
+      "Everything in Professional",
+      "Up to 25 pages",
+      "Extensive custom design and interaction",
+      "Blog and WhatsApp integration",
+      "Integration planning for booking, payments or a shop",
+      "Extended browser and accessibility testing",
+    ],
+  },
+} as const satisfies Record<PackageId, { name: string; from: number; pageLimit: number; summary: string; includes: readonly string[] }>;
+
 /** The one-off bespoke website, paid up front. Hosting and care are separate and optional. */
 export const ONE_OFF_WEBSITE = {
   name: "Bespoke website",
-  from: 999,
-  pages: 5,
+  from: ONE_OFF_TIERS.essential.from,
+  pages: ONE_OFF_TIERS.essential.pageLimit,
   summary: "For businesses that would rather buy their website outright and own it on full payment.",
   includes: [
     "Up to 5 pages",

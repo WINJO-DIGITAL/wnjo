@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { CtaBand, PageHero, SectionHead } from "@/components/Blocks";
-import { HostingPicker, PlanFlow } from "@/components/interactive/PlanFlow";
-import { OneOffWebsite } from "@/components/pricing/WebsitePackages";
+import { HostingPicker, PackagePicker, PlanFlow } from "@/components/interactive/PlanFlow";
 import { pageMetadata } from "@/lib/metadata";
 import { ONE_OFF_WEBSITE, SCOPED_FROM, SUBSCRIPTIONS, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
@@ -29,28 +28,34 @@ export default function WebsiteProjectsPage() {
         </div>
       </PageHero>
 
-      <section id="one-off" className="section--tight" style={{ paddingTop: 0 }} aria-label="The website project">
-        <div className="container container--wide">
-          <div data-reveal>
-            <OneOffWebsite />
-          </div>
-          <p className="plans-note" data-reveal>
-            Would rather not pay up front? A <Link href="/managed-websites">managed website</Link> includes the
-            design, hosting, maintenance and updates from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month.
-          </p>
-        </div>
-      </section>
-
-      {/* Hosting and care for websites bought outright. */}
+      {/* Pick a tier, then hosting; the bar along the bottom carries the choice into the proposal. */}
       <PlanFlow>
+        <section id="one-off" className="section--tight" style={{ paddingTop: 0 }} aria-labelledby="tiers-title">
+          <div className="container container--wide">
+            <SectionHead eyebrow="Website projects" title={<span id="tiers-title">Choose your website.</span>} split>
+              <p>Starting prices. A written proposal confirms the exact price before you pay anything.</p>
+            </SectionHead>
+          </div>
+          <div data-reveal>
+            <PackagePicker />
+          </div>
+        </section>
+
+        {/* Hosting and care for websites bought outright. */}
         <section id="care" className="section section--ruled">
           <div className="container container--wide">
-            <SectionHead eyebrow="After launch" title="Hosting and care." split>
-              <p>Optional, for websites bought outright. Managed plans already include it.</p>
+            <SectionHead eyebrow="After launch" title="Add hosting?" split>
+              <p>Optional. We keep your website online, secure and supported.</p>
             </SectionHead>
           </div>
           <div data-reveal>
             <HostingPicker />
+          </div>
+          <div className="container container--wide mt-6">
+            <p className="plans-note">
+              Prefer us to run everything? A <Link href="/pricing#plans">managed website</Link> includes the design, hosting,
+              maintenance and updates from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month.
+            </p>
           </div>
         </section>
       </PlanFlow>

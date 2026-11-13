@@ -1,9 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { PACKAGES, WEBSITE_PAGE_BANDS, type PackageId } from "./pricing";
+import { ONE_OFF_TIERS, ONE_OFF_WEBSITE, PACKAGES, WEBSITE_PAGE_BANDS, type PackageId } from "./pricing";
 import { packagePages, packagePlanCards } from "./plans";
 
 describe("packagePages", () => {
   const ids = Object.keys(PACKAGES) as PackageId[];
+
+  it("sells three bespoke tiers at the owner's starting prices", () => {
+    expect(Object.values(ONE_OFF_TIERS).map((t) => [t.name, t.from])).toEqual([["Essential", 999], ["Professional", 1999], ["Premium", 2999]]);
+    expect(ONE_OFF_WEBSITE.from).toBe(ONE_OFF_TIERS.essential.from);
+  });
+
+  it("shows each tier's own price and name on its card", () => {
+    expect(packagePlanCards.map((c) => [c.name, c.price])).toEqual([["Essential", "£999"], ["Professional", "£1,999"], ["Premium", "£2,999"]]);
+  });
 
   it("only passes page sizes the price form recognises", () => {
     for (const id of ids) expect(packagePages[id] in WEBSITE_PAGE_BANDS).toBe(true);

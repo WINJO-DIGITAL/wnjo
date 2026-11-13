@@ -1,7 +1,7 @@
 import type { PlanCard } from "@/components/interactive/PlanSwiper";
 import {
   CARE_PLANS,
-  PACKAGES,
+  ONE_OFF_TIERS,
   SCOPED_FROM,
   formatGBP,
   WEBSITE_PAGE_BANDS,
@@ -34,23 +34,23 @@ export const packagePages = Object.fromEntries(
     const bands = Object.keys(WEBSITE_PAGE_BANDS) as WebsitePageBand[];
     const fit = bands.find((b) => {
       const max = WEBSITE_PAGE_BANDS[b].max;
-      return max === null || max >= PACKAGES[id].pageLimit;
+      return max === null || max >= ONE_OFF_TIERS[id].pageLimit;
     });
     return [id, fit ?? bands[bands.length - 1]];
   }),
 ) as Record<PackageId, WebsitePageBand>;
 
-/** Website packages as selectable cards with their full inclusions; each opens the configurator. */
+/** The three bespoke tiers as selectable cards with their full inclusions. */
 export const packagePlanCards: PlanCard[] = packageOrder.map((id) => ({
   id,
   selectable: true,
-  name: PACKAGES[id].name,
-  summary: PACKAGES[id].summary,
-  price: formatGBP(PACKAGES[id].from),
+  name: ONE_OFF_TIERS[id].name,
+  summary: ONE_OFF_TIERS[id].summary,
+  price: formatGBP(ONE_OFF_TIERS[id].from),
   from: true,
-  includes: PACKAGES[id].includes,
+  includes: ONE_OFF_TIERS[id].includes,
   href: `/build/project?pages=${packagePages[id]}`,
-  cta: "Get my proposal",
+  cta: `Choose ${ONE_OFF_TIERS[id].name}`,
 }));
 
 /** App development, priced after scoping. It is not a website package, so it can't be picked in the flow. */

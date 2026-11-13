@@ -5,13 +5,13 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 import { depositPence } from "@/lib/deposit";
 import {
   CARE_PLANS,
+  ONE_OFF_TIERS,
   PACKAGES,
   formatGBP,
   type CarePlan,
   type PackageId,
 } from "@/lib/pricing";
 import {
-  appPlanCard,
   carePlanCards,
   packagePages,
   packagePlanCards,
@@ -67,8 +67,8 @@ export function PackagePicker() {
   const { pkg, setPkg } = useFlow();
   return (
     <PlanSwiper
-      plans={[...packagePlanCards, appPlanCard]}
-      label="Starting prices"
+      plans={packagePlanCards}
+      label="Website tiers"
       selectedId={pkg}
       onSelect={(id) => {
         if (isPackage(id)) setPkg(id);
@@ -111,7 +111,7 @@ function FlowBar() {
   const { pkg, care } = useFlow();
   if (!pkg) return null;
 
-  const pkgInfo = PACKAGES[pkg];
+  const pkgInfo = ONE_OFF_TIERS[pkg];
   const total = pkgInfo.from;
   const deposit = depositPence(total * 100) / 100;
   const href = care
