@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { cleanProgress, progressTooLarge } from "@/lib/brief-progress";
 import { serviceClient } from "@/lib/quote-store";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
-import { customerFromRequest } from "@/lib/staff-auth";
+import { PASS_ROUTE, PASS_STAGE, briefCaller } from "@/lib/brief-access";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,20 +22,23 @@ const EDITABLE_STAGES = ["brief_received", "reviewing", "awaiting_payment", "spe
 export async function POST(request: NextRequest) {
   const db = serviceClient();
   if (!db) return fail(503, "not_configured");
-  const customer = await customerFromRequest(db, request.headers.get("authorization"));
-  if (!customer) return fail(401, "Please sign in again.");
-  const limit = LIMITS_PER_ROUTE.briefDraft;
-  if (await sharedRateLimited(db, "brief-progress", customer.userId, limit.max, limit.windowSeconds)) return fail(429, "rate_limited");
-
-  const body = ((await request.json().catch(() => null)) ?? {}) as { briefId?: unknown; action?: unknown; progress?: unknown };
+  const body = ((await request.json().catch(() => null)) ?? {}) as { briefId?: unknown; action?: unknown; progress?: unknown; pass?: unknown };
   const briefId = typeof body.briefId === "string" && UUID.test(body.briefId) ? body.briefId : null;
   if (!briefId || (body.action !== "load" && body.action !== "save")) return fail(422, "invalid");
+  const caller = await briefCaller(db, request.headers.get("authorization"), body.pass, briefId);
+  if (!caller) return fail(401, "Please sign in again.");
+  // A pass can save progress, never read it back: reading stored details always needs a signed-in, verified email.
+  if (caller.kind === "pass" && body.action !== "save") return fail(401, "Please sign in again.");
+  const customer = caller.kind === "customer" ? caller : null;
+  const limit = LIMITS_PER_ROUTE.briefDraft;
+  if (await sharedRateLimited(db, "brief-progress", customer ? customer.userId : `pass:${briefId}`, limit.max, limit.windowSeconds)) return fail(429, "rate_limited");
 
-  const { data } = await db.from("website_briefs").select("email, tenant_id, stage").eq("id", briefId).maybeSingle();
-  const row = data as { email: string; tenant_id: string; stage: string } | null;
+  const { data } = await db.from("website_briefs").select("email, tenant_id, stage, route").eq("id", briefId).maybeSingle();
+  const row = data as { email: string; tenant_id: string; stage: string; route: string } | null;
   // Someone else's website looks exactly like a missing one.
-  if (!row || row.email.toLowerCase() !== customer.email) return fail(404, "not_found");
+  if (!row || (customer && row.email.toLowerCase() !== customer.email)) return fail(404, "not_found");
   if (!EDITABLE_STAGES.includes(row.stage)) return fail(409, "This form can't be changed now.");
+  if (!customer && (row.route !== PASS_ROUTE || row.stage !== PASS_STAGE)) return fail(401, "Please sign in to continue.");
 
   if (body.action === "load") {
     const { data: saved } = await db.from("website_brief_progress").select("payload, step").eq("brief_id", briefId).maybeSingle();

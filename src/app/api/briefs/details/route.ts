@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { mailConfig, sendEnquiryEmail } from "@/lib/mailer";
+import { mailConfig, notificationMailConfig, sendEmail, sendEnquiryEmail } from "@/lib/mailer";
 import { serviceClient } from "@/lib/quote-store";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
-import { customerFromRequest } from "@/lib/staff-auth";
+import { PASS_ROUTE, PASS_STAGE, briefCaller } from "@/lib/brief-access";
+import { briefReceivedEmail } from "@/lib/build-emails";
 import { pagesAllowedFor } from "@/lib/ai/website-ai-service";
 import { BRIEF_VERSION, DRAFT_ID_RE, cleanBrief, formatBrief, validateBrief, validateProfile } from "@/lib/website-brief";
 import { confirmBriefFiles } from "@/lib/brief-store";
@@ -26,17 +27,18 @@ const EDITABLE_STAGES = ["brief_received", "reviewing", "awaiting_payment", "spe
 export async function POST(request: NextRequest) {
   const db = serviceClient();
   if (!db) return fail(503, "not_configured");
-  const customer = await customerFromRequest(db, request.headers.get("authorization"));
-  if (!customer) return fail(401, "Please sign in again.");
-
-  const limit = LIMITS_PER_ROUTE.briefFeedback;
-  if (await sharedRateLimited(db, "brief-details", customer.userId, limit.max, limit.windowSeconds)) {
-    return fail(429, "Too many requests. Please try again in a few minutes.");
-  }
-
   const body = ((await request.json().catch(() => null)) ?? {}) as Record<string, unknown>;
   const briefId = typeof body.briefId === "string" && UUID.test(body.briefId) ? body.briefId : null;
   if (!briefId) return fail(422, "invalid");
+  // A signed-in customer, or someone who has just sent the short form and holds a pass for this one brief.
+  const caller = await briefCaller(db, request.headers.get("authorization"), body.pass, briefId);
+  if (!caller) return fail(401, "Please sign in again.");
+  const customer = caller.kind === "customer" ? caller : null;
+
+  const limit = LIMITS_PER_ROUTE.briefFeedback;
+  if (await sharedRateLimited(db, "brief-details", customer ? customer.userId : `pass:${briefId}`, limit.max, limit.windowSeconds)) {
+    return fail(429, "Too many requests. Please try again in a few minutes.");
+  }
 
   const { data } = await db
     .from("website_briefs")
@@ -45,8 +47,10 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
   const row = data as { id: string; tenant_id: string; reference: string; email: string; name: string; stage: string; answers: unknown; figures: { package?: string }; route: string } | null;
   // Someone else's website looks exactly like a missing one.
-  if (!row || row.email.toLowerCase() !== customer.email) return fail(404, "not_found");
+  if (!row || (customer && row.email.toLowerCase() !== customer.email)) return fail(404, "not_found");
   if (!EDITABLE_STAGES.includes(row.stage)) return fail(409, "This brief can't be changed now. Ask for changes on your preview instead.");
+  // A pass is for sending the answers once, on a buy-outright brief that hasn't been sent. Anything else needs sign-in.
+  if (!customer && (row.route !== PASS_ROUTE || row.stage !== PASS_STAGE)) return fail(401, "Please sign in to continue.");
 
   // Files were uploaded to this form's draft folder; only those really in it are kept.
   const draftId = typeof body.draftId === "string" && DRAFT_ID_RE.test(body.draftId) ? body.draftId : null;
@@ -81,7 +85,7 @@ export async function POST(request: NextRequest) {
   const { error } = await db.from("website_briefs").update({ brief: saved, ...who }).eq("id", row.id).eq("stage", row.stage);
   if (error) return fail(500, "We couldn't save your brief just now. Please try again.");
 
-  const actor = { tenant_id: row.tenant_id, brief_id: row.id, actor_type: "customer", actor_user: customer.userId, actor_email: customer.email };
+  const actor = { tenant_id: row.tenant_id, brief_id: row.id, actor_type: "customer", actor_user: customer?.userId ?? null, actor_email: customer?.email ?? row.email };
   const [v, e] = await Promise.all([
     db.from("website_brief_versions").insert({
       tenant_id: row.tenant_id,
@@ -90,7 +94,7 @@ export async function POST(request: NextRequest) {
       brief: saved,
       answers: row.answers ?? {},
       changed_by_type: "customer",
-      changed_by_user: customer.userId,
+      changed_by_user: customer?.userId ?? null,
     }),
     db.from("website_brief_events").insert({ ...actor, kind: "version", detail: { version, source: "customer_details" } }),
   ]);
@@ -124,8 +128,15 @@ export async function POST(request: NextRequest) {
         "",
         formatBrief(brief),
       ].join("\n"),
-      replyTo: customer.email,
+      replyTo: customer?.email ?? row.email,
     });
+  }
+  // Someone who answered straight after the short form gets a note that their answers are with us.
+  const customerConfig = notificationMailConfig();
+  if (!customer && customerConfig) {
+    const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
+    const note = briefReceivedEmail({ name: name || row.name, reference: row.reference, accountUrl: `${site.replace(/\/+$/, "")}/account` });
+    await sendEmail(customerConfig, { to: row.email, subject: note.subject, text: note.text }, "Brief received");
   }
   return NextResponse.json({ ok: true, version });
 }

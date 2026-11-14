@@ -77,3 +77,22 @@ export function handedOverEmail(args: { name: string; reference: string; account
     ].join("\n"),
   };
 }
+
+/** Sent when someone answers the six questions straight after the short form, so they know the answers arrived. */
+export function briefReceivedEmail(args: { name: string; reference: string; accountUrl: string }): { subject: string; text: string } {
+  return {
+    subject: `We've got your answers [${args.reference}]`,
+    text: [
+      `Hi ${first(args.name)},`,
+      "",
+      `Reference: ${args.reference}`,
+      "",
+      "Thank you. Your answers about your website are with us. We'll write you a fixed-price proposal and send it by email.",
+      "",
+      "Nothing is charged until you have read it and accepted it. To see your proposal when it's ready, sign in with this email address:",
+      args.accountUrl,
+      "",
+      "WINJO DIGITAL",
+    ].join("\n"),
+  };
+}
