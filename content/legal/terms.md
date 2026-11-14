@@ -120,7 +120,7 @@ We will confirm the date in writing straight away. There is no cancellation fee.
 
 8.3 **What happens when a subscription ends.** Whoever ends it, and whenever it ends, we will:
 - keep your website live, free of charge, for up to **7 days** after the end date if you ask, so you can arrange a move without downtime;
-- send you within **14 days** of your request a copy of your content (your text, images, logos and other material you supplied). The design files and page layouts for your website, as described in section 9.3, are sent once you have paid for **3 months** of your subscription;
+- send you within **14 days** of your request a copy of your content (your text, images, logos and other material you supplied, and the wording we wrote for your website). The design files and page layouts for your website, as described in section 9.3, are sent once you have paid for **3 months** of your subscription;
 - help you point your domain to a new host at no charge, with one follow-up if needed;
 - not delete your website or data from our servers until you have confirmed you have your copy, and in any case not before the 7-day period has ended.
 
@@ -158,12 +158,12 @@ We will confirm the date in writing straight away. There is no cancellation fee.
 9.2 **What we own.** Our proprietary software, the framework we build websites on, our reusable components and tools, and our underlying technology remain ours. We license you to use the website we run for you while your subscription is active. You do not receive our framework or tools when a subscription ends.
 
 9.3 **What you receive when your subscription ends.**
-- A **copy of your content** in standard formats (text, images and documents).
+- A **copy of your content** in standard formats: the text, images and documents you supplied, and the wording we wrote for your website.
 - **Design files and page layouts** for your website, in a form that can be opened in standard tools (for example, exported images, a copy of the page structure, and a list of fonts and colour values).
 - **Your bespoke design assets** that you have paid for in your plan: custom artwork, logos and images created for you.
 - **Exported website pages** where they can be produced without our framework.
 
-The design files and page layouts in the second bullet above are released once you have paid for **3 months** of your subscription. Your content, and the assets you have paid for in the third bullet, are released in every case.
+The design files and page layouts in the second bullet above are released once you have paid for **3 months** of your subscription. Your content (including the wording we wrote for your website) and the assets you have paid for in the third bullet are released in every case.
 
 9.4 **What cannot be released.** Our framework, and any code that depends on it, are not included and are not released.
 

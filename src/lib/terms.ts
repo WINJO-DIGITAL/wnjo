@@ -11,5 +11,6 @@
  * handover of content and design files, price changes, non-payment, liability and governing law.
  * 2026-11-14.1 limits the design files to customers who have paid for 3 months, and keeps the site live for 7 days after
  * the end date (was 30). Content is still handed over within 14 days.
+ * 2026-11-14.2 includes the wording we wrote for the website in the content handed over straight away.
  */
-export const QUOTE_TERMS_VERSION = "2026-11-14.1";
+export const QUOTE_TERMS_VERSION = "2026-11-14.2";
