@@ -9,5 +9,7 @@
  * monthly, no minimum term, WINJO Refresh, and the customer keeping their domain and content while we keep our code.
  * 2026-11-10.3 (draft, awaiting a solicitor's check) redrafts the whole page in full: change allowances, notice to end,
  * handover of content and design files, price changes, non-payment, liability and governing law.
+ * 2026-11-14.1 limits the design files to customers who have paid for 3 months, and keeps the site live for 7 days after
+ * the end date (was 30). Content is still handed over within 14 days.
  */
-export const QUOTE_TERMS_VERSION = "2026-11-13.2";
+export const QUOTE_TERMS_VERSION = "2026-11-14.1";

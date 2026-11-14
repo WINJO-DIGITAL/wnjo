@@ -119,10 +119,10 @@ We will confirm the date in writing straight away. There is no cancellation fee.
 (d) **Full performance.** If the service has been fully performed within the 14 days, at your express request, your right to cancel is lost once it has been fully performed.
 
 8.3 **What happens when a subscription ends.** Whoever ends it, and whenever it ends, we will:
-- keep your website live, free of charge, for up to **30 days** after the end date if you ask, so you can arrange a move without downtime;
-- send you within **14 days** of your request: a copy of your content (your text, images, logos and other material you supplied), and a copy of the design files and page layouts for your website, as described in section 9.3;
+- keep your website live, free of charge, for up to **7 days** after the end date if you ask, so you can arrange a move without downtime;
+- send you within **14 days** of your request a copy of your content (your text, images, logos and other material you supplied). The design files and page layouts for your website, as described in section 9.3, are sent once you have paid for **3 months** of your subscription;
 - help you point your domain to a new host at no charge, with one follow-up if needed;
-- not delete your website or data from our servers until you have confirmed you have your copy, and in any case not before the 30-day period has ended.
+- not delete your website or data from our servers until you have confirmed you have your copy, and in any case not before the 7-day period has ended.
 
 8.4 **Refunds on ending.** If a subscription ends before the end of a paid month, the unused part of that month is not refunded unless the cancellation is within the 14-day period in section 8.2, or we have caused the early end.
 
@@ -162,6 +162,8 @@ We will confirm the date in writing straight away. There is no cancellation fee.
 - **Design files and page layouts** for your website, in a form that can be opened in standard tools (for example, exported images, a copy of the page structure, and a list of fonts and colour values).
 - **Your bespoke design assets** that you have paid for in your plan: custom artwork, logos and images created for you.
 - **Exported website pages** where they can be produced without our framework.
+
+The design files and page layouts in the second bullet above are released once you have paid for **3 months** of your subscription. Your content, and the assets you have paid for in the third bullet, are released in every case.
 
 9.4 **What cannot be released.** Our framework, and any code that depends on it, are not included and are not released.
 
@@ -262,7 +264,7 @@ We will confirm the date in writing straight away. There is no cancellation fee.
 
 16.3 **Subprocessors.** The subprocessors we use are Supabase (database and sign-in, hosted in Frankfurt, Germany), Resend (email delivery, EU, Ireland), Vercel (website hosting, London) and Stripe (payments). We will tell you before we add a new one.
 
-16.4 **Retention.** We keep personal data only as long as needed for the service, the law or our accounts. When a subscription or project ends, we keep your website data for the 30-day export period in section 8.3, and then delete it within a further 30 days (so within 60 days of the end date), unless you ask us to delete it earlier or the law requires us to keep it. We do not keep separate backup copies of your website data, so deleted data is removed from our systems in the timings above. Enquiries that do not become a subscription or project are deleted **12 months** after our last contact with you. Customer and billing records that we must keep for tax and accounting purposes are kept for **6 years** after the end of the service, as UK law requires.
+16.4 **Retention.** We keep personal data only as long as needed for the service, the law or our accounts. When a subscription or project ends, we keep your website data for the 7-day export period in section 8.3, and then delete it within a further 30 days (so within 60 days of the end date), unless you ask us to delete it earlier or the law requires us to keep it. We do not keep separate backup copies of your website data, so deleted data is removed from our systems in the timings above. Enquiries that do not become a subscription or project are deleted **12 months** after our last contact with you. Customer and billing records that we must keep for tax and accounting purposes are kept for **6 years** after the end of the service, as UK law requires.
 
 16.5 **Your privacy notice.** Our privacy notice and this section work together. Where they differ, the Data Processing Agreement applies to the data we process for you.
 

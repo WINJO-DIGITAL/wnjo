@@ -4,23 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { LegalDraftNotice } from "@/components/pricing/WebsitePackages";
 import { contactPhoneHref } from "@/lib/site";
-import {
-  ADD_ONS,
-  CARE_PLANS,
-  EXTRA_PAGE,
-  ONE_OFF_WEBSITE,
-  OWNERSHIP,
-  VAT_NOTE,
-  WEBSITE_PAGE_BANDS,
-  DELIVERY,
-  WEBSITE_PLANS,
-  formatGBP,
-  formatPence,
-  type AddOnId,
-  type CarePlan,
-  type WebsitePageBand,
-  type WebsitePlanId,
-} from "@/lib/pricing";
+import { ADD_ONS, CARE_PLANS, EXTRA_PAGE, ONE_OFF_WEBSITE, OWNERSHIP, VAT_NOTE, WEBSITE_PAGE_BANDS, DELIVERY, WEBSITE_PLANS, formatGBP, formatPence, type AddOnId, type CarePlan, type WebsitePageBand, type WebsitePlanId, SUBSCRIPTION_TERMS } from "@/lib/pricing";
 import {
   DETAIL_LIMITS,
   EMPTY_DETAILS,
@@ -1173,7 +1157,7 @@ function PlanCheckout({
               <span>We reply within one working day, and your website is live within {DELIVERY.liveWithinDays} days of us having your goals.</span>
             </li>
             <li>
-              <span>Cancel any time, with no notice and no cancellation fee. Your plan ends at the end of the month you have paid for.</span>
+              <span>Cancel any time, with no notice and no cancellation fee. Your plan ends at the end of the month you have paid for. Your design files follow once you have paid for {SUBSCRIPTION_TERMS.designFilesAfterMonths} months, and your site stays live for {SUBSCRIPTION_TERMS.liveAfterEndDays} days after you cancel.</span>
             </li>
             <li>
               <span>

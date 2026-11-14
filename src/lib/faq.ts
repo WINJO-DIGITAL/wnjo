@@ -48,7 +48,7 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "What happens if I cancel?",
     category: "ongoing",
     short: "Your domain and content stay yours",
-    a: `Cancel any time, with no notice and no cancellation fee. Your plan ends at the end of the month you have paid for. We send you a copy of your content and design files within ${SUBSCRIPTION_TERMS.handoverDays} days, keep your website live for ${SUBSCRIPTION_TERMS.liveAfterEndDays} days so you can move it, and help point your domain to a new host at no charge. Your domain name is yours, and the code and framework we build on remain ours. The full steps are in our terms.`,
+    a: `Cancel any time, with no notice and no cancellation fee. Your plan ends at the end of the month you have paid for. We send you a copy of your content within ${SUBSCRIPTION_TERMS.handoverDays} days, your design files once you have paid for ${SUBSCRIPTION_TERMS.designFilesAfterMonths} months, and keep your website live for ${SUBSCRIPTION_TERMS.liveAfterEndDays} days after the end date so you can move it, and help point your domain to a new host at no charge. Your domain name is yours, and the code and framework we build on remain ours. The full steps are in our terms.`,
   },
   {
     q: "Who owns what?",

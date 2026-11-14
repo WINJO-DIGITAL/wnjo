@@ -288,8 +288,10 @@ export const SUBSCRIPTION_TERMS = {
   priceChangeNoticeDays: 30,
   /** Days within which we hand over content and design files after a request. */
   handoverDays: 14,
+  /** Months of payments before the design files and page layouts are handed over. Content is handed over at once. */
+  designFilesAfterMonths: 3,
   /** Days a site stays live, free of charge, after the end date, so a move can happen without downtime. */
-  liveAfterEndDays: 30,
+  liveAfterEndDays: 7,
   /** Days within which we reply to a support message, by plan. */
   replyWorkingDays: { bronze: 2, silver: 1, gold: 1 },
   /** Days within which a customer complaint gets a first written reply. */
