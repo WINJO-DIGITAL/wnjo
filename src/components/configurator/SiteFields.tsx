@@ -3,11 +3,12 @@
 import { useId, useState } from "react";
 import { DAYS, type DayAnswer, type RawAnswers } from "@/lib/site-template/answers";
 import { ABOUT_QUESTION, BUSINESS_GROUPS, SECTOR_PRESETS, type BusinessGroup } from "@/lib/site-template/presets";
-import { LOOKS, type Look } from "@/lib/site-template/schema";
+import { defaultLayout, LAYOUTS, LOOKS, type Layout, type Look } from "@/lib/site-template/schema";
 import { CUSTOMERS, FIRST_ACTIONS, PROFILE_LIMITS, TONES, type BusinessProfile, type FirstAction, type WebsiteBrief } from "@/lib/website-brief";
 import type { BriefChange } from "./BriefSteps";
 import styles from "./Configurator.module.css";
 
+const LAYOUT_LABELS: Record<Layout, string> = { showcase: "Photo first", split: "Side by side", essentials: "Details first" };
 const LOOK_LABELS: Record<Look, string> = { minimal: "Clean and minimal", warm: "Warm and friendly", bold: "Bold", classic: "Classic" };
 
 /** Theme colours the customer can pick. Dark enough for white text, so every look stays readable. */
@@ -249,6 +250,23 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
               {preset.highlights.map((h) => (
                 <button key={h.id} type="button" className="brief-chip" aria-pressed={ticked.has(h.id)} onClick={() => toggleHighlight(h.id)}>
                   {h.value}: {h.label.toLowerCase()}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className={styles.group}>
+            <legend className={styles.legend}>Layout</legend>
+            <div className={styles.layouts} role="group" aria-label="Layout">
+              {LAYOUTS.map((l) => (
+                <button key={l} type="button" className={styles.layout} aria-pressed={(answers.layout ?? defaultLayout(preset.id)) === l} onClick={() => set({ layout: l })}>
+                  {/* A small drawing of the page: the shaded block is the photo, the lines are the words. */}
+                  <span className={styles.layoutSketch} data-layout={l} aria-hidden="true">
+                    <i data-part="photo" />
+                    <i data-part="words" />
+                    <i data-part="list" />
+                  </span>
+                  {LAYOUT_LABELS[l]}
                 </button>
               ))}
             </div>

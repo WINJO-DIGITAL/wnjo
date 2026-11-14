@@ -44,6 +44,7 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
   const [openSite, setOpenSite] = useState<number | null>(null);
   const [view, setView] = useState<"phone" | "desktop">("phone");
   const [pageCount, setPageCount] = useState(1);
+  const [layout, setLayout] = useState("");
   const [pageSlug, setPageSlug] = useState("");
   const [rated, setRated] = useState<Record<number, string>>({});
   const [ratingNote, setRatingNote] = useState("");
@@ -66,7 +67,7 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
     const res = await fetch("/api/admin/ai/template-test", {
       method: "POST",
       headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-      body: JSON.stringify({ runs: 1, template, pages: pageCount }),
+      body: JSON.stringify({ runs: 1, template, pages: pageCount, layout: layout || undefined }),
     }).catch(() => null);
     const body = res ? ((await res.json().catch(() => null)) as (TemplateTestResult & { error?: string }) | null) : null;
     setRunning(false);
@@ -152,6 +153,13 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
             {n === 1 ? "1 page" : `${n} pages`}
           </option>
         ))}
+      </select>
+      <label className="acct-label" htmlFor="layout-pick">Layout</label>
+      <select id="layout-pick" className="input" value={layout} onChange={(e) => setLayout(e.target.value)} disabled={running}>
+        <option value="">Template default</option>
+        <option value="showcase">Photo first</option>
+        <option value="split">Side by side</option>
+        <option value="essentials">Details first</option>
       </select>
       <label className="acct-label" htmlFor="template-pick">Template</label>
       <select id="template-pick" className="input" value={template} onChange={(e) => setTemplate(e.target.value)} disabled={running}>

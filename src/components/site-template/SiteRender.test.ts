@@ -2,10 +2,10 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { checkSite } from "@/lib/site-template/checks";
-import { BARBER_PRESET } from "@/lib/site-template/presets";
+import { BARBER_PRESET, SECTOR_PRESETS } from "@/lib/site-template/presets";
 import { SAMPLE_BARBER, SAMPLE_BARBER_FACTS, SAMPLE_CAFE, SAMPLE_ELECTRICIAN } from "@/lib/site-template/sample";
-import type { SiteContent } from "@/lib/site-template/schema";
-import { SiteRender, safeImage, type EnquiryProps } from "./SiteRender";
+import { defaultLayout, LAYOUTS, type SiteContent } from "@/lib/site-template/schema";
+import { arrange, SiteRender, safeImage, type EnquiryProps } from "./SiteRender";
 
 const render = (content: SiteContent, props: { heroImage?: string; enquiry?: EnquiryProps } = {}) =>
   renderToStaticMarkup(createElement(SiteRender, { content, ...props }));
@@ -128,5 +128,40 @@ describe("SiteRender for the other sectors", () => {
     const c = structuredClone(SAMPLE_CAFE);
     c.sections[1] = { kind: "services", heading: "Everything we bake and brew every day", items: [{ name: "Flat white", price: "£3.20" }] };
     expect(render(c)).toContain('href="#services">Services</a>');
+  });
+});
+
+describe("layouts", () => {
+  const withGallery: SiteContent["sections"] = [
+    ...SAMPLE_ELECTRICIAN.sections.filter((s) => s.kind !== "gallery" && s.kind !== "facts"),
+    { kind: "gallery", heading: "Our work", images: [{ src: "/styler/trades-fuse.webp", alt: "A fuse board" }] },
+    { kind: "facts", items: [{ value: "Free", label: "Quotes" }] },
+  ];
+  const kinds = (layout: Parameters<typeof arrange>[1]) => arrange(withGallery, layout).map((s) => s.kind);
+  const original = withGallery.map((s) => s.kind);
+
+  it("brings the photos up for a picture-led layout, and the facts and price list up for an information-led one", () => {
+    expect(kinds("showcase").slice(0, 2)).toEqual(["hero", "gallery"]);
+    expect(kinds("essentials").slice(0, 3)).toEqual(["hero", "facts", "services"]);
+    expect(kinds("split")).toEqual(original);
+  });
+  it("only reorders: nothing is added or dropped", () => {
+    for (const l of LAYOUTS) expect([...kinds(l)].sort()).toEqual([...original].sort());
+  });
+  it("gives every sector a layout of its own to start on, and falls back for an unknown one", () => {
+    for (const id of Object.keys(SECTOR_PRESETS)) expect(LAYOUTS).toContain(defaultLayout(id));
+    expect(defaultLayout("barber")).toBe("showcase");
+    expect(defaultLayout("plumbing")).toBe("essentials");
+    expect(defaultLayout("nope")).toBe("showcase");
+  });
+});
+
+describe("stand-in photos", () => {
+  it("has a photo set on disk for every template", async () => {
+    const { existsSync, readFileSync } = await import("node:fs");
+    const source = readFileSync("src/lib/site-template/template-test.ts", "utf8");
+    const paths = source.match(/\/styler\/[a-z0-9-]+\.webp/g) ?? [];
+    expect(paths.length).toBeGreaterThanOrEqual(Object.keys(SECTOR_PRESETS).length * 4);
+    for (const p of paths) expect(existsSync(`public${p}`), p).toBe(true);
   });
 });

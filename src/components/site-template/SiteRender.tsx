@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { HoursItem, Section, SiteContent } from "@/lib/site-template/schema";
+import { LAYOUTS, type HoursItem, type Layout, type Section, type SiteContent } from "@/lib/site-template/schema";
 import css from "./SiteRender.module.css";
 
 /**
@@ -60,6 +60,17 @@ function bookingSlug(content: SiteContent): string | null {
   return content.pages?.find((p) => p.sections.some((s) => s.kind === "enquiry"))?.slug ?? null;
 }
 
+/**
+ * The order the home page is shown in. A picture-led layout brings the photos up under the top of the page; an
+ * information-led one brings the key facts and the price list up. Nothing is added or removed.
+ */
+export function arrange(sections: Section[], layout: Layout): Section[] {
+  const lead: Section["kind"][] = layout === "showcase" ? ["gallery"] : layout === "essentials" ? ["facts", "services"] : [];
+  if (!lead.length || sections[0]?.kind !== "hero") return sections;
+  const moved = lead.flatMap((kind) => sections.filter((s) => s.kind === kind));
+  return [sections[0], ...moved, ...sections.slice(1).filter((s) => !lead.includes(s.kind))];
+}
+
 /** The link to a page. A preview or staff view can swap it for its own (a tab, `?page=`). */
 export const defaultPageHref = (slug: string) => (slug ? `?page=${slug}` : "?");
 
@@ -78,7 +89,9 @@ export type SiteRenderProps = {
 
 export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = defaultPageHref }: SiteRenderProps) {
   const { business, theme } = content;
-  const current = pageSections(content, page);
+  const layout: Layout = (LAYOUTS as readonly string[]).includes(theme.layout ?? "") ? (theme.layout as Layout) : "showcase";
+  const shown = pageSections(content, page);
+  const current = shown.slug === "" ? { ...shown, sections: arrange(shown.sections, layout) } : shown;
   const multi = (content.pages?.length ?? 0) > 0;
   const bookOn = bookingSlug(content);
   // Every "book" button goes to the form, on this page or on the page that holds it.
@@ -296,7 +309,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
   });
 
   return (
-    <div className={css.site} data-look={theme.look} style={style}>
+    <div className={css.site} data-look={theme.look} data-layout={layout} style={style}>
       <header className={css.nav}>
         <b className={css.logo}>{business.name}</b>
         <nav aria-label={multi ? "Pages" : "Sections"} className={css.links}>

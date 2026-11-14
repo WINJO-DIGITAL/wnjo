@@ -31,21 +31,20 @@ export type TemplateTestRow = { template: string; passed: number; runs: number; 
 export type TemplateTestResult = { model: string; rows: TemplateTestRow[]; passed: number; total: number; pencePerSite: number };
 
 /**
- * Stand-in photos for the test, so a site shows its pictures. These are our own example photos, closest to each
- * template; a real customer's photos replace them. They only show the layout.
+ * Stand-in photos for the test, so a site shows its pictures. Each template has photos of its own kind of business (stock photos under the Unsplash licence); a real customer's photos replace them. They only show the layout.
  */
 const STANDIN_PHOTOS: Record<string, { hero: string; gallery: string[] }> = {
   barber: { hero: "/styler/barber-hero.webp", gallery: ["/styler/barber-cut.webp", "/styler/barber-fade.webp", "/styler/barber-shave.webp"] },
-  beauty: { hero: "/styler/barber-hero.webp", gallery: ["/styler/barber-cut.webp", "/styler/barber-fade.webp", "/styler/barber-shave.webp"] },
-  massage: { hero: "/styler/clinic-hero.webp", gallery: ["/styler/clinic-knee.webp", "/styler/clinic-rehab.webp", "/styler/clinic-sports.webp"] },
+  beauty: { hero: "/styler/beauty-hero.webp", gallery: ["/styler/beauty-1.webp", "/styler/beauty-2.webp", "/styler/beauty-3.webp"] },
+  massage: { hero: "/styler/massage-hero.webp", gallery: ["/styler/massage-1.webp", "/styler/massage-2.webp", "/styler/massage-3.webp"] },
   physio: { hero: "/styler/clinic-hero.webp", gallery: ["/styler/clinic-knee.webp", "/styler/clinic-rehab.webp", "/styler/clinic-sports.webp"] },
-  fitness: { hero: "/styler/trades-hero.webp", gallery: ["/styler/trades-fuse.webp", "/styler/trades-rewires.webp", "/styler/trades-testing.webp"] },
+  fitness: { hero: "/styler/fitness-hero.webp", gallery: ["/styler/fitness-1.webp", "/styler/fitness-2.webp", "/styler/fitness-3.webp"] },
   cafe: { hero: "/styler/cafe-hero.webp", gallery: ["/styler/cafe-plates.webp", "/styler/cafe-sourdough.webp", "/styler/cafe-wine.webp"] },
-  "holiday-let": { hero: "/styler/cafe-hero.webp", gallery: ["/styler/cafe-plates.webp", "/styler/cafe-sourdough.webp", "/styler/cafe-wine.webp"] },
+  "holiday-let": { hero: "/styler/holiday-hero.webp", gallery: ["/styler/holiday-1.webp", "/styler/holiday-2.webp", "/styler/holiday-3.webp"] },
   electrician: { hero: "/styler/trades-hero.webp", gallery: ["/styler/trades-fuse.webp", "/styler/trades-rewires.webp", "/styler/trades-testing.webp"] },
-  plumbing: { hero: "/styler/trades-hero.webp", gallery: ["/styler/trades-fuse.webp", "/styler/trades-rewires.webp", "/styler/trades-testing.webp"] },
-  building: { hero: "/styler/trades-hero.webp", gallery: ["/styler/trades-fuse.webp", "/styler/trades-rewires.webp", "/styler/trades-testing.webp"] },
-  cleaning: { hero: "/styler/trades-hero.webp", gallery: ["/styler/trades-fuse.webp", "/styler/trades-rewires.webp", "/styler/trades-testing.webp"] },
+  plumbing: { hero: "/styler/plumbing-hero.webp", gallery: ["/styler/plumbing-1.webp", "/styler/plumbing-2.webp", "/styler/plumbing-3.webp"] },
+  building: { hero: "/styler/building-hero.webp", gallery: ["/styler/building-1.webp", "/styler/building-2.webp", "/styler/building-3.webp"] },
+  cleaning: { hero: "/styler/cleaning-hero.webp", gallery: ["/styler/cleaning-1.webp", "/styler/cleaning-2.webp", "/styler/cleaning-3.webp"] },
 };
 
 /** The ids of every template, in the order they are tested. */
@@ -80,7 +79,7 @@ export function modelLinesOf(content: SiteContent, input: WriteInput): ModelLine
 }
 
 /** Tests every template, or only the ones named, so a slow run can be split across several requests. */
-export async function runTemplateTest(provider: AiProvider, runs: number, only?: string[], pageCount = 1): Promise<TemplateTestResult> {
+export async function runTemplateTest(provider: AiProvider, runs: number, only?: string[], pageCount = 1, layout?: string): Promise<TemplateTestResult> {
   // The customer chose this many pages; their plan is taken to allow at least that many.
   const chosen = Math.min(MAX_TEMPLATE_PAGES, Math.max(1, Math.floor(pageCount)));
   const pages = firstPages(chosen);
@@ -93,7 +92,7 @@ export async function runTemplateTest(provider: AiProvider, runs: number, only?:
     const row: TemplateTestRow = { template: preset.label, passed: 0, runs: count * sets.length, pencePerSite: 0, problems: [], sites: [] };
     let pence = 0;
     for (const answers of sets) {
-      const parsed = parseAnswers(answers, preset, { colour: "#1f3a34" });
+      const parsed = parseAnswers({ ...answers, ...(layout ? { layout } : {}) }, preset, { colour: "#1f3a34" });
       if (!parsed.ok) throw new Error(`${preset.label} (${answers.businessName}): answers not accepted`);
       for (let i = 0; i < count; i++) {
         const photos = STANDIN_PHOTOS[preset.id];
@@ -101,6 +100,7 @@ export async function runTemplateTest(provider: AiProvider, runs: number, only?:
           preset,
           facts: parsed.facts,
           look: parsed.look,
+          layout: parsed.layout,
           colour: parsed.colour,
           heroPhoto: photos?.hero,
           images: photos?.gallery.map((src, n) => ({ src, alt: `${answers.businessName ?? "Our"} photo ${n + 1}` })),

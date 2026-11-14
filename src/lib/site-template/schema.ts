@@ -11,6 +11,30 @@ export type SectionKind = (typeof SECTION_KINDS)[number];
 export const LOOKS = ["minimal", "warm", "bold", "classic"] as const;
 export type Look = (typeof LOOKS)[number];
 
+/**
+ * How the home page is arranged. "showcase" leads with a full-width photo and puts the gallery near the top, for
+ * businesses people choose with their eyes. "split" sets the words beside the photo. "essentials" leads with the
+ * words, the key facts and the price list, for businesses people choose on information.
+ */
+export const LAYOUTS = ["showcase", "split", "essentials"] as const;
+export type Layout = (typeof LAYOUTS)[number];
+
+/** The layout each sector starts on. The customer can pick another. */
+const SECTOR_LAYOUT: Record<string, Layout> = {
+  barber: "showcase",
+  beauty: "showcase",
+  massage: "showcase",
+  fitness: "showcase",
+  cafe: "showcase",
+  "holiday-let": "showcase",
+  building: "split",
+  physio: "essentials",
+  electrician: "essentials",
+  plumbing: "essentials",
+  cleaning: "essentials",
+};
+export const defaultLayout = (sector: string): Layout => SECTOR_LAYOUT[sector] ?? "showcase";
+
 /** The most each text field may hold. The checks enforce these; the page layouts are designed to fit them. */
 export const FIELD_LIMITS = {
   tagline: 100,
@@ -70,7 +94,7 @@ export type BusinessDetails = {
 
 export type SiteContent = {
   business: BusinessDetails;
-  theme: { colour: string; look: Look };
+  theme: { colour: string; look: Look; /** Left out on older builds, which show as "showcase". */ layout?: Layout };
   /** The home page. A one-page site has only this. */
   sections: Section[];
   /** The other pages of a multi-page site, in menu order. Absent for a one-page site. */

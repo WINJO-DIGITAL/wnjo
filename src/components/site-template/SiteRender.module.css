@@ -742,3 +742,62 @@
 .info .hours {
   max-width: none;
 }
+
+/* Layout "split": the words sit beside the photo instead of on it. */
+.site[data-layout="split"] .hero[data-variant="photo"],
+.site[data-layout="essentials"] .hero[data-variant="photo"] {
+  min-height: 0;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding-block: clamp(2.5rem, 7vw, 5rem);
+  color: var(--ink);
+}
+.site[data-layout="split"] .hero[data-variant="photo"]::after,
+.site[data-layout="essentials"] .hero[data-variant="photo"]::after {
+  display: none;
+}
+.site[data-layout="split"] .heroImg,
+.site[data-layout="essentials"] .heroImg {
+  position: static;
+  order: 2;
+  z-index: 0;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  border-radius: calc(var(--radius) + 10px);
+}
+.site[data-layout="split"] .heroCopy p,
+.site[data-layout="essentials"] .heroCopy p {
+  color: var(--muted);
+  opacity: 1;
+}
+
+/* Layout "essentials": the words first, then the photo as a wide band, then the facts and the price list. */
+.site[data-layout="essentials"] .hero[data-variant="photo"] {
+  padding-bottom: 0;
+}
+.site[data-layout="essentials"] .heroImg {
+  aspect-ratio: 16 / 10;
+}
+.site[data-layout="essentials"] .facts {
+  border-top: 0;
+}
+
+@media (min-width: 48rem) {
+  .site[data-layout="split"] .hero[data-variant="photo"] {
+    grid-template-columns: 1fr 1fr;
+    max-width: 76rem;
+    margin-inline: auto;
+  }
+  .site[data-layout="split"] .heroImg {
+    aspect-ratio: 4 / 5;
+    max-height: 38rem;
+    width: 100%;
+  }
+  .site[data-layout="essentials"] .heroImg {
+    aspect-ratio: 21 / 8;
+  }
+  .site[data-layout="essentials"] .hero[data-variant="photo"] {
+    max-width: 76rem;
+    margin-inline: auto;
+  }
+}

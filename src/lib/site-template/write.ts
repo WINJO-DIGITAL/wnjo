@@ -10,8 +10,8 @@ import { extractJson } from "@/lib/ai/website-plan";
 import { checkSite, describeIssues, FILLER_PHRASES, type CheckIssue } from "./checks";
 import { aboutSection, layoutPages, PAGE_KINDS, pageTitle, type PageHeads, type PageKind } from "./pages";
 import type { SectorPreset } from "./presets";
-import type { CustomerFacts, GalleryImage, Look, Section, SiteContent } from "./schema";
-import { FIELD_LIMITS, WORD_LIMITS } from "./schema";
+import type { CustomerFacts, GalleryImage, Layout, Look, Section, SiteContent } from "./schema";
+import { defaultLayout, FIELD_LIMITS, WORD_LIMITS } from "./schema";
 import { cutWords, wordCount } from "./text";
 
 export type SiteCopy = {
@@ -38,6 +38,8 @@ export type WriteInput = {
   images?: GalleryImage[];
   /** A change the owner or customer asked for, applied when the site is written again. */
   change?: string;
+  /** How the home page is arranged. Left out: the sector's own. */
+  layout?: Layout;
   /** The pages the customer chose, Home first. Left out for a one-page site. */
   pages?: PageKind[];
   /** The most pages their plan allows, so the model knows the limit. */
@@ -298,7 +300,7 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
       ...(facts.email ? { email: facts.email } : {}),
       ...(facts.address ? { address: facts.address } : {}),
     },
-    theme: { colour: input.colour, look: input.look },
+    theme: { colour: input.colour, look: input.look, layout: input.layout ?? defaultLayout(preset.id) },
     sections: layout.sections,
     ...(layout.pages.length ? { pages: layout.pages } : {}),
   };

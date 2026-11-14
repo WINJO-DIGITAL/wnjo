@@ -6,7 +6,7 @@ import { PAGE_CHOICES, slugFor, type PageKind } from "./pages";
 import type { CustomerFacts, Section, SiteContent } from "./schema";
 import { AVOID_WORDING } from "./avoid-wording";
 import { findCopiedRun } from "./originality";
-import { FIELD_LIMITS, LOOKS, SECTION_KINDS, WORD_LIMITS } from "./schema";
+import { FIELD_LIMITS, LAYOUTS, LOOKS, SECTION_KINDS, WORD_LIMITS } from "./schema";
 import { sentencesOf, wordCount, wordsOf } from "./text";
 import type { SectorPreset } from "./presets";
 
@@ -234,6 +234,7 @@ export function checkSite(
   if (options.pageLimit != null && pages.length > options.pageLimit) flag("over-plan", `The site has ${pages.length} pages but the plan allows ${options.pageLimit}.`);
 
   if (!(LOOKS as readonly string[]).includes(content.theme.look)) flag("bad-look", `"${content.theme.look}" is not an allowed look.`, "theme.look");
+  if (content.theme.layout !== undefined && !(LAYOUTS as readonly string[]).includes(content.theme.layout)) flag("bad-layout", `"${content.theme.layout}" is not an allowed layout.`, "theme.layout");
   if (!/^#[0-9a-f]{6}$/i.test(content.theme.colour)) flag("bad-colour", "The theme colour must be a hex colour such as #1a2b3c.", "theme.colour");
 
   const fields = textFields(content);

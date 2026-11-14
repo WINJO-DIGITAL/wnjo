@@ -3,8 +3,8 @@
  * database, no browser), so the form and the server apply the same rules. Typed text is kept as plain text.
  */
 import { ABOUT_QUESTION, type SectorPreset } from "./presets";
-import type { CustomerFacts, HoursItem, Look } from "./schema";
-import { FIELD_LIMITS, LOOKS } from "./schema";
+import type { CustomerFacts, HoursItem, Layout, Look } from "./schema";
+import { defaultLayout, FIELD_LIMITS, LAYOUTS, LOOKS } from "./schema";
 
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
@@ -26,10 +26,12 @@ export type RawAnswers = {
   /** Answers to the sector's own questions, by question id. */
   details?: Record<string, string>;
   look?: string;
+  /** How the home page is arranged. Left out: the sector's own. */
+  layout?: string;
   colour?: string;
 };
 
-export type ParsedAnswers = { ok: true; facts: CustomerFacts; look: Look; colour: string } | { ok: false; errors: Record<string, string> };
+export type ParsedAnswers = { ok: true; facts: CustomerFacts; look: Look; layout: Layout; colour: string } | { ok: false; errors: Record<string, string> };
 
 export const ANSWER_LIMITS = { businessName: 60, address: 160, email: 120, phone: 20, servicesText: 2000, areasText: 300, aboutText: 400, detailText: 200, details: 8 } as const;
 
@@ -175,6 +177,7 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
   }
 
   const look = (LOOKS as readonly string[]).includes(raw.look ?? "") ? (raw.look as Look) : preset.defaultLook;
+  const layout = (LAYOUTS as readonly string[]).includes(raw.layout ?? "") ? (raw.layout as Layout) : defaultLayout(preset.id);
   const colourInput = text(raw.colour);
   if (colourInput && !COLOUR.test(colourInput)) errors.colour = "Pick a colour from the swatches.";
   const colour = COLOUR.test(colourInput) ? colourInput.toLowerCase() : defaults.colour;
@@ -183,6 +186,7 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
   return {
     ok: true,
     look,
+    layout,
     colour,
     facts: {
       businessName,
@@ -243,6 +247,7 @@ export function cleanSiteAnswers(input: unknown, knownSectors: string[]): SiteAn
       about: str(a.about, ANSWER_LIMITS.aboutText),
       details,
       look: str(a.look, 20),
+      layout: str(a.layout, 20),
       colour: str(a.colour, 7),
     },
   };
