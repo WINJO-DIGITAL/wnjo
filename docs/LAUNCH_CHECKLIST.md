@@ -48,6 +48,15 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Hosting-only, online payment (14 November):** `/build/hosting` takes payment through Stripe. Database change applied (package codes `hosting`, `care`, `care_plus`). Tested on the live site in Stripe test mode: Care Plus hosting reached Stripe at £220 a month, the payment returned to the hosting confirmation page, the webhook activated the plan (one payment, no ownership milestone) and the owner got one alert after payment and none before. The customer welcome email's layout was checked in Gmail on a phone (owner, 14 November).
 - [x] **Grok context audit (14 November):** the one-off website quote is priced from the tier that fits the pages (Essential £999 for up to 5, Professional £1,999 for up to 10, Premium £2,999 for up to 20), matching the website. Tier page limits are now 5, 10 and 20, the same as the managed plans. The template writer is told the sector rules (such as no promised cures) up front. The older instant-quote calculator keeps its original prices and is no longer used by any customer page.
 
+## Before launch
+- [ ] **Full Fable audit before launch.** Scope:
+  - Signed-in account and admin screens: every page and action, including what a customer sees of someone else's data.
+  - Database security advisor (Supabase): row-level security on every table, and the brief pass (write-only, one brief, 48 hours).
+  - Live payments: the plan checkout, the deposit and balance, the billing portal, and the webhook's handling of each event, including retries.
+  - Public site: visual polish on phone and desktop, the buying path (tiers, hosting, six questions), wording, SEO and AEO markup.
+  - Email layout and copy as sent in a real inbox, plus the terms wording for the exit clause.
+  - Grok: the live AI reply shape, once the settings are in.
+
 ## Not started
 
 ## Still to do before launch
