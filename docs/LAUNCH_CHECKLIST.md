@@ -49,6 +49,7 @@ they can be done. Nothing here is pushed or deployed until the owner says so.
 - [x] **Grok context audit (14 November):** the one-off website quote is priced from the tier that fits the pages (Essential £999 for up to 5, Professional £1,999 for up to 10, Premium £2,999 for up to 20), matching the website. Tier page limits are now 5, 10 and 20, the same as the managed plans. The template writer is told the sector rules (such as no promised cures) up front. The older instant-quote calculator keeps its original prices and is no longer used by any customer page.
 
 ## Before launch
+- [ ] **AI quality checks (see `docs/AI_QUALITY_PLAN.md`):** criteria checks, copied-wording check, retry rule, and a £10 ceiling. Owner to confirm the ceiling and word limits.
 - [ ] **Full Fable audit before launch.** Scope:
   - Signed-in account and admin screens: every page and action, including what a customer sees of someone else's data.
   - Database security advisor (Supabase): row-level security on every table, and the brief pass (write-only, one brief, 48 hours).
