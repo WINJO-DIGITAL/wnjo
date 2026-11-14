@@ -16,6 +16,9 @@ export type SubmitState =
       pay?: { url: string } | null;
       /** A payment was set up (even if the Stripe page couldn't be opened, so a link was emailed). */
       paymentStarted?: boolean;
+      /** For a buy-outright request: the brief and a pass to answer its questions on the same page. */
+      briefId?: string;
+      pass?: string;
     }
   | { status: "not_configured"; message: string }
   | { status: "error"; message: string; fields?: FieldErrors };
@@ -50,6 +53,8 @@ export function useEnquirySubmit() {
         tracked?: boolean;
         pay?: { url?: unknown } | null;
         paymentStarted?: boolean;
+        briefId?: string;
+        pass?: string;
         fields?: FieldErrors;
       };
       if (res.ok) return settle({
@@ -60,6 +65,8 @@ export function useEnquirySubmit() {
           tracked: data.tracked,
           pay: data.pay && typeof data.pay.url === "string" ? { url: data.pay.url } : null,
           paymentStarted: data.paymentStarted === true,
+          briefId: typeof data.briefId === "string" ? data.briefId : undefined,
+          pass: typeof data.pass === "string" ? data.pass : undefined,
         });
       if (data.code === "not_configured") {
         return settle({ status: "not_configured", message: data.error ?? "Online enquiries aren't connected yet." });

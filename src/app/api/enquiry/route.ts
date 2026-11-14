@@ -22,6 +22,7 @@ import { confirmBriefFiles, createBrief } from "@/lib/brief-store";
 import { WNJO_TENANT_ID } from "@/lib/enquiry-store";
 import { cleanProjectRequest } from "@/lib/project-request";
 import { WEBSITE_STATUS, cleanHostingRequest } from "@/lib/hosting-request";
+import { briefPassKey, issueBriefPass } from "@/lib/brief-pass";
 import { stripeConfig } from "@/lib/stripe";
 import { createHostingOffer } from "@/lib/website-offers";
 import { checkoutParams, createOfferCheckout } from "@/lib/website-subscriptions";
@@ -251,7 +252,10 @@ async function handleProjectRequest(body: Json, request: NextRequest) {
     const ack = projectAcknowledgement({ reference, details, siteUrl: site });
     await sendEmail(customerConfig, { to: details.email, subject: ack.subject, text: ack.text }, "Project request acknowledgement");
   }
-  return NextResponse.json({ ok: true, reference, route: created?.route ?? null, tracked: Boolean(created), pay: null, paymentStarted: false });
+  // A pass to answer the six questions on the same page: for this one brief, write-only, and it expires.
+  const key = briefPassKey();
+  const pass = created && key ? issueBriefPass(created.id, key) : null;
+  return NextResponse.json({ ok: true, reference, route: created?.route ?? null, tracked: Boolean(created), pay: null, paymentStarted: false, ...(created && pass ? { briefId: created.id, pass } : {}) });
 }
 
 /**

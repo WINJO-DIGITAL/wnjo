@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { briefPassKey, briefPassValid } from "@/lib/brief-pass";
+import { createBrief } from "@/lib/brief-store";
 import { DEFAULT_WEBSITE_ANSWERS } from "@/lib/website-quote";
 
 const state = vi.hoisted(() => ({
@@ -8,6 +10,7 @@ const state = vi.hoisted(() => ({
   saved: 0,
 }));
 
+vi.mock("server-only", () => ({}));
 vi.mock("@/lib/enquiry-store", () => ({
   WNJO_TENANT_ID: "00000000-0000-4000-8000-000000000001",
   enquiryStoreConfigured: () => true,
@@ -184,6 +187,25 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     expect(await res.json()).toMatchObject({ ok: true, tracked: true, pay: null, paymentStarted: false });
     expect(startQuotePayment).not.toHaveBeenCalled();
     expect(emails().some((e) => e.to.includes("ada@example.com"))).toBe(true);
+  });
+
+  it("buy-outright request: hands back a pass for that one brief, so the six questions can open on the same page", async () => {
+    const BRIEF = "3f1c2a4e-9b7d-4c2a-8e1f-0a1b2c3d4e5f";
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "test-service-key");
+    vi.mocked(createBrief).mockResolvedValueOnce({ id: BRIEF, route: "proposal" });
+    const json = await (await post({ kind: "project", details: body().details, startedAt: Date.now() - 10_000 })).json();
+    expect(json.briefId).toBe(BRIEF);
+    const key = briefPassKey()!;
+    expect(briefPassValid(json.pass, BRIEF, key)).toBe(true);
+    expect(briefPassValid(json.pass, "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d", key)).toBe(false);
+  });
+
+  it("buy-outright request: gives no pass when the brief couldn't be stored", async () => {
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "test-service-key");
+    vi.mocked(createBrief).mockResolvedValueOnce(null);
+    const json = await (await post({ kind: "project", details: body().details, startedAt: Date.now() - 10_000 })).json();
+    expect(json.pass).toBeUndefined();
+    expect(json.briefId).toBeUndefined();
   });
 
   it("buy-outright request: needs only who is asking, because goals and pages come from the account steps", async () => {

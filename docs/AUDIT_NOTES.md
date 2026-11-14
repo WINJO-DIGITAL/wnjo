@@ -20,7 +20,7 @@ one commit each, and tick them off here as they land.
 - [x] Hero "Get my proposal" on `/website-projects` skips the tier cards. Point it to the "Choose your website" section instead.
 - [x] Hosting step: Continue is blocked until a hosting choice is made. "I'll host it myself" is a small button under the cards. Make it a proper card.
 - [x] Details form (`src/components/configurator/ProjectRequest.tsx`) doesn't show the chosen tier or hosting. Show both.
-- [ ] Biggest drop-off: after the details form, the customer must open an email and sign in before the six steps. Consider letting them start the questions straight away. Plan written: `docs/PLAN_BRIEF_BEFORE_SIGNIN.md` (awaiting the owner's go-ahead).
+- [x] Biggest drop-off: after the details form, the customer must open an email and sign in before the six steps. Consider letting them start the questions straight away. Plan written: `docs/PLAN_BRIEF_BEFORE_SIGNIN.md` (awaiting the owner's go-ahead).
 
 ## Visual
 - [x] `/website-projects`: tier cards are text only. Add a real example site to each tier, to sell visually.

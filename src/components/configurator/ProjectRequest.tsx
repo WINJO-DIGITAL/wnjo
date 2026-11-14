@@ -6,6 +6,7 @@ import type { ProjectErrors } from "@/lib/project-request";
 import { CARE_PLANS, ONE_OFF_TIERS, WEBSITE_PAGE_BANDS, formatGBP, tierForPages, type CarePlan, type WebsitePageBand } from "@/lib/pricing";
 import { DETAIL_LIMITS, EMPTY_DETAILS, type WebsiteDetails } from "@/lib/website-enquiry";
 import { useEnquirySubmit } from "../useEnquirySubmit";
+import { ProjectBrief } from "./ProjectBrief";
 import styles from "./Configurator.module.css";
 
 /**
@@ -41,6 +42,11 @@ export function ProjectRequest({ pages, care }: { pages?: string; care?: string 
     const result = await submit({ kind: "project", pages, care, details, website: honeypot, startedAt });
     if (result?.status === "error" && result.fields) setErrors(result.fields as ProjectErrors);
   };
+
+  // The short form is in: the six questions open on this same page, with a pass for this one brief.
+  if (state.status === "success" && state.briefId && state.pass && state.reference) {
+    return <ProjectBrief briefId={state.briefId} pass={state.pass} reference={state.reference} name={details.name} businessName={details.businessName} email={details.email} phone={details.phone} />;
+  }
 
   if (state.status === "success") {
     return (

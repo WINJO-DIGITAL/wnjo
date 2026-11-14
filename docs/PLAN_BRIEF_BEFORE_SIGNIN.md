@@ -1,6 +1,7 @@
 # Plan: answer the six questions before signing in
 
-Status: proposed, not built. Written 14 November 2026. Needs the owner's go-ahead on the decisions at the end.
+Status: BUILT (14 November 2026), awaiting a live check. The owner chose the recommended options: a write-only pass,
+48 hours, and no opening of uploaded files before sign-in. Built in commits `5a1bb91` and the one after it.
 
 ## The problem
 
