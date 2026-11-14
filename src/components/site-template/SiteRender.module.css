@@ -184,14 +184,16 @@
   opacity: 0.92;
 }
 
+/* Sections share one measure and one rhythm. Every second one sits on a soft tint, so the page reads in bands. */
 .section {
-  padding: clamp(2.5rem, 7vw, 5rem) var(--pad);
-  max-width: 62rem;
+  padding: clamp(3rem, 7vw, 5.5rem) var(--pad);
+  max-width: 68rem;
   margin: 0 auto;
 }
 .body {
-  max-width: 36rem;
+  max-width: 34rem;
   color: var(--muted);
+  font-size: 1.05rem;
 }
 .link {
   display: inline-block;
@@ -199,25 +201,66 @@
   color: var(--ink);
   font-weight: 600;
 }
+/* A quiet secondary action: a pill with an arrow that moves on hover. */
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0.7rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.more::after {
+  content: "→";
+  transition: transform 0.2s;
+}
+.more:hover {
+  border-color: var(--ink);
+}
+.more:hover::after {
+  transform: translateX(3px);
+}
 
+/* Services: a price list with a leader line, so the eye runs from the name to the price. */
 .menu {
   list-style: none;
   margin: 0;
   padding: 0;
+  display: grid;
+  gap: 0 3.5rem;
 }
 .menu li {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.2rem 1rem;
-  padding: 1rem 0;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+  padding: 1.05rem 0;
   border-bottom: 1px solid var(--line);
 }
+.menu li::before {
+  content: "";
+  grid-column: 2;
+  grid-row: 1;
+  border-bottom: 1px dotted color-mix(in srgb, var(--ink) 28%, transparent);
+  transform: translateY(-0.3em);
+}
 .menuName {
+  grid-column: 1;
+  grid-row: 1;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.12rem;
 }
 .price {
+  grid-column: 3;
+  grid-row: 1;
   font-weight: 650;
+  font-size: 1.12rem;
   font-variant-numeric: tabular-nums;
   color: var(--accent);
 }
@@ -227,17 +270,40 @@
   font-size: 0.95rem;
 }
 
+/* Hours and location as a pair of cards. */
+.info {
+  display: grid;
+  gap: 1rem;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3rem) var(--pad);
+}
+.info > .section {
+  width: 100%;
+  margin: 0;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper));
+  border-radius: calc(var(--radius) + 6px);
+}
+.info h2 {
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+}
+
 .hours {
   display: grid;
   gap: 0;
-  max-width: 24rem;
+  max-width: 26rem;
   margin: 0;
 }
 .hours div {
   display: flex;
   justify-content: space-between;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--line);
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+}
+.hours div:last-child {
+  border-bottom: 0;
 }
 .hours dt {
   font-weight: 600;
@@ -250,75 +316,113 @@
   color: var(--muted);
 }
 
+/* Gallery: on a phone the photos swipe sideways; on a wide screen the first one leads. */
 .gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: 78%;
   gap: 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  margin-inline: calc(var(--pad) * -1);
+  padding-inline: var(--pad);
+  scroll-padding-inline: var(--pad);
+}
+.gallery::-webkit-scrollbar {
+  display: none;
 }
 .gallery img {
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
-  border-radius: var(--radius);
+  border-radius: calc(var(--radius) + 4px);
   display: block;
+  scroll-snap-align: start;
 }
 
+/* Facts: a calm strip in a tint of the theme colour. */
 .facts {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem 4rem;
-  padding: 2.25rem var(--pad);
-  background: var(--ink);
-  color: var(--paper);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 1.5rem 2rem;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: clamp(1.75rem, 4vw, 2.75rem) var(--pad);
+  border-block: 1px solid var(--line);
 }
 .facts p {
   display: grid;
-  text-align: center;
+  gap: 0.15rem;
 }
 .facts b {
   font-family: var(--head);
-  font-size: 2.1rem;
+  font-weight: var(--head-weight);
+  text-transform: var(--head-case);
+  font-size: clamp(1.5rem, 3.4vw, 2.1rem);
   line-height: 1.1;
+  color: var(--accent);
 }
 .facts span {
-  font-size: 0.85rem;
-  opacity: 0.75;
+  font-size: 0.9rem;
+  color: var(--muted);
 }
 
+/* The request form: what to expect on one side, the form in a card on the other. */
 .book {
-  max-width: 34rem;
+  display: grid;
+  gap: 2rem;
+  scroll-margin-top: 5rem;
+}
+.bookIntro {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+.bookIntro h2 {
+  margin-bottom: 0;
 }
 .form {
   display: grid;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: 1.1rem;
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 6px);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 12px 32px -16px rgb(0 0 0 / 0.14);
 }
 .form label {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.4rem;
   font-size: 0.9rem;
   font-weight: 600;
 }
 .form input,
 .form textarea {
   font: inherit;
-  padding: 0.7rem 0.8rem;
+  font-size: 1rem;
+  padding: 0.85rem 0.9rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--paper);
   color: var(--ink);
+  transition: border-color 0.2s;
+}
+.form input:hover,
+.form textarea:hover {
+  border-color: color-mix(in srgb, var(--ink) 35%, transparent);
 }
 .form .btn {
-  justify-self: start;
+  padding-block: 1rem;
+  font-size: 1rem;
 }
 .sent {
   display: grid;
   gap: 0.35rem;
-  margin-top: 1.5rem;
-  padding: 1.25rem 1.4rem;
+  padding: 1.5rem;
   border: 1px solid var(--accent);
-  border-radius: var(--radius);
+  border-radius: calc(var(--radius) + 6px);
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper));
 }
 .formError {
   color: #a3322a;
@@ -332,26 +436,54 @@
   opacity: 0;
 }
 .site .contact {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  margin-top: 1.5rem;
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
 }
 .contact a {
   color: var(--ink);
-  font-weight: 600;
+  font-family: var(--head);
+  font-weight: var(--head-weight);
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  text-decoration: none;
+  width: fit-content;
+  border-bottom: 2px solid var(--accent);
 }
 
+/* Questions open in place, with a plus that turns into a minus. */
+.faq {
+  max-width: 44rem;
+}
 .faq details {
   border-bottom: 1px solid var(--line);
-  padding: 1rem 0;
 }
 .faq summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.15rem 0;
   cursor: pointer;
   font-weight: 600;
+  font-size: 1.08rem;
+  list-style: none;
+}
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq summary::after {
+  content: "+";
+  flex: none;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--accent);
+}
+.faq details[open] summary::after {
+  content: "–";
 }
 .faq details p {
-  margin-top: 0.6rem;
+  padding-bottom: 1.25rem;
   color: var(--muted);
   max-width: 36rem;
 }
@@ -359,80 +491,254 @@
 .closing {
   display: grid;
   justify-items: center;
-  gap: 1.5rem;
+  gap: 1.75rem;
+  margin: clamp(1rem, 3vw, 2.5rem) var(--pad) clamp(2rem, 5vw, 4rem);
   padding: clamp(3rem, 9vw, 6rem) var(--pad);
   text-align: center;
   background: var(--accent);
   color: var(--on-accent);
+  border-radius: calc(var(--radius) + 10px);
 }
-.closing h2 {
+.site .closing h2 {
   margin: 0;
+  font-size: clamp(1.9rem, 5vw, 3.2rem);
+  max-width: 18ch;
 }
 .closing .btn {
   background: var(--on-accent);
   color: var(--accent);
+  padding: 1rem 1.75rem;
+  font-size: 1rem;
 }
 
 .foot {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem 2rem;
-  padding: 1.5rem var(--pad);
+  display: grid;
+  gap: 1.75rem;
+  padding: 2.5rem var(--pad);
+  border-top: 1px solid var(--line);
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.92rem;
 }
-
-@media (max-width: 40rem) {
-  .links {
-    display: none;
-  }
+.foot div {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  justify-items: start;
+}
+.foot .logo {
+  color: var(--ink);
+  margin: 0;
+}
+.foot a {
+  color: inherit;
+  text-decoration: none;
+}
+.foot a:hover {
+  color: var(--ink);
 }
 
 .pagehead {
-  padding: clamp(2.5rem, 8vw, 5rem) var(--pad) clamp(1rem, 3vw, 2rem);
-  max-width: 62rem;
+  padding: clamp(3rem, 9vw, 6rem) var(--pad) clamp(2rem, 5vw, 3.5rem);
+  background: color-mix(in srgb, var(--accent) 7%, var(--paper));
+  border-bottom: 1px solid var(--line);
+}
+.pagehead > * {
+  max-width: 68rem;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+.site .pagehead h1 {
+  max-width: 68rem;
+  margin: 0 auto 1rem;
+  font-size: clamp(2.2rem, 6.5vw, 4rem);
+}
+.site .pagehead p {
+  max-width: 68rem;
   margin: 0 auto;
-}
-.pagehead h1 {
-  margin: 0 0 0.75rem;
-  font-family: var(--head);
-  font-weight: var(--head-weight);
-  text-transform: var(--head-case);
-  letter-spacing: var(--head-track);
-  font-size: clamp(2rem, 6vw, 3.25rem);
-  line-height: 1.1;
-}
-.pagehead p {
-  margin: 0;
-  max-width: 36rem;
   color: var(--muted);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
 
 .points {
   display: grid;
-  gap: 0;
-  max-width: 36rem;
-  margin: 1.5rem 0 0;
+  gap: 1rem;
+  margin: 2rem 0 0;
 }
 .points div {
   display: grid;
-  gap: 0.15rem;
-  padding: 0.9rem 0;
-  border-bottom: 1px solid var(--line);
+  gap: 0.3rem;
+  padding: 1.4rem;
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper));
+  border-radius: calc(var(--radius) + 6px);
 }
 .points dt {
-  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 .points dd {
   margin: 0;
-  color: var(--muted);
+  font-weight: 600;
+  font-size: 1.08rem;
 }
 
+/* The header: on a phone the page links scroll sideways under the name. */
+.nav {
+  flex-wrap: wrap;
+  row-gap: 0.6rem;
+}
+.links {
+  order: 3;
+  flex-basis: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-inline: calc(var(--pad) * -1);
+  padding-inline: var(--pad);
+  white-space: nowrap;
+}
+.links::-webkit-scrollbar {
+  display: none;
+}
+.links:empty {
+  display: none;
+}
+.links a {
+  padding-block: 0.25rem;
+}
 .links a[aria-current="page"] {
   color: var(--ink);
-  text-decoration: underline;
-  text-underline-offset: 0.35em;
-  text-decoration-color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 2px 0 var(--accent);
+}
+.nav .btn {
+  display: none;
+}
+
+/* The phone dock: call and book, always under the thumb. */
+.dock {
+  /* Sticky, not fixed: it stays inside the site, so a preview framed in another page keeps it in the frame. */
+  position: sticky;
+  bottom: 0;
+  z-index: 6;
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.7rem var(--pad) calc(0.7rem + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+}
+.dock > * {
+  flex: 1;
+  text-align: center;
+  padding-block: 0.95rem;
+}
+.dock .btnGhost {
+  flex: 0 1 34%;
+  border-color: var(--line);
+}
+
+.hero {
+  min-height: min(82svh, 44rem);
+}
+.heroCopy p {
+  text-wrap: pretty;
+}
+.btn,
+.btnGhost {
+  transition: filter 0.2s, background 0.2s, transform 0.2s;
+}
+.btn:active,
+.btnGhost:active {
+  transform: scale(0.98);
+}
+
+@media (min-width: 48rem) {
+  .nav {
+    flex-wrap: nowrap;
+  }
+  .links {
+    order: 0;
+    flex-basis: auto;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+  }
+  .nav .btn {
+    display: inline-block;
+  }
+  .dock {
+    display: none;
+  }
+  .foot {
+    grid-template-columns: 1.4fr 1fr 1fr;
+  }
+  .info:has(> :nth-child(2)) {
+    grid-template-columns: 1fr 1fr;
+  }
+  .menu[data-wide] {
+    grid-template-columns: 1fr 1fr;
+  }
+  .book {
+    grid-template-columns: 0.85fr 1fr;
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: start;
+  }
+  .bookIntro {
+    position: sticky;
+    top: 6rem;
+  }
+  .points {
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  }
+  /* The first photo leads; the rest fall in beside it. */
+  .gallery {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: repeat(4, 1fr);
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+  .gallery img {
+    height: 100%;
+    aspect-ratio: 1;
+  }
+  .gallery img:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  .gallery[data-count="2"] {
+    grid-template-columns: 1fr 1fr;
+  }
+  .gallery[data-count="2"] img:first-child {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .gallery[data-count="3"] img:not(:first-child) {
+    grid-column: span 2;
+    aspect-ratio: 2 / 1;
+  }
+}
+
+.menu li:not(:has(.price))::before {
+  display: none;
+}
+.site .hero h1 {
+  font-size: clamp(2.3rem, 6.2vw, 4.25rem);
+}
+.heroCopy {
+  max-width: 46rem;
+}
+
+/* No photo: the theme colour carries the top of the page instead, so it never looks unfinished. */
+.hero[data-variant="plain"] {
+  background: var(--accent);
+  color: var(--on-accent);
+  padding-block: clamp(4.5rem, 13vw, 9rem);
+}
+.hero[data-variant="plain"] .btn {
+  background: var(--on-accent);
+  color: var(--accent);
+}
+.info .hours {
+  max-width: none;
 }

@@ -90,6 +90,211 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
   // A section that draws nothing (a gallery with no usable pictures) gets no nav link, so no link points at nothing.
   const nav = current.sections.flatMap((s) => (ANCHOR_IDS[s.kind] && !(s.kind === "gallery" && !s.images.some((im) => safeImage(im.src))) ? [{ id: ANCHOR_IDS[s.kind]!.id, label: navLabel(s)! }] : []));
 
+  const renderSection = (s: Section, i: number) => {
+    switch (s.kind) {
+      case "hero":
+        return (
+          <section key={i} className={css.hero} data-variant={photo && s.variant !== "plain" ? "photo" : "plain"}>
+            {photo && s.variant !== "plain" && (
+              // eslint-disable-next-line @next/next/no-img-element -- customer uploads come from private storage, not the image optimiser
+              <img className={css.heroImg} src={photo} alt="" />
+            )}
+            <div className={css.heroCopy}>
+              <h1>{s.headline}</h1>
+              <p>{s.intro}</p>
+              <span className={css.heroActions}>
+                <a className={css.btn} href={bookHref}>
+                  {s.cta}
+                </a>
+                {business.phone && (
+                  <a className={css.btnGhost} href={telHref(business.phone)}>
+                    Call {business.phone}
+                  </a>
+                )}
+              </span>
+            </div>
+          </section>
+        );
+      case "services":
+        return (
+          <section key={i} id="services" className={css.section}>
+            <h2>{s.heading}</h2>
+            <ul className={css.menu} data-wide={!s.teaser && s.items.length > 5 ? "" : undefined}>
+              {(s.teaser ? s.items.slice(0, s.teaser) : s.items).map((it, j) => (
+                <li key={j}>
+                  <span className={css.menuName}>{it.name}</span>
+                  {it.price && <span className={css.price}>{it.price}</span>}
+                  {it.description && <span className={css.menuText}>{it.description}</span>}
+                </li>
+              ))}
+            </ul>
+            {s.teaser && s.items.length > s.teaser && (
+              <a className={css.more} href={pageHref("services")}>
+                See all {s.items.length}
+              </a>
+            )}
+          </section>
+        );
+      case "hours":
+        return (
+          <section key={i} id="hours" className={css.section}>
+            <h2>{s.heading}</h2>
+            <dl className={css.hours}>
+              {s.items.map((h, j) => (
+                <div key={j} data-closed={h.closed ? "" : undefined}>
+                  <dt>{h.day}</dt>
+                  <dd>{hoursText(h)}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        );
+      case "gallery": {
+        const images = s.images.flatMap((im) => {
+          const src = safeImage(im.src);
+          return src ? [{ src, alt: im.alt }] : [];
+        });
+        if (!images.length) return null;
+        return (
+          <section key={i} id="gallery" className={css.section}>
+            <h2>{s.heading}</h2>
+            <div className={css.gallery} data-count={Math.min(images.length, 6)}>
+              {images.map((im, j) => (
+                // eslint-disable-next-line @next/next/no-img-element -- see the hero image
+                <img key={j} src={im.src} alt={im.alt} loading="lazy" />
+              ))}
+            </div>
+          </section>
+        );
+      }
+      case "facts":
+        return (
+          <section key={i} className={css.facts}>
+            {s.items.map((f, j) => (
+              <p key={j}>
+                <b>{f.value}</b>
+                <span>{f.label}</span>
+              </p>
+            ))}
+          </section>
+        );
+      case "area":
+        return (
+          <section key={i} id="find-us" className={css.section}>
+            <h2>{s.heading}</h2>
+            <p className={css.body}>{s.text}</p>
+            {business.address && (
+              <a className={css.more} href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`}>
+                Get directions
+              </a>
+            )}
+          </section>
+        );
+      case "enquiry":
+        return (
+          <section key={i} id="book" className={`${css.section} ${css.book}`}>
+            <div className={css.bookIntro}>
+              <h2>{s.heading}</h2>
+              <p className={css.body}>{s.intro}</p>
+              {(business.phone || business.email) && (
+                <p className={css.contact}>
+                  {business.phone && <a href={telHref(business.phone)}>{business.phone}</a>}
+                  {business.email && <a href={`mailto:${business.email}`}>{business.email}</a>}
+                </p>
+              )}
+            </div>
+            {enquiry?.state === "sent" ? (
+              <div className={css.sent} role="status">
+                <b>Request sent</b>
+                <span>Thanks. {business.name} has your request and will reply to confirm a time.</span>
+              </div>
+            ) : (
+              <form className={css.form} action={enquiry?.action} method={enquiry ? "post" : undefined}>
+                {enquiry?.state === "error" && (
+                  <p className={css.formError} role="alert">
+                    That didn&apos;t send. Check your phone number or email and try again.
+                  </p>
+                )}
+                {enquiry && <input type="hidden" name="token" value={enquiry.token} />}
+                {/* A field real visitors never see: bots fill it in, and the request is dropped. */}
+                <input className={css.trap} name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+                <label>
+                  Name
+                  <input name="name" autoComplete="name" maxLength={80} required />
+                </label>
+                <label>
+                  Phone or email
+                  <input name="contact" autoComplete="email" maxLength={120} required />
+                </label>
+                <label>
+                  {s.prompt || "Anything we should know?"}
+                  <textarea name="message" rows={3} maxLength={1000} />
+                </label>
+                <button className={css.btn} type={enquiry ? "submit" : "button"}>
+                  {s.cta}
+                </button>
+              </form>
+            )}
+          </section>
+        );
+      case "faq":
+        return (
+          <section key={i} id="faq" className={css.section}>
+            <h2>{s.heading}</h2>
+            <div className={css.faq}>
+              {s.items.map((q, j) => (
+                <details key={j}>
+                  <summary>{q.question}</summary>
+                  <p>{q.answer}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+        );
+      case "cta":
+        return (
+          <section key={i} className={css.closing}>
+            <h2>{s.headline}</h2>
+            <a className={css.btn} href={bookHref}>
+              {s.cta}
+            </a>
+          </section>
+        );
+      case "pagehead":
+        return (
+          <section key={i} className={css.pagehead}>
+            <h1>{s.headline}</h1>
+            <p>{s.intro}</p>
+          </section>
+        );
+      case "about":
+        return (
+          <section key={i} id="about" className={css.section}>
+            <h2>{s.heading}</h2>
+            {s.text && <p className={css.body}>{s.text}</p>}
+            {s.points.length > 0 && (
+              <dl className={css.points}>
+                {s.points.map((pt, j) => (
+                  <div key={j}>
+                    <dt>{pt.label}</dt>
+                    <dd>{pt.text}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </section>
+        );
+    }
+  };
+  // Neighbouring "hours" and "find us" sections are shown as one pair.
+  const groups: { s: Section; i: number }[][] = [];
+  current.sections.forEach((s, i) => {
+    const last = groups[groups.length - 1];
+    const pairs = (k: Section["kind"]) => k === "hours" || k === "area";
+    if (last && last.length === 1 && pairs(s.kind) && pairs(last[0].s.kind) && last[0].s.kind !== s.kind) last.push({ s, i });
+    else groups.push([{ s, i }]);
+  });
+
   return (
     <div className={css.site} data-look={theme.look} style={style}>
       <header className={css.nav}>
@@ -114,205 +319,55 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
         )}
       </header>
 
-      {current.sections.map((s, i) => {
-        switch (s.kind) {
-          case "hero":
-            return (
-              <section key={i} className={css.hero} data-variant={photo && s.variant !== "plain" ? "photo" : "plain"}>
-                {photo && s.variant !== "plain" && (
-                  // eslint-disable-next-line @next/next/no-img-element -- customer uploads come from private storage, not the image optimiser
-                  <img className={css.heroImg} src={photo} alt="" />
-                )}
-                <div className={css.heroCopy}>
-                  <h1>{s.headline}</h1>
-                  <p>{s.intro}</p>
-                  <span className={css.heroActions}>
-                    <a className={css.btn} href={bookHref}>
-                      {s.cta}
-                    </a>
-                    {business.phone && (
-                      <a className={css.btnGhost} href={telHref(business.phone)}>
-                        Call {business.phone}
-                      </a>
-                    )}
-                  </span>
-                </div>
-              </section>
-            );
-          case "services":
-            return (
-              <section key={i} id="services" className={css.section}>
-                <h2>{s.heading}</h2>
-                <ul className={css.menu}>
-                  {(s.teaser ? s.items.slice(0, s.teaser) : s.items).map((it, j) => (
-                    <li key={j}>
-                      <span className={css.menuName}>{it.name}</span>
-                      {it.price && <span className={css.price}>{it.price}</span>}
-                      {it.description && <span className={css.menuText}>{it.description}</span>}
-                    </li>
-                  ))}
-                </ul>
-                {s.teaser && s.items.length > s.teaser && (
-                  <a className={css.link} href={pageHref("services")}>
-                    See all {s.items.length}
-                  </a>
-                )}
-              </section>
-            );
-          case "hours":
-            return (
-              <section key={i} id="hours" className={css.section}>
-                <h2>{s.heading}</h2>
-                <dl className={css.hours}>
-                  {s.items.map((h, j) => (
-                    <div key={j} data-closed={h.closed ? "" : undefined}>
-                      <dt>{h.day}</dt>
-                      <dd>{hoursText(h)}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </section>
-            );
-          case "gallery": {
-            const images = s.images.flatMap((im) => {
-              const src = safeImage(im.src);
-              return src ? [{ src, alt: im.alt }] : [];
-            });
-            if (!images.length) return null;
-            return (
-              <section key={i} id="gallery" className={css.section}>
-                <h2>{s.heading}</h2>
-                <div className={css.gallery}>
-                  {images.map((im, j) => (
-                    // eslint-disable-next-line @next/next/no-img-element -- see the hero image
-                    <img key={j} src={im.src} alt={im.alt} loading="lazy" />
-                  ))}
-                </div>
-              </section>
-            );
-          }
-          case "facts":
-            return (
-              <section key={i} className={css.facts}>
-                {s.items.map((f, j) => (
-                  <p key={j}>
-                    <b>{f.value}</b>
-                    <span>{f.label}</span>
-                  </p>
-                ))}
-              </section>
-            );
-          case "area":
-            return (
-              <section key={i} id="find-us" className={css.section}>
-                <h2>{s.heading}</h2>
-                <p className={css.body}>{s.text}</p>
-                {business.address && (
-                  <a className={css.link} href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`}>
-                    Get directions
-                  </a>
-                )}
-              </section>
-            );
-          case "enquiry":
-            return (
-              <section key={i} id="book" className={`${css.section} ${css.book}`}>
-                <h2>{s.heading}</h2>
-                <p className={css.body}>{s.intro}</p>
-                {enquiry?.state === "sent" ? (
-                  <div className={css.sent} role="status">
-                    <b>Request sent</b>
-                    <span>Thanks. {business.name} has your request and will reply to confirm a time.</span>
-                  </div>
-                ) : (
-                  <form className={css.form} action={enquiry?.action} method={enquiry ? "post" : undefined}>
-                    {enquiry?.state === "error" && (
-                      <p className={css.formError} role="alert">
-                        That didn&apos;t send. Check your phone number or email and try again.
-                      </p>
-                    )}
-                    {enquiry && <input type="hidden" name="token" value={enquiry.token} />}
-                    {/* A field real visitors never see: bots fill it in, and the request is dropped. */}
-                    <input className={css.trap} name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-                    <label>
-                      Name
-                      <input name="name" autoComplete="name" maxLength={80} required />
-                    </label>
-                    <label>
-                      Phone or email
-                      <input name="contact" autoComplete="email" maxLength={120} required />
-                    </label>
-                    <label>
-                      {s.prompt || "Anything we should know?"}
-                      <textarea name="message" rows={3} maxLength={1000} />
-                    </label>
-                    <button className={css.btn} type={enquiry ? "submit" : "button"}>
-                      {s.cta}
-                    </button>
-                  </form>
-                )}
-                {(business.phone || business.email) && (
-                  <p className={css.contact}>
-                    {business.phone && <a href={telHref(business.phone)}>{business.phone}</a>}
-                    {business.email && <a href={`mailto:${business.email}`}>{business.email}</a>}
-                  </p>
-                )}
-              </section>
-            );
-          case "faq":
-            return (
-              <section key={i} id="faq" className={css.section}>
-                <h2>{s.heading}</h2>
-                <div className={css.faq}>
-                  {s.items.map((q, j) => (
-                    <details key={j}>
-                      <summary>{q.question}</summary>
-                      <p>{q.answer}</p>
-                    </details>
-                  ))}
-                </div>
-              </section>
-            );
-          case "cta":
-            return (
-              <section key={i} className={css.closing}>
-                <h2>{s.headline}</h2>
-                <a className={css.btn} href={bookHref}>
-                  {s.cta}
-                </a>
-              </section>
-            );
-          case "pagehead":
-            return (
-              <section key={i} className={css.pagehead}>
-                <h1>{s.headline}</h1>
-                <p>{s.intro}</p>
-              </section>
-            );
-          case "about":
-            return (
-              <section key={i} id="about" className={css.section}>
-                <h2>{s.heading}</h2>
-                {s.text && <p className={css.body}>{s.text}</p>}
-                {s.points.length > 0 && (
-                  <dl className={css.points}>
-                    {s.points.map((pt, j) => (
-                      <div key={j}>
-                        <dt>{pt.label}</dt>
-                        <dd>{pt.text}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-              </section>
-            );
-        }
-      })}
+      {groups.map((group, g) =>
+        group.length > 1 || group[0].s.kind === "hours" || group[0].s.kind === "area" ? (
+          // Hours and where to find the business sit side by side: together they answer "can I come now?".
+          <div key={g} className={css.info}>
+            {group.map(({ s, i }) => renderSection(s, i))}
+          </div>
+        ) : (
+          renderSection(group[0].s, group[0].i)
+        ),
+      )}
 
       <footer className={css.foot}>
-        <span>{business.name}</span>
-        {business.address && <span>{business.address}</span>}
+        <div>
+          <b className={css.logo}>{business.name}</b>
+          {business.tagline && <span>{business.tagline}</span>}
+        </div>
+        {(business.address || business.phone || business.email) && (
+          <div>
+            {business.address && <span>{business.address}</span>}
+            {business.phone && <a href={telHref(business.phone)}>{business.phone}</a>}
+            {business.email && <a href={`mailto:${business.email}`}>{business.email}</a>}
+          </div>
+        )}
+        {multi && (
+          <div>
+            {[{ slug: "", title: "Home" }, ...(content.pages ?? [])].map((p) => (
+              <a key={p.slug} href={pageHref(p.slug)}>
+                {p.title}
+              </a>
+            ))}
+          </div>
+        )}
       </footer>
+
+      {/* On a phone the two things a visitor wants stay within reach of a thumb. */}
+      {(bookable || business.phone) && (
+        <div className={css.dock}>
+          {business.phone && (
+            <a className={css.btnGhost} href={telHref(business.phone)}>
+              Phone us
+            </a>
+          )}
+          {bookable && (
+            <a className={css.btn} href={bookHref}>
+              {bookable.cta}
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 }
