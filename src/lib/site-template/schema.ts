@@ -79,7 +79,7 @@ export type Section =
   /** The top of every page after the first: its title and one line under it. */
   | { kind: "pagehead"; headline: string; intro: string }
   /** The customer's own words about the business, and their answers to the sector's questions, set out as points. */
-  | { kind: "about"; heading: string; text: string; points: { label: string; text: string }[] };
+  | { kind: "about"; heading: string; text: string; points: { label: string; text: string }[]; /** One of the customer's own photos, shown beside the text. Left out when they gave none to spare. */ image?: GalleryImage };
 
 /** A page after the first. The first page is the content's own `sections`. */
 export type SitePage = { slug: string; title: string; sections: Section[] };

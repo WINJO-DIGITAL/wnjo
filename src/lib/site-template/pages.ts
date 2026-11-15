@@ -80,9 +80,9 @@ export function defaultPageHead(preset: SectorPreset, kind: PageKind): { headlin
 }
 
 /** The About page's content: the customer's own words, and their answers to the sector's questions as points. */
-export function aboutSection(facts: CustomerFacts, heading = "About us"): Section | null {
+export function aboutSection(facts: CustomerFacts, heading = "About us", image?: { src: string; alt: string }): Section | null {
   if (!facts.about?.trim()) return null;
-  return { kind: "about", heading, text: facts.about.trim(), points: (facts.details ?? []).map((d) => ({ label: d.label, text: d.value })) };
+  return { kind: "about", heading, text: facts.about.trim(), points: (facts.details ?? []).map((d) => ({ label: d.label, text: d.value })), ...(image ? { image } : {}) };
 }
 
 export type PageHeads = Partial<Record<PageKind, { headline: string; intro: string }>>;

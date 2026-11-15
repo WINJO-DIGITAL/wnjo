@@ -245,11 +245,14 @@ export function checkSite(
     if (PLACEHOLDERS.some((re) => re.test(f.text))) flag("placeholder", `Placeholder text left in: "${f.text.slice(0, 40)}".`, f.where);
     if (MARKUP.test(f.text)) flag("markup", "Text must be plain: no HTML or links.", f.where);
   }
-  for (const [i, s] of content.sections.entries()) {
-    if (s.kind === "gallery") s.images.forEach((im, j) => !im.alt.trim() && flag("missing-alt", "Image needs a short description.", `sections[${i}].images[${j}]`));
-    if (s.kind === "services" && s.items.length > FIELD_LIMITS.items) flag("too-many-items", `More than ${FIELD_LIMITS.items} services.`, `sections[${i}]`);
-    if (s.kind === "faq" && s.items.length > 6) flag("too-many-items", "More than six FAQ items.", `sections[${i}]`);
-    if (s.kind === "facts" && s.items.length > 4) flag("too-many-items", "More than four facts.", `sections[${i}]`);
+  // Every page, not only the home page: a gallery, FAQ or About page is checked the same way.
+  for (const pg of pagesOf(content)) for (const [i, s] of pg.sections.entries()) {
+    const at = `${pg.where}[${i}]`;
+    if (s.kind === "gallery") s.images.forEach((im, j) => !im.alt.trim() && flag("missing-alt", "Image needs a short description.", `${at}.images[${j}]`));
+    if (s.kind === "about" && s.image && !s.image.alt.trim()) flag("missing-alt", "Image needs a short description.", `${at}.image`);
+    if (s.kind === "services" && s.items.length > FIELD_LIMITS.items) flag("too-many-items", `More than ${FIELD_LIMITS.items} services.`, at);
+    if (s.kind === "faq" && s.items.length > 6) flag("too-many-items", "More than six FAQ items.", at);
+    if (s.kind === "facts" && s.items.length > 4) flag("too-many-items", "More than four facts.", at);
   }
 
   // Regulated or risky wording for this sector. Facts the customer ticked themselves are theirs to claim.

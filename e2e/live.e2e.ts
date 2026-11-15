@@ -177,3 +177,55 @@ test("a live site with photos shows its main photo at the top", async ({ page })
   await expect(hero).toBeVisible();
   expect(await hero.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
 });
+
+/** The inner pages of a live site: each is more than its title. */
+test("the About page puts a photo beside the text, and doesn't repeat its title", async ({ page }) => {
+  await page.goto(at("massage-p6", "/about"));
+  await expect(page.locator("h1")).toHaveCount(1);
+  const img = page.locator("section#about img");
+  await expect(img).toBeVisible();
+  expect(await img.evaluate((i: HTMLImageElement) => i.naturalWidth)).toBeGreaterThan(0);
+  // Beside, not below, on a wide screen.
+  const [text, photo] = await Promise.all([page.locator("section#about > div").boundingBox(), img.boundingBox()]);
+  expect(photo!.x).toBeGreaterThan(text!.x + text!.width - 1);
+  await expect(page.locator("section#about h2")).toHaveCount(0);
+  await expect(page.locator("section#about")).toHaveAttribute("aria-label", /.+/);
+});
+
+test("the About page has no photo when the customer gave none to spare", async ({ page }) => {
+  await page.goto(at("massage-p6-showcase-nophoto", "/about"));
+  await expect(page.locator("section#about")).toBeVisible();
+  await expect(page.locator("section#about img")).toHaveCount(0);
+});
+
+test("the Gallery page is a wall of photos that keep their own shapes", async ({ page }) => {
+  await page.goto(at("massage-p6", "/gallery"));
+  const figures = page.locator("figure");
+  expect(await figures.count()).toBeGreaterThanOrEqual(2);
+  for (const img of await page.locator("figure img").all()) {
+    await img.scrollIntoViewIfNeeded();
+    await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth)).toBeGreaterThan(0);
+    // Shown at its own proportions, not cropped to a fixed shape.
+    const [natural, shown] = await img.evaluate((i: HTMLImageElement) => [i.naturalWidth / i.naturalHeight, i.getBoundingClientRect().width / i.getBoundingClientRect().height]);
+    expect(Math.abs(natural - shown)).toBeLessThan(0.05);
+  }
+});
+
+test("the FAQs page tells people where to go if their question isn't there", async ({ page }) => {
+  await page.goto(at("electrician-p6", "/faq"));
+  const more = page.getByText("Can't see your answer?");
+  await expect(more).toBeVisible();
+  await expect(page.locator('p:has-text("Can\'t see your answer?") a[href^="tel:"]')).toHaveAttribute("href", "tel:01134960789");
+  await page.locator('p:has-text("Can\'t see your answer?") a:has-text("send a request")').click();
+  await expect(page).toHaveURL(/\/contact#book$/);
+  await expect(page.locator("#book form")).toBeVisible();
+});
+
+test("every inner page of a live site has one main heading and no repeated title", async ({ page }) => {
+  for (const path of ["/services", "/about", "/gallery", "/faq"]) {
+    await page.goto(at("plumbing-p6", path));
+    await expect(page.locator("h1"), path).toHaveCount(1);
+    const sectionHeadings = await page.locator("main h2, section h2:not(section[class*='closing'] h2)").count();
+    expect(sectionHeadings, path).toBe(0);
+  }
+});

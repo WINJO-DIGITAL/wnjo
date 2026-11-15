@@ -217,3 +217,24 @@ describe("facts only, and no repeating", () => {
     expect(prompt).not.toContain('"descriptions"');
   });
 });
+
+describe("pages other than the home page are checked too", () => {
+  const multi = (sections: SiteContent["sections"]): SiteContent => ({
+    ...sample.content,
+    pages: [{ slug: "faq", title: "FAQs", sections: [{ kind: "pagehead", headline: "Questions", intro: "Answers to what people ask us most." }, ...sections, ...(sample.content.sections.filter((s) => s.kind === "cta"))] }],
+  });
+  const run = (c: SiteContent) => checkSite(c, sample.facts, BARBER_PRESET, { pages: ["home", "faq"] }).issues.map((i) => i.code);
+
+  it("flags more than six questions on an FAQs page", () => {
+    const items = Array.from({ length: 7 }, (_, i) => ({ question: `Question ${i}?`, answer: "Walk-ins are welcome." }));
+    expect(run(multi([{ kind: "faq", heading: "Questions", items }]))).toContain("too-many-items");
+  });
+  it("flags a gallery photo with no description on a Gallery page", () => {
+    const c = multi([{ kind: "gallery", heading: "Photos", images: [{ src: "/a.webp", alt: "" }] }]);
+    expect(run(c)).toContain("missing-alt");
+  });
+  it("flags an About photo with no description", () => {
+    const c = multi([{ kind: "about", heading: "About us", text: "t", points: [], image: { src: "/a.webp", alt: " " } }]);
+    expect(run(c)).toContain("missing-alt");
+  });
+});

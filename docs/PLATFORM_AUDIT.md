@@ -290,3 +290,15 @@ Not done: a redirect between `www` and the bare domain, a performance measuremen
 Found and fixed by looking at the screenshots: with no hero photo, the "Side by side" and "Details first" layouts showed grey intro text on the theme colour, nearly unreadable (eight combinations of layout and look). A customer who uploads no photos would have got that. The live-site tests now measure the contrast. The photo handling also dropped any hero picture that was already a usable address, so the sample sites never showed their hero photo; fixed.
 
 Not done in phase D: richer About, FAQ and Services pages, a way to choose where a photo is cropped, the button labels, and more than three layouts. Fonts on the private preview and in the staff panel use the same files.
+
+## Status after phase D, second part (15 November 2026)
+
+Richer inner pages, using only what the customer gave:
+- **About:** one of the customer's own photos beside the text (their first gallery photo, with its description), or no photo if they gave none to spare. The points (their answers to the sector's questions) stay as cards.
+- **Gallery:** a wall of photos that keep their own shapes, two columns on a phone and three on a screen, not cropped to one fixed shape. A description the customer wrote shows as a caption; the automatic "<business> photo" never does.
+- **FAQs:** ends with "Can't see your answer?" and the customer's own phone and request form. Nothing is shown if the site has neither.
+- **No repeated titles:** a page that is one main section under its own title (About, Services, Gallery, FAQs) no longer repeats the title as a second heading. The section keeps it as its name for screen readers.
+
+Found and fixed along the way: the checks looked only at the home page's sections for too many FAQ questions, too many services and photos with no description, so a problem on an inner page slipped through. They now check every page. Tests cover each.
+
+Still not done in phase D: a way to choose where a photo is cropped (the Gallery wall avoids the problem, the hero and About photos still crop), the button labels, and more than three layouts. The stand-in photos for barber, café, physio and electrician are wide strips; real customer photos will be different shapes.

@@ -94,6 +94,9 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
   const shown = pageSections(content, page);
   const current = shown.slug === "" ? { ...shown, sections: arrange(shown.sections, layout) } : shown;
   const multi = (content.pages?.length ?? 0) > 0;
+  // A page that is one main section under its own title (About, Services, Gallery, FAQs) doesn't repeat the title as a second heading.
+  const solo = current.slug !== "" && current.sections.filter((x) => x.kind !== "pagehead" && x.kind !== "cta").length === 1;
+  const head = (text: string) => (solo ? null : <h2>{text}</h2>);
   const bookOn = bookingSlug(content);
   // Every "book" button goes to the form, on this page or on the page that holds it.
   const bookHref = bookOn === null || bookOn === current.slug ? "#book" : `${pageHref(bookOn)}#book`;
@@ -132,8 +135,8 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
         );
       case "services":
         return (
-          <section key={i} id="services" className={css.section}>
-            <h2>{s.heading}</h2>
+          <section key={i} id="services" className={css.section} aria-label={solo ? s.heading : undefined}>
+            {head(s.heading)}
             <ul className={css.menu} data-wide={!s.teaser && s.items.length > 5 ? "" : undefined}>
               {(s.teaser ? s.items.slice(0, s.teaser) : s.items).map((it, j) => (
                 <li key={j}>
@@ -170,9 +173,27 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
           return src ? [{ src, alt: im.alt }] : [];
         });
         if (!images.length) return null;
+        // On its own page the photos keep their own shapes, and a description the customer wrote is shown as a caption.
+        if (current.slug === "gallery") {
+          const caption = (alt: string) => (alt && !alt.toLowerCase().startsWith(`${business.name.toLowerCase()} photo`) ? alt : null);
+          return (
+            <section key={i} id="gallery" className={css.section} aria-label={solo ? s.heading : undefined}>
+              {head(s.heading)}
+              <div className={css.wall}>
+                {images.map((im, j) => (
+                  <figure key={j}>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- see the hero image */}
+                    <img src={im.src} alt={im.alt} loading="lazy" />
+                    {caption(im.alt) && <figcaption>{caption(im.alt)}</figcaption>}
+                  </figure>
+                ))}
+              </div>
+            </section>
+          );
+        }
         return (
-          <section key={i} id="gallery" className={css.section}>
-            <h2>{s.heading}</h2>
+          <section key={i} id="gallery" className={css.section} aria-label={solo ? s.heading : undefined}>
+            {head(s.heading)}
             <div className={css.gallery} data-count={Math.min(images.length, 6)}>
               {images.map((im, j) => (
                 // eslint-disable-next-line @next/next/no-img-element -- see the hero image
@@ -256,8 +277,8 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
         );
       case "faq":
         return (
-          <section key={i} id="faq" className={css.section}>
-            <h2>{s.heading}</h2>
+          <section key={i} id="faq" className={css.section} aria-label={solo ? s.heading : undefined}>
+            {head(s.heading)}
             <div className={css.faq}>
               {s.items.map((q, j) => (
                 <details key={j}>
@@ -266,6 +287,23 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                 </details>
               ))}
             </div>
+            {/* On its own page, where to go if the answer isn't there: only the customer's own phone and request form. */}
+            {current.slug === "faq" && (business.phone || bookable) && (
+              <p className={css.faqMore}>
+                Can&apos;t see your answer?{" "}
+                {business.phone && (
+                  <>
+                    Call <a href={telHref(business.phone)}>{business.phone}</a>
+                    {bookable ? " or " : "."}
+                  </>
+                )}
+                {bookable && (
+                  <>
+                    <a href={bookHref}>send a request</a>.
+                  </>
+                )}
+              </p>
+            )}
           </section>
         );
       case "cta":
@@ -284,23 +322,31 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
             <p>{s.intro}</p>
           </section>
         );
-      case "about":
+      case "about": {
+        const photo = s.image && safeImage(s.image.src) ? { src: safeImage(s.image.src)!, alt: s.image.alt } : null;
         return (
-          <section key={i} id="about" className={css.section}>
-            <h2>{s.heading}</h2>
-            {s.text && <p className={css.body}>{s.text}</p>}
-            {s.points.length > 0 && (
-              <dl className={css.points}>
-                {s.points.map((pt, j) => (
-                  <div key={j}>
-                    <dt>{pt.label}</dt>
-                    <dd>{pt.text}</dd>
-                  </div>
-                ))}
-              </dl>
+          <section key={i} id="about" className={`${css.section} ${css.about}`} data-photo={photo ? "" : undefined} aria-label={solo ? s.heading : undefined}>
+            <div className={css.aboutText}>
+              {head(s.heading)}
+              {s.text && <p className={css.body}>{s.text}</p>}
+              {s.points.length > 0 && (
+                <dl className={css.points}>
+                  {s.points.map((pt, j) => (
+                    <div key={j}>
+                      <dt>{pt.label}</dt>
+                      <dd>{pt.text}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </div>
+            {photo && (
+              // eslint-disable-next-line @next/next/no-img-element -- see the hero image
+              <img className={css.aboutImg} src={photo.src} alt={photo.alt} loading="lazy" />
             )}
           </section>
         );
+      }
     }
   };
   // Neighbouring "hours" and "find us" sections are shown as one pair.

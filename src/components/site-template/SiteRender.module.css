@@ -829,3 +829,70 @@
   object-fit: contain;
   margin-right: auto;
 }
+
+/* The About page: the words beside one of the customer's own photos. */
+.about {
+  display: grid;
+  gap: 2rem;
+}
+.aboutText {
+  min-width: 0;
+}
+.aboutImg {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: calc(var(--radius) + 8px);
+}
+@media (min-width: 48rem) {
+  .about[data-photo] {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: start;
+  }
+  .aboutImg {
+    aspect-ratio: 4 / 5;
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+/* The Gallery page: a wall of photos that keep their own shapes, two columns on a phone and three on a screen. */
+.wall {
+  columns: 2;
+  column-gap: 0.75rem;
+}
+.wall figure {
+  break-inside: avoid;
+  margin: 0 0 0.75rem;
+}
+.wall img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: calc(var(--radius) + 4px);
+}
+.wall figcaption {
+  padding: 0.4rem 0.1rem 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+@media (min-width: 48rem) {
+  .wall {
+    columns: 3;
+    column-gap: 1rem;
+  }
+  .wall figure {
+    margin-bottom: 1rem;
+  }
+}
+
+.site .faqMore {
+  margin-top: 1.5rem;
+  color: var(--muted);
+}
+.faqMore a {
+  color: var(--ink);
+  font-weight: 600;
+}

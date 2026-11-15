@@ -295,7 +295,7 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
   }
 
   // Spread the sections over the pages the customer chose. With one page chosen the site is just `sections`.
-  const layout = layoutPages(preset, input.pages ?? ["home"], sections, copy.pageHeads ?? {}, aboutSection(facts));
+  const layout = layoutPages(preset, input.pages ?? ["home"], sections, copy.pageHeads ?? {}, aboutSection(facts, "About us", input.images?.[0] ? { src: input.images[0].src, alt: input.images[0].alt.trim() || `${facts.businessName} photo` } : undefined));
 
   return {
     business: {

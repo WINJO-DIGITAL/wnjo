@@ -153,3 +153,23 @@ describe("the writer builds the pages the customer chose", () => {
     expect(prompt).toContain("allows up to 5");
   });
 });
+
+describe("the About page photo", () => {
+  const imgs = [1, 2, 3].map((n) => ({ src: `/styler/${n}.webp`, alt: n === 1 ? "Two barbers at work" : "" }));
+  const build = (images: { src: string; alt: string }[]) => {
+    const input = { preset: BARBER_PRESET, facts: SAMPLES.barber.facts, look: "classic" as const, colour: "#1f3a34", pages: firstPages(3), pageLimit: 5, images };
+    return assembleSite(input, defaultCopy(input));
+  };
+  const about = (c: ReturnType<typeof build>) => c.pages?.find((p) => p.slug === "about")?.sections.find((s) => s.kind === "about");
+
+  it("shows the customer's first gallery photo beside the text, with its description", () => {
+    const s = about(build(imgs));
+    expect(s?.kind === "about" && s.image).toEqual({ src: "/styler/1.webp", alt: "Two barbers at work" });
+  });
+  it("falls back to the business name for a photo with no description, and shows no photo when there are none", () => {
+    const s = about(build([{ src: "/styler/9.webp", alt: "" }]));
+    expect(s?.kind === "about" && s.image?.alt).toBe("Hartley & Sons photo");
+    const none = about(build([]));
+    expect(none?.kind === "about" && none.image).toBeUndefined();
+  });
+});

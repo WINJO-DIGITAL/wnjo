@@ -2,8 +2,10 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { checkSite } from "@/lib/site-template/checks";
+import { firstPages } from "@/lib/site-template/pages";
+import { assembleSite, defaultCopy } from "@/lib/site-template/write";
 import { BARBER_PRESET, SECTOR_PRESETS } from "@/lib/site-template/presets";
-import { SAMPLE_BARBER, SAMPLE_BARBER_FACTS, SAMPLE_CAFE, SAMPLE_ELECTRICIAN } from "@/lib/site-template/sample";
+import { SAMPLES, SAMPLE_BARBER, SAMPLE_BARBER_FACTS, SAMPLE_CAFE, SAMPLE_ELECTRICIAN } from "@/lib/site-template/sample";
 import { defaultLayout, LAYOUTS, type SiteContent } from "@/lib/site-template/schema";
 import { arrange, SiteRender, safeImage, type EnquiryProps } from "./SiteRender";
 
@@ -180,5 +182,55 @@ describe("the header logo and the request form's page", () => {
   it("tells the request route which page the form is on", () => {
     const html = renderToStaticMarkup(createElement(SiteRender, { content: SAMPLE_BARBER, enquiry: { action: "/api/site-enquiry", token: "tok123" }, page: "" }));
     expect(html).toContain('name="page" value=""');
+  });
+});
+
+describe("inner pages", () => {
+  const photos = [
+    { src: "/styler/a.webp", alt: "Two barbers at work" },
+    { src: "/styler/b.webp", alt: "Hartley & Sons photo 2" },
+    { src: "/styler/c.webp", alt: "" },
+  ];
+  const site = () => {
+    const input = { preset: BARBER_PRESET, facts: SAMPLES.barber.facts, look: "classic" as const, colour: "#1f3a34", pages: firstPages(6), pageLimit: 6, images: photos };
+    const copy = { ...defaultCopy(input), faq: [{ question: "Do you take walk-ins?", answer: "Yes, walk-ins are welcome." }] };
+    return assembleSite(input, copy);
+  };
+  const page = (slug: string, content = site()) => renderToStaticMarkup(createElement(SiteRender, { content, page: slug, pageHref: (s) => `/${s}` }));
+
+  it("puts a photo beside the About text", () => {
+    const html = page("about");
+    expect(html).toContain('src="/styler/a.webp"');
+    expect(html).toContain('alt="Two barbers at work"');
+    expect(html).toContain("data-photo");
+  });
+  it("shows the Gallery page as a wall, captioning only photos the customer described", () => {
+    const html = page("gallery");
+    expect(html).toContain("<figure");
+    expect(html).toContain("<figcaption>Two barbers at work</figcaption>");
+    // A description that is only the business's own name and a number isn't a caption.
+    expect(html).not.toContain("<figcaption>Hartley &amp; Sons photo 2</figcaption>");
+  });
+  it("ends the FAQs page with the customer's own phone and the request form, and nothing else", () => {
+    const html = page("faq");
+    expect(html).toContain("Can&#x27;t see your answer?");
+    expect(html).toContain('href="tel:01632960123"');
+    expect(html).toContain("send a request");
+    // With no phone and no request form anywhere on the site there is nowhere to send them, so nothing is shown.
+    const full = site();
+    const strip = (sections: SiteContent["sections"]) => sections.filter((s) => s.kind !== "enquiry");
+    const bare = page("faq", { ...full, business: { name: "Hartley & Sons" }, sections: strip(full.sections), pages: full.pages?.map((p) => ({ ...p, sections: strip(p.sections) })) });
+    expect(bare).not.toContain("Can&#x27;t see your answer?");
+  });
+  it("doesn't repeat a page's title as a second heading, but keeps it as the section's name for screen readers", () => {
+    for (const slug of ["about", "services", "gallery", "faq"]) {
+      // The closing banner has its own heading; the page's main section has none.
+      const html = page(slug).replace(/<section class="[^"]*closing[^"]*">.*?<\/section>/s, "");
+      expect(html.match(/<h2/g) ?? [], slug).toEqual([]);
+      expect(html, slug).toContain("aria-label=");
+    }
+  });
+  it("keeps the section headings on a page with several sections, such as Contact", () => {
+    expect(page("contact").match(/<h2/g)?.length).toBeGreaterThanOrEqual(2);
   });
 });

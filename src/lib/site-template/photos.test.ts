@@ -106,3 +106,25 @@ describe("a hero picture that is already a usable address", () => {
     expect(r.content.sections.find((s) => s.kind === "hero")).toMatchObject({ variant: "photo" });
   });
 });
+
+describe("a photo on the About page", () => {
+  const withAbout = (src: string): SiteContent => ({
+    ...SAMPLE_BARBER,
+    pages: [{ slug: "about", title: "About", sections: [{ kind: "about", heading: "About us", text: "t", points: [], image: { src, alt: "Two barbers" } }] }],
+  });
+  const aboutOf = (c: SiteContent) => c.pages?.[0].sections[0];
+
+  it("is found as a stored upload and swapped for its link like any other photo", () => {
+    const content = withAbout(photoRef("drafts/d/about.jpg"));
+    expect(photoRefs(content)).toContain(photoRef("drafts/d/about.jpg"));
+    const r = resolvePhotos(content, new Map([[photoRef("drafts/d/about.jpg"), "https://x.example/a.webp"]]));
+    expect(aboutOf(r.content)).toMatchObject({ image: { src: "https://x.example/a.webp", alt: "Two barbers" } });
+  });
+  it("is left out when its upload has no link, so the page goes without it", () => {
+    const r = resolvePhotos(withAbout(photoRef("drafts/d/about.jpg")), new Map());
+    expect(aboutOf(r.content)).not.toHaveProperty("image");
+  });
+  it("is kept when it is already a usable address", () => {
+    expect(aboutOf(resolvePhotos(withAbout("/styler/a.webp"), new Map()).content)).toMatchObject({ image: { src: "/styler/a.webp" } });
+  });
+});

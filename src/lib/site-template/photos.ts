@@ -40,6 +40,7 @@ export function photoRefs(content: SiteContent): string[] {
   for (const s of allSections(content)) {
     if (s.kind === "hero" && s.image && isPhotoRef(s.image)) refs.push(s.image);
     if (s.kind === "gallery") for (const im of s.images) if (isPhotoRef(im.src)) refs.push(im.src);
+    if (s.kind === "about" && s.image && isPhotoRef(s.image.src)) refs.push(s.image.src);
   }
   return [...new Set(refs)];
 }
@@ -58,6 +59,12 @@ export function resolvePhotos(content: SiteContent, urls: Map<string, string>): 
     }
     if (s.kind === "gallery") {
       return { ...s, images: s.images.flatMap((im) => (isPhotoRef(im.src) ? (urls.get(im.src) ? [{ ...im, src: urls.get(im.src)! }] : []) : [im])) };
+    }
+    if (s.kind === "about" && s.image) {
+      // The same rule as the gallery: a stored upload becomes its link, or the picture is left out.
+      const src = isPhotoRef(s.image.src) ? urls.get(s.image.src) : s.image.src;
+      const { image, ...rest } = s;
+      return src ? { ...rest, image: { ...image, src } } : rest;
     }
     return s;
   };
