@@ -35,7 +35,8 @@ describe("hosting emails", () => {
     expect(m.subject).toBe("Your hosting is active [WS-ABC123]");
     expect(m.text).toContain("connect your hosting to riverscafe.co.uk");
     expect(m.text).toContain("£95");
-    expect(m.text).toContain("30 days' notice");
+    expect(m.text).toContain("Cancel any time");
+    expect(m.text).not.toContain("30 days' notice");
     expect(m.text).not.toMatch(/goals|pages and style|ownership/i);
   });
 

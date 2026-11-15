@@ -82,7 +82,7 @@ export default function PricingPage() {
           <SectionHead eyebrow="Own your website?" title={<span id="after-launch-title">Add hosting and care to your website.</span>} split>
             <p>
               Every managed plan already includes all of this, so you only have to run your business. If you buy your website
-              outright, add hosting and care below. Rolling monthly, with 30 days&apos; notice to end.{" "}
+              outright, add hosting and care below. Rolling monthly. Cancel any time, and your plan runs to the end of the month you have paid for.{" "}
               <a href="#plans">See the monthly plans</a>, or <Link href="/build/hosting">get hosting only</Link>.
             </p>
           </SectionHead>

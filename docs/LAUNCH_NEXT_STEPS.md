@@ -9,8 +9,8 @@ Nothing else needs a code change before launch, except the items marked "Develop
 - [x] On a phone and a desktop, scroll the home page: the header stays solid, with no text showing through. Checked 15 Nov in a test browser at phone and desktop sizes. Worth one look on a real phone.
 
 ## 2. Decide the hosting exit notice (the terms and the pages disagree)
-- [ ] Decide: "any time, no notice" (terms section 8.1) or "30 days' notice" (hosting page, pricing page, `llms.txt`, hosting emails).
-- [ ] Tell the developer which one. If "any time", the pages and emails change. If "30 days", the terms change. The terms are still marked as draft and have no solicitor review.
+- [x] Decided 15 Nov: any time, no notice, and the plan runs to the end of the paid month. Was: "any time, no notice" (terms section 8.1) or "30 days' notice" (hosting page, pricing page, `llms.txt`, hosting emails).
+- [x] Pages and emails changed to match the terms. Was: tell the developer which one. If "any time", the pages and emails change. If "30 days", the terms change. The terms are still marked as draft and have no solicitor review.
 
 ## 3. Turn on live billing
 - [x] Stripe dashboard, live mode (WINJO Digital account): Settings > Billing > Customer portal. Save a configuration that allows updating the card and viewing invoices. Do not allow cancellation or plan changes, per the terms. Copy its ID (starts `bpc_`). Done 15 Nov: `bpc_1Uc8a4LEEs7hsljuaZley7ru`, set as the live default.

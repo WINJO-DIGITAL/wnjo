@@ -103,7 +103,7 @@ export function hostingAcknowledgement(args: { reference: string; details: Websi
     "WHAT HAPPENS NEXT",
     "We reply within one working day with a secure link to start your plan.",
     next,
-    "Nothing is charged until you use that link. Rolling monthly, with 30 days' notice to end.",
+    "Nothing is charged until you use that link. Rolling monthly. Cancel any time, and your plan runs to the end of the month you have paid for.",
     "",
     `Questions? Reply to this email, or see ${site}/website-projects`,
     "",
@@ -257,8 +257,8 @@ function detailsStep(f: SubscriptionEmailFacts): string[] {
   ];
 }
 
-/** Hosting is rolling monthly with 30 days' notice to end, as the pricing page says. */
-const HOSTING_TERM = "Rolling monthly, with 30 days' notice to end.";
+/** Hosting is rolling monthly and can be cancelled any time, as the terms and the pricing page say. */
+const HOSTING_TERM = "Rolling monthly. Cancel any time, and your plan runs to the end of the month you have paid for.";
 
 function hostingWelcome(f: SubscriptionEmailFacts, h: NonNullable<SubscriptionEmailFacts["hosting"]>): { subject: string; text: string } {
   const site = (siteUrl() ?? "https://winjodigital.co.uk").replace(/\/+$/, "");

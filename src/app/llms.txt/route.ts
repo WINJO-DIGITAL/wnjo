@@ -28,7 +28,7 @@ export function GET() {
     ...tiers,
     "",
     "## Hosting and care (for a website you own)",
-    "Rolling monthly, with 30 days' notice to end.",
+    "Rolling monthly. Cancel any time, and your plan runs to the end of the month you have paid for.",
     ...hosting,
     "",
     "## Also",

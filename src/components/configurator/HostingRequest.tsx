@@ -143,7 +143,7 @@ export function HostingRequest() {
             <div>
               <p className="eyebrow">Hosting only</p>
               <h2 className="h2">Choose your hosting</h2>
-              <p className="muted">Rolling monthly, with 30 days&apos; notice to end. Nothing to pay yet.</p>
+              <p className="muted">Rolling monthly. Cancel any time, and your plan runs to the end of the month you have paid for. Nothing to pay yet.</p>
             </div>
             <fieldset className={styles.group}>
               <legend className="visually-hidden">Hosting plan</legend>
@@ -262,7 +262,7 @@ export function HostingRequest() {
             <div className={styles.pay}>
               <p className="eyebrow">First payment</p>
               <p className={styles.payAmount}>{formatGBP(CARE_PLANS[plan].monthly)}</p>
-              <p className="muted">Your first month. Then {formatGBP(CARE_PLANS[plan].monthly)} a month, taken automatically. Rolling monthly, with 30 days&apos; notice to end.</p>
+              <p className="muted">Your first month. Then {formatGBP(CARE_PLANS[plan].monthly)} a month, taken automatically. Rolling monthly. Cancel any time, and your plan runs to the end of the month you have paid for.</p>
               <fieldset className="pay-agree">
                 <legend className="eyebrow">Before you pay</legend>
                 <label className="sub-agree">
