@@ -6,6 +6,7 @@ Read this first in any new session. It holds the working rules and open items th
 
 - Commit locally. Push or merge to main only when the owner says "push" or "merge to main". If a stop hook asks for a push, decline and give the commit hashes.
 - Merge is fast-forward only: push the feature branch to `main` with `git push origin claude/hopeful-rubin-b40vgv:refs/heads/main`, then push the branch itself.
+- Before asking the owner to spend money (live model runs, paid tests), finish and check the change yourself with free tests. Never ask the owner to run something to find out whether a change works. Say what has been verified and what hasn't.
 - Keep replies short and plain. Sentence-case labels. Tick checklist items only when confirmed.
 - Give copy-paste SQL for any database change. Never run a destructive change without the owner's OK.
 - Never put secrets in chat. API keys go in the Vercel dashboard. Do not request credentials for api.anthropic.com.
