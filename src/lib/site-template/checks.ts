@@ -9,6 +9,7 @@ import { findCopiedRun } from "./originality";
 import { FIELD_LIMITS, LAYOUTS, LOOKS, SECTION_KINDS, WORD_LIMITS } from "./schema";
 import { sentencesOf, wordCount, wordsOf } from "./text";
 import type { SectorPreset } from "./presets";
+import { ungroundedClaims } from "./claims";
 
 export type CheckIssue = { code: string; message: string; where?: string };
 export type CheckResult = { ok: boolean; issues: CheckIssue[] };
@@ -239,6 +240,15 @@ export function checkSite(
 
   const fields = textFields(content);
   const theirWords = [facts.about ?? "", ...(facts.details ?? []).map((d) => d.value)].join(" ");
+  // Every line the wording makes: each claim and each number must be one the customer gave. Their own words are the facts.
+  const factText = [facts.businessName, facts.about ?? "", facts.address ?? "", ...(facts.areas ?? []), ...facts.services.flatMap((x) => [x.name, x.price ?? ""]), ...(facts.highlights ?? []).map((h) => `${h.value} ${h.label}`), ...(facts.details ?? []).map((d) => d.value), ...(facts.hours ?? []).map((h) => `${h.day} ${h.open ?? ""} ${h.close ?? ""}`), facts.phone ?? "", facts.email ?? ""].join(" ");
+  for (const f of fields) {
+    // Picture descriptions are ours ("Business photo 2"), not claims, and the customer's own names and prices are theirs.
+    if (f.where.includes(".facts.") || f.where === "business.name" || /\.items\[\d+\]\.(name|price)$/.test(f.where) || /\.alt$|\.images\[\d+\]/.test(f.where)) continue;
+    for (const claim of ungroundedClaims(f.text, factText)) {
+      flag("claim-not-in-facts", `"${claim}" is not in the customer's own words. Remove it, or use only what they told us.`, f.where);
+    }
+  }
 
   for (const f of fields) {
     if (f.limit && f.text.length > f.limit) flag("too-long", `Text is ${f.text.length} characters; the limit is ${f.limit}.`, f.where);

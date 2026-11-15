@@ -54,3 +54,17 @@ So the checks catch invented prices, phone numbers, filler phrases and length. T
 5. **Fix the checklist item.** "Tune the checks" should now mean tightening, not loosening.
 
 Until fix 1 is in, the live test results should not be read as "the copy is safe".
+
+## What was fixed (15 November 2026)
+
+- **Every line is checked against the facts.** Each claim word (award, best, guaranteed, qualified, years, customers...) and each number in the headline, intro, tagline, page headings and any other written line must come from the customer's own words. Otherwise the check fails with "claim-not-in-facts", and the model is asked to write again without it.
+- **One list for every sector,** in `src/lib/site-template/claims.ts`. Each sector's own claim rules still apply on top.
+- **Question labels don't count.** The question "What are you best known for?" had put the word "best" in the facts, so any "best" passed. Only the customer's answers count now.
+- **Times match the way people say them.** 18:00 counts as 6, so "9 till 6" is accepted.
+- **Picture descriptions are ours,** so "photo 2" is not treated as a claim.
+
+Tested on 11 hand-written invented claims (all now flagged) and 6 honest lines (none flagged). These are examples written by hand, not real model output, so they show the rule works, not how often a real model would trip it.
+
+**Known gap:** a new service named in free text ("beard transplants") is not a claim word, so it still passes. Names of staff also still pass.
+
+**Important:** the live test results before this change (44 of 44) used the old rules. Run the template test on all eleven templates again. Some sites may now fail, and the panel gives the reason for each.
