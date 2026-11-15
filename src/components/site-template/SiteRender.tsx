@@ -75,7 +75,8 @@ export function arrange(sections: Section[], layout: Layout): Section[] {
 export const defaultPageHref = (slug: string) => (slug ? `?page=${slug}` : "?");
 
 /** Where the booking form posts, and what happened the last time it did. Without it the form is inactive (a preview). */
-export type EnquiryProps = { action: string; token: string; state?: "sent" | "error" };
+/** The token is the private preview's. A live site has none: the address it is served on says which site the request is for. */
+export type EnquiryProps = { action: string; token?: string; state?: "sent" | "error" };
 
 export type SiteRenderProps = {
   content: SiteContent;
@@ -229,7 +230,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                     That didn&apos;t send. Check your phone number or email and try again.
                   </p>
                 )}
-                {enquiry && <input type="hidden" name="token" value={enquiry.token} />}
+                {enquiry?.token && <input type="hidden" name="token" value={enquiry.token} />}
                 {/* The page the form is on, so the visitor comes back to it with the confirmation. */}
                 {enquiry && <input type="hidden" name="page" value={current.slug} />}
                 {/* A field real visitors never see: bots fill it in, and the request is dropped. */}

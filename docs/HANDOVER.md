@@ -24,11 +24,30 @@ Read this first in any new session. It holds the working rules and open items th
 - Stand-in photos for the template test are stock photos from Unsplash (free commercial licence), one set per sector, in `public/styler`. They are for the staff test only, never a customer's site.
 - The template test in the staff AI panel has a page-count picker and one tab per page. Re-run it on the live model after these changes.
 
+## Putting a customer's site on its own address (phase C)
+
+A released template site is now served on the customer's own address. How it works: `src/proxy.ts` sends any request to an address that isn't ours to `/sites/<address>/...`, which the Pages Router page `src/pages/sites/[host]/[[...page]].tsx` renders with none of our header, footer or styles. It shows only when all three are true: staff attached the address, the brief is at the **live** stage (the database allows that only after all four approvals), and a build is released.
+
+To put one live:
+1. Once only: run `docs/site_domains.sql` in the Supabase SQL editor.
+2. In Vercel, Project > Domains: add the customer's address (or a subdomain of ours, such as `hartley.winjodigital.co.uk`) and set its DNS as Vercel shows.
+3. In Admin, open the website, find **Live address**, type the address, press **Attach address** (owner or admin only).
+4. Approve and move the website to **Live** as usual.
+
+Good to know:
+- Our own addresses are `winjodigital.co.uk`, `www`, localhost and `*.vercel.app`. Add more (for example a staging domain) with the `MAIN_HOSTS` setting, comma separated.
+- Attach only one of `www` and the bare domain, and set a redirect for the other in Vercel: there is no redirect between them yet, so both would be served.
+- Live pages are cached for about a minute, so a change or a withdrawal shows within a couple of minutes.
+- Photos on a live site come from `/photo`, resized (hero 1600 px, gallery 900, logo 400) and cached for good. The private preview still uses signed links to the originals.
+- The booking form on a live site posts without a token; the address says which site it is. Requests are saved to `site_enquiries` and emailed.
+- Our API routes are also reachable on a customer's address (the proxy leaves `/api` alone). They need the same sign-in as on our own address.
+
 ## How to run the checks
 
 - `npm run typecheck`, `npm run lint`, `npm test` (unit tests).
 - `npm run build` then `npm run e2e` (browser tests; set `PLAYWRIGHT_CHROMIUM_PATH` if needed). See `docs/TESTING.md`.
 - Both run in GitHub Actions on every push (`.github/workflows/ci.yml`).
+- Browser tests include the live-site path, using made-up `*.e2e.test` addresses such as `barber-p6.e2e.test` (sector, pages, layout).
 
 ## Open items
 

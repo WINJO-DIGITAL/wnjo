@@ -17,7 +17,7 @@ const HIDDEN_ON = ["/contact", "/build", "/build/project", "/build/hosting", "/a
  * button reaches the strip along the bottom it would cover.
  */
 export function StickyCta() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const [show, setShow] = useState(false);
   // The plan chosen on the homepage, so the bar can carry it into the calculator.
   const [plan, setPlan] = useState<string | null>(null);

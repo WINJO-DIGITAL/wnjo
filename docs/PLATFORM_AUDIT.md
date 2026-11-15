@@ -266,3 +266,15 @@ Not done, and not started: phases B to E.
 | 8. Browser tests | Done. 59 Playwright tests over every sector, phone and desktop, all three layouts, every menu page, links, images, console errors, sideways scrolling, the booking buttons and the call-and-book bar. All pass. Checked that they catch a real fault by breaking the form's page field on purpose: the test failed, then I restored it. Runs in CI as the `browser` job (not yet seen running on GitHub). |
 | 11. Checks on real output | Not started. Needs a real Haiku run with the key in Vercel. |
 | 17. Alerts | Done for lead emails. The morning briefing counts booking requests from the last 7 days that were saved but not emailed, and says what to do. There is still no alert for a failed site build. |
+
+## Status after phase C (15 November 2026)
+
+| Finding | Status |
+|---|---|
+| 1. Publishing | Built, not yet used on a real domain. A released site is served on its own address through `src/proxy.ts` and a Pages Router page with no WINJO chrome. It shows only when the brief is at the live stage (after all four approvals), the address was attached by the owner or an admin, and a build is released. Needs `docs/site_domains.sql` run and a domain added in Vercel; steps are in `docs/HANDOVER.md`. Tested with the sample sites on `*.e2e.test` addresses and with unit tests; never run against the real database or a real domain. |
+| 7. SEO | Built for live sites: titles, descriptions, canonical links, social tags, LocalBusiness structured data from the customer's own facts, sitemap and robots file at the site's own address. Opening hours are only stated when they can be read exactly. Not measured by a search engine or Lighthouse. |
+| 5. Photos | Built for live sites: a photo route resizes to the width asked (hero 1600, gallery 900, logo 400), converts to WebP and caches for good, and only serves the website's own uploads. Not done: width and height on the images (so the page can still shift as they load), and the private preview still uses the originals. Tested with fake storage, not the real bucket. |
+
+Found and fixed along the way: the live site relied on our global styles for its box model (a phone scrolled sideways); the booking form's redirect used the server's address instead of the visitor's; a customer address asked for `/favicon.ico` and got a 404. Adding the Pages Router made `usePathname()` possibly null, so three components now default it.
+
+Not done: a redirect between `www` and the bare domain, a performance measurement, an accessibility tool run on a live site, and phase D.

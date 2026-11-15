@@ -17,7 +17,8 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${port}`,
     trace: "off",
-    launchOptions: executablePath ? { executablePath, args: ["--no-sandbox"] } : { args: ["--no-sandbox"] },
+    // Any *.e2e.test address points at this machine, so the tests can visit a customer's "own address" for real.
+    launchOptions: { ...(executablePath ? { executablePath } : {}), args: ["--no-sandbox", "--host-resolver-rules=MAP *.e2e.test 127.0.0.1"] },
   },
   webServer: {
     command: `E2E=1 npx next start -p ${port}`,

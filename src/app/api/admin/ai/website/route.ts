@@ -6,6 +6,7 @@ import { previewReadyEmail } from "@/lib/build-emails";
 import { notificationMailConfig, sendEmail } from "@/lib/mailer";
 import { serviceClient } from "@/lib/quote-store";
 import { releaseSiteBuild, runSiteBuildStep, withdrawSiteBuild } from "@/lib/site-template/build-service";
+import { attachSiteDomain, listSiteDomains, removeSiteDomain } from "@/lib/site-template/domains";
 import { sharedRateLimited } from "@/lib/rate-limit-shared";
 import { staffFromRequest } from "@/lib/staff-auth";
 
@@ -24,6 +25,7 @@ const fail = (status: number, error: string) => NextResponse.json({ error }, { s
  * - release: a person sends a draft preview to the customer. Nothing the AI writes reaches a customer without this.
  * - withdraw: takes a released preview back.
  * - link: the private address of a preview, for staff to review it.
+ * - site-domains, site-domain-attach, site-domain-remove: the addresses a live template website is served on.
  * - site, site-release, site-withdraw, site-link: the same four for a template build. A build that failed the automatic
  *   checks is released only with `override: true`.
  * Making a plan or a preview needs an AI provider key; releasing and withdrawing do not.
@@ -111,6 +113,20 @@ export async function POST(request: NextRequest) {
     const token = (data as { access_token: string } | null)?.access_token;
     if (!token) return fail(404, "not_found");
     return NextResponse.json({ url: `${new URL(request.url).origin}/site-preview/${token}` });
+  }
+
+  // The addresses a live website is served on. Listing is for any staff; attaching or removing is the owner's or an admin's.
+  if (body.action === "site-domains" || body.action === "site-domain-attach" || body.action === "site-domain-remove") {
+    const briefId = id("briefId");
+    if (!briefId) return fail(422, "invalid");
+    const hostname = typeof body.hostname === "string" ? body.hostname.slice(0, 300) : "";
+    const result =
+      body.action === "site-domains"
+        ? await listSiteDomains(db, staff, briefId)
+        : body.action === "site-domain-attach"
+          ? await attachSiteDomain(db, staff, briefId, hostname)
+          : await removeSiteDomain(db, staff, briefId, hostname);
+    return result.ok ? NextResponse.json(result) : fail(result.status, result.error);
   }
 
   if (body.action === "site-withdraw") {

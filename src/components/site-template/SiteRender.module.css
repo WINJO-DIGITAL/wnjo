@@ -1,6 +1,14 @@
 /* A customer site laid out from template content. Self-contained: it uses none of this site's own tokens, so it
    looks the same wherever it is shown. The theme colour arrives as --accent; the look picks type and shape. */
 
+/* The site brings its own box model, so it looks the same wherever it is shown, with or without our global styles. */
+.site,
+.site *,
+.site *::before,
+.site *::after {
+  box-sizing: border-box;
+}
+
 .site {
   --paper: #fbfaf7;
   --ink: #171614;

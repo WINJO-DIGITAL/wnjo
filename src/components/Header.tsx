@@ -129,7 +129,7 @@ function currentLink(menu: NavMenu, pathname: string, picked: NavLink | null): N
 }
 
 function SiteHeader() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const [open, setOpen] = useState(false); // mobile menu
   const customer = useCustomerSession();
   const [sub, setSub] = useState<number | null>(null); // mobile submenu
@@ -639,7 +639,7 @@ function SiteHeader() {
 
 /** The client and staff dashboards get their own top bar; every other page gets the site header. */
 export function Header() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   // A private preview shows the customer's website, not ours. So does the sample page the browser tests open.
   if (pathname.startsWith("/preview/") || pathname.startsWith("/site-preview/") || pathname === "/e2e-site") return null;
   if (pathname === "/admin" || pathname.startsWith("/admin/")) return <DashboardHeader variant="staff" />;

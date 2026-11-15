@@ -907,6 +907,72 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
           )}
         </div>
       )}
+      {siteBuilds.some((b) => b.status === "released") && <LiveAddress briefId={row.id} stage={row.stage} call={call} />}
+      {message && <p role={message.ok ? "status" : "alert"} className={message.ok ? "acct-meta" : "field-error"}>{message.text}</p>}
+    </div>
+  );
+}
+
+/**
+ * The addresses a customer's live website is served on. Attaching one publishes nothing by itself: visitors see the
+ * site only once the website is approved and marked live. Attach the address in Vercel and point its DNS first.
+ */
+function LiveAddress({ briefId, stage, call }: { briefId: string; stage: string; call: Call }) {
+  const [domains, setDomains] = useState<{ hostname: string }[]>([]);
+  const [address, setAddress] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    void call({ action: "site-domains", briefId }, "/api/admin/ai/website").then((r) => {
+      if (!cancelled && r.ok && Array.isArray(r.json.domains)) setDomains(r.json.domains as { hostname: string }[]);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // `call` is a new function on every render of the page above, so it is left out: the list reloads for another website or after a change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [briefId, tick]);
+
+  const change = async (action: "site-domain-attach" | "site-domain-remove", hostname: string, done: string) => {
+    setBusy(true);
+    setMessage(null);
+    const r = await call({ action, briefId, hostname }, "/api/admin/ai/website");
+    setBusy(false);
+    setMessage({ ok: r.ok, text: r.ok ? done : String(r.json.error ?? "That didn't work.") });
+    if (r.ok) {
+      setAddress("");
+      setTick((t) => t + 1);
+    }
+  };
+
+  return (
+    <div>
+      <p className="admin-label">Live address</p>
+      <p className="acct-meta">{stage === "live" ? "Visitors see the website on these addresses." : "Nothing shows on these until the website is approved and live."}</p>
+      {domains.length > 0 && (
+        <ul className="build-lines" role="list">
+          {domains.map((d) => (
+            <li key={d.hostname}>
+              {d.hostname}{" "}
+              <button type="button" className="linkbtn" disabled={busy} onClick={() => void change("site-domain-remove", d.hostname, "Address removed.")}>
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="admin-actions">
+        <label className="visually-hidden" htmlFor={`live-address-${briefId}`}>
+          Website address
+        </label>
+        <input id={`live-address-${briefId}`} className="input" value={address} placeholder="hartleyandsons.co.uk" maxLength={253} onChange={(e) => setAddress(e.target.value)} />
+        <button type="button" className="btn btn--secondary" disabled={busy || !address.trim()} onClick={() => void change("site-domain-attach", address, "Address attached.")}>
+          Attach address
+        </button>
+      </div>
       {message && <p role={message.ok ? "status" : "alert"} className={message.ok ? "acct-meta" : "field-error"}>{message.text}</p>}
     </div>
   );
