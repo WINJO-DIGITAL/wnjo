@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CtaBand, PageHero, SectionHead } from "@/components/Blocks";
 import { ArrowRight } from "@/components/Icons";
 import { HostingPicker, PackagePicker, PlanFlow } from "@/components/interactive/PlanFlow";
+import { ServiceData } from "@/components/ServiceData";
 import { pageMetadata } from "@/lib/metadata";
 import { ONE_OFF_WEBSITE, SCOPED_FROM, SUBSCRIPTIONS, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
@@ -14,6 +15,7 @@ export const metadata = pageMetadata(
 export default function WebsiteProjectsPage() {
   return (
     <>
+      <ServiceData page="website-projects" />
       <PageHero
         eyebrow="Website projects"
         title={<>Own your website.</>}

@@ -1,4 +1,4 @@
-import { CARE_PLANS, ONE_OFF_TIERS, WEBSITE_PLANS } from "@/lib/pricing";
+import { CARE_PLANS, ONE_OFF_TIERS, REFRESH, WEBSITE_PLANS } from "@/lib/pricing";
 import { site } from "@/lib/site";
 
 /**
@@ -82,5 +82,79 @@ export function faqSchema(items: { q: string; a: string }[]) {
       name: item.q,
       acceptedAnswer: { "@type": "Answer", text: item.a },
     })),
+  };
+}
+
+export type ServicePage = "managed-websites" | "website-projects" | "booking-software" | "app-development" | "winjo-refresh";
+
+const monthlyOffer = (name: string, price: number, description?: string) => ({
+  "@type": "Offer",
+  name,
+  ...(description && { description }),
+  priceSpecification: { "@type": "UnitPriceSpecification", price, priceCurrency: "GBP", unitText: "MONTH" },
+});
+
+const fromOffer = (name: string, from: number, description?: string) => ({
+  "@type": "Offer",
+  name,
+  ...(description && { description }),
+  priceSpecification: { "@type": "PriceSpecification", price: from, minPrice: from, priceCurrency: "GBP" },
+});
+
+/**
+ * One service page, described for search engines with the prices the site publishes for it. Each is tied to the
+ * business on the home page by its @id. Booking systems and software are quoted per project, so they carry no price,
+ * as on the home page. WINJO Refresh has no price of its own: it lists the plans that include it.
+ */
+export function serviceSchema(baseUrl: string, page: ServicePage) {
+  const url = baseUrl.replace(/\/+$/, "");
+  const plans = (ids: readonly ("bronze" | "silver" | "gold")[]) =>
+    ids.map((id) => monthlyOffer(`${WEBSITE_PLANS[id].name} managed website subscription`, WEBSITE_PLANS[id].monthly, WEBSITE_PLANS[id].tagline));
+  const services: Record<ServicePage, { name: string; serviceType: string; description: string; offers: object[] }> = {
+    "managed-websites": {
+      name: "Managed websites",
+      serviceType: "Managed website design, hosting and maintenance",
+      description: "A bespoke website designed, hosted, maintained and updated for one monthly payment, with no minimum term.",
+      offers: plans(["bronze", "silver", "gold"]),
+    },
+    "website-projects": {
+      name: "Bespoke website design",
+      serviceType: "Website design and build",
+      description: "A bespoke website paid for up front and owned by the customer on full payment, with optional hosting and care.",
+      offers: (["essential", "professional", "premium"] as const).map((id) =>
+        fromOffer(`${ONE_OFF_TIERS[id].name} bespoke website, bought outright`, ONE_OFF_TIERS[id].from, `${ONE_OFF_TIERS[id].summary} Up to ${ONE_OFF_TIERS[id].pageLimit} pages.`),
+      ),
+    },
+    "booking-software": {
+      name: "Booking system development",
+      serviceType: "Booking software development",
+      description: "A bespoke booking system with payments, the customer's branding and an operator app.",
+      offers: [],
+    },
+    "app-development": {
+      name: "Custom software and app development",
+      serviceType: "Custom software development",
+      description: "Web and mobile apps, customer portals, platforms, internal tools and integrations, built around the way a business operates.",
+      offers: [],
+    },
+    "winjo-refresh": {
+      name: "WINJO Refresh",
+      serviceType: "Website redesign",
+      description: `A planned website design and experience refresh every ${REFRESH.everyMonths} months, included in the ${WEBSITE_PLANS.silver.name} and ${WEBSITE_PLANS.gold.name} managed website plans.`,
+      offers: plans(["silver", "gold"]),
+    },
+  };
+  const service = services[page];
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${url}/${page}#service`,
+    name: service.name,
+    serviceType: service.serviceType,
+    description: service.description,
+    url: `${url}/${page}`,
+    provider: { "@id": `${url}/#business` },
+    areaServed: { "@type": "Country", name: "United Kingdom" },
+    ...(service.offers.length > 0 && { offers: service.offers }),
   };
 }

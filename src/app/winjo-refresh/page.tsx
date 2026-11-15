@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CtaBand, PageHero, SectionHead } from "@/components/Blocks";
 import { RefreshTimeline } from "@/components/managed/RefreshTimeline";
 import { RefreshCompare } from "@/components/managed/Sections";
+import { ServiceData } from "@/components/ServiceData";
 import { pageMetadata } from "@/lib/metadata";
 import { REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
@@ -25,6 +26,7 @@ const covers: [string, string][] = [
 export default function WinjoRefreshPage() {
   return (
     <>
+      <ServiceData page="winjo-refresh" />
       <PageHero
         eyebrow="WINJO Refresh"
         title={<>Your website shouldn&apos;t become outdated.</>}

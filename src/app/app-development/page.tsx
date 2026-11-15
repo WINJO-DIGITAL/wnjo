@@ -7,6 +7,7 @@ import { ArrowRight } from "@/components/Icons";
 import { AppBuilder } from "@/components/interactive/AppBuilder";
 import { ClipShowcase, type ClipItem } from "@/components/interactive/ClipShowcase";
 import { SheetToApp } from "@/components/interactive/SheetToApp";
+import { ServiceData } from "@/components/ServiceData";
 import { pageMetadata } from "@/lib/metadata";
 import { projectBySlug } from "@/lib/projects";
 import opBookings from "../../../public/work/app/op-bookings.webp";
@@ -42,6 +43,7 @@ const replace = [
 export default function AppDevelopmentPage() {
   return (
     <>
+      <ServiceData page="app-development" />
       <PageHero
         eyebrow="Apps and software"
         title={

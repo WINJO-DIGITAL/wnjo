@@ -44,3 +44,28 @@ describe("faqSchema", () => {
     expect(schema.mainEntity).toEqual([{ "@type": "Question", name: "What does Core cost?", acceptedAnswer: { "@type": "Answer", text: "£99 a month." } }]);
   });
 });
+
+describe("serviceSchema", () => {
+  it("describes each service page and ties it to the business", async () => {
+    const { serviceSchema } = await import("./structured-data");
+    for (const page of ["managed-websites", "website-projects", "booking-software", "app-development", "winjo-refresh"] as const) {
+      const schema = serviceSchema("https://winjodigital.co.uk/", page);
+      expect(schema["@type"]).toBe("Service");
+      expect(schema.url).toBe(`https://winjodigital.co.uk/${page}`);
+      expect(schema.provider).toEqual({ "@id": "https://winjodigital.co.uk/#business" });
+      expect(JSON.stringify(schema)).not.toMatch(/aggregateRating|review/i);
+    }
+  });
+
+  it("uses the published plan prices, and no price for work quoted per project", async () => {
+    const { serviceSchema } = await import("./structured-data");
+    const { WEBSITE_PLANS, ONE_OFF_TIERS } = await import("./pricing");
+    const prices = (page: Parameters<typeof serviceSchema>[1]) =>
+      ((serviceSchema("https://winjodigital.co.uk", page) as { offers?: { priceSpecification: { price: number } }[] }).offers ?? []).map((o) => o.priceSpecification.price);
+    expect(prices("managed-websites")).toEqual([WEBSITE_PLANS.bronze.monthly, WEBSITE_PLANS.silver.monthly, WEBSITE_PLANS.gold.monthly]);
+    expect(prices("website-projects")).toEqual([ONE_OFF_TIERS.essential.from, ONE_OFF_TIERS.professional.from, ONE_OFF_TIERS.premium.from]);
+    expect(prices("winjo-refresh")).toEqual([WEBSITE_PLANS.silver.monthly, WEBSITE_PLANS.gold.monthly]);
+    expect(prices("booking-software")).toEqual([]);
+    expect(prices("app-development")).toEqual([]);
+  });
+});

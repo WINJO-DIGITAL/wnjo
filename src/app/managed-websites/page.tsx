@@ -8,6 +8,7 @@ import { CareHero } from "@/components/managed/CareHero";
 import { RefreshCompare, SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
 import { WebStages } from "@/components/WebStages";
 import { archivo, jost } from "@/lib/fonts";
+import { ServiceData } from "@/components/ServiceData";
 import { pageMetadata } from "@/lib/metadata";
 import { REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { projects } from "@/lib/projects";
@@ -34,6 +35,7 @@ const heroSite = projects.find((p) => p.slug === "ev-exec") ?? projects[0];
 export default function ManagedWebsitesPage() {
   return (
     <>
+      <ServiceData page="managed-websites" />
       <PageHero
         eyebrow="Managed websites"
         title={<>A website built for your business, looked after by us.</>}

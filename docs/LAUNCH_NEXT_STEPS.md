@@ -36,7 +36,7 @@ Nothing else needs a code change before launch, except the items marked "Develop
 - [ ] Check the hosting welcome email's exit wording matches the decision in item 2.
 
 ## For the developer (not the owner)
-- Service pages still lack service and price markup.
+- Done 15 Nov, on this branch and not yet live: the five service pages now carry service and price data.
 - The `/build` note in the audit was wrong: the bare `/build` redirect to `/pricing#plans` is intended.
 
 Suggested model for the other account: Sonnet 5.5 for items 1, 3, 4 and 7. Fable 5.2 for item 6.

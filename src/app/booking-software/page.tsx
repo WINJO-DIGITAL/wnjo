@@ -6,6 +6,7 @@ import { BookingDemo } from "@/components/interactive/BookingDemo";
 import { BookingStudio } from "@/components/interactive/BookingStudio";
 import { PhoneFan } from "@/components/interactive/PhoneFan";
 import { archivo, jost } from "@/lib/fonts";
+import { ServiceData } from "@/components/ServiceData";
 import { pageMetadata } from "@/lib/metadata";
 import { projectBySlug } from "@/lib/projects";
 
@@ -28,6 +29,7 @@ const evexec = projectBySlug("ev-exec")!;
 export default function BookingSoftwarePage() {
   return (
     <>
+      <ServiceData page="booking-software" />
       {/*
         Compact copy, so the replay is on screen as soon as the page opens: on phones the
         buttons follow the replay; on desktop the copy and buttons sit beside it.
