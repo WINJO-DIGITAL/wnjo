@@ -7,20 +7,23 @@
 import type { SectorPreset } from "./presets";
 import type { CustomerFacts, Section, SitePage } from "./schema";
 
-export const PAGE_KINDS = ["home", "services", "about", "gallery", "faq", "contact"] as const;
+export const PAGE_KINDS = ["home", "services", "prices", "about", "gallery", "faq", "contact"] as const;
 export type PageKind = (typeof PAGE_KINDS)[number];
 
 /** The most pages a template site can have today: one of each kind. Plus and Pro can ask for more than this. */
 export const MAX_TEMPLATE_PAGES = PAGE_KINDS.length;
 
 /** The names a customer picks from, in menu order. */
-export const PAGE_CHOICES: Record<PageKind, string> = { home: "Home", services: "Services", about: "About", gallery: "Gallery", faq: "FAQs", contact: "Contact" };
+export const PAGE_CHOICES: Record<PageKind, string> = { home: "Home", services: "Services", prices: "Prices", about: "About", gallery: "Gallery", faq: "FAQs", contact: "Contact" };
 
 const ALIASES: Record<string, PageKind> = {
   home: "home",
   services: "services",
   menu: "services",
   treatments: "services",
+  prices: "prices",
+  pricing: "prices",
+  "price list": "prices",
   about: "about",
   "about us": "about",
   gallery: "gallery",
@@ -66,6 +69,8 @@ export function defaultPageHead(preset: SectorPreset, kind: PageKind): { headlin
   switch (kind) {
     case "services":
       return { headline: h.services, intro: "Everything we offer." };
+    case "prices":
+      return { headline: "Our prices", intro: "What each service costs." };
     case "about":
       return { headline: "About us", intro: "Who we are and what we do." };
     case "gallery":
@@ -91,14 +96,14 @@ export type Layout = { sections: Section[]; pages: SitePage[]; missing: PageKind
 /**
  * Lays a site's sections out across the chosen pages. `flat` is every section in the sector's order, as built for a
  * one-page site. With one page chosen the site is that page, unchanged. With more, each page takes its own sections:
- * Services the full list (Home keeps a short teaser), Contact the hours, the place and the request form, and so on.
+ * Services the full list (Home keeps a short teaser), Prices only the priced services, Contact the hours, the place and the request form, and so on.
  * A page whose content is missing (a Gallery with no photos, an FAQ with no questions) is left out and named in
  * `missing`, so the check can say so. The closing next step goes on every page.
  */
 export function layoutPages(preset: SectorPreset, chosen: readonly PageKind[], flat: Section[], heads: PageHeads, about: Section | null): Layout {
   if (chosen.length <= 1) return { sections: flat, pages: [], missing: [] };
   const has = (k: PageKind) => chosen.includes(k);
-  const bucket: Record<PageKind, Section[]> = { home: [], services: [], about: [], gallery: [], faq: [], contact: [] };
+  const bucket: Record<PageKind, Section[]> = { home: [], services: [], prices: [], about: [], gallery: [], faq: [], contact: [] };
   let cta: Section | null = null;
 
   for (const s of flat) {
@@ -112,6 +117,11 @@ export function layoutPages(preset: SectorPreset, chosen: readonly PageKind[], f
           bucket.services.push(s);
           bucket.home.push({ ...s, teaser: 3 });
         } else bucket.home.push(s);
+        // The Prices page lists only the services the customer gave a price for, exactly as they gave it.
+        if (has("prices")) {
+          const priced = s.items.filter((item) => item.price?.trim());
+          if (priced.length) bucket.prices.push({ kind: "services", heading: "Prices", items: priced });
+        }
         break;
       case "hours":
       case "area":

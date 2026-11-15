@@ -28,7 +28,7 @@ export function buildE2ESample(p: E2EParams): { content: SiteContent; heroImage?
     heroPhoto: photos?.hero,
     images: photos ? photos.gallery.map((src, n) => ({ src, alt: `${parsed.facts.businessName} photo ${n + 1}` })) : [],
     pages: firstPages(p.pages),
-    pageLimit: 6,
+    pageLimit: 7,
   };
   const copy = {
     ...defaultCopy(input),
@@ -42,6 +42,6 @@ export function buildE2ESample(p: E2EParams): { content: SiteContent; heroImage?
 
 /** The address a sample is served on: `<sector>-p<pages>[-<layout>][-<look>][-nophoto].e2e.test`, for example `barber-p6-split-warm.e2e.test`. */
 export function e2eParamsFromHost(host: string): E2EParams | null {
-  const m = host.match(/^(.+?)-p([1-6])(?:-(showcase|split|essentials))?(?:-(minimal|warm|bold|classic))?(-nophoto)?\.e2e\.test$/);
+  const m = host.match(/^(.+?)-p([1-7])(?:-(showcase|split|essentials))?(?:-(minimal|warm|bold|classic))?(-nophoto)?\.e2e\.test$/);
   return m ? { sector: m[1], pages: Number(m[2]), layout: m[3], look: m[4], photos: !m[5] } : null;
 }

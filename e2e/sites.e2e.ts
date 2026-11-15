@@ -45,10 +45,12 @@ for (const sector of SECTORS) {
       const page = await context.newPage();
       const problems = watch(page);
 
-      await page.goto(`/e2e-site?t=${sector}&n=6`);
+      await page.goto(`/e2e-site?t=${sector}&n=7`);
       const pages = page.getByRole("navigation", { name: "Pages" }).getByRole("link");
       const hrefs = await pages.evaluateAll((links) => links.map((l) => l.getAttribute("href") ?? ""));
-      expect(hrefs.length, "a six-page site shows six pages in its menu").toBe(6);
+      // The building sample gives no prices, so its Prices page is rightly left out.
+      const expected = sector === "building" ? 6 : 7;
+      expect(hrefs.length, `a seven-page site shows ${expected} pages in its menu`).toBe(expected);
 
       for (const href of hrefs) {
         await page.goto(`/e2e-site${href}`);
@@ -95,8 +97,8 @@ test("a site with no photos still has a finished top of page", async ({ page }) 
 
 test("the booking buttons lead to the request form, and the form is labelled", async ({ page }) => {
   await page.setViewportSize(DESKTOP);
-  await page.goto("/e2e-site?t=barber&n=6");
-  // From Home on a six-page site, the main button goes to the Contact page's form.
+  await page.goto("/e2e-site?t=barber&n=7");
+  // From Home on a seven-page site, the main button goes to the Contact page's form.
   await page.getByRole("link", { name: /request a booking/i }).first().click();
   await expect(page).toHaveURL(/page=contact.*#book|#book/);
   const form = page.locator("#book form");
@@ -120,7 +122,7 @@ test("a phone shows the call and book bar; a desktop does not", async ({ browser
 });
 
 test("every image has a description and every control has a name", async ({ page }) => {
-  await page.goto("/e2e-site?t=cafe&n=6");
+  await page.goto("/e2e-site?t=cafe&n=7");
   const bad = await page.evaluate(() => [
     ...[...document.querySelectorAll("img")].filter((i) => !i.hasAttribute("alt")).map((i) => `img ${i.src}`),
     ...[...document.querySelectorAll("a, button")].filter((e) => !(e.textContent ?? "").trim() && !e.getAttribute("aria-label")).map((e) => e.outerHTML.slice(0, 80)),

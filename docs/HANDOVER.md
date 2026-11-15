@@ -18,7 +18,7 @@ Read this first in any new session. It holds the working rules and open items th
 ## Current state
 
 - AI: Anthropic only. Model `claude-haiku-5-5`. Limits: three rounds per site, £1 ceiling per website, word limits headline 8, intro 18, sentence 18.
-- Multi-page template sites are built. The customer chooses Home plus up to five pages (Services, About, Gallery, FAQs, Contact), within their plan limit. Core 5, Plus 10, Pro 20. Templates hold six page types, so Plus and Pro build at most six.
+- Multi-page template sites are built. The customer chooses Home plus up to six pages (Services, Prices, About, Gallery, FAQs, Contact), within their plan limit. Core 5, Plus 10, Pro 20. Templates hold seven page types, so Plus and Pro build at most seven. The Prices page lists only the services the customer gave a price for, and is named as missing when none has one.
 - Facts only. The model writes no service descriptions, and it is told never to invent anything. FAQ answers must come from the customer's facts, are capped at six, and may not repeat each other or the intro.
 - Photos: the customer marks one main photo and one logo on the files step. The main photo leads, other photos go in the gallery, and the logo is left out.
 - Layouts: every template has three home-page layouts. "Photo first" (showcase) for picture-led businesses, "Side by side" (split), and "Details first" (essentials) for information-led ones. Each sector starts on its own (`defaultLayout` in `schema.ts`) and the customer can pick another in the form. The layout only reorders and restyles; it never adds or removes content.
@@ -65,4 +65,4 @@ Good to know:
 - The layout picker in the customer form has not been checked on a real phone yet.
 - Remaining quality step: a rated re-test with a target (for example 8 in 10 rated good), then tune checks on live results.
 - Full audit of the AI build with a stronger model, in a fresh session.
-- Decide whether to add page types beyond six, so Plus and Pro can build their full page allowance.
+- Plus and Pro can still ask for more pages than the seven page types. Further types (Areas we cover, Team, Reviews) each need a new customer question. Prices was added 16 Nov.

@@ -69,7 +69,7 @@ export function validateStep(step: StepId, brief: WebsiteBrief, ctx: StepContext
         const named = brief.pages.filter((p) => p.trim().toLowerCase() !== "home");
         // A Gallery page is only built from real photos: at least three, not counting the logo.
         const photos = brief.files.filter((f) => ["image/jpeg", "image/png", "image/webp"].includes(f.type) && f.role !== "logo").length;
-        if (named.some((p) => !pageKindFor(p))) errors.pages = "Choose from Services, About, Gallery, FAQs and Contact.";
+        if (named.some((p) => !pageKindFor(p))) errors.pages = "Choose from Services, Prices, About, Gallery, FAQs and Contact.";
         else if (named.some((p) => pageKindFor(p) === "gallery") && photos < 3) errors.pages = "A Gallery page needs at least three photos. Add them on the files step, or take the Gallery page off.";
         else if (ctx.allowedPages !== null && named.length + 1 > ctx.allowedPages) errors.pages = `Your plan covers up to ${ctx.allowedPages} pages. Remove ${named.length + 1 - ctx.allowedPages} to continue.`;
       }

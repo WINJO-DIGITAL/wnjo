@@ -14,7 +14,7 @@ describe("choosing the pages", () => {
   });
 
   it("makes 2 pages when 2 are picked, 4 when 4 are, and 5 when 5 are", () => {
-    const six = ["Home", "Services", "About", "Gallery", "FAQs", "Contact"];
+    const six = ["Home", "Services", "Prices", "About", "Gallery", "FAQs", "Contact"];
     expect(choosePages(six.slice(0, 2), 5)).toHaveLength(2);
     expect(choosePages(["Home", "Services", "About", "Gallery"], 5)).toHaveLength(4);
     expect(choosePages(["Home", "Services", "About", "Gallery", "FAQs"], 5)).toHaveLength(5);
@@ -28,7 +28,7 @@ describe("choosing the pages", () => {
   });
 
   it("never builds more than a template can hold, however large the plan", () => {
-    const all = ["Home", "Services", "About", "Gallery", "FAQs", "Contact"];
+    const all = ["Home", "Services", "Prices", "About", "Gallery", "FAQs", "Contact"];
     expect(choosePages(all, 20)).toHaveLength(MAX_TEMPLATE_PAGES);
     expect(choosePages(all, null)).toHaveLength(MAX_TEMPLATE_PAGES);
   });
@@ -42,7 +42,7 @@ describe("choosing the pages", () => {
 
   it("takes the first few pages in menu order when a test asks for a number", () => {
     expect(firstPages(1)).toEqual(["home"]);
-    expect(firstPages(3)).toEqual(["home", "services", "about"]);
+    expect(firstPages(3)).toEqual(["home", "services", "prices"]);
     expect(firstPages(99)).toHaveLength(MAX_TEMPLATE_PAGES);
   });
 
@@ -108,9 +108,9 @@ describe("laying the sections out across pages", () => {
     expect(section?.kind === "about" && section.points).toHaveLength(parsed.facts.details?.length ?? 0);
   });
 
-  it("builds every page when all six are picked, each starting with its own heading", () => {
+  it("builds every page when all seven are picked, each starting with its own heading", () => {
     const l = lay([...PAGE_KINDS]);
-    expect(l.pages.map((p) => p.slug)).toEqual(["services", "about", "gallery", "faq", "contact"]);
+    expect(l.pages.map((p) => p.slug)).toEqual(["services", "prices", "about", "gallery", "faq", "contact"]);
     expect(l.missing).toEqual([]);
     for (const page of l.pages) expect(page.sections[0].kind).toBe("pagehead");
   });
@@ -157,7 +157,7 @@ describe("the writer builds the pages the customer chose", () => {
 describe("the About page photo", () => {
   const imgs = [1, 2, 3].map((n) => ({ src: `/styler/${n}.webp`, alt: n === 1 ? "Two barbers at work" : "" }));
   const build = (images: { src: string; alt: string }[]) => {
-    const input = { preset: BARBER_PRESET, facts: SAMPLES.barber.facts, look: "classic" as const, colour: "#1f3a34", pages: firstPages(3), pageLimit: 5, images };
+    const input = { preset: BARBER_PRESET, facts: SAMPLES.barber.facts, look: "classic" as const, colour: "#1f3a34", pages: firstPages(4), pageLimit: 5, images };
     return assembleSite(input, defaultCopy(input));
   };
   const about = (c: ReturnType<typeof build>) => c.pages?.find((p) => p.slug === "about")?.sections.find((s) => s.kind === "about");
@@ -171,5 +171,47 @@ describe("the About page photo", () => {
     expect(s?.kind === "about" && s.image?.alt).toBe("Hartley & Sons photo");
     const none = about(build([]));
     expect(none?.kind === "about" && none.image).toBeUndefined();
+  });
+});
+
+describe("the Prices page", () => {
+  it("is chosen by its name or the words people use for it", () => {
+    expect(choosePages(["Prices"], 5)).toEqual(["home", "prices"]);
+    expect(choosePages(["Pricing", "Price list"], 5)).toEqual(["home", "prices"]);
+  });
+
+  it("lists only the services that have a price, as the customer gave them", () => {
+    const services: Section = { kind: "services", heading: "Services", items: [{ name: "Cut", price: "£20" }, { name: "Consultation" }, { name: "Colour", price: "£55" }] };
+    const l = layoutPages(BARBER_PRESET, ["home", "prices"], [services], {}, null);
+    const page = l.pages.find((p) => p.slug === "prices");
+    const list = page?.sections.find((s) => s.kind === "services");
+    expect(list?.kind === "services" && list.items.map((i) => [i.name, i.price])).toEqual([["Cut", "£20"], ["Colour", "£55"]]);
+    expect(l.sections.some((s) => s.kind === "services")).toBe(true);
+  });
+
+  it("is named as missing when no service has a price", () => {
+    const services: Section = { kind: "services", heading: "Services", items: [{ name: "Cut" }, { name: "Colour" }] };
+    const l = layoutPages(BARBER_PRESET, ["home", "prices"], [services], {}, null);
+    expect(l.missing).toEqual(["prices"]);
+    expect(l.pages).toEqual([]);
+  });
+
+  it("sits beside Services without taking its place", () => {
+    const services: Section = { kind: "services", heading: "Services", items: [{ name: "Cut", price: "£20" }] };
+    const l = layoutPages(BARBER_PRESET, ["home", "services", "prices"], [services], {}, null);
+    expect(l.pages.map((p) => p.slug)).toEqual(["services", "prices"]);
+  });
+});
+
+describe("every sector's sample site", () => {
+  it("builds all seven pages, and leaves Prices out only when no service has a price", () => {
+    for (const preset of Object.values(SECTOR_PRESETS)) {
+      const parsed = parseAnswers(SAMPLE_ANSWERS[preset.id], preset, { colour: "#1f3a34" });
+      if (!parsed.ok) throw new Error(`${preset.id} sample answers don't parse`);
+      const input = { preset, facts: parsed.facts, look: parsed.look, colour: parsed.colour, images: Array.from({ length: 3 }, (_, n) => ({ src: `/p/${n}.webp`, alt: `photo ${n}` })), pages: firstPages(7), pageLimit: 7 };
+      const site = assembleSite(input, { ...defaultCopy(input), faq: [{ question: "Where are you?", answer: "On the Contact page." }] });
+      const anyPrice = parsed.facts.services.some((svc) => svc.price);
+      expect(site.pages?.map((p) => p.slug), preset.id).toEqual(["services", ...(anyPrice ? ["prices"] : []), "about", "gallery", "faq", "contact"]);
+    }
   });
 });
