@@ -78,7 +78,7 @@ export async function buildSite(ctx: { provider: AiProvider; store: SiteBuildSto
   const pages = input.pages ? choosePages(input.pages, input.pageLimit ?? null) : undefined;
   const written = await writeSite(
     { provider: ctx.provider, spentPence: await ctx.store.spentPence(ctx.briefId), maxPence: ctx.maxPence },
-    { preset, facts, look: parsed.look, layout: parsed.layout, colour: parsed.colour, heroPhoto: photos.hero, images: photos.gallery, change: input.change?.trim() || undefined, pages, pageLimit: input.pageLimit ?? null },
+    { preset, facts, look: parsed.look, layout: parsed.layout, colour: parsed.colour, heroPhoto: photos.hero, logo: photos.logo, images: photos.gallery, change: input.change?.trim() || undefined, pages, pageLimit: input.pageLimit ?? null },
   );
   const content = written.content;
   if (!content) return { ok: false, reason: written.ok ? "No content." : written.reason, costPence: written.costPence };

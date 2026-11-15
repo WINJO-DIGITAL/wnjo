@@ -40,6 +40,8 @@ export type WriteInput = {
   change?: string;
   /** How the home page is arranged. Left out: the sector's own. */
   layout?: Layout;
+  /** The customer's logo, as a stored reference. Shown in the header and footer. */
+  logo?: string;
   /** The pages the customer chose, Home first. Left out for a one-page site. */
   pages?: PageKind[];
   /** The most pages their plan allows, so the model knows the limit. */
@@ -295,6 +297,7 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
   return {
     business: {
       name: facts.businessName,
+      ...(input.logo ? { logo: input.logo } : {}),
       ...(copy.tagline ? { tagline: copy.tagline } : {}),
       ...(facts.phone ? { phone: facts.phone } : {}),
       ...(facts.email ? { email: facts.email } : {}),

@@ -242,3 +242,16 @@ The 95 target should be scored after phase D, from the phase B evidence, not bef
 8. **CI (finding 9):** approve a GitHub Action in the repo.
 9. **Leaked-password protection:** turn on in the Supabase dashboard (your action).
 10. **Benchmark sectors:** which of professional services, retail, restaurants and personal trainers to add first.
+
+## Status after phase A (15 November 2026)
+
+| Finding | Status |
+|---|---|
+| 2. Form confirmation on multi-page sites | Done. The form posts its page, and the visitor returns to it. Tested. |
+| 3. Leads saved | Done in code. Needs the table: run `docs/site_enquiries.sql` in Supabase (copied to the migration folder too). No screen for the owner to read leads yet. |
+| 6. Logo shown | Done. Header shows the logo with the name as its text. Vector logos are accepted as images only. |
+| 13. Pale colours | Done. Colours must reach 4.5:1 on the site's paper. Every swatch passes. |
+| 15. Plans and pages | Partly. A Gallery page now needs three photos. The FAQs-on-Essential conflict isn't fixed: the form doesn't know the plan yet. |
+| 20. Housekeeping | Done: stray logs and the `undefined` folder removed, testing notes corrected. The package name `fydevs` is left alone: renaming it changes the lock file and nothing customer-facing. |
+
+Not done, and not started: phases B to E.

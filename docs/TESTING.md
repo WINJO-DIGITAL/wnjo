@@ -28,5 +28,5 @@ Last full run of each file: before the most recent database changes. Rerun them 
 ## Not yet tested
 - Signed-in flows in the browser (client account, staff admin). These need a sign-in link.
 - Live server writes on the production database (quotes, enquiries, files). The key is configured; a test submission on the preview would confirm it.
-- Payments, Stripe webhooks, the Claude provider, GitHub-based deployment. These aren't built or connected.
+- Live payments and webhooks in production (tested in Stripe test mode only, see the launch checklist). The Claude provider needs its key in Vercel to run. GitHub-based deployment isn't set up.
 - Accessibility and performance audits of new screens.

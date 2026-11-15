@@ -56,12 +56,19 @@ describe("what each step needs", () => {
   });
 
   it("goals: a template site can choose Home plus any of the five pages its layouts hold", () => {
-    expect(validateStep("goals", { ...barber, pages: ["Home", "Services", "About", "Gallery", "FAQs", "Contact"] }, ctx({ allowedPages: 6 }))).toEqual({});
+    const photo = (n: number) => ({ path: `drafts/d/${n}.jpg`, name: `${n}.jpg`, size: 100, type: "image/jpeg" });
+    expect(validateStep("goals", { ...barber, pages: ["Home", "Services", "About", "Gallery", "FAQs", "Contact"], files: [photo(1), photo(2), photo(3)] }, ctx({ allowedPages: 6 }))).toEqual({});
     expect(validateStep("goals", { ...barber, pages: ["Home", "Services"] }, ctx({ allowedPages: 5 }))).toEqual({});
   });
 
   it("goals: a template site can't choose a page it has no layout for", () => {
     expect(validateStep("goals", { ...barber, pages: ["Home", "Pricing calculator"] }, ctx()).pages).toContain("Choose from");
+  });
+
+  it("goals: a template site can't have a Gallery page without at least three photos", () => {
+    const photo = (n: number) => ({ path: `drafts/d/${n}.jpg`, name: `${n}.jpg`, size: 100, type: "image/jpeg" });
+    expect(validateStep("goals", { ...barber, pages: ["Home", "Gallery"], files: [photo(1), photo(2)] }, ctx({ allowedPages: 5 })).pages).toContain("three photos");
+    expect(validateStep("goals", { ...barber, pages: ["Home", "Gallery"], files: [photo(1), photo(2), photo(3)] }, ctx({ allowedPages: 5 }))).toEqual({});
   });
 
   it("goals: a template site can't choose more pages than the plan allows, and Home counts", () => {

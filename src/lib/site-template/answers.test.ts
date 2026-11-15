@@ -163,3 +163,16 @@ describe("cleanSiteAnswers", () => {
     expect(cleanSiteAnswers({ sector: "barber", answers: { phone: "01632\u0000 960123" } }, known)?.answers.phone).toBe("01632 960123");
   });
 });
+
+describe("colour readability", () => {
+  it("every swatch the customer can pick is readable on the site's paper", async () => {
+    const { SITE_COLOURS } = await import("@/components/configurator/SiteFields");
+    const { readableOnPaper } = await import("./answers");
+    for (const c of SITE_COLOURS) expect(readableOnPaper(c.hex), c.label).toBe(true);
+  });
+  it("rejects a pale colour, with a reason the customer can act on", () => {
+    const r = parseAnswers({ ...({} as RawAnswers), businessName: "Hartley", colour: "#f4e3a1" }, BARBER_PRESET, { colour: "#222222" });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.errors.colour).toContain("Pick a darker one");
+  });
+});

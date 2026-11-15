@@ -100,6 +100,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
   const style = { "--accent": colour, "--on-accent": onColour(colour) } as CSSProperties;
   const bookable = bookOn === null ? undefined : [...content.sections, ...(content.pages ?? []).flatMap((p) => p.sections)].find((s): s is Extract<Section, { kind: "enquiry" }> => s.kind === "enquiry");
   const photo = safeImage(heroImage);
+  const logo = safeImage(business.logo);
   // A section that draws nothing (a gallery with no usable pictures) gets no nav link, so no link points at nothing.
   const nav = current.sections.flatMap((s) => (ANCHOR_IDS[s.kind] && !(s.kind === "gallery" && !s.images.some((im) => safeImage(im.src))) ? [{ id: ANCHOR_IDS[s.kind]!.id, label: navLabel(s)! }] : []));
 
@@ -229,6 +230,8 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                   </p>
                 )}
                 {enquiry && <input type="hidden" name="token" value={enquiry.token} />}
+                {/* The page the form is on, so the visitor comes back to it with the confirmation. */}
+                {enquiry && <input type="hidden" name="page" value={current.slug} />}
                 {/* A field real visitors never see: bots fill it in, and the request is dropped. */}
                 <input className={css.trap} name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
                 <label>
@@ -311,7 +314,12 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
   return (
     <div className={css.site} data-look={theme.look} data-layout={layout} style={style}>
       <header className={css.nav}>
-        <b className={css.logo}>{business.name}</b>
+        {logo ? (
+          // eslint-disable-next-line @next/next/no-img-element -- customer logos come from private storage, not the image optimiser
+          <img className={css.logoImg} src={logo} alt={business.name} />
+        ) : (
+          <b className={css.logo}>{business.name}</b>
+        )}
         <nav aria-label={multi ? "Pages" : "Sections"} className={css.links}>
           {multi
             ? [{ slug: "", title: "Home" }, ...(content.pages ?? [])].map((p) => (

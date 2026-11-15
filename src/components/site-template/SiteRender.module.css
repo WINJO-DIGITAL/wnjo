@@ -801,3 +801,12 @@
     margin-inline: auto;
   }
 }
+
+.logoImg {
+  display: block;
+  height: 2.5rem;
+  width: auto;
+  max-width: 12rem;
+  object-fit: contain;
+  margin-right: auto;
+}

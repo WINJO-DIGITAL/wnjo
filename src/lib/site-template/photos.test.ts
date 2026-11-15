@@ -71,3 +71,21 @@ describe("pickPhotos: what the customer says each picture is for", () => {
     expect(r.gallery).toEqual([]);
   });
 });
+
+describe("the logo", () => {
+  const roled = (name: string, role?: "logo" | "hero", type = "image/jpeg") => ({ path: `drafts/d/${name}`, name, size: 100, type, ...(role ? { role } : {}) });
+  it("is picked out as the logo, not a gallery photo, and can be a vector file", () => {
+    const r = pickPhotos([roled("mark.svg", "logo", "image/svg+xml"), roled("a.jpg")]);
+    expect(r.logo).toBe("brief-file:drafts/d/mark.svg");
+    expect(r.gallery).toEqual([]);
+  });
+  it("is left out when none is marked", () => {
+    expect(pickPhotos([roled("a.jpg")]).logo).toBeUndefined();
+  });
+  it("is resolved to a link like a photo, and dropped when it has none", () => {
+    const content = { ...SAMPLE_BARBER, business: { ...SAMPLE_BARBER.business, logo: "brief-file:drafts/d/mark.svg" } };
+    expect(photoRefs(content)).toContain("brief-file:drafts/d/mark.svg");
+    expect(resolvePhotos(content, new Map([["brief-file:drafts/d/mark.svg", "https://x.example/mark.svg"]])).content.business.logo).toBe("https://x.example/mark.svg");
+    expect(resolvePhotos(content, new Map()).content.business.logo).toBeUndefined();
+  });
+});

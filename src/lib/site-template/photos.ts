@@ -15,7 +15,11 @@ export const isPhotoRef = (src: string) => src.startsWith(PHOTO_SCHEME);
 export const photoPath = (ref: string) => ref.slice(PHOTO_SCHEME.length);
 
 /** Photographs only (not SVG logos, documents, or files named like a logo). The first is the hero, the next few the gallery. */
-export function pickPhotos(files: BriefFile[]): { hero?: string; gallery: GalleryImage[] } {
+/** A logo may also be a vector file: it is shown only as an image, never run as a document. */
+const LOGO_TYPES = new Set([...PHOTO_TYPES, "image/svg+xml"]);
+
+export function pickPhotos(files: BriefFile[]): { hero?: string; gallery: GalleryImage[]; logo?: string } {
+  const logo = files.find((f) => f.role === "logo" && LOGO_TYPES.has(f.type));
   const photos = files.filter((f) => PHOTO_TYPES.has(f.type) && f.role !== "logo" && !(f.role === undefined && /logo/i.test(f.name)));
   // The picture the customer marked as the main one leads. Otherwise the first photo does.
   const chosen = photos.find((f) => f.role === "hero");
@@ -23,6 +27,7 @@ export function pickPhotos(files: BriefFile[]): { hero?: string; gallery: Galler
   return {
     ...(first ? { hero: photoRef(first.path) } : {}),
     gallery: rest.slice(0, MAX_GALLERY).map((f) => ({ src: photoRef(f.path), alt: "" })),
+    ...(logo ? { logo: photoRef(logo.path) } : {}),
   };
 }
 
@@ -31,6 +36,7 @@ const allSections = (content: SiteContent): Section[] => [...content.sections, .
 /** The private files a build refers to, so the page knows what to sign. */
 export function photoRefs(content: SiteContent): string[] {
   const refs: string[] = [];
+  if (content.business.logo && isPhotoRef(content.business.logo)) refs.push(content.business.logo);
   for (const s of allSections(content)) {
     if (s.kind === "hero" && s.image && isPhotoRef(s.image)) refs.push(s.image);
     if (s.kind === "gallery") for (const im of s.images) if (isPhotoRef(im.src)) refs.push(im.src);
@@ -56,5 +62,8 @@ export function resolvePhotos(content: SiteContent, urls: Map<string, string>): 
   };
   const sections = content.sections.map(fix);
   const pages = content.pages?.map((p) => ({ ...p, sections: p.sections.map(fix) }));
-  return { content: { ...content, sections, ...(pages ? { pages } : {}) }, heroImage };
+  // A logo that has no link is left out: the header then shows the business name as text.
+  const { logo, ...business } = content.business;
+  const logoUrl = logo && isPhotoRef(logo) ? urls.get(logo) : undefined;
+  return { content: { ...content, business: { ...business, ...(logoUrl ? { logo: logoUrl } : {}) }, sections, ...(pages ? { pages } : {}) }, heroImage };
 }

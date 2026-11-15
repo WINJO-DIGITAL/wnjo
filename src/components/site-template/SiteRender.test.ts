@@ -165,3 +165,20 @@ describe("stand-in photos", () => {
     for (const p of paths) expect(existsSync(`public${p}`), p).toBe(true);
   });
 });
+
+describe("the header logo and the request form's page", () => {
+  it("shows the logo in the header with the business name as its text, and the name alone without one", () => {
+    const withLogo = { ...SAMPLE_BARBER, business: { ...SAMPLE_BARBER.business, logo: "https://cdn.example/logo.svg" } };
+    expect(render(withLogo)).toContain('src="https://cdn.example/logo.svg"');
+    expect(render(withLogo)).toContain('alt="Hartley &amp; Sons"');
+    expect(render(SAMPLE_BARBER)).not.toContain("logo.svg");
+  });
+  it("never shows a logo from an unsafe address", () => {
+    const bad = { ...SAMPLE_BARBER, business: { ...SAMPLE_BARBER.business, logo: "javascript:alert(1)" } };
+    expect(render(bad)).not.toContain("javascript:");
+  });
+  it("tells the request route which page the form is on", () => {
+    const html = renderToStaticMarkup(createElement(SiteRender, { content: SAMPLE_BARBER, enquiry: { action: "/api/site-enquiry", token: "tok123" }, page: "" }));
+    expect(html).toContain('name="page" value=""');
+  });
+});

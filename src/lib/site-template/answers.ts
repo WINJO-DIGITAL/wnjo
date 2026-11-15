@@ -98,6 +98,19 @@ const PHONE = /^\+?[\d\s()-]{9,16}$/;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const COLOUR = /^#[0-9a-f]{6}$/i;
 
+/** Relative luminance of a hex colour (WCAG). */
+function luminance(hex: string): number {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** Prices and links are drawn in the colour on the site's paper. WCAG asks for 4.5:1 for text this size. */
+export function readableOnPaper(hex: string): boolean {
+  const paper = luminance("#fbfaf7");
+  const ink = luminance(hex);
+  return (Math.max(paper, ink) + 0.05) / (Math.min(paper, ink) + 0.05) >= 4.5;
+}
+
 export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { colour: string }): ParsedAnswers {
   const errors: Record<string, string> = {};
 
@@ -180,6 +193,7 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
   const layout = (LAYOUTS as readonly string[]).includes(raw.layout ?? "") ? (raw.layout as Layout) : defaultLayout(preset.id);
   const colourInput = text(raw.colour);
   if (colourInput && !COLOUR.test(colourInput)) errors.colour = "Pick a colour from the swatches.";
+  else if (COLOUR.test(colourInput) && !readableOnPaper(colourInput)) errors.colour = "That colour is too pale for the prices and links to read. Pick a darker one.";
   const colour = COLOUR.test(colourInput) ? colourInput.toLowerCase() : defaults.colour;
 
   if (Object.keys(errors).length) return { ok: false, errors };

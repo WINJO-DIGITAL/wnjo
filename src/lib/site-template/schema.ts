@@ -86,6 +86,8 @@ export type SitePage = { slug: string; title: string; sections: Section[] };
 
 export type BusinessDetails = {
   name: string;
+  /** The customer's logo: a stored reference while the build is kept, a link once it is shown. Left out without one. */
+  logo?: string;
   tagline?: string;
   phone?: string;
   email?: string;
