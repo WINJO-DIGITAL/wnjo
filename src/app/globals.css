@@ -604,9 +604,7 @@ button.arrow-link {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgb(242 236 226 / 0.86);
-  backdrop-filter: saturate(1.4) blur(14px);
-  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  background: var(--color-bg);
   border-bottom: 1px solid transparent;
   transition: border-color var(--duration) var(--ease);
 }
