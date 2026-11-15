@@ -263,6 +263,6 @@ Not done, and not started: phases B to E.
 | 9. Automatic checks | Done. `.github/workflows/ci.yml` runs types, lint and tests on every push and pull request. The same three commands pass locally. Not yet seen running on GitHub: it runs when the branch is pushed. |
 | 12. Quality results | Partly. The test panel shows how many staff ratings each template has, and the share rated good. No release rule (for example 8 in 10) is set yet; that needs the owner's number. |
 | 18. Database functions | Reviewed. All nine functions that run with elevated rights check who is calling. The quote and approval functions also check the caller's organisation. No defects found. Leaked-password protection is still off: the owner turns it on in the Supabase dashboard. |
-| 8. Browser tests | Not started. Needs a decision: add the Playwright test package as a dev dependency. |
+| 8. Browser tests | Done. 59 Playwright tests over every sector, phone and desktop, all three layouts, every menu page, links, images, console errors, sideways scrolling, the booking buttons and the call-and-book bar. All pass. Checked that they catch a real fault by breaking the form's page field on purpose: the test failed, then I restored it. Runs in CI as the `browser` job (not yet seen running on GitHub). |
 | 11. Checks on real output | Not started. Needs a real Haiku run with the key in Vercel. |
-| 17. Alerts | Not started. Failed lead emails are logged only. |
+| 17. Alerts | Done for lead emails. The morning briefing counts booking requests from the last 7 days that were saved but not emailed, and says what to do. There is still no alert for a failed site build. |

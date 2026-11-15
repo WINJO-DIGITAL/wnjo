@@ -6,6 +6,15 @@ npx vitest run
 ```
 Covers pricing parity (more than 10,000 answer combinations), quote records, catalogue mapping, the enquiry route, the AI engine (permissions, budgets, approvals, retries, loop limits, provider errors, run store), event routing, the morning briefing and its scheduling.
 
+## Browser tests (need a built site and a Chromium browser)
+```
+npm run build
+npm run e2e
+```
+They open the real built site and check what a visitor would meet on generated sites: every sector, on a phone and a desktop, every page reachable from the menu, every link and image, no console errors, no sideways scrolling, the three layouts, the booking buttons and the form's labels, and the phone call-and-book bar. 59 tests, about a minute. The sample sites come from `src/app/e2e-site/page.tsx`, which exists only when the server starts with `E2E=1` (the test config does that) and is a 404 everywhere else. Set `PLAYWRIGHT_CHROMIUM_PATH` to use an installed browser. They run in GitHub Actions on every push as the `browser` job.
+
+Not covered by them: a real customer's uploaded photos, the live form submission (the route has unit tests), accessibility tools such as axe, performance numbers, and signed-in screens.
+
 ## Database tests (need the live Supabase project)
 Each file in `supabase/tests/` runs in one transaction and ends with a deliberate error that rolls everything back. The output lists PASS or FAIL for every check. Run them in the Supabase SQL editor, or with `psql`, as the database owner.
 

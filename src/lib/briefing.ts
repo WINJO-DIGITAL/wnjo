@@ -58,6 +58,8 @@ export type BriefingFacts = {
   unansweredClientMessages: Array<{ projectName: string; waitingSince: string }>;
   newEnquiriesLast24h: number;
   failedAiTasks: number;
+  /** Booking requests from customers' websites in the last 7 days that were saved but whose email didn't go out. */
+  unsentSiteRequests: number;
   aiSpendThisMonthPence: number;
 };
 
@@ -78,6 +80,7 @@ export function buildBriefing(facts: BriefingFacts, generatedFor: string): Brief
     { text: `${facts.openRevisions} open revision request${facts.openRevisions === 1 ? "" : "s"}.` },
     { text: `${facts.newEnquiriesLast24h} new enquir${facts.newEnquiriesLast24h === 1 ? "y" : "ies"} in the last 24 hours.` },
     { text: `${facts.failedAiTasks} failed AI task${facts.failedAiTasks === 1 ? "" : "s"}.` },
+    { text: `${facts.unsentSiteRequests} booking request${facts.unsentSiteRequests === 1 ? "" : "s"} on customer websites saved but not emailed, in the last 7 days.` },
     { text: `AI spend this month: £${(facts.aiSpendThisMonthPence / 100).toFixed(2)}.` },
   ];
   for (const m of facts.overdueMilestones) items.push({ text: `Overdue: ${m.title}, due ${m.dueOn}.`, project: m.projectName });
@@ -88,6 +91,7 @@ export function buildBriefing(facts: BriefingFacts, generatedFor: string): Brief
   for (const a of facts.pendingApprovals) recommendations.push({ text: `Chase the approval "${a.title}", waiting since ${a.openSince}.`, project: a.projectName });
   for (const c of facts.unansweredClientMessages) recommendations.push({ text: `Reply to the client, who has been waiting since ${c.waitingSince}.`, project: c.projectName });
   if (facts.failedAiTasks > 0) recommendations.push({ text: "Review the failed AI tasks before enabling more agents." });
+  if (facts.unsentSiteRequests > 0) recommendations.push({ text: "Booking requests were saved but never emailed to website owners. Check the email service, then read them in the site_enquiries table and pass them on." });
 
   return { generatedFor, facts: items, recommendations };
 }

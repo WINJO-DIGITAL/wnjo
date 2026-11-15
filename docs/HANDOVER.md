@@ -24,6 +24,12 @@ Read this first in any new session. It holds the working rules and open items th
 - Stand-in photos for the template test are stock photos from Unsplash (free commercial licence), one set per sector, in `public/styler`. They are for the staff test only, never a customer's site.
 - The template test in the staff AI panel has a page-count picker and one tab per page. Re-run it on the live model after these changes.
 
+## How to run the checks
+
+- `npm run typecheck`, `npm run lint`, `npm test` (unit tests).
+- `npm run build` then `npm run e2e` (browser tests; set `PLAYWRIGHT_CHROMIUM_PATH` if needed). See `docs/TESTING.md`.
+- Both run in GitHub Actions on every push (`.github/workflows/ci.yml`).
+
 ## Open items
 
 - Remove old `evexec_` helper functions from the `winjo digital` database. Owner needs to confirm the project and count first.

@@ -51,9 +51,10 @@ export async function GET(request: NextRequest) {
 /** Reads the counts the briefing needs. Items the database doesn't track yet are left empty, not guessed. */
 async function gatherFacts(db: SupabaseClient, tenantId: string, now: Date): Promise<BriefingFacts> {
   const since24h = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+  const since7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
 
-  const [projects, approvals, revisions, enquiries, failed, spend] = await Promise.all([
+  const [projects, approvals, revisions, enquiries, failed, spend, unsent] = await Promise.all([
     db.from("projects").select("id", { count: "exact", head: true }).eq("tenant_id", tenantId).in("status", ["planning", "in_progress"]),
     db
       .from("approval_requests")
@@ -66,10 +67,12 @@ async function gatherFacts(db: SupabaseClient, tenantId: string, now: Date): Pro
     db.from("enquiries").select("id", { count: "exact", head: true }).eq("tenant_id", tenantId).gte("created_at", since24h),
     db.from("ai_tasks").select("id", { count: "exact", head: true }).eq("tenant_id", tenantId).eq("status", "failed"),
     db.from("ai_tasks").select("spent_pence").eq("tenant_id", tenantId).gte("created_at", monthStart),
+    db.from("site_enquiries").select("id", { count: "exact", head: true }).eq("tenant_id", tenantId).eq("email_sent", false).gte("created_at", since7d),
   ]);
   for (const result of [projects, approvals, revisions, enquiries, failed, spend]) {
     if (result.error) throw result.error;
   }
+  // A missing table (the leads migration not run yet) must never stop the whole briefing: it just counts as none.
 
   type ApprovalRow = { title: string; created_at: string; projects: { name: string } | null };
   const spendRows = (spend.data ?? []) as Array<{ spent_pence: number }>;
@@ -87,6 +90,7 @@ async function gatherFacts(db: SupabaseClient, tenantId: string, now: Date): Pro
     unansweredClientMessages: [],
     newEnquiriesLast24h: enquiries.count ?? 0,
     failedAiTasks: failed.count ?? 0,
+    unsentSiteRequests: unsent.error ? 0 : (unsent.count ?? 0),
     aiSpendThisMonthPence: spendRows.reduce((sum, row) => sum + Number(row.spent_pence ?? 0), 0),
   };
 }

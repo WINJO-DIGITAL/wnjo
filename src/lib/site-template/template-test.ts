@@ -33,7 +33,7 @@ export type TemplateTestResult = { model: string; rows: TemplateTestRow[]; passe
 /**
  * Stand-in photos for the test, so a site shows its pictures. Each template has photos of its own kind of business (stock photos under the Unsplash licence); a real customer's photos replace them. They only show the layout.
  */
-const STANDIN_PHOTOS: Record<string, { hero: string; gallery: string[] }> = {
+export const STANDIN_PHOTOS: Record<string, { hero: string; gallery: string[] }> = {
   barber: { hero: "/styler/barber-hero.webp", gallery: ["/styler/barber-cut.webp", "/styler/barber-fade.webp", "/styler/barber-shave.webp"] },
   beauty: { hero: "/styler/beauty-hero.webp", gallery: ["/styler/beauty-1.webp", "/styler/beauty-2.webp", "/styler/beauty-3.webp"] },
   massage: { hero: "/styler/massage-hero.webp", gallery: ["/styler/massage-1.webp", "/styler/massage-2.webp", "/styler/massage-3.webp"] },

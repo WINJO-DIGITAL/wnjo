@@ -10,6 +10,7 @@ const empty: BriefingFacts = {
   unansweredClientMessages: [],
   newEnquiriesLast24h: 0,
   failedAiTasks: 0,
+  unsentSiteRequests: 0,
   aiSpendThisMonthPence: 0,
 };
 
@@ -72,5 +73,18 @@ describe("londonDay", () => {
     expect(londonDay(new Date("2026-06-01T23:30:00Z"))).toBe("2026-06-02");
     // 23:30 UTC in November is still the same day in London (GMT).
     expect(londonDay(new Date("2026-11-07T23:30:00Z"))).toBe("2026-11-07");
+  });
+});
+
+describe("booking requests that were saved but not emailed", () => {
+  it("says how many there were, and tells the owner what to do about them", () => {
+    const b = buildBriefing({ ...empty, unsentSiteRequests: 2 }, "2026-11-15");
+    expect(b.facts.map((f) => f.text)).toContain("2 booking requests on customer websites saved but not emailed, in the last 7 days.");
+    expect(b.recommendations.map((r) => r.text).join(" ")).toContain("site_enquiries");
+  });
+  it("adds no recommendation when there are none", () => {
+    const b = buildBriefing(empty, "2026-11-15");
+    expect(b.facts.map((f) => f.text)).toContain("0 booking requests on customer websites saved but not emailed, in the last 7 days.");
+    expect(b.recommendations).toEqual([]);
   });
 });
