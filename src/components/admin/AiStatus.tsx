@@ -27,7 +27,7 @@ const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", 
 const pounds = (pence: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(pence / 100);
 
 type ModelLine = { label: string; text: string };
-type TestSite = { business: string; passed: boolean; content: SiteContent | null; facts: { services: { name: string; price?: string }[]; phone?: string; email?: string; address?: string; areas?: string[] }; modelLines: ModelLine[]; issues: string[] };
+type TestSite = { business: string; passed: boolean; costPence: number; content: SiteContent | null; facts: { services: { name: string; price?: string }[]; phone?: string; email?: string; address?: string; areas?: string[] }; modelLines: ModelLine[]; issues: string[] };
 type TemplateTestRow = { template: string; passed: number; runs: number; pencePerSite: number; problems: string[]; sites: TestSite[] };
 type TemplateTestResult = { model: string; rows: TemplateTestRow[] };
 
@@ -115,6 +115,7 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
     const f = site.facts;
     return (
       <>
+        <p className="acct-meta">This site cost {site.costPence}p to write.</p>
         <p className="acct-meta">Placeholder photos: they show the layout, not the business.</p>
         <div className="admin-row-static">
           <p className="acct-label">What the customer gave</p>
@@ -205,13 +206,13 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
       {result && (
         <>
           <p className="acct-meta">
-            {model}: {result.passed} of {result.runs} passed the checks. About {result.pencePerSite}p per site.
+            {model}: {result.passed} of {result.runs} passed the checks. Cost: about {result.pencePerSite}p per site, {Math.round(result.sites.reduce((n, s) => n + s.costPence, 0))}p for all {result.sites.length}.
           </p>
           <ul className="admin-list" role="list">
             {result.sites.map((site, i) => (
               <li key={i} className="admin-row-static">
                 <button type="button" className="arrow-link" aria-expanded={openSite === i} onClick={() => { setPageSlug(""); setOpenSite(openSite === i ? null : i); }}>
-                  {site.business} {site.passed ? "(passed)" : "(not passed)"}
+                  {site.business} {site.passed ? "(passed)" : "(not passed)"} · {site.costPence}p
                 </button>
                 {openSite === i && (
                   <div style={{ marginTop: "0.5rem" }}>

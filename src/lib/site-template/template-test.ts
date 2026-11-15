@@ -22,6 +22,8 @@ export type ModelLine = { label: string; text: string };
 export type TemplateTestSite = {
   business: string;
   passed: boolean;
+  /** What the model cost for this site, in pence, including any retries. */
+  costPence: number;
   content: SiteContent | null;
   facts: CustomerFacts;
   modelLines: ModelLine[];
@@ -116,6 +118,7 @@ export async function runTemplateTest(provider: AiProvider, runs: number, only?:
         row.sites.push({
           business: answers.businessName ?? "",
           passed: r.ok,
+          costPence: r.costPence,
           content: r.content ?? null,
           facts: parsed.facts,
           modelLines: r.content ? modelLinesOf(r.content, writeInput) : [],
