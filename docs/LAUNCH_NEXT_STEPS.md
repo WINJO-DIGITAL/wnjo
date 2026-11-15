@@ -4,17 +4,17 @@ Code state: `main` is at `8f95133` (header fix, plus the CI typecheck fix in `2c
 Nothing else needs a code change before launch, except the items marked "Developer".
 
 ## 1. Check the deploy
-- [ ] Vercel (winjodigital project): the production deployment for `8f95133` shows Ready.
-- [ ] GitHub Actions: the CI run for `8f95133` is green (both `checks` and `browser` jobs).
-- [ ] On a phone and a desktop, scroll the home page: the header stays solid, with no text showing through.
+- [x] Vercel (winjodigital project): the production deployment for `8f95133` shows Ready. Checked 15 Nov: Ready.
+- [x] GitHub Actions: the CI run for `8f95133` is green (both `checks` and `browser` jobs). Checked 15 Nov: green.
+- [x] On a phone and a desktop, scroll the home page: the header stays solid, with no text showing through. Checked 15 Nov in a test browser at phone and desktop sizes. Worth one look on a real phone.
 
 ## 2. Decide the hosting exit notice (the terms and the pages disagree)
 - [ ] Decide: "any time, no notice" (terms section 8.1) or "30 days' notice" (hosting page, pricing page, `llms.txt`, hosting emails).
 - [ ] Tell the developer which one. If "any time", the pages and emails change. If "30 days", the terms change. The terms are still marked as draft and have no solicitor review.
 
 ## 3. Turn on live billing
-- [ ] Stripe dashboard, live mode (WINJO Digital account): Settings > Billing > Customer portal. Save a configuration that allows updating the card and viewing invoices. Do not allow cancellation or plan changes, per the terms. Copy its ID (starts `bpc_`).
-- [ ] Vercel > winjodigital project > Settings > Environment Variables: add `STRIPE_PORTAL_CONFIGURATION_ID` with that ID, for production. Redeploy.
+- [x] Stripe dashboard, live mode (WINJO Digital account): Settings > Billing > Customer portal. Save a configuration that allows updating the card and viewing invoices. Do not allow cancellation or plan changes, per the terms. Copy its ID (starts `bpc_`). Done 15 Nov: `bpc_1Uc8a4LEEs7hsljuaZley7ru`, set as the live default.
+- [ ] Vercel > winjodigital project > Settings > Environment Variables: add `STRIPE_PORTAL_CONFIGURATION_ID` with that ID, for production. Redeploy. Variable added 15 Nov. The redeploy is still to do: it takes effect on the next production build.
 - [ ] Done when: "Manage billing" on the account page opens Stripe's billing page for a customer with a subscription. Not yet tested, because no live subscriptions exist.
 
 ## 4. Tighten sign-in settings (Supabase, project `oqwkvrhkgmuhrrxfsahx`)
