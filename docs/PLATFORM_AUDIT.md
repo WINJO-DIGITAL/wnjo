@@ -255,3 +255,14 @@ The 95 target should be scored after phase D, from the phase B evidence, not bef
 | 20. Housekeeping | Done: stray logs and the `undefined` folder removed, testing notes corrected. The package name `fydevs` is left alone: renaming it changes the lock file and nothing customer-facing. |
 
 Not done, and not started: phases B to E.
+
+## Status after phase B (15 November 2026)
+
+| Finding | Status |
+|---|---|
+| 9. Automatic checks | Done. `.github/workflows/ci.yml` runs types, lint and tests on every push and pull request. The same three commands pass locally. Not yet seen running on GitHub: it runs when the branch is pushed. |
+| 12. Quality results | Partly. The test panel shows how many staff ratings each template has, and the share rated good. No release rule (for example 8 in 10) is set yet; that needs the owner's number. |
+| 18. Database functions | Reviewed. All nine functions that run with elevated rights check who is calling. The quote and approval functions also check the caller's organisation. No defects found. Leaked-password protection is still off: the owner turns it on in the Supabase dashboard. |
+| 8. Browser tests | Not started. Needs a decision: add the Playwright test package as a dev dependency. |
+| 11. Checks on real output | Not started. Needs a real Haiku run with the key in Vercel. |
+| 17. Alerts | Not started. Failed lead emails are logged only. |

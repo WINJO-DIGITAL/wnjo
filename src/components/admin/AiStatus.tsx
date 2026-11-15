@@ -51,6 +51,21 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
 
   const tokenOrNull = async () => (await client.auth.getSession()).data.session?.access_token ?? null;
 
+  // The ratings saved so far, per template, so the owner can see which templates pass with people.
+  const [summary, setSummary] = useState<{ template: string; good: number; needsWork: number }[]>([]);
+  const loadSummary = async () => {
+    const token = await tokenOrNull();
+    if (!token) return;
+    const res = await fetch("/api/admin/ai/template-test", {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+      body: JSON.stringify({ action: "summary" }),
+    }).catch(() => null);
+    const body = res ? ((await res.json().catch(() => null)) as { summary?: typeof summary } | null) : null;
+    if (res?.ok && body?.summary) setSummary(body.summary);
+  };
+
+
   const run = async () => {
     setRunning(true);
     setNote(null);
@@ -173,6 +188,19 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
         {running ? "Writing the websites…" : "Run the test for this template"}
       </button>
       {note && <p className="acct-meta">{note}</p>}
+      <button type="button" className="arrow-link" onClick={() => void loadSummary()} style={{ marginTop: "0.5rem", alignSelf: "start" }}>
+        See the ratings so far
+      </button>
+      {summary.length > 0 && (
+        <ul className="admin-list" role="list" aria-label="Ratings so far">
+          {summary.map((s) => (
+            <li key={s.template} className="acct-meta">
+              {TEMPLATE_LABELS[s.template] ?? s.template}: {s.good} good, {s.needsWork} needs work
+              {s.good + s.needsWork > 0 && ` (${Math.round((100 * s.good) / (s.good + s.needsWork))}% good)`}
+            </li>
+          ))}
+        </ul>
+      )}
       {result && (
         <>
           <p className="acct-meta">
@@ -204,10 +232,10 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
                             maxLength={500}
                           />
                           <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
-                            <button type="button" className="btn btn--primary" onClick={() => rate(i, site, "good")}>
+                            <button type="button" className="btn btn--primary" onClick={() => void rate(i, site, "good").then(loadSummary)}>
                               Good
                             </button>
-                            <button type="button" className="btn btn--secondary" onClick={() => rate(i, site, "needs_work")}>
+                            <button type="button" className="btn btn--secondary" onClick={() => void rate(i, site, "needs_work").then(loadSummary)}>
                               Needs work
                             </button>
                           </div>

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { providerFromEnv } from "@/lib/ai/agent-runtime";
 import { serviceClient } from "@/lib/quote-store";
+import { summariseRatings } from "@/lib/site-template/ratings";
 import { runTemplateTest, TEMPLATE_IDS } from "@/lib/site-template/template-test";
 import { staffFromRequest } from "@/lib/staff-auth";
 
@@ -20,6 +21,13 @@ export async function POST(request: NextRequest) {
   if (!staff) return NextResponse.json({ error: "sign_in" }, { status: 401 });
   if (staff.role !== "owner" && staff.role !== "admin") return NextResponse.json({ error: "Only the owner or an admin can run this test." }, { status: 403 });
   const body = ((await request.json().catch(() => null)) ?? {}) as { action?: unknown; runs?: unknown; template?: unknown; pages?: unknown; layout?: unknown; business?: unknown; rating?: unknown; note?: unknown };
+
+  // The ratings so far, per template. Reads only; nothing here calls the model.
+  if (body.action === "summary") {
+    const { data, error } = await db.from("template_test_ratings").select("template, rating").eq("tenant_id", staff.tenantId);
+    if (error) return NextResponse.json({ error: "The ratings couldn't be read." }, { status: 502 });
+    return NextResponse.json({ summary: summariseRatings((data ?? []) as { template: string; rating: string }[]) });
+  }
 
   // Saving a judgement on one generated site. Nothing here calls the model.
   if (body.action === "rate") {
