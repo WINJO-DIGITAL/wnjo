@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { providerFromEnv } from "@/lib/ai/agent-runtime";
 import { serviceClient } from "@/lib/quote-store";
+import { recheckSaved, runRows, type SavedRun } from "@/lib/site-template/recheck";
 import { summariseRatings } from "@/lib/site-template/ratings";
 import { runTemplateTest, TEMPLATE_IDS } from "@/lib/site-template/template-test";
 import { staffFromRequest } from "@/lib/staff-auth";
@@ -29,6 +30,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ summary: summariseRatings((data ?? []) as { template: string; rating: string }[]) });
   }
 
+  // Today's checks on the sites saved from earlier runs. Free: nothing here calls the model.
+  if (body.action === "recheck") {
+    const { data, error } = await db
+      .from("template_test_runs")
+      .select("template, business, model, passed, cost_pence, pages, facts, content, model_lines, issues")
+      .eq("tenant_id", staff.tenantId)
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) return NextResponse.json({ error: "No saved sites yet. Run the template test once and they are kept." }, { status: 404 });
+    return NextResponse.json(recheckSaved((data ?? []) as SavedRun[]));
+  }
+
   // Saving a judgement on one generated site. Nothing here calls the model.
   if (body.action === "rate") {
     const template = typeof body.template === "string" && TEMPLATE_IDS.includes(body.template) ? body.template : null;
@@ -48,7 +61,16 @@ export async function POST(request: NextRequest) {
   const only = typeof body.template === "string" && TEMPLATE_IDS.includes(body.template) ? [body.template] : undefined;
   if (typeof body.template === "string" && !only) return NextResponse.json({ error: "Unknown template." }, { status: 422 });
   try {
-    return NextResponse.json(await runTemplateTest(provider, runs, only, typeof body.pages === "number" ? body.pages : 1, typeof body.layout === "string" ? body.layout : undefined));
+    const pages = typeof body.pages === "number" ? body.pages : 1;
+    const result = await runTemplateTest(provider, runs, only, pages, typeof body.layout === "string" ? body.layout : undefined);
+    // Keep every site so the checks can be tried on it again for free. If the table isn't there yet, the test still works.
+    try {
+      const { error: saveError } = await db.from("template_test_runs").insert(runRows(result, pages, staff.tenantId, staff.userId));
+      if (saveError) console.error("template-test: the sites couldn't be saved", saveError.message);
+    } catch (saveError) {
+      console.error("template-test: the sites couldn't be saved", saveError);
+    }
+    return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "The test couldn't run." }, { status: 502 });
   }

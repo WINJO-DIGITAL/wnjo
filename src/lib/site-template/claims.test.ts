@@ -12,10 +12,16 @@ const withIntro = (intro: string): SiteContent => {
   if (hero?.kind === "hero") hero.intro = intro;
   return c;
 };
-const flagged = (intro: string) => checkSite(withIntro(intro), facts, BARBER_PRESET).issues.some((i) => i.code === "claim-not-in-facts");
+const GROUNDING = ["claim-not-in-facts", "service-not-in-facts", "name-not-in-facts"];
+const flagged = (intro: string) => checkSite(withIntro(intro), facts, BARBER_PRESET).issues.some((i) => GROUNDING.includes(i.code));
 
 /** Written by hand as the kinds of claim a model makes. Each should be flagged. */
 const INVENTED = [
+  "We also offer beard transplants and colour correction, as well as cuts.",
+  "Specialising in luxury weddings and film work.",
+  "Ask for Mike, our senior barber.",
+  "Led by James Carter, a former champion.",
+  "Proudly serving Yorkshire.",
   "Over 25 years of experience cutting hair in Leeds.",
   "Award-winning barbers serving Leeds.",
   "Trusted by over 5,000 customers across Leeds.",
@@ -29,14 +35,20 @@ const INVENTED = [
 ];
 
 /**
- * Known gap, written down so it isn't forgotten: a new service named in free text ("beard transplants") is not a claim
- * word, so it isn't caught here. Services the customer didn't list are caught only where the service list itself is
- * checked (service-invented), not in the wording.
+ * Known gaps, written down so they aren't forgotten. A service named without an offer verb ("Beard transplants
+ * available here.") is not read as an offer. A name in lower case ("ask for mike") isn't spotted as a name. And a
+ * claim worded in a way the list doesn't know ("second to none") still gets through. Each needs real model output
+ * to judge, not a guess at the wording.
  */
-export const KNOWN_GAPS = ["We also offer beard transplants and colour correction, as well as cuts."];
+export const KNOWN_GAPS = ["Beard transplants available here.", "Ask for mike, our senior barber.", "A shop that is simply unmatched."];
 
 /** Written by hand as honest lines from the customer's own facts. None should be flagged. */
 const GROUNDED = [
+  "We offer cuts, shaves and beard trims.",
+  "Skin fades and hot towel shaves in Leeds.",
+  "Including cuts and shaves.",
+  "Call us on 01632 960123.",
+  "Hours are Monday to Friday and Saturday.",
   "A family barber shop on the high street.",
   "Cuts, shaves and beard work in Leeds.",
   "Walk-ins and bookings are welcome at Hartley & Sons.",

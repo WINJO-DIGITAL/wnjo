@@ -1,3 +1,5 @@
+import { sentencesOf, wordsOf } from "./text";
+
 /**
  * Claims the wording makes about a business, checked against the facts the customer gave. A claim is a number that
  * isn't in the facts (a year, a count, a price-like figure) or a word that makes a promise or a comparison (award,
@@ -49,5 +51,59 @@ export function ungroundedClaims(line: string, facts: string): string[] {
     if (!corpus.includes(` ${phrase} `)) out.add(m[0]);
   }
   for (const n of line.match(NUMBER_RE) ?? []) if (!numbersInFacts.has(Number(n))) out.add(n);
+  return [...out];
+}
+
+/** A word reduced to its root, so "shaves" matches "shave" and "trims" matches "trim". */
+const stem = (w: string): string => w.replace(/ies$/, "y").replace(/(?:ing|es|s)$/, (m, offset: number) => (offset >= 3 ? "" : m));
+
+const STOP = new Set(
+  "a an and are as at be but by can do does for from get got has have how i if in is it its of on or our so that the their them then there these they this to up us we what when where which who will with you your yes no not any all may just also about over out into than too very per each one two more most some many much made make makes well".split(" "),
+);
+/** Everyday words a line about what a business does may use without naming anything new. */
+const EVERYDAY = new Set("services service work jobs job everything anything things every day days week weekend morning evening time times call book booking bookings visit welcome walk walk-ins appointment appointments quote quotes".split(" "));
+
+const OFFER_RE = /\b(offers?|offering|provides?|providing|specialis(?:e|es|ing)|specializ(?:e|es|ing)|as well as|including|such as)\b/i;
+
+/**
+ * Things a line says the business offers that the customer never listed. A sentence that says what a business "offers",
+ * "provides" or "specialises in", "including" or "such as" something is read: every other word in it must come from
+ * the customer's facts (allowing for plurals). This is what catches a service the customer never named ("beard
+ * transplants") that no claim word would.
+ */
+export function unknownOffers(line: string, facts: string): string[] {
+  const known = new Set(wordsOf(facts).map(stem));
+  const out = new Set<string>();
+  for (const sentence of sentencesOf(line)) {
+    const m = OFFER_RE.exec(sentence);
+    if (!m) continue;
+    for (const w of wordsOf(sentence.slice(m.index + m[0].length))) {
+      if (w.length < 4 || STOP.has(w) || EVERYDAY.has(w) || known.has(stem(w))) continue;
+      out.add(w);
+    }
+  }
+  return [...out];
+}
+
+const WEEKDAYS_AND_MONTHS = new Set("monday tuesday wednesday thursday friday saturday sunday january february march april may june july august september october november december".split(" "));
+
+/**
+ * Names in a line that the customer didn't give: a capitalised word in the middle of a sentence (a person, a place, a
+ * brand, a qualification) that isn't in their facts. The first word of a sentence is skipped, because it is capitalised
+ * anyway. Days and months are allowed.
+ */
+export function unknownNames(line: string, facts: string): string[] {
+  const known = new Set(wordsOf(facts));
+  const out = new Set<string>();
+  for (const sentence of sentencesOf(line)) {
+    const tokens = sentence.split(/\s+/).slice(1);
+    for (const raw of tokens) {
+      const word = raw.replace(/^[^\p{L}]+|[^\p{L}'-]+$/gu, "");
+      if (!/^[A-Z][a-z]{2,}/.test(word)) continue;
+      const lower = word.toLowerCase().replace(/'s$/, "");
+      if (known.has(lower) || WEEKDAYS_AND_MONTHS.has(lower)) continue;
+      out.add(word);
+    }
+  }
   return [...out];
 }

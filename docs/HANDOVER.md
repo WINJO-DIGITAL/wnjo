@@ -48,6 +48,7 @@ Good to know:
 - **Type:** `src/lib/site-template/fonts.ts` loads four typefaces. Put `siteFontClasses` on an element around a site (the live page, the private preview, the staff panel and the test page all do) and the stylesheet picks the face its look uses. Without it a site falls back to the device's fonts.
 - **Wording:** the original wording for a sector is in `presets.ts`; two alternatives per sector are in `copy-variants.ts`. A business gets one of the three from its name. Keep every alternative short, plain and free of claims: a test holds it to the sector's own rules.
 - **Photos:** the customer can mark a main photo and a logo, and describe each photo. The description is the picture's alt text.
+- **Checks:** see `docs/CHECKS_AUDIT.md`. The template test saves its sites (table `template_test_runs`); the panel's "Re-check saved sites (free)" tries the current rules on them with no model calls.
 - **Test addresses** can name a look and no photos: `plumbing-p1-essentials-bold-nophoto.e2e.test`.
 
 ## How to run the checks

@@ -68,3 +68,15 @@ Tested on 11 hand-written invented claims (all now flagged) and 6 honest lines (
 **Known gap:** a new service named in free text ("beard transplants") is not a claim word, so it still passes. Names of staff also still pass.
 
 **Important:** the live test results before this change (44 of 44) used the old rules. Run the template test on all eleven templates again. Some sites may now fail, and the panel gives the reason for each.
+
+## Second round of fixes (15 November 2026)
+
+- **Services named in free text are caught.** A sentence that says what the business "offers", "provides", "specialises in", or "including" / "such as" something is read, and every other word in it must come from the customer's facts (plurals allowed). "We also offer beard transplants" now fails.
+- **Names are caught.** A capitalised word in the middle of a sentence (a person, a place, a brand, a qualification) must be in the customer's facts. "Ask for Mike" and "Proudly serving Yorkshire" now fail. The first word of a sentence and days and months are skipped.
+- **The prompt names the words to avoid,** so the model trips the rules less and fewer retries are needed.
+- **Our own samples broke the rules and were fixed.** Three sample sites named regions ("West Yorkshire", "South Lakeland", "Greater Manchester") the customer never gave; Harrogate is not in West Yorkshire at all. They now use only the places in their facts. A test stub that sent "Plumbers for Preston" for a barber in Leeds was also fixed.
+- **Saved runs, and a free re-check.** The template test now saves every site it writes, with the facts it was written from, to a new table (`docs/template_test_runs.sql`). The panel has a "Re-check saved sites (free)" button that runs today's checks on those saved sites and shows which would now fail and why. It calls no model, so a change to the rules can be tried on real wording without spending anything. The test still works if the table isn't there yet; nothing is saved until the SQL is run.
+
+**Still caught by nothing:** a service named without an offer verb ("Beard transplants available here"), a name in lower case ("ask for mike"), and a claim worded in a way the list doesn't know ("second to none"). They are written down in `claims.test.ts` and need real wording to judge.
+
+**What has not been checked:** the rules have never run on real model output. The 11 invented and 11 honest lines in the tests were written by hand. The first saved live run will show how often a real model trips the rules; after that, every change can be tried for free.

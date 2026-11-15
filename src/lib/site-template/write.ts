@@ -90,7 +90,7 @@ export function buildCopyPrompt(input: WriteInput, retryIssues?: string): string
   // Only the sections the model writes wording for. The rest are fixed wording and facts, put in by our own code.
   const wanted = preset.sections.filter((s) => s.kind === "hero" || s.kind === "faq").map((s) => `- ${s.kind}${s.required ? "" : " (only if the facts support it)"}: ${s.guidance}`);
   return [
-    "These are real businesses' websites. Use only the facts below. Never invent a service, price, qualification, year, number, name, guarantee or claim. If the facts don't say it, leave it out. Do not describe services: the customer's own names and prices are shown as given.",
+    "These are real businesses' websites. Use only the facts below. Never invent a service, price, qualification, year, number, name, guarantee or claim. If the facts don't say it, leave it out. Do not describe services: the customer's own names and prices are shown as given. Name no person, place or business that isn't in the facts, say nothing is offered beyond the listed services, and don't use these words unless the customer did: award, best, leading, guarantee, qualified, trained, experienced, years, customers, clients, since, and no numbers.",
     `Business: ${facts.businessName}`,
     `Sector: ${preset.label}. Voice: ${preset.voice} Tone: ${LOOK_TONE[input.look]}.`,
     `${preset.itemsLabel}: ${facts.services.map((s) => s.name).join("; ")}`,

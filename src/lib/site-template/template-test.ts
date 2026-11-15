@@ -29,7 +29,7 @@ export type TemplateTestSite = {
   modelLines: ModelLine[];
   issues: string[];
 };
-export type TemplateTestRow = { template: string; passed: number; runs: number; pencePerSite: number; problems: string[]; sites: TemplateTestSite[] };
+export type TemplateTestRow = { template: string; /** The template's id, for saving and re-checking. */ templateId: string; passed: number; runs: number; pencePerSite: number; problems: string[]; sites: TemplateTestSite[] };
 export type TemplateTestResult = { model: string; rows: TemplateTestRow[]; passed: number; total: number; pencePerSite: number };
 
 /**
@@ -91,7 +91,7 @@ export async function runTemplateTest(provider: AiProvider, runs: number, only?:
   for (const preset of presets) {
     // The main sample plus the extra made-up businesses for this template, each written `count` times.
     const sets = [SAMPLE_ANSWERS[preset.id], ...(SAMPLE_VARIANTS[preset.id] ?? [])];
-    const row: TemplateTestRow = { template: preset.label, passed: 0, runs: count * sets.length, pencePerSite: 0, problems: [], sites: [] };
+    const row: TemplateTestRow = { template: preset.label, templateId: preset.id, passed: 0, runs: count * sets.length, pencePerSite: 0, problems: [], sites: [] };
     let pence = 0;
     for (const answers of sets) {
       const parsed = parseAnswers({ ...answers, ...(layout ? { layout } : {}) }, preset, { colour: "#1f3a34" });

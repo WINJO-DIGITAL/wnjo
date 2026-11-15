@@ -117,7 +117,7 @@ export const SAMPLE_ELECTRICIAN_FACTS: CustomerFacts = {
 };
 
 export const SAMPLE_ELECTRICIAN: SiteContent = {
-  business: { name: "Spark & Co", tagline: "Electricians across West Yorkshire", phone: "0113 496 0789", email: "jobs@sparkandco.example" },
+  business: { name: "Spark & Co", tagline: "Electricians across Leeds, Wakefield and Harrogate", phone: "0113 496 0789", email: "jobs@sparkandco.example" },
   theme: { colour: "#2b2b2b", look: "bold" },
   sections: [
     { kind: "hero", variant: "plain", headline: "Electricians for Leeds, Wakefield and Harrogate", intro: "Rewires, fuse boards and alarm testing from Spark & Co.", cta: "Get a free quote" },
@@ -421,7 +421,7 @@ export const SAMPLE_BUILDING_FACTS: CustomerFacts = {
 };
 
 export const SAMPLE_BUILDING: SiteContent = {
-  business: { name: "Granite & Oak Building", tagline: "Builders in South Lakeland", phone: "01539 720411", email: "enquiries@graniteandoak.example" },
+  business: { name: "Granite & Oak Building", tagline: "Builders in Kendal, Windermere and Ulverston", phone: "01539 720411", email: "enquiries@graniteandoak.example" },
   theme: { colour: "#2b2b2b", look: "classic" },
   sections: [
     { kind: "hero", variant: "plain", headline: "Builders for Kendal, Windermere and Ulverston", intro: "Extensions, lofts and kitchens from Granite & Oak Building, a small family firm that does the work itself.", cta: "Get a free quote" },
@@ -454,7 +454,7 @@ export const SAMPLE_CLEANING_FACTS: CustomerFacts = {
 };
 
 export const SAMPLE_CLEANING: SiteContent = {
-  business: { name: "Fresh Start Cleaning", tagline: "Cleaners across Greater Manchester", phone: "01204 960777", email: "hello@freshstart.example" },
+  business: { name: "Fresh Start Cleaning", tagline: "Cleaners across Bolton, Bury and Wigan", phone: "01204 960777", email: "hello@freshstart.example" },
   theme: { colour: "#1f3a34", look: "minimal" },
   sections: [
     { kind: "hero", variant: "plain", headline: "Cleaners for Bolton, Bury and Wigan", intro: "Regular and one-off cleans for homes and small offices from Fresh Start Cleaning.", cta: "Get a free quote" },

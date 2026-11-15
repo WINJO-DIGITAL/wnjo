@@ -9,7 +9,7 @@ import { findCopiedRun } from "./originality";
 import { FIELD_LIMITS, LAYOUTS, LOOKS, SECTION_KINDS, WORD_LIMITS } from "./schema";
 import { sentencesOf, wordCount, wordsOf } from "./text";
 import type { SectorPreset } from "./presets";
-import { ungroundedClaims } from "./claims";
+import { ungroundedClaims, unknownNames, unknownOffers } from "./claims";
 
 export type CheckIssue = { code: string; message: string; where?: string };
 export type CheckResult = { ok: boolean; issues: CheckIssue[] };
@@ -248,6 +248,8 @@ export function checkSite(
     for (const claim of ungroundedClaims(f.text, factText)) {
       flag("claim-not-in-facts", `"${claim}" is not in the customer's own words. Remove it, or use only what they told us.`, f.where);
     }
+    for (const word of unknownOffers(f.text, factText)) flag("service-not-in-facts", `"${word}" is something the customer never said they offer. Name only the services they listed.`, f.where);
+    for (const word of unknownNames(f.text, factText)) flag("name-not-in-facts", `"${word}" is a name the customer didn't give us. Use only names from their answers.`, f.where);
   }
 
   for (const f of fields) {

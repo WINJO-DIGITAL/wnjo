@@ -4,7 +4,8 @@ import { SECTOR_PRESETS } from "./presets";
 import { runTemplateTest } from "./template-test";
 
 const reply = (text: string, costPence = 1): AiProvider => ({ name: "fake", model: "fake-1", complete: async () => ({ kind: "final", text, usage: { inputTokens: 0, outputTokens: 0, costPence } }) });
-const good = JSON.stringify({ hero: { headline: "Plumbers for Preston", intro: "A local plumber who answers his own phone." } });
+// No place or claim in it: the same reply is sent for every template, so it must not name anything a particular business never said.
+const good = JSON.stringify({ hero: { headline: "Your local trade", intro: "A small business that answers its own phone." } });
 const templates = Object.keys(SECTOR_PRESETS).length;
 
 describe("runTemplateTest", () => {

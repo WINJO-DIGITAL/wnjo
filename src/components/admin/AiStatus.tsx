@@ -52,6 +52,25 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
 
   const tokenOrNull = async () => (await client.auth.getSession()).data.session?.access_token ?? null;
 
+  // Today's checks on the sites saved from earlier runs: free, nothing is sent to the model.
+  const [recheck, setRecheck] = useState<{ checked: number; stillPass: number; nowFail: number; nowPass: number; results: { template: string; business: string; wasPassed: boolean; passesNow: boolean; reasons: string[] }[] } | null>(null);
+  const runRecheck = async () => {
+    const token = await tokenOrNull();
+    if (!token) return setNote("Sign in again, then re-check.");
+    const res = await fetch("/api/admin/ai/template-test", {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+      body: JSON.stringify({ action: "recheck" }),
+    }).catch(() => null);
+    const body = res ? ((await res.json().catch(() => null)) as (typeof recheck & { error?: string }) | null) : null;
+    if (res?.ok && body && !body.error) {
+      setRecheck(body);
+      setNote(null);
+    } else {
+      setNote(body?.error ?? "The re-check couldn't run. Please try again.");
+    }
+  };
+
   // The ratings saved so far, per template, so the owner can see which templates pass with people.
   const [summary, setSummary] = useState<{ template: string; good: number; needsWork: number }[]>([]);
   const loadSummary = async () => {
@@ -193,6 +212,27 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
       <button type="button" className="arrow-link" onClick={() => void loadSummary()} style={{ marginTop: "0.5rem", alignSelf: "start" }}>
         See the ratings so far
       </button>
+      <button type="button" className="arrow-link" onClick={() => void runRecheck()} style={{ marginTop: "0.5rem", alignSelf: "start" }}>
+        Re-check saved sites (free)
+      </button>
+      {recheck && (
+        <div>
+          <p className="acct-meta">
+            Today&apos;s checks on {recheck.checked} saved sites: {recheck.stillPass} still pass, {recheck.nowFail} now fail
+            {recheck.nowPass > 0 ? `, ${recheck.nowPass} now pass` : ""}. Nothing was sent to the model.
+          </p>
+          <ul className="admin-list" role="list">
+            {recheck.results
+              .filter((r) => !r.passesNow)
+              .slice(0, 30)
+              .map((r, n) => (
+                <li key={n} className="acct-meta">
+                  {r.business} ({r.template}): {r.reasons.slice(0, 3).join(" ")}
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
       {summary.length > 0 && (
         <ul className="admin-list" role="list" aria-label="Ratings so far">
           {summary.map((s) => (
