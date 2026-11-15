@@ -14799,3 +14799,8 @@ body:has(.pv, .sitepv) .site-footer {
     display: block;
   }
 }
+
+/* The "describe this photo" box sits on its own row under the file's name. */
+.brief-files__alt {
+  grid-column: 1 / -1;
+}

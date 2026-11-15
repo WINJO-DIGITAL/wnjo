@@ -15,7 +15,9 @@
   --muted: #5d5a54;
   --line: #e4e0d8;
   --radius: 6px;
-  --head: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --system: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --body: var(--tpl-font-body, var(--system));
+  --head: var(--body);
   --head-weight: 650;
   --head-case: none;
   --head-track: -0.01em;
@@ -23,25 +25,27 @@
 
   background: var(--paper);
   color: var(--ink);
-  font: 400 1rem/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 400 1rem/1.6 var(--body);
   min-height: 100%;
 }
 
 .site[data-look="classic"] {
-  --head: Georgia, "Times New Roman", serif;
+  --head: var(--tpl-font-classic, Georgia, "Times New Roman", serif);
   --head-weight: 600;
   --radius: 2px;
   --paper: #f6f2ea;
   --line: #ddd5c6;
 }
 .site[data-look="warm"] {
-  --head: ui-rounded, "Nunito", system-ui, sans-serif;
+  --body: var(--tpl-font-warm, ui-rounded, system-ui, sans-serif);
+  --head: var(--body);
   --radius: 16px;
   --paper: #fcf7f0;
   --line: #eadfce;
 }
 .site[data-look="bold"] {
-  --head-weight: 850;
+  --head: var(--tpl-font-bold, "Arial Narrow", var(--system));
+  --head-weight: 800;
   --head-case: uppercase;
   --head-track: 0.01em;
   --radius: 0;
@@ -83,7 +87,10 @@
   color: var(--on-accent);
   border: 0;
   border-radius: var(--radius);
-  font: 600 0.95rem/1 inherit;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
   text-decoration: none;
   cursor: pointer;
 }
@@ -110,7 +117,10 @@
   border: 1px solid currentColor;
   border-radius: var(--radius);
   color: inherit;
-  font: 600 0.95rem/1 inherit;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
   text-decoration: none;
 }
 .btnGhost:hover {
@@ -773,8 +783,9 @@
   aspect-ratio: 4 / 3;
   border-radius: calc(var(--radius) + 10px);
 }
-.site[data-layout="split"] .heroCopy p,
-.site[data-layout="essentials"] .heroCopy p {
+/* Only when there is a photo: the words then sit on the page's paper. With no photo the hero is the theme colour, and its text stays light. */
+.site[data-layout="split"] .hero[data-variant="photo"] .heroCopy p,
+.site[data-layout="essentials"] .hero[data-variant="photo"] .heroCopy p {
   color: var(--muted);
   opacity: 1;
 }

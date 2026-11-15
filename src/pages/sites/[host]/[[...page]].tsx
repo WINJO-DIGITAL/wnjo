@@ -1,6 +1,7 @@
 import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import { SiteRender } from "@/components/site-template/SiteRender";
+import { siteFontClasses } from "@/lib/site-template/fonts";
 import { extraMainHosts, hostOf, isMainHost, originOf } from "@/lib/site-template/hosts";
 import { livePhotoUrl, livePhotoUrls } from "@/lib/site-template/live";
 import { liveSiteFor } from "@/lib/site-template/live-source";
@@ -86,13 +87,15 @@ export default function LiveSitePage({ content, heroImage, slug, sent, title, de
         <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
         <script key="ld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
       </Head>
-      <SiteRender
-        content={content}
-        heroImage={heroImage ?? undefined}
-        page={slug}
-        pageHref={(s) => (s ? `/${s}` : "/")}
-        enquiry={{ action: "/api/site-enquiry", state: sent ?? undefined }}
-      />
+      <div className={siteFontClasses}>
+        <SiteRender
+          content={content}
+          heroImage={heroImage ?? undefined}
+          page={slug}
+          pageHref={(s) => (s ? `/${s}` : "/")}
+          enquiry={{ action: "/api/site-enquiry", state: sent ?? undefined }}
+        />
+      </div>
     </>
   );
 }

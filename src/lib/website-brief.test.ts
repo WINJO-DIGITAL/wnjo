@@ -143,3 +143,19 @@ describe("the typed business type", () => {
     expect(formatBrief({ ...EMPTY_BRIEF, otherBusinessType: "Florist" })).toContain("Business type (their words): Florist");
   });
 });
+
+describe("a description on an uploaded file", () => {
+  it("is kept, cleaned and limited, and left out when empty", async () => {
+    const { cleanBrief, BRIEF_LIMITS } = await import("./website-brief");
+    const draft = "0123abcd-0123-4abc-8abc-0123456789ab";
+    const files = [
+      { path: `drafts/${draft}/a.jpg`, name: "a.jpg", size: 100, type: "image/jpeg", alt: "  Two   barbers at work  " },
+      { path: `drafts/${draft}/b.jpg`, name: "b.jpg", size: 100, type: "image/jpeg", alt: "x".repeat(500) },
+      { path: `drafts/${draft}/c.jpg`, name: "c.jpg", size: 100, type: "image/jpeg", alt: "   " },
+    ];
+    const brief = cleanBrief({ files }, draft);
+    expect(brief.files[0].alt).toBe("Two barbers at work");
+    expect(brief.files[1].alt?.length).toBe(BRIEF_LIMITS.fileAlt);
+    expect(brief.files[2]).not.toHaveProperty("alt");
+  });
+});

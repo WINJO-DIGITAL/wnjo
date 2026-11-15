@@ -4,6 +4,7 @@ import { SiteRender } from "@/components/site-template/SiteRender";
 import { BRIEF_BUCKET } from "@/lib/brief-store";
 import { serviceClient } from "@/lib/quote-store";
 import { previewExpired } from "@/lib/preview-access";
+import { siteFontClasses } from "@/lib/site-template/fonts";
 import { photoPath, photoRefs, resolvePhotos } from "@/lib/site-template/photos";
 import type { SiteContent } from "@/lib/site-template/schema";
 import type { WebsiteBrief } from "@/lib/website-brief";
@@ -50,13 +51,15 @@ export default async function SitePreviewPage({ params, searchParams }: { params
         {row.status === "draft" ? "Draft preview. Not shared with the customer yet." : "Private preview of your website."}
         {!row.checks_ok && " Some automatic checks failed, so look closely."}
       </p>
-      <SiteRender
-        content={content}
-        heroImage={heroImage}
-        page={typeof page === "string" ? page : ""}
-        // Only a build a person has released takes booking requests. A draft is a private preview and sends nothing.
-        enquiry={row.status === "released" ? { action: "/api/site-enquiry", token, state: sent === "1" ? "sent" : sent === "0" ? "error" : undefined } : undefined}
-      />
+      <div className={siteFontClasses}>
+        <SiteRender
+          content={content}
+          heroImage={heroImage}
+          page={typeof page === "string" ? page : ""}
+          // Only a build a person has released takes booking requests. A draft is a private preview and sends nothing.
+          enquiry={row.status === "released" ? { action: "/api/site-enquiry", token, state: sent === "1" ? "sent" : sent === "0" ? "error" : undefined } : undefined}
+        />
+      </div>
     </div>
   );
 }

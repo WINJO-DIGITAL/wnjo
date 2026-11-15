@@ -412,6 +412,16 @@ export function FilesField({
                   Remove
                 </button>
               </span>
+              {isImage(f) && f.role !== "logo" && (
+                <input
+                  className="input brief-files__alt"
+                  aria-label={`Describe ${f.name} in a few words`}
+                  placeholder="Describe it in a few words"
+                  maxLength={BRIEF_LIMITS.fileAlt}
+                  value={f.alt ?? ""}
+                  onChange={(e) => onChange({ files: brief.files.map((x) => (x.path === f.path ? { ...x, alt: e.target.value } : x)) })}
+                />
+              )}
             </li>
           ))}
         </ul>

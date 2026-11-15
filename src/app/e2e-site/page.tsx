@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { SiteRender } from "@/components/site-template/SiteRender";
+import { siteFontClasses } from "@/lib/site-template/fonts";
 import { buildE2ESample } from "@/lib/site-template/e2e-sample";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +20,7 @@ export default async function E2ESite({ searchParams }: { searchParams: Promise<
   const pageHref = (slug: string) => `?${keep.toString()}${slug ? `${keep.size ? "&" : ""}page=${slug}` : ""}`;
   return (
     // "sitepv" is what hides our own footer, the same as on a private preview.
-    <div className="sitepv">
+    <div className={`sitepv ${siteFontClasses}`}>
       <SiteRender content={sample.content} heroImage={sample.heroImage} page={q.page ?? ""} pageHref={pageHref} enquiry={{ action: "/api/site-enquiry", token: "e2e-token-e2e-token-e2e" }} />
     </div>
   );

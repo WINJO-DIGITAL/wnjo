@@ -54,6 +54,7 @@ export const STYLES = {
 export type StyleId = keyof typeof STYLES;
 
 export const BRIEF_LIMITS = {
+  fileAlt: 120,
   goalNote: 600,
   pageName: 40,
   pages: 30,
@@ -80,7 +81,7 @@ export const BRIEF_UPLOAD = {
   } as Record<string, string>,
 } as const;
 
-export type BriefFile = { path: string; name: string; size: number; type: string; /** What the customer says this picture is for. Left out for an ordinary photo. */ role?: "logo" | "hero" };
+export type BriefFile = { path: string; name: string; size: number; type: string; /** What the customer says this picture is for. Left out for an ordinary photo. */ role?: "logo" | "hero"; /** A few words describing the picture, for screen readers and search. Left out when not given. */ alt?: string };
 
 export type WebsiteBrief = {
   goals: GoalId[];
@@ -238,7 +239,8 @@ export function cleanBrief(input: unknown, draftId?: string): WebsiteBrief {
           const name = text(r.name, BRIEF_LIMITS.fileName);
           if (!prefix || !path.startsWith(prefix) || path.includes("..") || path.length > 260) return null;
           if (!(type in BRIEF_UPLOAD.types) || size <= 0 || size > BRIEF_UPLOAD.maxBytes || !name) return null;
-          return { path, name, size, type, ...(r.role === "logo" || r.role === "hero" ? { role: r.role } : {}) };
+          const alt = text(r.alt, BRIEF_LIMITS.fileAlt).replace(/\s+/g, " ");
+          return { path, name, size, type, ...(r.role === "logo" || r.role === "hero" ? { role: r.role } : {}), ...(alt ? { alt } : {}) };
         })
         .filter((f): f is BriefFile => f !== null)
         .filter((f, i, all) => all.findIndex((g) => g.path === f.path) === i)

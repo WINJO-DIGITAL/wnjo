@@ -40,8 +40,8 @@ export function buildE2ESample(p: E2EParams): { content: SiteContent; heroImage?
   return { content: assembleSite(input, copy), heroImage: input.heroPhoto };
 }
 
-/** The address a sample is served on: `<sector>-p<pages>[-<layout>].e2e.test`, for example `barber-p6-split.e2e.test`. */
+/** The address a sample is served on: `<sector>-p<pages>[-<layout>][-<look>][-nophoto].e2e.test`, for example `barber-p6-split-warm.e2e.test`. */
 export function e2eParamsFromHost(host: string): E2EParams | null {
-  const m = host.match(/^(.+?)-p([1-6])(?:-(showcase|split|essentials))?\.e2e\.test$/);
-  return m ? { sector: m[1], pages: Number(m[2]), layout: m[3], photos: true } : null;
+  const m = host.match(/^(.+?)-p([1-6])(?:-(showcase|split|essentials))?(?:-(minimal|warm|bold|classic))?(-nophoto)?\.e2e\.test$/);
+  return m ? { sector: m[1], pages: Number(m[2]), layout: m[3], look: m[4], photos: !m[5] } : null;
 }

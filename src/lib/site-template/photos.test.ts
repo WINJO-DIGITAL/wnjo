@@ -89,3 +89,20 @@ describe("the logo", () => {
     expect(resolvePhotos(content, new Map()).content.business.logo).toBeUndefined();
   });
 });
+
+describe("a description the customer gives a photo", () => {
+  const withAlt = (name: string, alt?: string) => ({ ...file(name), ...(alt ? { alt } : {}) });
+  it("becomes the picture's description in the gallery, trimmed, and is empty when not given", () => {
+    const r = pickPhotos([withAlt("hero.jpg"), withAlt("a.jpg", "  Two barbers at work  "), withAlt("b.jpg")]);
+    expect(r.gallery.map((g) => g.alt)).toEqual(["Two barbers at work", ""]);
+  });
+});
+
+describe("a hero picture that is already a usable address", () => {
+  it("is kept, not dropped as if it were a missing upload", () => {
+    const content = { ...SAMPLE_BARBER, sections: SAMPLE_BARBER.sections.map((s) => (s.kind === "hero" ? { ...s, variant: "photo" as const, image: "/styler/barber-hero.webp" } : s)) };
+    const r = resolvePhotos(content, new Map());
+    expect(r.heroImage).toBe("/styler/barber-hero.webp");
+    expect(r.content.sections.find((s) => s.kind === "hero")).toMatchObject({ variant: "photo" });
+  });
+});

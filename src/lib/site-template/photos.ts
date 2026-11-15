@@ -26,7 +26,7 @@ export function pickPhotos(files: BriefFile[]): { hero?: string; gallery: Galler
   const [first, ...rest] = chosen ? [chosen, ...photos.filter((f) => f !== chosen)] : photos;
   return {
     ...(first ? { hero: photoRef(first.path) } : {}),
-    gallery: rest.slice(0, MAX_GALLERY).map((f) => ({ src: photoRef(f.path), alt: "" })),
+    gallery: rest.slice(0, MAX_GALLERY).map((f) => ({ src: photoRef(f.path), alt: f.alt?.trim() ?? "" })),
     ...(logo ? { logo: photoRef(logo.path) } : {}),
   };
 }
@@ -52,7 +52,8 @@ export function resolvePhotos(content: SiteContent, urls: Map<string, string>): 
   let heroImage: string | undefined;
   const fix = (s: Section): Section => {
     if (s.kind === "hero") {
-      heroImage = s.image ? urls.get(s.image) : undefined;
+      // A stored upload is swapped for its link, or dropped if it has none. An address that is already usable stays.
+      heroImage = s.image ? (isPhotoRef(s.image) ? urls.get(s.image) : s.image) : undefined;
       return heroImage ? s : { ...s, variant: "plain" as const };
     }
     if (s.kind === "gallery") {

@@ -114,3 +114,66 @@ test("a single-page live site works too, and a phone gets the same site", async 
   expect(problems).toEqual([]);
   await context.close();
 });
+
+/** The look of a site is its type as much as its colour. Each look uses its own typeface, served from our own address. */
+const LOOKS: { look: string; heading: RegExp; body: RegExp; capitals: boolean }[] = [
+  { look: "classic", heading: /Playfair/i, body: /Inter/i, capitals: false },
+  { look: "warm", heading: /Nunito/i, body: /Nunito/i, capitals: false },
+  { look: "bold", heading: /Barlow/i, body: /Inter/i, capitals: true },
+  { look: "minimal", heading: /Inter/i, body: /Inter/i, capitals: false },
+];
+
+for (const { look, heading, body, capitals } of LOOKS) {
+  test(`the ${look} look sets its headings and text in its own typeface, loaded from our own address`, async ({ page }) => {
+    const external: string[] = [];
+    const fonts: string[] = [];
+    page.on("request", (r) => {
+      const url = new URL(r.url());
+      if (/(^|\.)(googleapis|gstatic)\.com$/.test(url.hostname)) external.push(r.url());
+      if (/\.woff2?$/.test(url.pathname)) fonts.push(`${url.hostname}${url.pathname}`);
+    });
+    await page.goto(at(`barber-p1-showcase-${look}`));
+    await page.evaluate(() => document.fonts.ready);
+    const style = await page.locator("h1").evaluate((h) => ({ family: getComputedStyle(h).fontFamily, transform: getComputedStyle(h).textTransform, bodyFamily: getComputedStyle(document.querySelector("p")!).fontFamily }));
+    expect(style.family).toMatch(heading);
+    expect(style.bodyFamily).toMatch(body);
+    expect(style.transform).toBe(capitals ? "uppercase" : "none");
+    // The font file was really fetched, from this site, and the face reports loaded.
+    const loaded = await page.evaluate(() => [...document.fonts].filter((f) => f.status === "loaded").map((f) => f.family));
+    expect(loaded.some((f) => heading.test(f)), `loaded faces: ${loaded.join(", ")}`).toBe(true);
+    expect(fonts.length).toBeGreaterThan(0);
+    expect(fonts.every((f) => f.startsWith("barber-p1-showcase-" + look + ".e2e.test"))).toBe(true);
+    expect(external, "nothing is fetched from Google").toEqual([]);
+  });
+}
+
+/** Words on a colour must be readable. With no photo, the top of the page is the theme colour in every layout. */
+const luminance = ([r, g, b]: number[]) => {
+  const [lr, lg, lb] = [r, g, b].map((v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * lr + 0.7152 * lg + 0.0722 * lb;
+};
+const rgbOf = (css: string) => (css.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+
+for (const layout of ["showcase", "split", "essentials"]) {
+  for (const look of ["classic", "warm", "bold", "minimal"]) {
+    test(`with no photo, the ${layout} layout in the ${look} look keeps its top-of-page text readable`, async ({ page }) => {
+      await page.goto(at(`plumbing-p1-${layout}-${look}-nophoto`));
+      const colours = await page.locator("section[data-variant]").first().evaluate((section) => {
+        const bg = getComputedStyle(section).backgroundColor;
+        return ["h1", "p"].map((tag) => ({ tag, fg: getComputedStyle(section.querySelector(tag)!).color, bg }));
+      });
+      for (const { tag, fg, bg } of colours) {
+        const [a, b] = [luminance(rgbOf(fg)), luminance(rgbOf(bg))];
+        const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+        expect(ratio, `${tag}: ${fg} on ${bg}`).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+  }
+}
+
+test("a live site with photos shows its main photo at the top", async ({ page }) => {
+  await page.goto(at("plumbing-p1-showcase"));
+  const hero = page.locator("section[data-variant='photo'] img").first();
+  await expect(hero).toBeVisible();
+  expect(await hero.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+});

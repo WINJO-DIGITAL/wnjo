@@ -8,6 +8,7 @@ import { MAX_ROUNDS } from "@/lib/ai/limits";
 import { ProviderError, type AiProvider } from "@/lib/ai/provider";
 import { extractJson } from "@/lib/ai/website-plan";
 import { checkSite, describeIssues, FILLER_PHRASES, type CheckIssue } from "./checks";
+import { variantFor } from "./copy-variants";
 import { aboutSection, layoutPages, PAGE_KINDS, pageTitle, type PageHeads, type PageKind } from "./pages";
 import type { SectorPreset } from "./presets";
 import type { CustomerFacts, GalleryImage, Layout, Look, Section, SiteContent } from "./schema";
@@ -205,7 +206,9 @@ function cut(text: string, max: number): string {
  */
 export function defaultCopy(input: WriteInput): SiteCopy {
   const { facts, preset } = input;
-  const c = preset.copy;
+  // A business gets the sector's own wording or one of its alternatives, chosen from its name.
+  const v = variantFor(preset.id, facts.businessName);
+  const c = v ? { ...preset.copy, enquiryIntro: v.enquiryIntro, closingHeadline: v.closingHeadline, headings: { ...preset.copy.headings, services: v.servicesHeading, gallery: v.galleryHeading } } : preset.copy;
   const places = facts.areas?.length ? facts.areas : [];
   const place = places.length ? joinList(places) : townOf(facts.address);
   const headline = place ? `${c.trade} ${places.length ? (c.areasPreposition ?? "for") : "in"} ${place}` : facts.businessName;

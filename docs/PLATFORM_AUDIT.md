@@ -278,3 +278,15 @@ Not done, and not started: phases B to E.
 Found and fixed along the way: the live site relied on our global styles for its box model (a phone scrolled sideways); the booking form's redirect used the server's address instead of the visitor's; a customer address asked for `/favicon.ico` and got a 404. Adding the Pages Router made `usePathname()` possibly null, so three components now default it.
 
 Not done: a redirect between `www` and the bare domain, a performance measurement, an accessibility tool run on a live site, and phase D.
+
+## Status after phase D, first part (15 November 2026)
+
+| Finding | Status |
+|---|---|
+| 4. Sites in a sector read the same | Partly. Each sector now has the original wording plus two alternatives for the services heading, the photos heading, the line above the form and the closing line. A business gets one of the three, chosen from its name, so the same business always gets the same one. I chose fixed alternatives, not model-written headings: they can't invent anything, cost nothing, and pass the same checks. Still the same for every business: the main button labels and the About and FAQ page layouts. |
+| 10. Typography | Done. Four typefaces, self-hosted by Next.js (nothing is fetched from Google): Playfair Display (classic), Nunito (warm), Barlow Condensed in capitals (bold), Inter (minimal, and the body of classic and bold). A font downloads only when text uses it. Checked in a real browser: each look uses its own face, the file loads from the site's own address. |
+| 14. Photo descriptions | Done. The form has a "Describe it in a few words" box under each photo; it becomes the picture's description. A photo without one still gets the business name. |
+
+Found and fixed by looking at the screenshots: with no hero photo, the "Side by side" and "Details first" layouts showed grey intro text on the theme colour, nearly unreadable (eight combinations of layout and look). A customer who uploads no photos would have got that. The live-site tests now measure the contrast. The photo handling also dropped any hero picture that was already a usable address, so the sample sites never showed their hero photo; fixed.
+
+Not done in phase D: richer About, FAQ and Services pages, a way to choose where a photo is cropped, the button labels, and more than three layouts. Fonts on the private preview and in the staff panel use the same files.

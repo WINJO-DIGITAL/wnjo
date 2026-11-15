@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { nextBriefingAt, type Briefing } from "@/lib/briefing";
+import { siteFontClasses } from "@/lib/site-template/fonts";
 import { SECTOR_PRESETS } from "@/lib/site-template/presets";
 import type { SiteContent } from "@/lib/site-template/schema";
 import { SiteRender } from "@/components/site-template/SiteRender";
@@ -149,7 +150,7 @@ function TemplateTest({ client }: { client: SupabaseClient }) {
           </button>
         </div>
         {site.content && (
-          <div onClick={(e) => { const a = (e.target as HTMLElement).closest("a"); const h = a?.getAttribute("href"); if (a && h && h.startsWith("#") && site.content?.pages?.length) { e.preventDefault(); setPageSlug(h.slice(1).split("#")[0]); } }} style={{ maxWidth: view === "phone" ? 390 : "100%", margin: "0 auto", border: "1px solid var(--color-line)", borderRadius: "12px", overflow: "hidden", background: "#fff" }}>
+          <div className={siteFontClasses} onClick={(e) => { const a = (e.target as HTMLElement).closest("a"); const h = a?.getAttribute("href"); if (a && h && h.startsWith("#") && site.content?.pages?.length) { e.preventDefault(); setPageSlug(h.slice(1).split("#")[0]); } }} style={{ maxWidth: view === "phone" ? 390 : "100%", margin: "0 auto", border: "1px solid var(--color-line)", borderRadius: "12px", overflow: "hidden", background: "#fff" }}>
             <SiteRender content={site.content} page={pageSlug} pageHref={(slug) => `#${slug}`} />
           </div>
         )}
