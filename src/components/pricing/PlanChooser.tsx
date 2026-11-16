@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CARD_POINTS, PLAN_ORDER } from "./WebsitePackages";
-import { WEBSITE_PLANS, formatGBP, type WebsitePlanId } from "@/lib/pricing";
+import { REFRESH, WEBSITE_PLANS, formatGBP, type WebsitePlanId } from "@/lib/pricing";
 import { PLAN_EVENT } from "@/lib/plan-selection";
 
 /**
@@ -35,6 +35,7 @@ export function PlanChooser() {
                   <li key={p}>{p}</li>
                 ))}
               </ul>
+              {plan.refresh && <p className="pkg-card__refresh">{REFRESH.levels[id].line}</p>}
               <button
                 type="button"
                 className={`btn pkg-card__cta ${isSelected ? "btn--primary pkg-card__cta--selected" : "btn--secondary"}`}

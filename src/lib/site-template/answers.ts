@@ -3,7 +3,7 @@
  * database, no browser), so the form and the server apply the same rules. Typed text is kept as plain text.
  */
 import { ABOUT_QUESTION, type SectorPreset } from "./presets";
-import type { CustomerFacts, HoursItem, Layout, Look } from "./schema";
+import type { CustomerFacts, HoursItem, Layout, Look, SuppliedReview } from "./schema";
 import { defaultLayout, FIELD_LIMITS, LAYOUTS, LOOKS } from "./schema";
 
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
@@ -17,10 +17,18 @@ export type RawAnswers = {
   hours?: DayAnswer[];
   highlights?: string[];
   phone?: string;
+  /** WhatsApp number. Left blank when they don't want the button. */
+  whatsapp?: string;
   email?: string;
   address?: string;
-  /** Places a trade covers, separated by commas or new lines. */
+  /** Places they cover, separated by commas or new lines. Optional unless the sector asks for them. */
   areas?: string;
+  /** https link to their Google Business Profile. */
+  googleProfile?: string;
+  /** Other https profile links, one per line. */
+  links?: string;
+  /** Reviews they want shown, one per line: the words, a dash, then who said it. */
+  reviews?: string;
   /** In their own words: what makes the business different. */
   about?: string;
   /** Answers to the sector's own questions, by question id. */
@@ -33,7 +41,7 @@ export type RawAnswers = {
 
 export type ParsedAnswers = { ok: true; facts: CustomerFacts; look: Look; layout: Layout; colour: string } | { ok: false; errors: Record<string, string> };
 
-export const ANSWER_LIMITS = { businessName: 60, address: 160, email: 120, phone: 20, servicesText: 2000, areasText: 300, aboutText: 400, detailText: 200, details: 8 } as const;
+export const ANSWER_LIMITS = { businessName: 60, address: 160, email: 120, phone: 20, servicesText: 2000, areasText: 300, aboutText: 400, detailText: 200, details: 8, googleProfile: 300, linksText: 1000, reviewsText: 2000, reviewQuote: 280, reviewName: 60, reviewSource: 40, reviews: 6, links: 6 } as const;
 
 const text = (v: unknown): string => (typeof v === "string" ? v.replace(/<[^>]*>/g, "").replace(/[ \t]+/g, " ").trim() : "");
 
@@ -63,6 +71,52 @@ export function parseServicesText(input: string): { services: { name: string; pr
   }
   if (services.length > FIELD_LIMITS.items) errors.push(`Add up to ${FIELD_LIMITS.items} services.`);
   return { services: services.slice(0, FIELD_LIMITS.items), errors };
+}
+
+/** An https address with no sign-in details. Anything else is refused rather than guessed. */
+export function httpsUrl(value: string): string | null {
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== "https:" || url.username || url.password) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+/** Profile links, one per line. Blank is fine. A line that isn't an https link is an error. */
+export function parseLinks(input: string): { links: string[]; error?: string } {
+  const links: string[] = [];
+  for (const line of input.split(/\r?\n/).map((l) => text(l)).filter(Boolean)) {
+    const url = httpsUrl(line);
+    if (!url) return { links: [], error: "Use a full link that starts with https://." };
+    if (!links.includes(url)) links.push(url);
+  }
+  if (links.length > ANSWER_LIMITS.links) return { links: links.slice(0, ANSWER_LIMITS.links), error: `Add up to ${ANSWER_LIMITS.links} links.` };
+  return { links };
+}
+
+/**
+ * Reviews the customer typed, one per line: the words, then a dash, then who said them.
+ * "Great cut — Sam, Google". Blank means they have none to show. A line we can't read is an error,
+ * so a half-read review is never shown as if it were complete.
+ */
+export function parseReviews(input: string): { reviews: SuppliedReview[]; error?: string } {
+  const reviews: SuppliedReview[] = [];
+  for (const line of input.split(/\r?\n/).map((l) => text(l)).filter(Boolean)) {
+    const parts = line.split(/\s+[—–|-]\s+|\s+\|\s+/);
+    if (parts.length < 2) return { reviews: [], error: 'Write each review as the words, then a dash, then who said it. For example: Great cut — Sam, Google.' };
+    const quote = parts[0].replace(/^["“]|["”]$/g, "").trim();
+    const who = parts.slice(1).join(" - ").split(",");
+    const name = who[0]?.trim() ?? "";
+    const source = who.slice(1).join(",").trim();
+    if (!quote || !name) return { reviews: [], error: "Each review needs the words and the name of the person who said them." };
+    if (quote.length > ANSWER_LIMITS.reviewQuote) return { reviews: [], error: `Keep each review under ${ANSWER_LIMITS.reviewQuote} characters.` };
+    if (name.length > ANSWER_LIMITS.reviewName || source.length > ANSWER_LIMITS.reviewSource) return { reviews: [], error: "Keep the name, and where it was posted, short." };
+    reviews.push({ quote, name, ...(source ? { source } : {}) });
+  }
+  if (reviews.length > ANSWER_LIMITS.reviews) return { reviews: reviews.slice(0, ANSWER_LIMITS.reviews), error: `Add up to ${ANSWER_LIMITS.reviews} reviews.` };
+  return { reviews };
 }
 
 /** The places a trade covers: one per comma or line, each kept as the customer typed it. */
@@ -155,19 +209,22 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
     if (hoursError) errors.hours = hoursError;
   }
 
-  // Areas: a trade says where it works.
+  // Areas: required where the sector is built around them, optional everywhere else. Blank means the section stays hidden.
   let areas: string[] = [];
-  if (preset.areaSource === "areas") {
-    const parsedAreas = parseAreas(typeof raw.areas === "string" ? raw.areas.slice(0, ANSWER_LIMITS.areasText) : "");
+  const areasInput = typeof raw.areas === "string" ? raw.areas.slice(0, ANSWER_LIMITS.areasText) : "";
+  if (preset.areaSource === "areas" || text(areasInput)) {
+    const parsedAreas = parseAreas(areasInput);
     areas = parsedAreas.areas;
     if (parsedAreas.error) errors.areas = parsedAreas.error;
-    else if (areas.length === 0) errors.areas = "Add the areas you cover.";
+    else if (preset.areaSource === "areas" && areas.length === 0) errors.areas = "Add the areas you cover.";
   }
 
   const phone = text(raw.phone);
+  const whatsapp = text(raw.whatsapp);
   const email = text(raw.email).toLowerCase();
   const address = text(raw.address);
   if (phone && !PHONE.test(phone)) errors.phone = "Check the phone number.";
+  if (whatsapp && !PHONE.test(whatsapp)) errors.whatsapp = "Check the WhatsApp number.";
   if (email && !EMAIL.test(email)) errors.email = "Check the email address.";
   if (email.length > ANSWER_LIMITS.email) errors.email = "That email address is too long.";
   if (address.length > ANSWER_LIMITS.address) errors.address = `Keep it under ${ANSWER_LIMITS.address} characters.`;
@@ -188,6 +245,18 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
     else if (!value && q.required) errors[`detail-${q.id}`] = "Answer this question.";
     else if (value) details.push({ label: q.label, value });
   }
+
+  const profile = text(raw.googleProfile);
+  let googleProfile = "";
+  if (profile) {
+    const url = httpsUrl(profile);
+    if (!url || url.length > ANSWER_LIMITS.googleProfile) errors.googleProfile = "Use the full https link to your Google Business Profile.";
+    else googleProfile = url;
+  }
+  const parsedLinks = parseLinks(typeof raw.links === "string" ? raw.links.slice(0, ANSWER_LIMITS.linksText) : "");
+  if (parsedLinks.error) errors.links = parsedLinks.error;
+  const parsedReviews = parseReviews(typeof raw.reviews === "string" ? raw.reviews.slice(0, ANSWER_LIMITS.reviewsText) : "");
+  if (parsedReviews.error) errors.reviews = parsedReviews.error;
 
   const look = (LOOKS as readonly string[]).includes(raw.look ?? "") ? (raw.look as Look) : preset.defaultLook;
   const layout = (LAYOUTS as readonly string[]).includes(raw.layout ?? "") ? (raw.layout as Layout) : defaultLayout(preset.id);
@@ -211,8 +280,12 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
       about,
       ...(details.length ? { details } : {}),
       ...(phone ? { phone } : {}),
+      ...(whatsapp ? { whatsapp } : {}),
       ...(email ? { email } : {}),
       ...(address ? { address } : {}),
+      ...(googleProfile ? { googleProfile } : {}),
+      ...(parsedLinks.links.length ? { sameAs: parsedLinks.links } : {}),
+      ...(parsedReviews.reviews.length ? { reviews: parsedReviews.reviews } : {}),
     },
   };
 }
@@ -255,9 +328,13 @@ export function cleanSiteAnswers(input: unknown, knownSectors: string[]): SiteAn
       hours,
       highlights: Array.isArray(a.highlights) ? [...new Set(a.highlights.filter((h): h is string => typeof h === "string").map((h) => h.slice(0, 30)))].slice(0, 8) : [],
       phone: str(a.phone, ANSWER_LIMITS.phone),
+      whatsapp: str(a.whatsapp, ANSWER_LIMITS.phone),
       email: str(a.email, ANSWER_LIMITS.email),
       address: str(a.address, ANSWER_LIMITS.address),
       areas: str(a.areas, ANSWER_LIMITS.areasText),
+      googleProfile: str(a.googleProfile, ANSWER_LIMITS.googleProfile),
+      links: str(a.links, ANSWER_LIMITS.linksText),
+      reviews: str(a.reviews, ANSWER_LIMITS.reviewsText),
       about: str(a.about, ANSWER_LIMITS.aboutText),
       details,
       look: str(a.look, 20),

@@ -7,7 +7,7 @@ import { livePhotoUrl, livePhotoUrls } from "@/lib/site-template/live";
 import { liveSiteFor } from "@/lib/site-template/live-source";
 import { isPhotoRef, photoPath, resolvePhotos } from "@/lib/site-template/photos";
 import type { SiteContent } from "@/lib/site-template/schema";
-import { jsonLdText, localBusinessJsonLd, pageDescription, pagesOf, pageTitle } from "@/lib/site-template/seo";
+import { jsonLdText, localBusinessJsonLd, pageMetaDescription, pagesOf, pageTitle } from "@/lib/site-template/seo";
 
 type Props = {
   content: SiteContent;
@@ -59,7 +59,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
         slug,
         sent,
         title: pageTitle(content, slug),
-        description: pageDescription(content, slug),
+        description: pageMetaDescription(content, slug),
         canonical: `${origin}/${slug}`,
         ogImage,
         // The customer's logo is the tab icon. Without one the icon is empty, so the browser doesn't ask for a file that isn't there.

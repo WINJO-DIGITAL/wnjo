@@ -57,7 +57,7 @@ describe("the booking-request route", () => {
     expect(res.headers.get("location")).toBe(`https://winjo.test/site-preview/${TOKEN}?sent=1#book`);
     expect(state.sent).toHaveLength(1);
     expect(state.sent[0].to).toBe("owner@shop.co.uk");
-    expect(state.sent[0].subject).toBe("New booking request for Hartley & Sons");
+    expect(state.sent[0].subject).toBe("New enquiry for Hartley & Sons");
   });
 
   it("saves the request before emailing it, and marks it sent once the email goes", async () => {

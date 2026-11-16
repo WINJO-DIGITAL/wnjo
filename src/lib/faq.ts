@@ -33,7 +33,7 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "What does each plan cost?",
     category: "pricing",
     short: `From ${formatGBP(core.monthly)} a month`,
-    a: `${core.name} is ${formatGBP(core.monthly)} a month for a website of up to ${core.pages} pages, built on a sector design. ${plus.name} is ${formatGBP(plus.monthly)} for up to ${plus.pages} pages and ${pro.name} is ${formatGBP(pro.monthly)} for up to ${pro.pages}. Every plan includes hosting, an SSL certificate, security monitoring, maintenance and support. ${plus.name} and ${pro.name} add search work, performance reporting, monthly time for changes and WINJO Refresh.`,
+    a: `${core.name} is ${formatGBP(core.monthly)} a month for a website of up to ${core.pages} pages, built on a sector design. ${plus.name} is ${formatGBP(plus.monthly)} for up to ${plus.pages} pages and ${pro.name} is ${formatGBP(pro.monthly)} for up to ${pro.pages}. Every plan includes hosting, an SSL certificate, security monitoring, maintenance, support, a quote form, WhatsApp and click-to-call, reviews you supply, opening hours and areas covered, local SEO basics, Google Business Profile setup at launch, time for changes and WINJO Refresh. ${plus.name} and ${pro.name} add further search work, performance reporting and more time for changes. Advanced enquiry forms, meaning extra questions or a second form, stay optional.`,
   },
   {
     q: "How do payments work?",

@@ -8,45 +8,51 @@ import { RefreshSlider } from "./RefreshSlider";
  * it (taken from each plan's inclusions in lib/pricing). No rankings, AI visibility or recommendations are promised.
  */
 const CORE = WEBSITE_PLANS.bronze.name;
-const PRO = WEBSITE_PLANS.silver.name;
-const PLUS = WEBSITE_PLANS.gold.name;
+const PLUS = WEBSITE_PLANS.silver.name;
+const PRO = WEBSITE_PLANS.gold.name;
 
 export const SEARCH_SERVICES: { benefit: string; term: string; line: string; plans: string }[] = [
   {
     benefit: "Easier to find on Google",
     term: "SEO",
     line: "Your website built and maintained so search engines can read it properly.",
-    plans: `${CORE} (basic), ${PRO} (enhanced and local), ${PLUS} (advanced)`,
+    plans: `${CORE} (basic), ${PLUS} (enhanced and local), ${PRO} (advanced)`,
   },
   {
     benefit: "Know who is visiting, and what they do",
     term: "Google Analytics",
     line: "See how people arrive and how they use your website.",
-    plans: `${PRO} and ${PLUS}`,
+    plans: `${PLUS} and ${PRO}`,
   },
   {
     benefit: "Spot search problems early",
     term: "Google Search Console",
     line: "We watch how Google indexes your website and how it performs in search.",
-    plans: `${PRO} and ${PLUS}`,
+    plans: `${PLUS} and ${PRO}`,
   },
   {
     benefit: "Clear answers for answer engines",
     term: "AEO, answer engine optimisation",
     line: "Content structured so answer engines can understand and interpret it.",
-    plans: `${PRO} (foundations), ${PLUS} (expanded)`,
+    plans: `${PLUS} (foundations), ${PRO} (expanded)`,
   },
   {
     benefit: "Ready for AI-powered search",
     term: "GEO, generative engine optimisation",
     line: "Clearer structure and wording for discovery through AI search experiences.",
-    plans: PLUS,
+    plans: PRO,
   },
   {
     benefit: "Easier for AI tools to read",
     term: "Structured data",
     line: "Your business details marked up so AI tools can read them accurately.",
-    plans: PLUS,
+    plans: PRO,
+  },
+  {
+    benefit: "Your details ready for local search",
+    term: "Local SEO basics",
+    line: "Your name, address, phone, opening hours and areas covered in a form search engines can read, a map on the contact page, and a title and description for each page.",
+    plans: `${CORE}, ${PLUS} and ${PRO}`,
   },
 ];
 

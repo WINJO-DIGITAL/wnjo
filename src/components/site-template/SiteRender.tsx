@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react";
+import { serviceChoices } from "@/lib/site-template/enquiry";
+import { mapsEmbedUrl, safeHttpsUrl } from "@/lib/site-template/seo";
 import { LAYOUTS, type HoursItem, type Layout, type Section, type SiteContent } from "@/lib/site-template/schema";
 import css from "./SiteRender.module.css";
 
@@ -25,6 +27,13 @@ export function safeImage(src: string | undefined): string | null {
 }
 
 const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
+
+/** A wa.me link. A leading 0 is treated as a UK number; a number that already has a country code is left as it is. */
+function whatsappHref(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  const international = digits.startsWith("0") ? `44${digits.slice(1)}` : digits;
+  return `https://wa.me/${international}`;
+}
 
 function hoursText(h: HoursItem): string {
   if (h.closed) return "Closed";
@@ -103,10 +112,14 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
   const colour = HEX.test(theme.colour) ? theme.colour : "#1a1a1a";
   const style = { "--accent": colour, "--on-accent": onColour(colour) } as CSSProperties;
   const bookable = bookOn === null ? undefined : [...content.sections, ...(content.pages ?? []).flatMap((p) => p.sections)].find((s): s is Extract<Section, { kind: "enquiry" }> => s.kind === "enquiry");
+  const services = serviceChoices(content);
+  const reviews = (content.reviews ?? []).filter((review) => review.quote.trim() && review.name.trim());
+  const profile = safeHttpsUrl(business.googleProfile);
   const photo = safeImage(heroImage);
   const logo = safeImage(business.logo);
   // A section that draws nothing (a gallery with no usable pictures) gets no nav link, so no link points at nothing.
   const nav = current.sections.flatMap((s) => (ANCHOR_IDS[s.kind] && !(s.kind === "gallery" && !s.images.some((im) => safeImage(im.src))) ? [{ id: ANCHOR_IDS[s.kind]!.id, label: navLabel(s)! }] : []));
+  if (!multi && reviews.length) nav.push({ id: "reviews", label: "Reviews" });
 
   const renderSection = (s: Section, i: number) => {
     switch (s.kind) {
@@ -224,6 +237,9 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                 Get directions
               </a>
             )}
+            {business.address && (current.slug === "contact" || !multi) && (
+              <iframe className={css.map} title={`Map of ${business.address}`} src={mapsEmbedUrl(business.address)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+            )}
           </section>
         );
       case "enquiry":
@@ -245,7 +261,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                 <span>Thanks. {business.name} has your request and will reply to confirm a time.</span>
               </div>
             ) : (
-              <form className={css.form} action={enquiry?.action} method={enquiry ? "post" : undefined}>
+              <form className={css.form} action={enquiry?.action} method={enquiry ? "post" : undefined} encType={enquiry ? "multipart/form-data" : undefined}>
                 {enquiry?.state === "error" && (
                   <p className={css.formError} role="alert">
                     That didn&apos;t send. Check your phone number or email and try again.
@@ -263,6 +279,25 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                 <label>
                   Phone or email
                   <input name="contact" autoComplete="email" maxLength={120} required />
+                </label>
+                {services.length > 0 && (
+                  <label>
+                    Service
+                    <select name="service" required defaultValue="">
+                      <option value="" disabled>
+                        Choose a service
+                      </option>
+                      {services.map((name) => (
+                        <option key={name} value={name}>
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+                <label>
+                  Photo <span className={css.optional}>(optional)</span>
+                  <input name="photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
                 </label>
                 <label>
                   {s.prompt || "Anything we should know?"}
@@ -380,6 +415,11 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                 </a>
               ))}
         </nav>
+        {business.phone && (
+          <a className={`${css.btnGhost} ${css.call}`} href={telHref(business.phone)}>
+            Call
+          </a>
+        )}
         {bookable && (
           <a className={css.btn} href={bookHref}>
             {bookable.cta}
@@ -398,16 +438,40 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
         ),
       )}
 
+      {current.slug === "" && reviews.length > 0 && (
+        <section id="reviews" className={css.section}>
+          <h2>Reviews</h2>
+          <ul className={css.reviews} role="list">
+            {reviews.map((review) => (
+              <li key={`${review.name}-${review.quote.slice(0, 24)}`}>
+                <blockquote>
+                  <p>{review.quote}</p>
+                  <footer>
+                    {review.name}
+                    {review.source ? <span>{review.source}</span> : null}
+                  </footer>
+                </blockquote>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <footer className={css.foot}>
         <div>
           <b className={css.logo}>{business.name}</b>
           {business.tagline && <span>{business.tagline}</span>}
         </div>
-        {(business.address || business.phone || business.email) && (
+        {(business.address || business.phone || business.email || profile) && (
           <div>
             {business.address && <span>{business.address}</span>}
             {business.phone && <a href={telHref(business.phone)}>{business.phone}</a>}
             {business.email && <a href={`mailto:${business.email}`}>{business.email}</a>}
+            {profile && (
+              <a href={profile} rel="noopener noreferrer">
+                Google Business Profile
+              </a>
+            )}
           </div>
         )}
         {multi && (
@@ -426,7 +490,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
         <div className={css.dock}>
           {business.phone && (
             <a className={css.btnGhost} href={telHref(business.phone)}>
-              Phone us
+              Call us
             </a>
           )}
           {bookable && (
@@ -435,6 +499,12 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
             </a>
           )}
         </div>
+      )}
+
+      {business.whatsapp && (
+        <a className={css.whatsapp} href={whatsappHref(business.whatsapp)} rel="noopener noreferrer">
+          WhatsApp
+        </a>
       )}
     </div>
   );

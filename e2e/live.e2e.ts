@@ -96,7 +96,8 @@ test("the request form posts from the live address and stays there, on the page 
   await expect(form.locator('input[name="token"]')).toHaveCount(0);
   await form.getByLabel("Name").fill("Sam");
   await form.getByLabel("Phone or email").fill("07700 900123");
-  await form.getByRole("button").click();
+  await form.getByLabel("Service").selectOption("Cut & style");
+  await form.getByRole("button", { name: "Send request" }).click();
   // With no database to save to, the request can't be sent: the visitor is told so, on the same address and page.
   await expect(page).toHaveURL(at("barber-p7", "/contact?sent=0#book"));
   await expect(page.locator("#book").getByRole("alert")).toContainText("didn't send");
@@ -129,7 +130,9 @@ for (const { look, heading, body, capitals } of LOOKS) {
     const fonts: string[] = [];
     page.on("request", (r) => {
       const url = new URL(r.url());
-      if (/(^|\.)(googleapis|gstatic)\.com$/.test(url.hostname)) external.push(r.url());
+      // The map embed is the one Google request a customer site makes. Fonts stay on our own address.
+      const map = url.hostname === "maps.google.com" || /(^|\.)maps\.(googleapis|gstatic)\.com$/.test(url.hostname);
+      if (/(^|\.)(googleapis|gstatic)\.com$/.test(url.hostname) && !map) external.push(r.url());
       if (/\.woff2?$/.test(url.pathname)) fonts.push(`${url.hostname}${url.pathname}`);
     });
     await page.goto(at(`barber-p1-showcase-${look}`));

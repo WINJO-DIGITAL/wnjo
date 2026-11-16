@@ -78,6 +78,23 @@ describe("SiteRender", () => {
     expect(html).not.toContain('name="token"');
   });
 
+  it("hides WhatsApp, reviews and the map until the customer has supplied them", () => {
+    const html = render(SAMPLE_BARBER);
+    expect(html).not.toContain("WhatsApp");
+    expect(html).not.toContain(">Reviews<");
+    expect(html).toContain("maps.google.com/maps?q=");
+    const withExtras = {
+      ...SAMPLE_BARBER,
+      business: { ...SAMPLE_BARBER.business, whatsapp: "07700 900123", googleProfile: "https://maps.google.com/?cid=1" },
+      reviews: [{ quote: "A tidy cut.", name: "Sam", source: "Google" }],
+    };
+    const extra = render(withExtras);
+    expect(extra).toContain("https://wa.me/447700900123");
+    expect(extra).toContain("A tidy cut.");
+    expect(extra).toContain("Google Business Profile");
+    expect(extra).toContain(">Service<");
+  });
+
   it("posts to the enquiry route when the build is live, with its token and a bot trap", () => {
     const html = render(SAMPLE_BARBER, { enquiry: { action: "/api/site-enquiry", token: "tok123" } });
     expect(html).toContain('action="/api/site-enquiry"');

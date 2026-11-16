@@ -115,6 +115,13 @@ describe("add-ons", () => {
     expect(q.oneOffTotal).toBe(0);
   });
 
+  it("includes WhatsApp and testimonials on Core and does not charge for them", () => {
+    const q = websiteQuote(monthly("bronze", { addOns: ["whatsapp", "testimonials", "booking"] }));
+    expect(q.lines.find((l) => l.label === ADD_ONS.whatsapp.label)?.status).toBe("included");
+    expect(q.lines.find((l) => l.label === ADD_ONS.testimonials.label)?.status).toBe("included");
+    expect(q.monthly).toBe(99 + 15);
+  });
+
   it("charges the monthly price for add-ons on a monthly package", () => {
     const q = websiteQuote(monthly("bronze", { addOns: ["booking", "blog", "aiAssistant"] }));
     expect(q.monthly).toBe(99 + 15 + 10 + 29);

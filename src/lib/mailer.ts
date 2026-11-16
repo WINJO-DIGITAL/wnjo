@@ -38,7 +38,7 @@ export async function sendEnquiryEmail(
  */
 export async function sendEmail(
   config: { apiKey: string; from: string },
-  message: { to: string; subject: string; text: string; replyTo?: string; internal?: boolean },
+  message: { to: string; subject: string; text: string; replyTo?: string; internal?: boolean; attachments?: { filename: string; content: string }[] },
   label = "Email",
 ): Promise<boolean> {
   if (isProductionMail() && isReservedRecipient(message.to)) {
@@ -58,6 +58,7 @@ export async function sendEmail(
         subject: message.subject,
         text: message.text,
         ...(html ? { html } : {}),
+        ...(message.attachments?.length ? { attachments: message.attachments } : {}),
       }),
       signal: AbortSignal.timeout(10_000),
     });

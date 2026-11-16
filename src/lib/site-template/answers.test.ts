@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { checkSite } from "./checks";
-import { DAYS, cleanSiteAnswers, groupHours, parseAnswers, parseServicesText, type DayAnswer, type RawAnswers } from "./answers";
+import { DAYS, cleanSiteAnswers, groupHours, parseAnswers, parseReviews, parseServicesText, type DayAnswer, type RawAnswers } from "./answers";
 import { BARBER_PRESET } from "./presets";
 
 const week = (over: Partial<Record<(typeof DAYS)[number], Partial<DayAnswer>>> = {}): DayAnswer[] =>
@@ -139,6 +139,21 @@ describe("parseAnswers", () => {
   it("copes with junk input without throwing", () => {
     const r = parseAnswers({ hours: [null as never, 5 as never], highlights: "x" as never, servicesText: 7 as never }, BARBER_PRESET, { colour: "#222222" });
     expect(r.ok).toBe(false);
+  });
+});
+
+describe("parseReviews", () => {
+  it("keeps reviews the customer wrote, and nothing when the line can't be read", () => {
+    expect(parseReviews("Great cut — Sam, Google\n")).toEqual({ reviews: [{ quote: "Great cut", name: "Sam", source: "Google" }] });
+    expect(parseReviews("").reviews).toEqual([]);
+    expect(parseReviews("Just some praise").error).toBeTruthy();
+  });
+
+  it("leaves optional contact details off the facts when they are blank", () => {
+    const r = parse();
+    expect(r.ok && r.facts.whatsapp).toBeUndefined();
+    expect(r.ok && r.facts.reviews).toBeUndefined();
+    expect(r.ok && r.facts.googleProfile).toBeUndefined();
   });
 });
 

@@ -94,7 +94,7 @@ export default function PricingPage() {
               <li>A sector design tailored to your business</li>
               <li>Managed hosting and SSL</li>
               <li>Security, updates and upkeep</li>
-              <li>A real team to ask for help</li>
+              <li>A real person to ask for help</li>
             </ul>
           </div>
           <div data-reveal>

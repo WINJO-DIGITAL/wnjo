@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { parseSiteEnquiry, siteEnquiryEmail } from "./enquiry";
 
-const good = { name: "Sam Lee", contact: "07700 900123", message: "Saturday morning for a skin fade?" };
+const good = { name: "Sam Lee", contact: "07700 900123", message: "Saturday morning for a skin fade?", service: "" };
 
 describe("parseSiteEnquiry", () => {
   it("accepts a name, a phone or email, and a message", () => {
-    expect(parseSiteEnquiry(good)).toEqual({ ok: true, enquiry: good });
+    expect(parseSiteEnquiry(good)).toEqual({ ok: true, enquiry: { ...good, service: "" } });
     expect(parseSiteEnquiry({ ...good, contact: "sam@example.com" }).ok).toBe(true);
   });
 
   it("lets the message be empty", () => {
-    expect(parseSiteEnquiry({ ...good, message: "" })).toMatchObject({ ok: true, enquiry: { message: "" } });
+    expect(parseSiteEnquiry({ ...good, message: "", service: "Cut & style" })).toMatchObject({ ok: true, enquiry: { message: "", service: "Cut & style" } });
   });
 
   it("asks for what is missing or unusable", () => {
@@ -38,7 +38,7 @@ describe("parseSiteEnquiry", () => {
 describe("siteEnquiryEmail", () => {
   it("is plain text naming the business, with a reply-to only when they gave an email", () => {
     const withPhone = siteEnquiryEmail({ businessName: "Hartley & Sons", enquiry: good });
-    expect(withPhone.subject).toBe("New booking request for Hartley & Sons");
+    expect(withPhone.subject).toBe("New enquiry for Hartley & Sons");
     expect(withPhone.text).toContain("Phone or email: 07700 900123");
     expect(withPhone.text).toContain("Saturday morning");
     expect(withPhone.replyTo).toBeUndefined();

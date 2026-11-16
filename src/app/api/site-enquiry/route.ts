@@ -2,12 +2,23 @@ import { NextResponse, type NextRequest } from "next/server";
 import { notificationMailConfig, sendEmail } from "@/lib/mailer";
 import { serviceClient } from "@/lib/quote-store";
 import { sharedRateLimited } from "@/lib/rate-limit-shared";
-import { parseSiteEnquiry, siteEnquiryEmail } from "@/lib/site-template/enquiry";
+import { matchService, parseSiteEnquiry, PHOTO_MAX_BYTES, PHOTO_TYPES, serviceChoices, siteEnquiryEmail } from "@/lib/site-template/enquiry";
+import type { SiteContent } from "@/lib/site-template/schema";
 import { extraMainHosts, hostOf, isMainHost, originOf } from "@/lib/site-template/hosts";
 import { loadLiveSite } from "@/lib/site-template/live";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const PHOTO = new Set<string>(PHOTO_TYPES);
+
+/** A picture small enough to email. Anything else is noted and left out, so the enquiry itself still goes. */
+async function readPhoto(value: FormDataEntryValue | null): Promise<{ status?: "attached" | "skipped"; note: string; file?: { filename: string; content: string } }> {
+  if (!(value instanceof File) || value.size === 0) return { note: "" };
+  if (value.size > PHOTO_MAX_BYTES || !PHOTO.has(value.type)) return { status: "skipped", note: "Photo not included." };
+  const filename = value.name.replace(/[^\w.\- ]+/g, "").replace(/^\.+/, "").slice(0, 80) || "photo";
+  return { status: "attached", note: "Photo attached to the email.", file: { filename, content: Buffer.from(await value.arrayBuffer()).toString("base64") } };
+}
 
 const TOKEN = /^[A-Za-z0-9_-]{20,64}$/;
 /** The page the form was on, by its short name. Anything else is ignored and the visitor goes back to Home. */
@@ -18,7 +29,7 @@ type Row = {
   tenant_id: string;
   brief_id: string;
   status: string;
-  content: { business?: { name?: string } } | null;
+  content: SiteContent | null;
   website_briefs: { email: string; business_name: string | null; name: string } | null;
 };
 
@@ -66,23 +77,29 @@ export async function POST(request: NextRequest) {
   const row = found as unknown as Row | null;
   if (!row || row.status !== "released" || !row.website_briefs?.email) return new NextResponse(null, { status: 404 });
 
-  const parsed = parseSiteEnquiry(Object.fromEntries(form.entries()));
+  const fields = Object.fromEntries([...form.entries()].filter(([, value]) => typeof value === "string"));
+  const parsed = parseSiteEnquiry(fields);
   // A bot is told it worked, and nothing is sent.
   if (!parsed.ok) return back(Boolean(parsed.spam));
-  const { name, contact, message } = parsed.enquiry;
+  const service = matchService(parsed.enquiry.service, serviceChoices(row.content));
+  const enquiry = { ...parsed.enquiry, service };
+  const photo = await readPhoto(form.get("photo"));
+  const { name, contact, message } = enquiry;
+  const storedMessage = [service ? `Service: ${service}` : "", message].filter(Boolean).join("\n\n");
 
   // Save first. If the table isn't there yet or the write fails, the email still goes, so nothing is lost either way.
+  // The photo itself is only emailed: the table keeps a note that one was attached, not the file.
   const { data: lead, error: saveError } = await db
     .from("site_enquiries")
-    .insert({ tenant_id: row.tenant_id, brief_id: row.brief_id, build_id: row.id, page, name, contact, message })
+    .insert({ tenant_id: row.tenant_id, brief_id: row.brief_id, build_id: row.id, page, name, contact, message: photo.note ? `${storedMessage}${storedMessage ? "\n\n" : ""}${photo.note}` : storedMessage })
     .select("id")
     .maybeSingle();
   if (saveError) console.error("site-enquiry: could not save the request", saveError.message);
 
   const config = notificationMailConfig();
   const businessName = row.content?.business?.name || row.website_briefs.business_name || row.website_briefs.name;
-  const email = siteEnquiryEmail({ businessName, enquiry: parsed.enquiry });
-  const sent = config ? await sendEmail(config, { to: row.website_briefs.email, subject: email.subject, text: email.text, replyTo: email.replyTo }, "Booking request") : false;
+  const email = siteEnquiryEmail({ businessName, enquiry, photo: photo.status });
+  const sent = config ? await sendEmail(config, { to: row.website_briefs.email, subject: email.subject, text: email.text, replyTo: email.replyTo, ...(photo.file ? { attachments: [photo.file] } : {}) }, "Enquiry") : false;
   if (!sent) console.error("site-enquiry: the owner was not emailed", { saved: Boolean(lead) });
   if (lead && sent) await db.from("site_enquiries").update({ email_sent: true }).eq("id", (lead as { id: string }).id);
 

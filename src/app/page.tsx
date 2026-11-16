@@ -80,7 +80,7 @@ export default function HomePage() {
           </h2>
           <div className="tile__aside">
             <p className="tile__line">
-              One predictable monthly payment. One team looking after it.
+              One predictable monthly payment. One person looking after it.
             </p>
             <p className="tile__more">
               <Link href="/managed-websites" className="arrow-link">
