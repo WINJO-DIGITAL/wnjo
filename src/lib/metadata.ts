@@ -7,6 +7,19 @@ import { site, siteUrl } from "./site";
  */
 const shareImage = { url: "/opengraph-image.png", width: 1200, height: 630, alt: `${site.name} logo` };
 
+/**
+ * The homepage keeps the title and description from the root layout and adds its canonical URL and og:url, like every
+ * other page. Both are emitted only once the production domain is configured.
+ */
+export function homeMetadata(): Metadata {
+  if (!siteUrl()) return {};
+  const title = `${site.name} | Fully managed business websites`;
+  return {
+    alternates: { canonical: "/" },
+    openGraph: { type: "website", siteName: site.name, locale: site.locale, title, description: site.description, images: [shareImage], url: "/" },
+  };
+}
+
 /** Per-page metadata. Canonical URLs are emitted only once the production domain is configured. */
 export function pageMetadata(path: string, title: string, description: string): Metadata {
   const hasDomain = Boolean(siteUrl());

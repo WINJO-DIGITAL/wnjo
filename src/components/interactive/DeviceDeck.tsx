@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import type { Project } from "@/lib/projects";
 
 type Item = Pick<Project, "slug" | "name" | "host" | "url" | "mobile" | "tablet" | "logo">;
@@ -288,9 +289,9 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         target="_blank"
         rel="noopener noreferrer"
         className="deck__visit"
-        aria-label={`Visit ${current.name}'s website (opens in a new tab)`}
       >
         Visit {current.host} <span aria-hidden="true">↗</span>
+        <span className="visually-hidden"> (opens in a new tab)</span>
       </a>
 
       <div ref={railRef} className="deck__rail" role="group" aria-label="Choose a project">
@@ -315,7 +316,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         <Link href="/pricing" className="deck__btn">
           <span className="deck__btn-main">GET YOUR WEBSITE</span>
           <span className="deck__btn-price">
-            From £99<span className="deck__unit">/Month</span>
+            From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/Month</span>
           </span>
         </Link>
         <ul className="deck__bullets" role="list">

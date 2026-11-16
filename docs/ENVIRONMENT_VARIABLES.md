@@ -37,8 +37,8 @@ Rules:
 - Tables `website_subscriptions` and `website_subscription_payments` (migration `20261108140000`) are live in the
   shared database; nothing on the live site uses them yet.
 - `STRIPE_PORTAL_CONFIGURATION_ID` (optional, server only): the Stripe billing-portal configuration customers use to
-  update their card and see invoices, with cancellation and plan changes switched off (the minimum term is handled
-  under the agreement). Test mode: `bpc_1UZev9FZtOV6mSdmIeyyYYgZ` (also the test-mode default). Live mode:
+  update their card and see invoices, with cancellation and plan changes switched off (subscriptions are rolling monthly with no
+  minimum term; cancellation is requested from the account page). Test mode: `bpc_1UZev9FZtOV6mSdmIeyyYYgZ` (also the test-mode default). Live mode:
   `bpc_1Uc8a4LEEs7hsljuaZley7ru` (also the live default), set in Vercel for production.
 - Stripe webhook endpoints need these events: `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed`,
   `customer.subscription.updated`, `customer.subscription.deleted`. Test endpoint updated 8 November 2026 to

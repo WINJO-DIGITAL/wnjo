@@ -227,7 +227,7 @@ Built in sub-steps, each tested before the next.
 
 ## Production state
 - `main` fast-forwarded to `845ac72` (the working branch merged, 22 commits) and pushed. Vercel production built from `main` and is READY.
-- Checked live on `www.wnjoweb.co.uk`: `/account` and `/admin` serve (both `noindex`), and the homepage serves. `wnjoweb.co.uk` now returns a 308 redirect to `www`, so the earlier 404 on the bare domain is resolved.
+- Checked live on the old domain, `www.wnjoweb.co.uk` (the site is now at `winjodigital.co.uk`): `/account` and `/admin` serve (both `noindex`), and the homepage serves. `wnjoweb.co.uk` now returns a 308 redirect to `www`, so the earlier 404 on the bare domain is resolved.
 - Still open: the database test suites in `supabase/tests/` have not been re-run since the latest migrations; the Resend and IONOS keys need rotating; Stripe, the AI key and the GitHub App are not connected.
 
 ### 3g. Staff-side client linking — built, tested
@@ -274,7 +274,7 @@ Built in sub-steps, each tested before the next.
 
 ## Build journey: pay from the quote, and pay the deposit after a proposal — built, tested; not yet run against real Stripe
 
-- **Standard packages end in payment.** On the last step of "Build my website", a monthly package (Core, Plus, Pro) shows its first payment (setup, any one-off extras and the first month), a terms tick that also names the 12-month minimum term, and "Pay £x securely". The server saves the brief, works the price out again from the answers (the page sends no price), creates the offer and the Stripe Checkout, and the customer lands on Stripe. They are emailed their private payment link in case they close the page. A callback is still offered underneath.
+- **Standard packages end in payment.** On the last step of "Build my website", a monthly package (Core, Plus, Pro) shows its first payment (setup, any one-off extras and the first month), a terms tick (subscriptions are now rolling monthly with no minimum term), and "Pay £x securely". The server saves the brief, works the price out again from the answers (the page sends no price), creates the offer and the Stripe Checkout, and the customer lands on Stripe. They are emailed their private payment link in case they close the page. A callback is still offered underneath.
 - **One-off websites at or under £1,000** also pay the 50% deposit at once (a single payment; no minimum term). **Decision to confirm:** the owner's rule was a 50% deposit for bespoke builds over £1,000. This case (the £999 one-off) wasn't covered, so it takes the deposit online like the rest. To keep it as a request instead, make `payNowFor` in `src/lib/pay-now.ts` return null for `oneOff`.
 - **Bespoke builds over £1,000 (and anything needing a custom quote) never pay from the quote.** They go through the written proposal and your approval as before. Once the customer accepts the approved proposal, a "Your deposit" card appears on their build in `/account`: 50% of the agreed price for a one-off build, or the first payment for a monthly build. They tick the terms and go to Stripe (`POST /api/briefs/pay`). The amount comes only from the accepted proposal.
 - **Paying moves the build on.** The payment handler now moves a build from "Payment" (or the start) to "AI processing" and records "Payment received." in its history. It didn't before. The build shows "Payment" while the customer is on the Stripe page.

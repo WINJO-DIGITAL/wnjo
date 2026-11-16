@@ -10,16 +10,16 @@ import { Responsibility } from "@/components/managed/Responsibility";
 import { SubscriptionTerms } from "@/components/managed/Sections";
 import { BrowserFrame } from "@/components/Devices";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
+import { TrustCues } from "@/components/TrustCues";
 import { WebStages } from "@/components/WebStages";
 import { ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
-import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
+import { homeMetadata } from "@/lib/metadata";
+import { heroProjects, OWNER_QUOTES, projectBySlug, projectLine } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
 
-// Title, description and share image come from the root layout; only the canonical URL is added here.
-export const metadata: Metadata = siteUrl()
-  ? { alternates: { canonical: "/" } }
-  : {};
+// Title and description come from the root layout; the canonical URL and og:url are added here.
+export const metadata: Metadata = homeMetadata();
 
 const fystay = projectBySlug("fystay")!;
 const evexec = projectBySlug("ev-exec")!;
@@ -53,12 +53,18 @@ export default function HomePage() {
               <span className="hero-ed__line">Your website.</span>{" "}
               <span className="serif-em">Our responsibility.</span>
             </h1>
+            <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
+              Design, hosting, updates and support in one monthly plan, with no minimum term.
+            </p>
             <div
               className="btn-row rise"
               style={{ "--i": 4 } as React.CSSProperties}
             >
               <Link href="/pricing" className="btn btn--primary">
-                Get your website from £99 a month
+                Get your website from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month
+              </Link>
+              <Link href="/work" className="btn btn--secondary">
+                See our work
               </Link>
             </div>
           </div>
@@ -68,6 +74,24 @@ export default function HomePage() {
           className="container container--wide showcase-section"
         >
           <HeroShowcase items={heroProjects} />
+        </div>
+      </section>
+
+      {/* Trust: the owners in their own words. */}
+      <section className="owner-quotes" aria-label="From the owners">
+        <div className="container container--wide">
+          <OwnerQuotes
+            items={OWNER_QUOTES.map(({ project, quote, pull }) => ({
+              slug: project.slug,
+              name: project.name,
+              logo: project.logo,
+              location: project.location,
+              url: project.url,
+              host: project.host,
+              quote,
+              pull,
+            }))}
+          />
         </div>
       </section>
 
@@ -100,7 +124,7 @@ export default function HomePage() {
       </section>
 
       {/* The three subscriptions. */}
-      <section id="packages" className="tile home-tile" data-nav="/pricing" aria-labelledby="packages-title">
+      <section id="packages" className="tile home-tile tile--soft" data-nav="/pricing" aria-labelledby="packages-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Plans</p>
           <h2 id="packages-title" className="tile__title">
@@ -119,6 +143,7 @@ export default function HomePage() {
         </div>
         <div className="container container--wide tile__visual" data-reveal>
           <PlanChooser />
+          <TrustCues />
         </div>
       </section>
 
@@ -163,23 +188,34 @@ export default function HomePage() {
           </div>
         </div>
         <div className="container container--wide" data-reveal>
-          <ul className="home-work" role="list">
+          <ul className="work-tiles" role="list">
             {work.map((p) => (
-              <li key={p.slug}>
-                <Link href={`/work#${p.slug}`} className="home-work__link">
+              <li key={p.slug} className="work-tile">
+                {/* The picture repeats the "View project" link beneath it, so it is skipped by keyboards and screen readers. */}
+                <Link href={`/work#${p.slug}`} className="work-tile__media" tabIndex={-1} aria-hidden="true">
                   <Image
                     src={p.desktop}
-                    alt={`The ${p.name} website`}
-                    sizes="(min-width: 64rem) 300px, 80vw"
+                    alt=""
+                    sizes="(min-width: 64rem) 620px, 100vw"
                     placeholder="blur"
-                    className="home-work__shot"
+                    className="work-tile__shot"
                   />
-                  <span className="home-work__head">
-                    <Image src={p.logo} alt="" width={28} height={28} sizes="28px" className="home-work__logo" aria-hidden />
-                    <span className="home-work__name">{p.name}</span>
-                  </span>
-                  <span className="home-work__problem">{p.sector}</span>
                 </Link>
+                <div className="work-tile__body">
+                  <h3 className="work-tile__name">
+                    <Image src={p.logo} alt="" width={32} height={32} sizes="32px" className="work-tile__logo" aria-hidden />
+                    {p.name}
+                  </h3>
+                  <p className="work-tile__line">{projectLine(p)}</p>
+                  <p className="work-tile__links">
+                    <Link href={`/work#${p.slug}`}>
+                      View project<span className="visually-hidden">: {p.name}</span> <ArrowRight />
+                    </Link>
+                    <a href={p.url} target="_blank" rel="noopener noreferrer">
+                      View live<span className="visually-hidden">: {p.name} (opens in a new tab)</span> <span aria-hidden="true">↗</span>
+                    </a>
+                  </p>
+                </div>
               </li>
             ))}
           </ul>
@@ -203,7 +239,7 @@ export default function HomePage() {
       </section>
 
       {/* The subscription and ownership, plainly. */}
-      <section id="ownership" className="tile home-tile" data-nav="/pricing" aria-labelledby="own-title">
+      <section id="ownership" className="tile home-tile tile--soft" data-nav="/pricing" aria-labelledby="own-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">No lock-in</p>
           <h2 id="own-title" className="tile__title">
@@ -220,24 +256,6 @@ export default function HomePage() {
         </div>
         <div className="container container--wide" data-reveal>
           <SubscriptionTerms />
-        </div>
-      </section>
-
-      {/* Trust: the owners in their own words. */}
-      <section className="owner-quotes" aria-label="From the owners">
-        <div className="container container--wide">
-          <OwnerQuotes
-            items={OWNER_QUOTES.map(({ project, quote, pull }) => ({
-              slug: project.slug,
-              name: project.name,
-              logo: project.logo,
-              location: project.location,
-              url: project.url,
-              host: project.host,
-              quote,
-              pull,
-            }))}
-          />
         </div>
       </section>
 

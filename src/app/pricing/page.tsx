@@ -4,6 +4,7 @@ import { ArrowRight } from "@/components/Icons";
 import { RefreshCompare, SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
 import { AddOnsTable, CareComparison, PackageComparison } from "@/components/pricing/WebsitePackages";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
+import { TrustCues } from "@/components/TrustCues";
 import { pageMetadata } from "@/lib/metadata";
 import { DAY_RATE, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
@@ -51,6 +52,7 @@ export default function PricingPage() {
         <div className="container container--wide">
           <div data-reveal>
             <PlanChooser />
+            <TrustCues />
           </div>
           <p className="plans-note" data-reveal>
             Every plan is a rolling monthly subscription with no minimum contract and no large upfront cost. Change
@@ -79,7 +81,7 @@ export default function PricingPage() {
       </section>
 
       {/* 2b. Bought outright: hosting and care are added. The monthly plans already include all of it. */}
-      <section id="after-launch" className="section--tight" aria-labelledby="after-launch-title">
+      <section id="after-launch" className="section--tight section--soft" aria-labelledby="after-launch-title">
         <div className="container container--wide">
           <SectionHead eyebrow="Own your website?" title={<span id="after-launch-title">Add hosting and care to your website.</span>} split>
             <p>
@@ -140,7 +142,7 @@ export default function PricingPage() {
       </section>
 
       {/* 5. The search services behind Pro and Plus. */}
-      <section id="search" className="section section--ruled" aria-labelledby="search-title">
+      <section id="search" className="section section--ruled section--soft" aria-labelledby="search-title">
         <div className="container container--wide">
           <SectionHead eyebrow="Being found" title={<span id="search-title">What the search work means for you.</span>} split>
             <p>The benefit first, then the name it goes by and the plans that include it.</p>

@@ -59,7 +59,8 @@ export const SEARCH_SERVICES: { benefit: string; term: string; line: string; pla
 export function SearchServices() {
   return (
     <>
-      <ul role="list" className="search-list">
+      {/* On phones this list scrolls sideways, so it can be reached and scrolled from the keyboard. */}
+      <ul role="list" className="search-list" tabIndex={0} aria-label="Search services">
         {SEARCH_SERVICES.map((s) => (
           <li key={s.term}>
             <h3 className="search-list__benefit">{s.benefit}</h3>
