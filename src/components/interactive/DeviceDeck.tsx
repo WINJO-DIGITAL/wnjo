@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
-import { showsAddress, type Project } from "@/lib/projects";
+import type { Project } from "@/lib/projects";
 
 type Item = Pick<Project, "slug" | "name" | "host" | "url" | "showAddress" | "mobile" | "tablet" | "logo">;
 type Mode = "phone" | "tablet";
@@ -285,9 +285,9 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       </div>
 
       {/* The project pills sit under the device, so the headline and the phone lead. */}
-      {/* A project whose address stays hidden is named instead. Its logo is already in the row below. */}
+      {/* Named, never addressed, the same for every project. */}
       <a href={current.url} target="_blank" rel="noopener noreferrer" className="deck__visit">
-        Visit {showsAddress(current) ? current.host : current.name} <span aria-hidden="true">↗</span>
+        Visit {current.name} <span aria-hidden="true">↗</span>
         <span className="visually-hidden"> (opens in a new tab)</span>
       </a>
 

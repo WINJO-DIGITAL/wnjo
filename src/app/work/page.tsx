@@ -2,12 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { CtaBand, PageHero } from "@/components/Blocks";
 import { PhoneFrame } from "@/components/Devices";
-import { VisitLogo } from "@/components/VisitLogo";
+import { ArrowRight } from "@/components/Icons";
 import { ScrollShot } from "@/components/interactive/ScrollShot";
 import { Tilt } from "@/components/interactive/Tilt";
-import { ArrowRight } from "@/components/Icons";
 import { pageMetadata } from "@/lib/metadata";
-import { INDUSTRIES, projects, showsAddress, type Industry } from "@/lib/projects";
+import { INDUSTRIES, projects, type Industry } from "@/lib/projects";
 import { PortfolioFilter } from "@/components/interactive/PortfolioFilter";
 
 export const metadata = pageMetadata(
@@ -75,15 +74,11 @@ export default function WorkPage() {
                     </div>
                     <p className="muted">{p.summary}</p>
                     <p>
-                      {showsAddress(p) ? (
-                        <a href={p.url} className="btn btn--secondary btn--sm" target="_blank" rel="noopener noreferrer">
-                          Visit the live site
-                          <ArrowRight />
-                          <span className="visually-hidden"> (opens in a new tab)</span>
-                        </a>
-                      ) : (
-                        <VisitLogo name={p.name} url={p.url} logo={p.logo} />
-                      )}
+                      <a href={p.url} className="btn btn--secondary btn--sm" target="_blank" rel="noopener noreferrer">
+                        Visit the live site
+                        <ArrowRight />
+                        <span className="visually-hidden"> (opens in a new tab)</span>
+                      </a>
                     </p>
                     {p.slug === "ev-exec" && (
                       <p className="small muted">

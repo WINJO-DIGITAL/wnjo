@@ -15,7 +15,7 @@ import { TrustCues } from "@/components/TrustCues";
 import { WebStages } from "@/components/WebStages";
 import { ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { homeMetadata } from "@/lib/metadata";
-import { heroProjects, OWNER_QUOTES, projectBySlug, projectLine, showsAddress } from "@/lib/projects";
+import { heroProjects, OWNER_QUOTES, projectBySlug, projectLine } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
 
@@ -219,13 +219,7 @@ export default function HomePage() {
                     <Link href={`/work#${p.slug}`}>
                       View project<span className="visually-hidden">: {p.name}</span> <ArrowRight />
                     </Link>
-                    {showsAddress(p) ? (
-                      <a href={p.url} target="_blank" rel="noopener noreferrer">
-                        View live<span className="visually-hidden">: {p.name} (opens in a new tab)</span> <span aria-hidden="true">↗</span>
-                      </a>
-                    ) : (
-                      <VisitLogo name={p.name} url={p.url} logo={p.logo} />
-                    )}
+                    <VisitLogo name={p.name} url={p.url} logo={p.logo} />
                   </p>
                 </div>
               </li>
