@@ -13,14 +13,13 @@ import { PlanChooser } from "@/components/pricing/PlanChooser";
 import { TrustCues } from "@/components/TrustCues";
 import { WebStages } from "@/components/WebStages";
 import { ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
+import { homeMetadata } from "@/lib/metadata";
 import { heroProjects, OWNER_QUOTES, projectBySlug, projectLine } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
 
-// Title, description and share image come from the root layout; only the canonical URL is added here.
-export const metadata: Metadata = siteUrl()
-  ? { alternates: { canonical: "/" } }
-  : {};
+// Title and description come from the root layout; the canonical URL and og:url are added here.
+export const metadata: Metadata = homeMetadata();
 
 const fystay = projectBySlug("fystay")!;
 const evexec = projectBySlug("ev-exec")!;

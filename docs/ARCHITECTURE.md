@@ -6,7 +6,7 @@
 - **Email:** Resend, sending from the verified `winjodigital.co.uk` domain.
 - **Payments:** Stripe. Checkout routes for deposits (`src/app/api/deposits`), briefs (`src/app/api/briefs/pay`) and subscriptions (`src/app/api/subscriptions/checkout`), a billing portal (`src/app/api/subscriptions/portal`), and a webhook (`src/app/api/stripe/webhook`). The live webhook endpoint was pointed at `winjodigital.co.uk` on 8 November 2026 (see `docs/ENVIRONMENT_VARIABLES.md`).
 - **AI:** provider-neutral engine (`src/lib/ai/`). The Claude adapter (`anthropic.ts`) is written but not connected (no key).
-- **Source control:** GitHub, `WNJOWEB/wnjo`. Work happens on `claude/winjo-repositioning-exdr4m`; `main` is what production builds from.
+- **Source control:** GitHub, `WINJO-DIGITAL/wnjo`. Work happens on `claude/winjo-repositioning-exdr4m`; `main` is what production builds from.
 
 ## Layers
 1. **Pages and components** (`src/app`, `src/components`): presentation only. Anything that matters for money or access is enforced in the database or on the server, never in the page.

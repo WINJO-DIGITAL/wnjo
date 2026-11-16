@@ -58,6 +58,15 @@ const nextConfig: NextConfig = {
     return [
       { source: "/bespoke-systems", destination: "/app-development", permanent: true },
       { source: "/websites", destination: "/managed-websites", permanent: true },
+      // The project's default Vercel address goes to the real domain (308). Only that exact host: preview addresses
+      // (winjodigital-git-<branch>-... and per-deployment ones) are different hosts and keep working. The API is left
+      // alone, so webhooks and scheduled jobs sent to that address are never bounced.
+      {
+        source: "/:path((?!api/).*)",
+        has: [{ type: "host", value: "winjodigital.vercel.app" }],
+        destination: "https://winjodigital.co.uk/:path",
+        permanent: true,
+      },
     ];
   },
   async headers() {

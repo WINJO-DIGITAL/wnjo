@@ -618,7 +618,7 @@ Confirmed by the owner on 8 November 2026 and live on `winjodigital.co.uk`. This
 
 ### 18.3 Commercial model
 - Two pathways, subscription first:
-  - Monthly subscription: the build cost spread across monthly payments with hosting, maintenance, security updates, support and agreed improvements; 12-month minimum term from go-live, then month to month on 30 days' notice; the rest of the minimum term is due on early cancellation; buy the build outright at any time at the price in the quote (it reduces as payments are made); domain and content always the client's.
+  - Monthly subscription: the build cost spread across monthly payments with hosting, maintenance, security updates, support and agreed improvements; rolling monthly with no minimum term; cancel any time with no cancellation fee, and the plan runs to the end of the month already paid for; domain and content always the client's.
   - Bespoke project: one-off fee, 50% to start and 50% before launch; hosting and care billed separately; optional development retainer.
 - Terms page updated to match (terms version `2026-11-08`). Not yet reviewed by a lawyer.
 - Prices confirmed by the owner on 8 November 2026, set from UK market ranges (`PRICING_STATUS = "confirmed"`):
@@ -649,9 +649,9 @@ The owner replaced the Grow subscriptions and one-off packages with the model be
 branch only; the live site keeps the earlier prices until the redrafted terms have had a legal review
 (`LEGAL_REVIEW_PENDING` in `src/lib/pricing.ts` shows a "draft terms" notice until then).
 
-- Monthly packages (12-month minimum term; ownership of the agreed deliverables after 12 successful payments):
-  Bronze £99/month + £99 setup (3 pages); Silver £149/month + £149 setup (5 pages, most popular); Gold £199/month +
-  £199 setup (10 pages). Inclusions, page allowances and content-update hours are in `WEBSITE_PLANS`.
+- Monthly packages (rolling monthly with no minimum term):
+  Core £99/month (5 pages); Plus £149/month (10 pages, the recommended plan); Pro £199/month (20 pages). No setup
+  fee. Inclusions, page allowances and content-update hours are in `WEBSITE_PLANS`.
 - One-off bespoke website from £999 (5 pages), owned on full payment. Extra pages £10/month (monthly) or £75 (one-off).
 - Hosting £49, Care £95, Care Plus £220 a month, for one-off websites only; monthly packages already include hosting.
 - Add-ons with monthly and one-off prices in `ADD_ONS`; a package's included add-ons are never charged.

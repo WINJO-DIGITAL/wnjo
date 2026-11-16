@@ -11,6 +11,8 @@ export const site = {
     "Managed websites from £99 a month, tailored from a sector design, with hosting and care. Website projects are designed from scratch. Rolling monthly, no minimum term.",
   locale: "en_GB",
   themeColor: "#F2ECE2",
+  /** ICO registration number. Empty until the owner supplies it; the privacy page shows the line only once it is set. */
+  icoRegistrationNumber: "",
 } as const;
 
 /**
@@ -199,6 +201,7 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
       { href: "/privacy", label: "Privacy" },
       { href: "/terms", label: "Terms" },
       { href: "/cookies", label: "Cookies" },
+      { href: "/dpa", label: "Data processing (DPA)" },
       { href: "/account", label: "Client sign-in" },
     ],
   },

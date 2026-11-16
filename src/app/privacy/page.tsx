@@ -29,6 +29,12 @@ export default function PrivacyPage() {
               3 Knoxwood Close, Thornton-Cleveleys, FY5 3UP, United Kingdom.
               <br />
               Email: <a href="mailto:hello@winjodigital.co.uk">hello@winjodigital.co.uk</a>
+              {site.icoRegistrationNumber && (
+                <>
+                  <br />
+                  ICO registration number: {site.icoRegistrationNumber}
+                </>
+              )}
             </p>
 
             <h2>What we collect</h2>
