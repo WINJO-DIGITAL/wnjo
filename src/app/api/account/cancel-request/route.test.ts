@@ -26,7 +26,14 @@ vi.mock("@/lib/quote-store", () => ({
 vi.mock("@/lib/rate-limit-shared", () => ({ LIMITS_PER_ROUTE: { checkout: { max: 10, windowSeconds: 600 } }, sharedRateLimited: async () => state.limited }));
 vi.mock("@/lib/staff-auth", () => ({ customerFromRequest: async () => ({ userId: "c1", email: "owner@shop.co.uk" }) }));
 vi.mock("@/lib/stripe", () => ({ STRIPE_API: "https://api.stripe.com/v1", stripeConfig: () => ({ secretKey: "sk_test_x" }) }));
-vi.mock("@/lib/mailer", () => ({ notificationMailConfig: () => state.mail, sendEmail: async (_c: unknown, m: { to: string; subject: string; text: string }) => (state.sent.push(m), true) }));
+vi.mock("@/lib/mailer", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/mailer")>();
+  return {
+    notificationMailConfig: () => state.mail,
+    sendEmail: async (_c: unknown, m: { to: string; subject: string; text: string }) => (state.sent.push(m), true),
+    enquiryTo: () => actual.enquiryTo(),
+  };
+});
 
 import { POST } from "./route";
 

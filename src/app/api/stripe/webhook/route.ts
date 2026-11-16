@@ -2,7 +2,7 @@ import { after, NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
 import { paymentMatches, stripeConfig, verifyStripeSignature } from "@/lib/stripe";
 import { recordEvent } from "@/lib/ai/event-store";
-import { notificationMailConfig, sendEmail } from "@/lib/mailer";
+import { enquiryTo, notificationMailConfig, sendEmail } from "@/lib/mailer";
 import { kickWorker, processDueEvents } from "@/lib/ai/sweep";
 import { providerFromEnv } from "@/lib/ai/agent-runtime";
 import { runAutoDrafts } from "@/lib/ai/website-auto";
@@ -33,7 +33,7 @@ export const maxDuration = 300;
  */
 async function alertStaff(subject: string, detail: string): Promise<void> {
   const config = notificationMailConfig();
-  const to = process.env.ENQUIRY_TO_EMAIL?.trim();
+  const to = enquiryTo();
   if (!config || !to) return;
   await sendEmail(config, { to, subject: `[WINJO DIGITAL payments] ${subject}`, text: detail, internal: true }, "Payment alert").catch(() => {});
 }

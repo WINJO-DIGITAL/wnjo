@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { canRequestCancel, cleanCancelRequest, describeCancelRequest } from "@/lib/cancel-request";
-import { notificationMailConfig, sendEmail } from "@/lib/mailer";
+import { enquiryTo, notificationMailConfig, sendEmail } from "@/lib/mailer";
 import { STRIPE_API, stripeConfig } from "@/lib/stripe";
 import { serviceClient } from "@/lib/quote-store";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       endsOn: endsOn ?? undefined,
     });
     await sendEmail(config, { to: sub.email, subject: message.subject, text: message.text }, "Cancellation request").catch(() => false);
-    const staff = process.env.ENQUIRY_TO_EMAIL?.trim();
+    const staff = enquiryTo();
     if (staff) {
       await sendEmail(
         config,
