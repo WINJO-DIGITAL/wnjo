@@ -14963,8 +14963,8 @@ body:has(.pv, .sitepv) .site-footer {
 @media (max-width: 719px) {
   .seg {
     flex-wrap: nowrap;
-    margin: 0 -20px;
-    padding: 0 20px;
+    margin-inline: -20px;
+    padding-inline: 20px;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -15599,4 +15599,25 @@ a.timeline__what:hover {
 .plan__price span {
   letter-spacing: 0;
   text-transform: none;
+}
+
+/* The payment link form: inputs fill their column and never push past the card, on any width. */
+.admin-sub-figures > label {
+  min-width: 0;
+}
+.admin .admin-sub-form .acct-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+.admin .admin-sub-form {
+  min-width: 0;
+}
+@media (max-width: 479px) {
+  .admin-sub-figures {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin .admin-sub-form {
+    padding: 22px 20px;
+  }
 }
