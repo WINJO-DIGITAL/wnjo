@@ -212,7 +212,7 @@ test("the Gallery page is a wall of photos that keep their own shapes", async ({
 });
 
 test("the FAQs page tells people where to go if their question isn't there", async ({ page }) => {
-  await page.goto(at("electrician-p6", "/faq"));
+  await page.goto(at("electrician-p7", "/faq"));
   const more = page.getByText("Can't see your answer?");
   await expect(more).toBeVisible();
   await expect(page.locator('p:has-text("Can\'t see your answer?") a[href^="tel:"]')).toHaveAttribute("href", "tel:01134960789");
