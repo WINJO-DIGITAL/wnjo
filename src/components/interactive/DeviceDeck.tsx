@@ -289,9 +289,9 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         target="_blank"
         rel="noopener noreferrer"
         className="deck__visit"
-        aria-label={`Visit ${current.name}'s website (opens in a new tab)`}
       >
         Visit {current.host} <span aria-hidden="true">↗</span>
+        <span className="visually-hidden"> (opens in a new tab)</span>
       </a>
 
       <div ref={railRef} className="deck__rail" role="group" aria-label="Choose a project">

@@ -16201,3 +16201,84 @@ a.timeline__what:hover {
 .section--soft .pkg-card:not(.pkg-card--selected):not(.pkg-card--recommended) {
   background: var(--color-surface);
 }
+
+/* ---------- Readability: 16px body text, darker greys, larger section labels ---------- */
+:root {
+  --text-sm: 1rem; /* 16: the smallest size body text is set in */
+  --color-ink-3: #5c554d; /* 6.2:1 on --color-bg, 6.9:1 on the lighter cream */
+  --tracking-label: 0.1em;
+}
+/* The dashboards keep the denser type they were designed with. */
+body:has(.dash-header) {
+  --text-sm: 0.9375rem;
+  --color-ink-3: #665f57;
+  --tracking-label: 0.08em;
+}
+.fine {
+  font-size: 0.875rem;
+  color: var(--color-ink-2);
+}
+.inverse .fine {
+  color: var(--color-inverse-ink-2);
+}
+.pkg-card__points,
+.pkg-card__refresh,
+.home-work__problem {
+  font-size: 1rem;
+}
+/* Section labels and other small capitals: 13px, a little more tracking, and the stronger grey. */
+.eyebrow,
+.tile__name,
+.resp__label,
+.terms-grid__label,
+.included-panel__label,
+.case dt,
+.work-row__meta,
+.tag,
+.pkg-compare__group th,
+.pkg-card__name,
+.oq__by {
+  font-size: 0.8125rem;
+  letter-spacing: var(--tracking-label);
+}
+.eyebrow,
+.tile__name,
+.terms-grid__label,
+.included-panel__label,
+.case dt,
+.work-row__meta {
+  color: var(--color-ink-2);
+}
+.section-head .eyebrow::before {
+  color: inherit;
+}
+.inverse .eyebrow,
+.inverse .tile__name {
+  color: var(--color-inverse-ink-2);
+}
+.pkg-compare__tag,
+.rfc__tag,
+.managed-split__shot figcaption,
+.breadcrumbs,
+.build-line {
+  font-size: 0.8125rem;
+}
+
+/* ---------- Reading progress: on the very top edge of the screen, clear of the logo ---------- */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: 3px;
+}
+.breadcrumbs li,
+.breadcrumbs a {
+  font-size: 0.8125rem;
+}
+.oq__switch button {
+  font-size: 1rem;
+}
+.option-card__note,
+.search-list__meta {
+  font-size: 0.875rem;
+}
