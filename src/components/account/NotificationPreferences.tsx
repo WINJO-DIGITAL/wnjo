@@ -8,7 +8,7 @@ type Pref = { kind: string; in_app: boolean; email: string | boolean };
 /** The kinds a customer can choose for. Each one has its own on-site and email switch. */
 const KINDS: Array<{ id: string; label: string }> = [
   { id: "progress", label: "Progress on your website" },
-  { id: "message", label: "Messages from us" },
+  { id: "message", label: "Messages from the team" },
   { id: "approval", label: "Approvals to review" },
   { id: "quote", label: "Quotes" },
 ];

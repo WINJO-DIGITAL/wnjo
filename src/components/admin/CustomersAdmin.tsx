@@ -303,7 +303,7 @@ function Notes({ client, tenantId, email }: { client: SupabaseClient; tenantId: 
   return (
     <aside className="notes" aria-labelledby="cust-notes">
       <h3 id="cust-notes" className="admin-label">Internal notes</h3>
-      <p className="acct-meta">Only you see these.</p>
+      <p className="acct-meta">Only your team sees these.</p>
       <form onSubmit={add} className="notes__form">
         <label className="visually-hidden" htmlFor="note-text">Add a note</label>
         <textarea id="note-text" className="acct-input notes__input" rows={3} maxLength={2000} placeholder="Add a note" value={text} onChange={(e) => setText(e.target.value)} />

@@ -37,7 +37,7 @@ const SWIPE_MIN_PX = 80;
 /**
  * The details form a customer fills in after paying, one short step at a time. Every step is saved to the server as
  * they go, so closing the page by accident loses at most the last few seconds, and they come back to the step they
- * were on. Saving progress never sends anything to WINJO: only "Send to WINJO" does that.
+ * were on. Saving progress never sends anything to the team: only "Send to the team" does that.
  */
 export function BriefWizard({
   initial,
@@ -318,7 +318,7 @@ export function BriefWizard({
           )}
           {current === "review" ? (
             <button type="button" className="btn btn--primary" onClick={() => void send()} disabled={busy}>
-              {busy ? "Sending…" : "Send to WINJO"}
+              {busy ? "Sending…" : "Send to the team"}
             </button>
           ) : (
             <button type="button" className="btn btn--primary" onClick={next}>
