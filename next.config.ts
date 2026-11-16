@@ -28,7 +28,7 @@ function contentSecurityPolicy(): string {
     "font-src": ["'self'", "data:", ...vercel],
     "media-src": ["'self'", "blob:", ...(supabase ? [supabase] : [])],
     "connect-src": ["'self'", ...(supabase ? [supabase, supabaseWs] : []), ...vercel, ...(preview ? ["wss://ws-us3.pusher.com"] : [])],
-    "frame-src": preview ? vercel : ["'none'"],
+    "frame-src": ["https://maps.google.com", "https://www.google.com", ...(preview ? vercel : [])],
     "worker-src": ["'self'", "blob:"],
     "object-src": ["'none'"],
     "base-uri": ["'self'"],

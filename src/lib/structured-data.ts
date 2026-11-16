@@ -5,6 +5,15 @@ import { site } from "@/lib/site";
  * The business, described for search engines using only what the site itself shows: name, description, the town in
  * the footer, and the published starting prices. No street address, phone number, ratings or reviews are included.
  */
+/** Offer text for search engines. It avoids the word "review", which would look like a rating we don't publish. */
+function planOfferDescription(id: "bronze" | "silver" | "gold"): string {
+  if (id === "bronze") {
+    return `${WEBSITE_PLANS.bronze.summary} Includes a quote form, WhatsApp and click-to-call, testimonials the client supplies, opening hours and areas covered, local SEO basics, and Google Business Profile setup at launch.`;
+  }
+  if (id === "silver") return WEBSITE_PLANS.silver.summary;
+  return "Everything in Plus, with advanced search and technical work and more time for changes each month.";
+}
+
 export function businessSchema(baseUrl: string) {
   const url = baseUrl.replace(/\/+$/, "");
   return [
@@ -33,7 +42,7 @@ export function businessSchema(baseUrl: string) {
         ...(["bronze", "silver", "gold"] as const).map((id) => ({
           "@type": "Offer",
           name: `${WEBSITE_PLANS[id].name} managed website subscription`,
-          description: WEBSITE_PLANS[id].tagline,
+          description: planOfferDescription(id),
           priceSpecification: {
             "@type": "UnitPriceSpecification",
             price: WEBSITE_PLANS[id].monthly,
@@ -109,7 +118,7 @@ const fromOffer = (name: string, from: number, description?: string) => ({
 export function serviceSchema(baseUrl: string, page: ServicePage) {
   const url = baseUrl.replace(/\/+$/, "");
   const plans = (ids: readonly ("bronze" | "silver" | "gold")[]) =>
-    ids.map((id) => monthlyOffer(`${WEBSITE_PLANS[id].name} managed website subscription`, WEBSITE_PLANS[id].monthly, WEBSITE_PLANS[id].tagline));
+    ids.map((id) => monthlyOffer(`${WEBSITE_PLANS[id].name} managed website subscription`, WEBSITE_PLANS[id].monthly, planOfferDescription(id)));
   const services: Record<ServicePage, { name: string; serviceType: string; description: string; offers: object[] }> = {
     "managed-websites": {
       name: "Managed websites",

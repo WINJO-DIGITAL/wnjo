@@ -26,7 +26,10 @@ const monthly: [string, string][] = [
   ["Security", "Monitored, and fixed when something needs attention."],
   ["Maintenance and updates", "The technical upkeep, done without you asking."],
   ["Monitoring and fixes", "We watch for downtime and resolve faults."],
-  ["Support and changes", "One team to ask when something needs changing."],
+  ["Support and changes", "One person to ask when something needs changing."],
+  ["Enquiries, calls and WhatsApp", "A quote form emailed to you, a call button and a mobile call bar, and a WhatsApp button."],
+  ["Local presence", "Opening hours, areas covered, a map, local SEO basics, and your Google Business Profile linked from the site."],
+  ["Reviews you supply", "Shown only when you give them. We never write reviews."],
 ];
 
 // A real website we look after, for the hero picture.

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { SAMPLE_BARBER, SAMPLE_ELECTRICIAN } from "./sample";
 import type { SiteContent } from "./schema";
-import { daysFrom, jsonLdText, localBusinessJsonLd, pageDescription, pagesOf, pageTitle, robotsTxt, sitemapXml } from "./seo";
+import { daysFrom, jsonLdText, localBusinessJsonLd, pageDescription, pageMetaDescription, pagesOf, pageTitle, robotsTxt, sitemapXml } from "./seo";
 
 const multi: SiteContent = {
   ...SAMPLE_BARBER,
@@ -26,6 +26,18 @@ describe("page titles and descriptions", () => {
     const long: SiteContent = { ...multi, pages: [{ slug: "services", title: "Services", sections: [{ kind: "pagehead", headline: "H", intro: "word ".repeat(100) }] }] };
     expect(pageDescription(long, "services").length).toBeLessThanOrEqual(160);
   });
+  it("keeps each page's meta description distinct when the opening words match", () => {
+    const shared = "Tell us what you need.";
+    const clash: SiteContent = {
+      ...multi,
+      sections: [{ kind: "hero", variant: "plain", headline: "Hello", intro: shared, cta: "Book" }],
+      pages: [
+        { slug: "contact", title: "Contact", sections: [{ kind: "pagehead", headline: "Get in touch", intro: shared }] },
+      ],
+    };
+    expect(pageMetaDescription(clash, "")).not.toBe(pageMetaDescription(clash, "contact"));
+    expect(pageMetaDescription(multi, "services")).toBe("Every cut, with its price.");
+  });
 });
 
 describe("opening days", () => {
@@ -49,6 +61,13 @@ describe("structured data", () => {
     expect(data.telephone).toBe("01632 960123");
     expect(data.address).toMatchObject({ streetAddress: "12 High Street, Leeds" });
     expect(JSON.stringify(data)).toContain("Monday");
+    expect(data.areaServed).toEqual([{ "@type": "AdministrativeArea", name: "Leeds" }]);
+    const linked = localBusinessJsonLd(
+      { ...SAMPLE_BARBER, business: { ...SAMPLE_BARBER.business, areas: ["Leeds", "Bradford"], sameAs: ["https://example.com/hartley", "javascript:alert(1)"], googleProfile: "https://maps.google.com/?cid=1" } },
+      "https://hartley.example/",
+    );
+    expect(linked.areaServed).toEqual([{ "@type": "AdministrativeArea", name: "Leeds" }, { "@type": "AdministrativeArea", name: "Bradford" }]);
+    expect(linked.sameAs).toEqual(["https://example.com/hartley"]);
     // The electrician gave no hours, so none are claimed.
     expect(localBusinessJsonLd(SAMPLE_ELECTRICIAN, "https://spark.example/")).not.toHaveProperty("openingHoursSpecification");
   });

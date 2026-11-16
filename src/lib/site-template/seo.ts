@@ -34,6 +34,19 @@ export function pageDescription(content: SiteContent, slug: string): string {
   return chosen.length <= 160 ? chosen : cutWords(chosen, 24).slice(0, 160).trim();
 }
 
+/**
+ * The description used in the page head. It is the page's own description, and if another page would share it,
+ * the page name is added so each page stays distinct.
+ */
+export function pageMetaDescription(content: SiteContent, slug: string): string {
+  const mine = pageDescription(content, slug);
+  const clash = pagesOf(content).some((page) => page.slug !== slug && pageDescription(content, page.slug) === mine);
+  if (!clash) return mine;
+  const title = slug ? (content.pages?.find((page) => page.slug === slug)?.title ?? content.business.name) : "Home";
+  const withTitle = `${title}. ${mine}`;
+  return withTitle.length <= 160 ? withTitle : `${withTitle.slice(0, 157).trimEnd()}…`;
+}
+
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
 const dayIndex = (word: string) => DAYS.findIndex((d) => d.toLowerCase().startsWith(word.trim().toLowerCase().slice(0, 3)) && word.trim().length >= 3);
 
@@ -60,11 +73,44 @@ function openingHours(items: HoursItem[]) {
   });
 }
 
+/** The town at the end of an address ("12 High Street, Leeds"), ignoring a postcode if that is the last part. */
+function townOf(address?: string): string | undefined {
+  const parts = address?.split(",").map((part) => part.trim()).filter(Boolean) ?? [];
+  const last = parts.at(-1);
+  if (!last) return undefined;
+  if (/^[A-Z]{1,2}\d/i.test(last)) return parts.length > 1 ? parts.at(-2) : undefined;
+  return last;
+}
+
+/** An https link, or nothing. Used for profile links so a bad address never reaches the page. */
+export function safeHttpsUrl(value: string | undefined): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== "https:" || url.username || url.password) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+/** A Google Maps embed for an address the customer gave. No key, and nothing is shown without an address. */
+export function mapsEmbedUrl(address: string): string {
+  return `https://maps.google.com/maps?q=${encodeURIComponent(address)}&z=15&output=embed`;
+}
+
 /** Structured data about the business, from its own details. Only fields the customer gave appear. */
 export function localBusinessJsonLd(content: SiteContent, url: string, image?: string): Record<string, unknown> {
   const { business } = content;
   const hours = content.sections.find((s): s is Extract<Section, { kind: "hours" }> => s.kind === "hours") ?? content.pages?.flatMap((p) => p.sections).find((s): s is Extract<Section, { kind: "hours" }> => s.kind === "hours");
   const specs = hours ? openingHours(hours.items) : [];
+  const areaNames = business.areas?.map((area) => area.trim()).filter(Boolean) ?? [];
+  const town = areaNames.length ? undefined : townOf(business.address);
+  const areaServed = areaNames.length ? areaNames.map((name) => ({ "@type": "AdministrativeArea", name })) : town ? [{ "@type": "AdministrativeArea", name: town }] : [];
+  const sameAs = [...new Set((business.sameAs ?? []).flatMap((link) => {
+    const safe = safeHttpsUrl(link);
+    return safe ? [safe] : [];
+  }))];
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -75,6 +121,8 @@ export function localBusinessJsonLd(content: SiteContent, url: string, image?: s
     ...(business.email ? { email: business.email } : {}),
     ...(business.address ? { address: { "@type": "PostalAddress", streetAddress: business.address, addressCountry: "GB" } } : {}),
     ...(specs.length ? { openingHoursSpecification: specs } : {}),
+    ...(areaServed.length ? { areaServed } : {}),
+    ...(sameAs.length ? { sameAs } : {}),
   };
 }
 

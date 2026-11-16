@@ -669,6 +669,7 @@ function Inner({
                           />
                           <span className={styles.choiceBody}>
                             <span className={styles.choiceLabel}>{a.label}</span>
+                            {"note" in a && a.note && <span className={styles.choiceHint}>{a.note}</span>}
                             <span className={styles.choicePrice}>{addOnPrice(id, monthly, included)}</span>
                           </span>
                         </label>

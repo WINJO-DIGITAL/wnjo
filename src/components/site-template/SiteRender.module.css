@@ -627,7 +627,8 @@
   font-weight: 600;
   box-shadow: 0 2px 0 var(--accent);
 }
-.nav .btn {
+.nav .btn,
+.nav .call {
   display: none;
 }
 
@@ -652,6 +653,69 @@
 .dock .btnGhost {
   flex: 0 1 34%;
   border-color: var(--line);
+}
+
+/* WhatsApp sits above the call bar on a phone. The wider-screen rule below hides it. */
+.whatsapp {
+  display: inline-block;
+  position: fixed;
+  right: 1rem;
+  bottom: calc(5.4rem + env(safe-area-inset-bottom));
+  z-index: 7;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 650;
+  text-decoration: none;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.map {
+  display: block;
+  width: 100%;
+  height: 16rem;
+  margin-top: 1.25rem;
+  border: 0;
+  border-radius: var(--radius);
+}
+.reviews {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reviews blockquote {
+  margin: 0;
+}
+.reviews p {
+  font-family: var(--head);
+  font-size: 1.15rem;
+  line-height: 1.35;
+}
+.reviews footer {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.reviews footer span::before {
+  content: " · ";
+}
+.optional {
+  color: var(--muted);
+  font-weight: 400;
+}
+.form select,
+.form input[type="file"] {
+  width: 100%;
+  margin-top: 0.35rem;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 0.55rem 0;
 }
 
 .hero {
@@ -680,10 +744,12 @@
     margin: 0;
     padding: 0;
   }
-  .nav .btn {
+  .nav .btn,
+  .nav .call {
     display: inline-block;
   }
-  .dock {
+  .dock,
+  .whatsapp {
     display: none;
   }
   .foot {

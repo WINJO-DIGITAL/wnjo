@@ -67,7 +67,7 @@ export function nextStepFor(input: { stage: Stage; route: Route; proposalSent: b
     case "changes":
       return { title: "Making your changes", body: "Nothing needed from you.", action: false, tab: null, cta: null };
     case "approval":
-      return { title: "Final checks", body: "Our team is checking before launch.", action: false, tab: null, cta: null };
+      return { title: "Final checks", body: "We're checking before launch.", action: false, tab: null, cta: null };
     case "brief_received":
       return { title: "We have your brief", body: "Nothing needed from you.", action: false, tab: null, cta: null };
     case "reviewing":

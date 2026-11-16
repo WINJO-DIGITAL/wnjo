@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     const text = note(body.note);
     if (!kind || !decision) return fail(422, "Choose an approval and a decision.");
     if (!canDecide(staff.role, kind)) return fail(403, `Only an owner or admin can decide ${APPROVALS[kind].label.toLowerCase()}.`);
-    if (decision === "rejected" && !text) return fail(422, "Say why, so the team knows what to fix.");
+    if (decision === "rejected" && !text) return fail(422, "Say why, so it's clear what to fix.");
     const { error } = await db.from("build_approvals").insert({
       tenant_id: staff.tenantId,
       brief_id: brief.id,

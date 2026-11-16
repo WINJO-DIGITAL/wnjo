@@ -77,7 +77,7 @@ export function OverviewAdmin({ client }: { client: SupabaseClient }) {
         { label: "Proposals to approve", count: toApprove.count ?? 0, href: "#builds" },
         { label: "Proposals to send", count: toSend.count ?? 0, href: "#builds" },
         { label: "Briefs to review", count: briefs.count ?? 0, href: "#builds" },
-        { label: "Goals received, ready for the team", count: withGoals, href: "#builds" },
+        { label: "Goals received, ready to build", count: withGoals, href: "#builds" },
         { label: "Quotes waiting for an answer", count: quotes.count ?? 0, href: "#quotes" },
       ].filter((n) => n.count > 0);
 

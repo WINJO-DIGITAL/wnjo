@@ -23,12 +23,14 @@ export const PLAN_ANCHOR: Record<WebsitePlanId, string> = { bronze: "core", silv
  */
 export const CARD_POINTS: Record<WebsitePlanId, string[]> = {
   bronze: [
+    "Quote form, WhatsApp and click-to-call",
+    "Reviews you supply, hours and areas covered",
+    "Local SEO basics and a Google Business Profile link",
+    "Up to 30 minutes of changes a month",
     "Sector design tailored to you, up to 5 pages",
     "Managed hosting and SSL",
     "Security monitoring",
     "Maintenance, updates and fault resolution",
-    "Basic SEO foundations",
-    "Technical support and small agreed changes",
   ],
   silver: [
     "Everything in Core",
@@ -122,7 +124,13 @@ export function PackageComparison() {
         ["Sector design, tailored to your business", () => true],
         ["Pages", (id) => `Up to ${WEBSITE_PLANS[id].pages}`],
         ["Mobile optimisation", () => true],
-        ["Contact forms", () => true],
+        ["Quote form, with a service choice and optional photo", () => true],
+        ["WhatsApp click-to-chat", () => true],
+        ["Click-to-call and a mobile call bar", () => true],
+        ["Testimonials from reviews you supply", () => true],
+        ["Opening hours and areas covered", () => true],
+        ["Google Business Profile setup at launch, and a link", () => true],
+        ["Local SEO basics", () => true],
       ],
     },
     {
@@ -330,10 +338,15 @@ export function AddOnsTable() {
             const from = "from" in a && a.from === true;
             const quoted = "monthlyQuoted" in a && a.monthlyQuoted === true;
             const includedIn = PLAN_ORDER.filter((p) => has(p, id)).map((p) => WEBSITE_PLANS[p].name);
+            const onEveryPlan = includedIn.length === PLAN_ORDER.length;
+            const note = "note" in a ? a.note : undefined;
             return (
               <tr key={id}>
-                <th scope="row">{a.label}</th>
-                <td>{quoted ? "Custom subscription" : a.monthly !== null ? price(a.monthly, from, " a month") : price(a.oneOff, from, " once")}</td>
+                <th scope="row">
+                  {a.label}
+                  {note && <span className="fine"> {note}</span>}
+                </th>
+                <td>{onEveryPlan ? "Included" : quoted ? "Custom subscription" : a.monthly !== null ? price(a.monthly, from, " a month") : price(a.oneOff, from, " once")}</td>
                 <td>{a.oneOff !== null ? price(a.oneOff, from) : price(a.monthly, from, " a month")}</td>
                 <td className="muted">{includedIn.length ? includedIn.join(", ") : "–"}</td>
               </tr>

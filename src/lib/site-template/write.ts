@@ -186,6 +186,16 @@ export function parseCopy(text: string): ParsedCopy {
 
 const joinList = (items: string[]) => (items.length <= 1 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`);
 
+/** Adds the places the customer named, when the wording doesn't already say them. */
+function withAreas(text: string, areas: string[] | undefined): string {
+  if (!areas?.length) return text;
+  const missing = areas.filter((area) => !text.toLowerCase().includes(area.toLowerCase()));
+  if (!missing.length) return text;
+  const extra = `Areas covered: ${joinList(missing)}.`;
+  const combined = text.trim() ? `${text.trim()} ${extra}` : extra;
+  return combined.length <= FIELD_LIMITS.body ? combined : extra.slice(0, FIELD_LIMITS.body);
+}
+
 /** The last part of an address, which is the town in the way people write them: "12 High Street, Leeds". */
 const townOf = (address?: string) => address?.split(",").map((part) => part.trim()).filter(Boolean).pop();
 
@@ -218,7 +228,7 @@ export function defaultCopy(input: WriteInput): SiteCopy {
     hero: { headline: fits ? headline : facts.businessName, intro: cutWords(cut(facts.about ?? "", FIELD_LIMITS.intro), WORD_LIMITS.intro), cta: c.heroCta },
     headings: c.headings,
     descriptions: {},
-    area: places.length ? `${c.areaLead} ${joinList(places)}.` : facts.address ? `We are at ${facts.address}.` : "",
+    area: preset.areaSource === "areas" && places.length ? `${c.areaLead} ${joinList(places)}.` : facts.address ? `We are at ${facts.address}.` : places.length ? `Areas covered: ${joinList(places)}.` : "",
     enquiry: { intro: c.enquiryIntro, cta: c.enquiryCta },
     faq: [],
     closing: { headline: c.closingHeadline, cta: c.closingCta },
@@ -279,9 +289,15 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
       case "facts":
         if (facts.highlights?.length) sections.push({ kind: "facts", items: facts.highlights.slice(0, 4) });
         break;
-      case "area":
-        if ((preset.areaSource === "areas" ? facts.areas?.length : facts.address) && copy.area) sections.push({ kind: "area", heading: copy.headings.area, text: copy.area });
+      case "area": {
+        const hasPlace = preset.areaSource === "areas" ? Boolean(facts.areas?.length) : Boolean(facts.address || facts.areas?.length);
+        const text = withAreas(copy.area, preset.areaSource === "areas" ? undefined : facts.areas);
+        if (hasPlace && text.trim()) {
+          const heading = preset.areaSource === "address" && !facts.address && facts.areas?.length ? "Areas we cover" : copy.headings.area;
+          sections.push({ kind: "area", heading, text });
+        }
         break;
+      }
       case "enquiry":
         sections.push({ kind: "enquiry", heading: copy.headings.enquiry, ...copy.enquiry, prompt: preset.enquiryPrompt });
         break;
@@ -297,18 +313,24 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
   // Spread the sections over the pages the customer chose. With one page chosen the site is just `sections`.
   const layout = layoutPages(preset, input.pages ?? ["home"], sections, copy.pageHeads ?? {}, aboutSection(facts, "About us", input.images?.[0] ? { src: input.images[0].src, alt: input.images[0].alt.trim() || `${facts.businessName} photo` } : undefined));
 
+  const sameAs = [...new Set([...(facts.sameAs ?? []), ...(facts.googleProfile ? [facts.googleProfile] : [])])];
   return {
     business: {
       name: facts.businessName,
       ...(input.logo ? { logo: input.logo } : {}),
       ...(copy.tagline ? { tagline: copy.tagline } : {}),
       ...(facts.phone ? { phone: facts.phone } : {}),
+      ...(facts.whatsapp ? { whatsapp: facts.whatsapp } : {}),
       ...(facts.email ? { email: facts.email } : {}),
       ...(facts.address ? { address: facts.address } : {}),
+      ...(facts.googleProfile ? { googleProfile: facts.googleProfile } : {}),
+      ...(sameAs.length ? { sameAs } : {}),
+      ...(facts.areas?.length ? { areas: facts.areas } : {}),
     },
     theme: { colour: input.colour, look: input.look, layout: input.layout ?? defaultLayout(preset.id) },
     sections: layout.sections,
     ...(layout.pages.length ? { pages: layout.pages } : {}),
+    ...(facts.reviews?.length ? { reviews: facts.reviews } : {}),
   };
 }
 

@@ -65,6 +65,8 @@ export type HoursItem = { day: string; open?: string; close?: string; closed?: b
 export type GalleryImage = { src: string; alt: string };
 export type Fact = { value: string; label: string };
 export type FaqItem = { question: string; answer: string };
+/** A review the customer typed in themselves. Never written by the model. */
+export type SuppliedReview = { quote: string; name: string; source?: string };
 
 export type Section =
   | { kind: "hero"; variant: "photo" | "video" | "plain"; headline: string; intro: string; cta: string; image?: string }
@@ -92,6 +94,14 @@ export type BusinessDetails = {
   phone?: string;
   email?: string;
   address?: string;
+  /** WhatsApp number for the click-to-chat button. Left out, and the button hidden, when they didn't give one. */
+  whatsapp?: string;
+  /** Their Google Business Profile, as an https link. Left out when they didn't give one. */
+  googleProfile?: string;
+  /** Profile links (the Google Business Profile, social pages) for local business markup. */
+  sameAs?: string[];
+  /** Places they cover, exactly as they typed them. */
+  areas?: string[];
 };
 
 export type SiteContent = {
@@ -101,6 +111,8 @@ export type SiteContent = {
   sections: Section[];
   /** The other pages of a multi-page site, in menu order. Absent for a one-page site. */
   pages?: SitePage[];
+  /** Reviews the customer supplied. Absent when they gave none, so the section is not shown. */
+  reviews?: SuppliedReview[];
 };
 
 /**
@@ -116,8 +128,16 @@ export type CustomerFacts = {
   /** Places a trade covers, each named as the customer gave it. */
   areas?: string[];
   phone?: string;
+  /** WhatsApp number for the click-to-chat button. Left out when they didn't give one. */
+  whatsapp?: string;
   email?: string;
   address?: string;
+  /** https link to their Google Business Profile. */
+  googleProfile?: string;
+  /** Other https profile links, for the site's local business markup. */
+  sameAs?: string[];
+  /** Reviews they pasted, word for word. Never invented. */
+  reviews?: SuppliedReview[];
   /** The customer's own words on what makes the business different. The writer may rephrase it, never add to it. */
   about?: string;
   /** The customer's answers to the sector's own questions, each with the question it answers. */

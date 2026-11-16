@@ -8,6 +8,7 @@ import { REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
 const core = WEBSITE_PLANS.bronze;
 const plus = WEBSITE_PLANS.silver;
+const pro = WEBSITE_PLANS.gold;
 
 export const metadata = pageMetadata(
   "/winjo-refresh",
@@ -66,7 +67,9 @@ export default function WinjoRefreshPage() {
       <section id="covers" className="section section--ruled" aria-labelledby="covers-title">
         <div className="container container--wide">
           <SectionHead eyebrow="What you get" title={<span id="covers-title">A planned design and experience refresh.</span>} split>
-            <p>Every {REFRESH.everyMonths} months, on every plan. The level depends on the plan.</p>
+            <p>
+              Every {REFRESH.everyMonths} months, on every plan. {core.name}: {REFRESH.levels.bronze.name}. {plus.name}: {REFRESH.levels.silver.name}. {pro.name}: {REFRESH.levels.gold.name}.
+            </p>
           </SectionHead>
           <ul role="list" className="managed-list managed-list--wide" data-reveal>
             {covers.map(([title, line]) => (

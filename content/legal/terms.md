@@ -1,6 +1,6 @@
 # WINJO DIGITAL – Terms and Conditions
 
-Version 2026-11-16.1. Replaces 2026-11-14.2.
+Version 2026-11-16.2. Replaces 2026-11-16.1.
 
 ---
 
@@ -35,6 +35,8 @@ Booking systems, custom software and other individually scoped services are cove
 - **Core:** £99 a month;
 - **Plus:** £149 a month;
 - **Pro:** £199 a month.
+
+Every plan includes the Core services: a quote and enquiry form (a choice of your services, an optional photo, emailed to you), a WhatsApp click-to-chat button, a click-to-call button and a sticky mobile call bar, a testimonials section for reviews you supply, opening hours and areas covered, local SEO basics (your business details for search, a map on the contact page, and a title and description for each page), and Google Business Profile setup or optimisation at launch with a link from the site. Plus and Pro include everything in Core, and the further services listed for that plan on our pricing page. Advanced enquiry forms, meaning extra questions or a second form beyond that standard form, are optional and priced separately.
 
 3.3 There is no setup fee. Payments are taken monthly in advance through Stripe, starting with your first payment when you agree to go ahead.
 

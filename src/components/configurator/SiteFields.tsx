@@ -148,14 +148,12 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
             {err("services")}
           </div>
 
-          {preset.areaSource === "areas" && (
-            <div className="field">
-              <label htmlFor={`${id}-areas`}>Areas you cover</label>
-              <textarea id={`${id}-areas`} className="textarea" rows={3} maxLength={300} value={answers.areas ?? ""} placeholder={"Leeds, Wakefield, Harrogate"} aria-invalid={errors.areas ? true : undefined} onChange={(e) => set({ areas: e.target.value })} />
-              <p className="field-hint">One place per line, or separated by commas.</p>
-              {err("areas")}
-            </div>
-          )}
+          <div className="field">
+            <label htmlFor={`${id}-areas`}>Areas you cover {preset.areaSource !== "areas" && <span className="optional">(optional)</span>}</label>
+            <textarea id={`${id}-areas`} className="textarea" rows={3} maxLength={300} value={answers.areas ?? ""} placeholder={"Leeds, Wakefield, Harrogate"} aria-invalid={errors.areas ? true : undefined} onChange={(e) => set({ areas: e.target.value })} />
+            <p className="field-hint">{preset.areaSource === "areas" ? "One place per line, or separated by commas." : "Leave this blank if you only want your address shown. One place per line, or separated by commas."}</p>
+            {err("areas")}
+          </div>
 
           {hasHours && (
           <fieldset className={styles.group}>
@@ -237,6 +235,30 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
                 <label htmlFor={`${id}-address`}>Address <span className="optional">(optional)</span></label>
                 <input id={`${id}-address`} className="input" autoComplete="street-address" maxLength={160} value={answers.address ?? ""} onChange={(e) => set({ address: e.target.value })} />
                 {err("address")}
+              </div>
+              <div className="field">
+                <label htmlFor={`${id}-whatsapp`}>WhatsApp number <span className="optional">(optional)</span></label>
+                <input id={`${id}-whatsapp`} className="input" type="tel" autoComplete="tel" maxLength={20} value={answers.whatsapp ?? ""} onChange={(e) => set({ whatsapp: e.target.value })} />
+                <p className="field-hint">Shown as a WhatsApp button on phones. Leave it blank and the button is left off.</p>
+                {err("whatsapp")}
+              </div>
+              <div className="field">
+                <label htmlFor={`${id}-profile`}>Google Business Profile link <span className="optional">(optional)</span></label>
+                <input id={`${id}-profile`} className="input" type="url" inputMode="url" maxLength={300} placeholder="https://" value={answers.googleProfile ?? ""} onChange={(e) => set({ googleProfile: e.target.value })} />
+                <p className="field-hint">The link to the profile. We also set the profile up, or improve it, when the site launches.</p>
+                {err("googleProfile")}
+              </div>
+              <div className="field">
+                <label htmlFor={`${id}-links`}>Other profile links <span className="optional">(optional)</span></label>
+                <textarea id={`${id}-links`} className="textarea" rows={3} maxLength={1000} placeholder={"https://"} value={answers.links ?? ""} onChange={(e) => set({ links: e.target.value })} />
+                <p className="field-hint">One https link per line. Facebook, Instagram or similar. Used so search engines can connect the site to those profiles.</p>
+                {err("links")}
+              </div>
+              <div className="field">
+                <label htmlFor={`${id}-reviews`}>Reviews we can show <span className="optional">(optional)</span></label>
+                <textarea id={`${id}-reviews`} className="textarea" rows={4} maxLength={2000} placeholder={"Great cut — Sam, Google"} value={answers.reviews ?? ""} onChange={(e) => set({ reviews: e.target.value })} />
+                <p className="field-hint">Only reviews you already have and are happy to show, one per line: the words, a dash, then who said it. We never write reviews. Leave this blank and the section is left off.</p>
+                {err("reviews")}
               </div>
             </div>
             {err("contact")}

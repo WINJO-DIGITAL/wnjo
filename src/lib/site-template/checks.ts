@@ -349,7 +349,7 @@ export function checkSite(
   // A price is the customer's if its number is theirs, so "£140 a night" also covers a bare "£140".
   const knownPrices = new Set([...facts.services.flatMap((s) => (s.price ? (s.price.match(PRICE) ?? [s.price]) : [])), ...(theirWords.match(PRICE) ?? [])].map((p) => priceKey(p)));
   const knownEmails = new Set([facts.email, ...(theirWords.match(EMAIL) ?? [])].filter(Boolean).map((e) => norm(e!)));
-  const knownPhones = new Set([facts.phone, ...(theirWords.match(PHONE) ?? [])].filter(Boolean).map((p) => digits(p!)));
+  const knownPhones = new Set([facts.phone, facts.whatsapp, ...(theirWords.match(PHONE) ?? [])].filter(Boolean).map((p) => digits(p!)));
   for (const f of fields) {
     for (const m of f.text.match(PRICE) ?? []) {
       if (!knownPrices.has(priceKey(m))) flag("price-invented", `The price ${m} was not given by the customer.`, f.where);
@@ -363,6 +363,14 @@ export function checkSite(
   }
   const b = content.business;
   if (b.phone && (!facts.phone || digits(b.phone) !== digits(facts.phone))) flag("phone-invented", "The phone number does not match the customer's.", "business.phone");
+  if (digits(b.whatsapp ?? "") !== digits(facts.whatsapp ?? "")) flag("whatsapp-invented", "The WhatsApp number must be the one the customer gave.", "business.whatsapp");
+  if ((b.googleProfile ?? "") !== (facts.googleProfile ?? "")) flag("profile-invented", "The Google Business Profile link must be the one the customer gave.", "business.googleProfile");
+  const wantedLinks = new Set([...(facts.sameAs ?? []), ...(facts.googleProfile ? [facts.googleProfile] : [])]);
+  const gotLinks = new Set(b.sameAs ?? []);
+  if (wantedLinks.size !== gotLinks.size || [...wantedLinks].some((link) => !gotLinks.has(link))) flag("profile-invented", "Profile links must be the ones the customer gave.", "business.sameAs");
+  const gotReviews = JSON.stringify(content.reviews ?? []);
+  const wantedReviews = JSON.stringify(facts.reviews ?? []);
+  if (gotReviews !== wantedReviews) flag(content.reviews?.length ? "reviews-invented" : "reviews-missing", "Reviews must be exactly the ones the customer supplied, and none others.", "reviews");
   if (b.email && (!facts.email || norm(b.email) !== norm(facts.email))) flag("email-invented", "The email does not match the customer's.", "business.email");
   if (b.address && (!facts.address || norm(b.address) !== norm(facts.address))) flag("address-invented", "The address does not match the customer's.", "business.address");
 
@@ -378,7 +386,12 @@ export function checkSite(
 
   // "Find us" needs something true to say: the address for a shop, the areas for a trade.
   if (seen.has("area")) {
-    if (preset.areaSource === "address" && !facts.address) flag("area-without-address", "The customer gave no address, so there is nothing to put in the area section.", "area");
+    if (preset.areaSource === "address" && !facts.address && !facts.areas?.length) flag("area-without-address", "The customer gave no address, so there is nothing to put in the area section.", "area");
+    if (preset.areaSource === "address" && facts.areas?.length) {
+      const areaSection = all.find((s) => s.kind === "area");
+      const areaText = areaSection && areaSection.kind === "area" ? norm(`${areaSection.heading} ${areaSection.text}`) : "";
+      for (const place of facts.areas) if (!areaText.includes(norm(place))) flag("area-missing", `The area "${place}" is missing.`, "area");
+    }
     if (preset.areaSource === "areas") {
       if (!facts.areas?.length) flag("area-without-areas", "The customer gave no areas, so there is nothing to put in the area section.", "area");
       const areaSection = all.find((s) => s.kind === "area");

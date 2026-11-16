@@ -318,7 +318,12 @@ export const ADD_ONS = {
   blog: { label: "Blog", monthly: 10, oneOff: 99 },
   gallery: { label: "Image gallery", monthly: 5, oneOff: 49 },
   testimonials: { label: "Testimonials section", monthly: 5, oneOff: 49 },
-  advancedForms: { label: "Advanced enquiry forms", monthly: 10, oneOff: 99 },
+  advancedForms: {
+    label: "Advanced enquiry forms",
+    monthly: 10,
+    oneOff: 99,
+    note: "Extra questions or a second form. The standard enquiry form, with a service choice and an optional photo, is included on every plan.",
+  },
   whatsapp: { label: "WhatsApp integration", monthly: 5, oneOff: 49 },
   liveChat: { label: "Live chat", monthly: 10, oneOff: 99, thirdParty: "Live chat software fees, if any, are paid to the provider." },
   ecommerce: { label: "Online shop (e-commerce)", monthly: null, oneOff: 499, from: true, monthlyQuoted: true, thirdParty: "Payment processing fees are charged by the payment provider." },
@@ -328,7 +333,7 @@ export const ADD_ONS = {
   seoManagement: { label: "Ongoing SEO management", monthly: 99, oneOff: null, from: true },
 } as const satisfies Record<
   string,
-  { label: string; monthly: number | null; oneOff: number | null; from?: boolean; monthlyQuoted?: boolean; thirdParty?: string }
+  { label: string; monthly: number | null; oneOff: number | null; from?: boolean; monthlyQuoted?: boolean; thirdParty?: string; note?: string }
 >;
 export type AddOnId = keyof typeof ADD_ONS;
 
@@ -361,7 +366,7 @@ export const WEBSITE_PLANS = {
     pages: 5,
     popular: false,
     tagline: "Essential managed website service.",
-    summary: "A professionally designed website with all the essential technical management taken care of.",
+    summary: "A professionally designed website with a quote form, call and WhatsApp buttons, local SEO basics and the technical side looked after.",
     bestFor: "For businesses that need a professional website and want the technical side handled.",
     contentHours: 0,
     changes: "Up to 30 minutes a month",
@@ -377,13 +382,19 @@ export const WEBSITE_PLANS = {
       "Security monitoring",
       "Technical maintenance and updates",
       "Uptime monitoring and fault resolution",
-      "Contact forms",
+      "Quote and enquiry form, with a service choice and an optional photo",
+      "WhatsApp click-to-chat button",
+      "Click-to-call button and a sticky mobile call bar",
+      "Testimonials from reviews you supply",
+      "Opening hours and areas covered",
+      "Google Business Profile setup or optimisation at launch, and a link from the site",
+      "Local SEO basics",
       "Mobile optimisation",
       "Basic SEO foundations",
       "Technical support",
       "Up to 30 minutes of small website changes a month",
     ],
-    includedAddOns: [] as AddOnId[],
+    includedAddOns: ["whatsapp", "testimonials"] as AddOnId[],
   },
   silver: {
     name: "Plus",
@@ -412,7 +423,7 @@ export const WEBSITE_PLANS = {
       "Priority support",
       "WINJO Enhanced Refresh every 24 months",
     ],
-    includedAddOns: ["localSeo"] as AddOnId[],
+    includedAddOns: ["localSeo", "whatsapp", "testimonials"] as AddOnId[],
   },
   gold: {
     name: "Pro",
@@ -441,7 +452,7 @@ export const WEBSITE_PLANS = {
       "Enhanced priority support",
       "WINJO Complete Refresh every 24 months",
     ],
-    includedAddOns: ["localSeo"] as AddOnId[],
+    includedAddOns: ["localSeo", "whatsapp", "testimonials"] as AddOnId[],
   },
 } as const;
 export type WebsitePlanId = keyof typeof WEBSITE_PLANS;
