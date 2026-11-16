@@ -23,7 +23,7 @@ export const PLAN_ANCHOR: Record<WebsitePlanId, string> = { bronze: "core", silv
  */
 export const CARD_POINTS: Record<WebsitePlanId, string[]> = {
   bronze: [
-    "Bespoke design, up to 5 pages",
+    "Sector design tailored to you, up to 5 pages",
     "Managed hosting and SSL",
     "Security monitoring",
     "Maintenance, updates and fault resolution",
@@ -32,7 +32,7 @@ export const CARD_POINTS: Record<WebsitePlanId, string[]> = {
   ],
   silver: [
     "Everything in Core",
-    "Bespoke design, up to 10 pages",
+    "Sector design tailored to you, up to 10 pages",
     "Enhanced and local SEO foundations",
     "Google Analytics and Search Console",
     "AEO foundations for AI-powered search",
@@ -42,7 +42,7 @@ export const CARD_POINTS: Record<WebsitePlanId, string[]> = {
   ],
   gold: [
     "Everything in Plus",
-    "Bespoke design, up to 20 pages",
+    "Sector design tailored to you, up to 20 pages",
     "Advanced SEO and technical optimisation",
     "Expanded AEO and GEO strategy",
     "Structured data for AI tools",
@@ -119,7 +119,7 @@ export function PackageComparison() {
       title: "Your website",
       rows: [
         ["Monthly price", (id) => formatGBP(WEBSITE_PLANS[id].monthly)],
-        ["Bespoke website design", () => true],
+        ["Sector design, tailored to your business", () => true],
         ["Pages", (id) => `Up to ${WEBSITE_PLANS[id].pages}`],
         ["Mobile optimisation", () => true],
         ["Contact forms", () => true],

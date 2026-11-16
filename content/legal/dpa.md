@@ -25,9 +25,11 @@ Referred to in this DPA as "WINJO", the "Processor" or "we".
 
 **1.2 The Controller**
 
-- Customer name/business: [CUSTOMER NAME]
-- Business address: [CUSTOMER ADDRESS]
-- Contact email: [CUSTOMER EMAIL]
+- Customer name or business: ______________________________
+- Business address: ______________________________
+- Contact email: ______________________________
+
+Fill in the customer's name, address and email on the lines above before the agreement is signed.
 
 Referred to in this DPA as the "Customer" or "Controller".
 
@@ -415,6 +417,7 @@ The providers below are those used to run WINJO's services for customer websites
 | Supabase Inc. | Database, authentication and file storage | Frankfurt, Germany (AWS eu-central-1). Confirmed from the project settings |
 | Resend Inc. | Transactional email (enquiries, quotes, notifications) | EU (Ireland), eu-west-1, per the sending domain configuration |
 | Stripe, Inc. | Payment processing (checkout and billing portal) | Stripe processes card payments as its own controller; WINJO's role is limited to payment records. Listed for transparency |
+| Anthropic, PBC | Drafts website wording from a customer's brief (Claude). A person reviews the draft before it is published | We will confirm the location in writing before this provider handles a customer's personal data |
 
 WINJO shall notify the Customer of relevant changes in accordance with section 8.
 

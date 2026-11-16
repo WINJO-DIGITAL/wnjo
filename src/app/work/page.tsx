@@ -22,7 +22,7 @@ export default function WorkPage() {
       <PageHero
         eyebrow="Our work"
         title={<>Bespoke, every time.</>}
-        lede="Four client businesses and our own platform. Each one designed around the business it serves, and live today."
+        lede="Four client businesses and our own platform. Each one was designed from scratch for the business it serves, and is live today."
       />
 
       <section className="section--tight" style={{ paddingTop: 0 }}>
@@ -62,7 +62,7 @@ export default function WorkPage() {
                       <span>{p.location}</span>
                     </p>
                     <h2 id={`${p.slug}-title`} className="h2 work-row__title">
-                      <Image src={p.logo} alt="" width={44} height={44} sizes="44px" className="work-row__logo" />
+                      <Image src={p.logo} alt="" width={44} height={44} sizes="44px" className="work-row__logo" aria-hidden />
                       {p.name}
                     </h2>
                     <div>

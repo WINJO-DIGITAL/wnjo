@@ -8,7 +8,7 @@ export const site = {
   shortName: "WINJO DIGITAL",
   tagline: "Your website. Our responsibility.",
   description:
-    "WINJO DIGITAL builds, hosts, maintains and updates bespoke business websites for one predictable monthly payment, from £99 a month. Rolling monthly, with no minimum term.",
+    "Managed websites from £99 a month, tailored from a sector design, with hosting and care. Website projects are designed from scratch. Rolling monthly, no minimum term.",
   locale: "en_GB",
   themeColor: "#F2ECE2",
 } as const;

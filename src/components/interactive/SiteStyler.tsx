@@ -36,7 +36,7 @@ const SITES = [
     benefit: "An online menu, table bookings, and easy to find on Google and maps.",
     name: "Your café",
     host: "yourcafe.co.uk",
-    title: "Your headline here.",
+    title: "Breakfast until late.",
     line: "Breakfast till late, in the heart of Leeds.",
     cta: "Book a table",
     second: "See the menu",
@@ -111,10 +111,10 @@ const SITES = [
 type Site = (typeof SITES)[number];
 
 /** A photo filling its frame (the frame sets the shape; the crop is in the file). */
-function Photo({ src, sizes }: { src: StaticImageData; sizes: string }) {
+function Photo({ src, sizes, alt }: { src: StaticImageData; sizes: string; alt: string }) {
   return (
     <span className="ss-photo">
-      <Image src={src} alt="" sizes={sizes} />
+      <Image src={src} alt={alt} sizes={sizes} />
     </span>
   );
 }
@@ -123,7 +123,7 @@ function Desktop({ site }: { site: Site }) {
   return (
     <div className="ss-site" key={site.id}>
       <div className="ss-hero">
-        <Photo src={site.photo} sizes="(min-width: 56rem) 760px, 70vw" />
+        <Photo src={site.photo} sizes="(min-width: 56rem) 760px, 70vw" alt={`Example ${site.kind.toLowerCase()} photograph on the sample site`} />
         <div className="ss-nav">
           <b className="ss-logo">{site.name}</b>
           {site.nav.map((n) => (
@@ -144,7 +144,7 @@ function Desktop({ site }: { site: Site }) {
       <div className="ss-cards">
         {site.cards.map(([c, img, detail]) => (
           <span key={c}>
-            <Photo src={img} sizes="(min-width: 56rem) 240px, 25vw" />
+            <Photo src={img} sizes="(min-width: 56rem) 240px, 25vw" alt={`Example photograph: ${c}`} />
             <b>{c}</b>
             <small>{detail}</small>
           </span>
@@ -158,7 +158,7 @@ function Mobile({ site }: { site: Site }) {
   return (
     <div className="ss-site" key={site.id}>
       <div className="ss-hero">
-        <Photo src={site.photo} sizes="(min-width: 56rem) 260px, 30vw" />
+        <Photo src={site.photo} sizes="(min-width: 56rem) 260px, 30vw" alt={`Example ${site.kind.toLowerCase()} photograph on the sample site`} />
         <div className="ss-nav">
           <b className="ss-logo">{site.name}</b>
           <i className="ss-menu" />
@@ -173,7 +173,7 @@ function Mobile({ site }: { site: Site }) {
       <div className="ss-cards">
         {site.cards.slice(0, 2).map(([c, img, detail]) => (
           <span key={c}>
-            <Photo src={img} sizes="(min-width: 56rem) 120px, 15vw" />
+            <Photo src={img} sizes="(min-width: 56rem) 120px, 15vw" alt={`Example photograph: ${c}`} />
             <b>{c}</b>
             <small>{detail}</small>
           </span>
