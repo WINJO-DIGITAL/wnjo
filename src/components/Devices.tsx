@@ -1,4 +1,5 @@
 import Image, { type StaticImageData } from "next/image";
+import { addressBar } from "@/lib/projects";
 import styles from "./Devices.module.css";
 
 type FrameProps = {
@@ -10,7 +11,17 @@ type FrameProps = {
 };
 
 /** A restrained browser window around a real screenshot. */
-export function BrowserFrame({ src, alt, sizes, preload, className, host }: FrameProps & { host?: string }) {
+export function BrowserFrame({
+  src,
+  alt,
+  sizes,
+  preload,
+  className,
+  host,
+  name,
+  showAddress,
+}: FrameProps & { host?: string; name?: string; showAddress?: boolean }) {
+  const bar = addressBar({ name, host, showAddress });
   return (
     <figure className={`${styles.browser} ${className ?? ""}`}>
       <div className={styles.bar} aria-hidden="true">
@@ -19,7 +30,7 @@ export function BrowserFrame({ src, alt, sizes, preload, className, host }: Fram
           <i />
           <i />
         </span>
-        {host && <span className={styles.url}>{host}</span>}
+        {bar && <span className={styles.url}>{bar}</span>}
       </div>
       <Image src={src} alt={alt} sizes={sizes} preload={preload} placeholder="blur" className={styles.shot} />
     </figure>

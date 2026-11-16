@@ -7,7 +7,7 @@ import { ScrollShot } from "./ScrollShot";
 import { Tilt } from "./Tilt";
 import { useDragScroll } from "./useDragScroll";
 
-type Item = Pick<Project, "slug" | "name" | "sector" | "location" | "host" | "page" | "kind">;
+type Item = Pick<Project, "slug" | "name" | "sector" | "location" | "host" | "showAddress" | "page" | "kind">;
 
 /**
  * A full-bleed, swipeable row of projects. Native scroll-snap handles touch and
@@ -32,6 +32,8 @@ export function WorkCarousel({ items }: { items: Item[] }) {
                 <ScrollShot
                   src={p.page}
                   host={p.host}
+                  name={p.name}
+                  showAddress={p.showAddress}
                   alt={`The ${p.name} website`}
                   sizes="(min-width: 64rem) 640px, 84vw"
                 />

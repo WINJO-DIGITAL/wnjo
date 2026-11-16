@@ -20,6 +20,7 @@ It applies where WINJO DIGITAL processes personal data on behalf of a customer i
 - Legal identity: Nitisat Sirisom trading as WINJO DIGITAL
 - Business address: 3 Knoxwood Close, Thornton-Cleveleys, FY5 3UP, United Kingdom
 - Email: hello@winjodigital.co.uk
+- ICO registration number: ZC301156
 
 Referred to in this DPA as "WINJO", the "Processor" or "we".
 

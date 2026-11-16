@@ -2,11 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { CtaBand, PageHero } from "@/components/Blocks";
 import { PhoneFrame } from "@/components/Devices";
+import { VisitLogo } from "@/components/VisitLogo";
 import { ScrollShot } from "@/components/interactive/ScrollShot";
 import { Tilt } from "@/components/interactive/Tilt";
 import { ArrowRight } from "@/components/Icons";
 import { pageMetadata } from "@/lib/metadata";
-import { INDUSTRIES, projects, type Industry } from "@/lib/projects";
+import { INDUSTRIES, projects, showsAddress, type Industry } from "@/lib/projects";
 import { PortfolioFilter } from "@/components/interactive/PortfolioFilter";
 
 export const metadata = pageMetadata(
@@ -43,6 +44,8 @@ export default function WorkPage() {
                     <ScrollShot
                       src={p.page}
                       host={p.host}
+                      name={p.name}
+                      showAddress={p.showAddress}
                       alt={`The ${p.name} website, full page`}
                       eager={i === 0}
                       sizes="(min-width: 80rem) 760px, (min-width: 64rem) 60vw, 100vw"
@@ -72,11 +75,15 @@ export default function WorkPage() {
                     </div>
                     <p className="muted">{p.summary}</p>
                     <p>
-                      <a href={p.url} className="btn btn--secondary btn--sm" target="_blank" rel="noopener noreferrer">
-                        Visit the live site
-                        <ArrowRight />
-                        <span className="visually-hidden"> (opens in a new tab)</span>
-                      </a>
+                      {showsAddress(p) ? (
+                        <a href={p.url} className="btn btn--secondary btn--sm" target="_blank" rel="noopener noreferrer">
+                          Visit the live site
+                          <ArrowRight />
+                          <span className="visually-hidden"> (opens in a new tab)</span>
+                        </a>
+                      ) : (
+                        <VisitLogo name={p.name} url={p.url} logo={p.logo} />
+                      )}
                     </p>
                     {p.slug === "ev-exec" && (
                       <p className="small muted">

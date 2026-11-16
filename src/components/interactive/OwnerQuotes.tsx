@@ -2,6 +2,8 @@
 
 import Image, { type StaticImageData } from "next/image";
 import { useState } from "react";
+import { VisitLogo } from "@/components/VisitLogo";
+import { showsAddress } from "@/lib/projects";
 
 export type OwnerQuoteItem = {
   slug: string;
@@ -10,6 +12,7 @@ export type OwnerQuoteItem = {
   location: string;
   url: string;
   host: string;
+  showAddress?: boolean;
   /** A sentence taken word for word from the quote, shown large. */
   pull: string;
   /** The owner's full approved words. */
@@ -47,10 +50,14 @@ export function OwnerQuotes({ items }: { items: OwnerQuoteItem[] }) {
             </blockquote>
             <figcaption className="oq__by">
               Owner, {item.name} · {item.location} ·{" "}
-              <a href={item.url} target="_blank" rel="noopener noreferrer" tabIndex={i === active ? undefined : -1}>
-                Visit {item.host}
-                <span className="visually-hidden"> (opens in a new tab)</span>
-              </a>
+              {showsAddress(item) ? (
+                <a href={item.url} target="_blank" rel="noopener noreferrer" tabIndex={i === active ? undefined : -1}>
+                  Visit {item.host}
+                  <span className="visually-hidden"> (opens in a new tab)</span>
+                </a>
+              ) : (
+                <VisitLogo name={item.name} url={item.url} logo={item.logo} tabIndex={i === active ? undefined : -1} />
+              )}
             </figcaption>
           </figure>
         ))}
