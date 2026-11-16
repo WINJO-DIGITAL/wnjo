@@ -10,6 +10,7 @@ import { Responsibility } from "@/components/managed/Responsibility";
 import { SubscriptionTerms } from "@/components/managed/Sections";
 import { BrowserFrame } from "@/components/Devices";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
+import { TrustCues } from "@/components/TrustCues";
 import { WebStages } from "@/components/WebStages";
 import { ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { heroProjects, OWNER_QUOTES, projectBySlug } from "@/lib/projects";
@@ -125,6 +126,7 @@ export default function HomePage() {
         </div>
         <div className="container container--wide tile__visual" data-reveal>
           <PlanChooser />
+          <TrustCues />
         </div>
       </section>
 

@@ -4,6 +4,7 @@ import { ArrowRight } from "@/components/Icons";
 import { RefreshCompare, SearchServices, SubscriptionTerms } from "@/components/managed/Sections";
 import { AddOnsTable, CareComparison, PackageComparison } from "@/components/pricing/WebsitePackages";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
+import { TrustCues } from "@/components/TrustCues";
 import { pageMetadata } from "@/lib/metadata";
 import { DAY_RATE, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
@@ -51,6 +52,7 @@ export default function PricingPage() {
         <div className="container container--wide">
           <div data-reveal>
             <PlanChooser />
+            <TrustCues />
           </div>
           <p className="plans-note" data-reveal>
             Every plan is a rolling monthly subscription with no minimum contract and no large upfront cost. Change

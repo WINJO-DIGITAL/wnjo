@@ -15818,3 +15818,117 @@ a.timeline__what:hover {
     --deck-fixed: 496px;
   }
 }
+
+/* ---------- Plan cards: Plus set apart as the recommended plan; equal heights; stacked on phones ---------- */
+.pkg-selector .pkg-cards {
+  align-items: stretch;
+}
+.pkg-selector .pkg-card {
+  position: relative;
+  transition:
+    box-shadow var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+.pkg-selector .pkg-card__tagline {
+  min-height: 3.2em; /* two lines, so the lists below start level */
+}
+/* The refresh row and the button sit on the same line in every card, whatever the length of the list above. */
+.pkg-selector .pkg-card__refresh {
+  margin-top: auto;
+}
+.pkg-selector .pkg-card__cta {
+  margin-top: 0;
+}
+.pkg-selector .pkg-card--recommended {
+  border-color: var(--color-accent);
+  border-top-width: 4px;
+  background: #fffefb;
+  box-shadow:
+    0 1px 2px rgb(58 45 34 / 0.05),
+    0 24px 48px -28px rgb(58 45 34 / 0.45);
+}
+.pkg-selector .pkg-card--recommended.pkg-card--selected {
+  border-color: var(--color-accent);
+  background: var(--color-inverse-bg);
+}
+.pkg-selector .pkg-card__badge,
+.pkg-selector .pkg-card--selected .pkg-card__badge {
+  position: absolute;
+  top: 0;
+  right: clamp(1.1rem, 0.8rem + 1vw, 1.8rem);
+  transform: translateY(-50%);
+  padding: 0.35em 0.9em;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+@media (min-width: 56rem) {
+  /* The lift: the card runs a little taller than its neighbours, so its contents stay level with theirs. */
+  .pkg-selector .pkg-card--recommended {
+    margin-block: -0.75rem;
+    padding-block: calc(clamp(1.4rem, 1rem + 1.2vw, 2.2rem) + 0.75rem - 3px) calc(clamp(1.4rem, 1rem + 1.2vw, 2.2rem) + 0.75rem);
+  }
+}
+@media (max-width: 39.99rem) {
+  /* Phones: all three plans stacked in price order, so none is hidden off the side of the screen. */
+  #packages .pkg-cards,
+  #plans .pkg-cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+    overflow: visible;
+    padding-bottom: 0;
+  }
+  #packages .pkg-card,
+  #plans .pkg-card {
+    flex: none;
+    padding: 1.3rem;
+  }
+  .pkg-selector .pkg-card__tagline {
+    min-height: 0;
+  }
+  #packages .pkg-card__tagline {
+    display: block;
+  }
+}
+
+/* ---------- Trust cues: four plain facts beside the plans ---------- */
+.trust-cues {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4) var(--space-5);
+  margin: var(--space-7) 0 0;
+  padding: var(--space-5) 0 0;
+  border-top: 1px solid var(--color-line-strong);
+  text-align: left;
+}
+.trust-cues li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--color-ink);
+}
+.trust-cues svg {
+  flex: none;
+  color: var(--color-accent);
+}
+@media (min-width: 56rem) {
+  .trust-cues {
+    grid-template-columns: repeat(4, auto);
+    justify-content: space-between;
+  }
+}
+@media (max-width: 24rem) {
+  .trust-cues {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
