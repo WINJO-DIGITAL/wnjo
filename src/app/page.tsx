@@ -125,7 +125,7 @@ export default function HomePage() {
       </section>
 
       {/* The three subscriptions. */}
-      <section id="packages" className="tile home-tile" data-nav="/pricing" aria-labelledby="packages-title">
+      <section id="packages" className="tile home-tile tile--soft" data-nav="/pricing" aria-labelledby="packages-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">Plans</p>
           <h2 id="packages-title" className="tile__title">
@@ -240,7 +240,7 @@ export default function HomePage() {
       </section>
 
       {/* The subscription and ownership, plainly. */}
-      <section id="ownership" className="tile home-tile" data-nav="/pricing" aria-labelledby="own-title">
+      <section id="ownership" className="tile home-tile tile--soft" data-nav="/pricing" aria-labelledby="own-title">
         <div className="container container--wide tile__head" data-reveal>
           <p className="tile__name">No lock-in</p>
           <h2 id="own-title" className="tile__title">

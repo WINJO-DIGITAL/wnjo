@@ -16110,3 +16110,94 @@ a.timeline__what:hover {
   color: var(--color-ink);
   text-underline-offset: 0.25em;
 }
+
+/* ---------- "One less thing to worry about": our list as icon tiles, two to a row on wider screens ---------- */
+.resp__col--ours .resp__list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-height: none;
+  padding: var(--space-3);
+  border: 1px solid rgb(242 236 226 / 0.12);
+  border-radius: var(--radius-sm);
+  background: rgb(242 236 226 / 0.05);
+}
+.resp__icon {
+  flex: none;
+  box-sizing: content-box;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  background: rgb(242 236 226 / 0.1);
+  color: #f0a27f; /* the accent, lifted for the dark panel (6.9:1) */
+}
+.resp__col--ours .resp__list li span,
+#managed .resp__col--ours .resp__list li span {
+  padding: 0;
+  font-size: var(--text-base);
+  line-height: 1.3;
+}
+.resp__col--ours .resp__list li span::before {
+  content: none;
+}
+.resp[data-ours="false"] .resp__col--ours .resp__list li {
+  display: none;
+}
+.resp__col--ours .resp__list {
+  gap: var(--space-2);
+}
+@media (min-width: 40rem) {
+  /* Two to a row where the panel is wide enough for each job to stay on one line; one to a row beside the screenshot. */
+  .resp__col--ours .resp__list {
+    grid-template-columns: repeat(auto-fit, minmax(14.5rem, 1fr));
+    gap: var(--space-2) var(--space-3);
+  }
+  .resp__col--ours .resp__list li {
+    padding: var(--space-2) var(--space-3);
+  }
+}
+@media (max-width: 39.99rem) {
+  .resp__col--ours .resp__list li {
+    padding: 0.4rem 0.5rem;
+  }
+  .resp__icon {
+    width: 18px;
+    height: 18px;
+    padding: 0.4rem;
+  }
+}
+
+/* ---------- Spacing: about a third less vertical padding sitewide, on one scale ---------- */
+:root {
+  --section-y: clamp(3.25rem, 2rem + 4.6vw, 6rem);
+}
+.tile {
+  padding-block: clamp(3.25rem, 2.25rem + 4vw, 5.5rem) 0;
+}
+.home-tile {
+  padding-bottom: clamp(3rem, 2rem + 3vw, 5rem);
+}
+.tile__visual {
+  margin-top: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+}
+.page-hero {
+  padding-block: clamp(2.75rem, 1.75rem + 4vw, 5rem) clamp(2rem, 1.25rem + 2.8vw, 3.5rem);
+}
+.page-hero--compact {
+  padding-block: var(--space-4) var(--space-5);
+}
+.section-head {
+  margin-bottom: var(--space-7);
+}
+.trust-cues {
+  margin-top: var(--space-6);
+}
+
+/* ---------- Section backgrounds: cream, a lighter cream and the dark brown, so neighbours are easy to tell apart ---------- */
+.tile--soft,
+.section--soft {
+  background: var(--color-surface-raised);
+}
+.tile--soft .pkg-card:not(.pkg-card--selected):not(.pkg-card--recommended),
+.section--soft .pkg-card:not(.pkg-card--selected):not(.pkg-card--recommended) {
+  background: var(--color-surface);
+}

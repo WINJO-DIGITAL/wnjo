@@ -81,7 +81,7 @@ export default function PricingPage() {
       </section>
 
       {/* 2b. Bought outright: hosting and care are added. The monthly plans already include all of it. */}
-      <section id="after-launch" className="section--tight" aria-labelledby="after-launch-title">
+      <section id="after-launch" className="section--tight section--soft" aria-labelledby="after-launch-title">
         <div className="container container--wide">
           <SectionHead eyebrow="Own your website?" title={<span id="after-launch-title">Add hosting and care to your website.</span>} split>
             <p>
@@ -142,7 +142,7 @@ export default function PricingPage() {
       </section>
 
       {/* 5. The search services behind Pro and Plus. */}
-      <section id="search" className="section section--ruled" aria-labelledby="search-title">
+      <section id="search" className="section section--ruled section--soft" aria-labelledby="search-title">
         <div className="container container--wide">
           <SectionHead eyebrow="Being found" title={<span id="search-title">What the search work means for you.</span>} split>
             <p>The benefit first, then the name it goes by and the plans that include it.</p>
