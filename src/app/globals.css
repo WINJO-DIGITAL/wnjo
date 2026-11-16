@@ -14963,8 +14963,6 @@ body:has(.pv, .sitepv) .site-footer {
 @media (max-width: 719px) {
   .seg {
     flex-wrap: nowrap;
-    margin-inline: -20px;
-    padding-inline: 20px;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -15759,4 +15757,16 @@ a.timeline__what:hover {
   margin-left: 8px;
   font-size: 13px;
   color: var(--color-ink-3);
+}
+
+/* Phones: a row of filters scrolls inside its own box, grid children may shrink, and long emails wrap. */
+.cust > *,
+.today > *,
+.admin > * {
+  min-width: 0;
+}
+@media (max-width: 719px) {
+  .admin .admin-table--stack td {
+    overflow-wrap: anywhere;
+  }
 }

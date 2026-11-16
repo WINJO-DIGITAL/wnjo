@@ -44,7 +44,7 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: "requests", label: "Asked to cancel" },
   { id: "offered", label: "Link sent" },
   { id: "cancelled", label: "Ended" },
-  { id: "expired", label: "Withdrawn or expired" },
+  { id: "expired", label: "Withdrawn" },
 ];
 
 /**
