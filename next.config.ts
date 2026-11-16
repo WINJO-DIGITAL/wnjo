@@ -5,6 +5,7 @@ import type { NextConfig } from "next";
  * only talk to this site and the Supabase project (sign-in and file uploads). Inline scripts and styles stay
  * allowed because Next.js writes inline bootstrap scripts and the pages use inline styles; everything else that
  * makes cross-site scripting useful (other origins, plugins, framing, base-tag tricks) is shut off.
+ * Cloudflare Turnstile is allowed so the contact form check can load.
  * Preview deployments also allow Vercel's comment toolbar; development allows eval for hot reload.
  */
 function contentSecurityPolicy(): string {
@@ -22,13 +23,13 @@ function contentSecurityPolicy(): string {
 
   const directives: Record<string, string[]> = {
     "default-src": ["'self'"],
-    "script-src": ["'self'", "'unsafe-inline'", ...(dev ? ["'unsafe-eval'"] : []), ...vercel],
+    "script-src": ["'self'", "'unsafe-inline'", "https://challenges.cloudflare.com", ...(dev ? ["'unsafe-eval'"] : []), ...vercel],
     "style-src": ["'self'", "'unsafe-inline'", ...vercel],
     "img-src": ["'self'", "data:", "blob:", ...(supabase ? [supabase] : []), ...vercel],
     "font-src": ["'self'", "data:", ...vercel],
     "media-src": ["'self'", "blob:", ...(supabase ? [supabase] : [])],
-    "connect-src": ["'self'", ...(supabase ? [supabase, supabaseWs] : []), ...vercel, ...(preview ? ["wss://ws-us3.pusher.com"] : [])],
-    "frame-src": ["https://maps.google.com", "https://www.google.com", ...(preview ? vercel : [])],
+    "connect-src": ["'self'", "https://challenges.cloudflare.com", ...(supabase ? [supabase, supabaseWs] : []), ...vercel, ...(preview ? ["wss://ws-us3.pusher.com"] : [])],
+    "frame-src": ["https://maps.google.com", "https://www.google.com", "https://challenges.cloudflare.com", ...(preview ? vercel : [])],
     "worker-src": ["'self'", "blob:"],
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
