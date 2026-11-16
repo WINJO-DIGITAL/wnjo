@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addressBar, OWNER_QUOTES, projectBySlug, projects, showsAddress } from "@/lib/projects";
+import { addressBar, heroProjects, OWNER_QUOTES, projectBySlug, projects, showsAddress } from "@/lib/projects";
 
 describe("OWNER_QUOTES", () => {
   it("shows each pull-quote word for word from the owner's approved quote", () => {
@@ -13,6 +13,18 @@ describe("OWNER_QUOTES", () => {
       expect(pull.length).toBeLessThanOrEqual(90);
       expect(pull.trim().endsWith(".")).toBe(true);
     }
+  });
+});
+
+describe("Duratek in the hero and the owners' quotes", () => {
+  it("is one of the hero's projects, once, after RAENG Fitness", () => {
+    expect(heroProjects.map((p) => p.slug)).toEqual(["ev-exec", "boonma", "raeng-fitness", "duratek"]);
+  });
+
+  it("has the owner's quote, credited like the others", () => {
+    const entry = OWNER_QUOTES.find((q) => q.project.slug === "duratek");
+    expect(entry?.quote).toBe("Finally, a website that does our business justice.");
+    expect(entry?.pull).toBe(entry?.quote);
   });
 });
 

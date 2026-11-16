@@ -10,8 +10,8 @@ type Item = Pick<
   "slug" | "name" | "sector" | "host" | "url" | "showAddress" | "desktop" | "mobile" | "tablet" | "walkthrough" | "logo"
 >;
 
-/** The phone hero shows these three clients; the laptop showcase keeps the full set. */
-const PHONE_CLIENTS = ["ev-exec", "boonma", "raeng-fitness"];
+/** The phone hero shows these four clients, the same as the laptop showcase. */
+const PHONE_CLIENTS = ["ev-exec", "boonma", "raeng-fitness", "duratek"];
 
 const phoneQuery = "(max-width: 39.99rem)";
 const subscribe = (onChange: () => void) => {
