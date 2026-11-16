@@ -34,6 +34,8 @@ export const INDUSTRIES = [
   { id: "hospitality", label: "Hospitality" },
   { id: "beauty", label: "Beauty" },
   { id: "transport", label: "Transport" },
+  { id: "fitness", label: "Fitness" },
+  { id: "trade", label: "Trade and retail" },
   { id: "other", label: "Other" },
 ] as const;
 export type Industry = (typeof INDUSTRIES)[number]["id"];
@@ -142,7 +144,7 @@ export const projects: Project[] = [
     name: "RAENG Fitness",
     kind: "client",
     sector: "Kettlebell training",
-    industry: "other",
+    industry: "fitness",
     location: "Cumbernauld",
     summary: "Kettlebell classes, one-to-one and small group coaching, and memberships from a studio in Cumbernauld.",
     challenge:
@@ -173,7 +175,7 @@ export const projects: Project[] = [
     name: "Duratek",
     kind: "client",
     sector: "Flooring wholesaler",
-    industry: "other",
+    industry: "trade",
     location: "Northwest UK",
     summary: "A flooring wholesaler selling waterproof click flooring, with fifteen finishes and free samples posted to the customer.",
     challenge:
@@ -235,6 +237,12 @@ export const projects: Project[] = [
     identity: "Seaside warmth: terracotta, sand and an app-like mobile tab bar.",
   },
 ];
+
+/** One line for a project tile: the first sentence of its summary, exactly as written. */
+export const projectLine = (p: Project) => {
+  const first = p.summary.split(/(?<=\.)\s/)[0];
+  return first.endsWith(".") ? first : `${first}.`;
+};
 
 export const projectBySlug = (slug: string) => projects.find((p) => p.slug === slug);
 

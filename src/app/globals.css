@@ -15980,3 +15980,133 @@ a.timeline__what:hover {
     font-size: var(--text-xs);
   }
 }
+
+/* ---------- Homepage work: large tiles, two to a row on desktop, full width on phones ---------- */
+.work-tiles {
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-7) var(--space-6);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  text-align: left;
+}
+.work-tile {
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+}
+.work-tile__media {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-sunken);
+  box-shadow: var(--shadow-md);
+  transition:
+    transform var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+.work-tile__shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+  transition: transform var(--duration-slow) var(--ease);
+}
+.work-tile__body {
+  display: grid;
+  gap: var(--space-2);
+}
+.work-tile__name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.work-tile__logo {
+  border-radius: 8px;
+}
+.work-tile__line {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--color-ink-2);
+}
+.work-tile__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-5);
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.work-tile__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  min-height: 2.75rem;
+  color: var(--color-ink);
+  text-underline-offset: 0.25em;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .work-tile:hover .work-tile__media {
+    transform: translateY(-4px);
+    box-shadow:
+      0 1px 2px rgb(32 33 36 / 0.05),
+      0 22px 40px -22px rgb(58 45 34 / 0.4);
+  }
+  .work-tile:hover .work-tile__shot {
+    transform: scale(1.025);
+  }
+}
+@media (min-width: 48rem) {
+  .work-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* The first project leads across both columns, picture beside words, so five tiles sit evenly. */
+  .work-tile:first-child {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-6);
+  }
+  .work-tile:first-child .work-tile__name {
+    font-size: var(--text-2xl);
+  }
+}
+
+/* Portfolio filter: the two industries added with Duratek and RAENG Fitness. */
+.portfolio[data-filter="fitness"] [data-industry]:not([data-industry="fitness"]),
+.portfolio[data-filter="trade"] [data-industry]:not([data-industry="trade"]) {
+  display: none;
+}
+
+/* ---------- Owners' words: a band of its own, straight after the hero ---------- */
+.owner-quotes {
+  padding-block: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
+  border-block: 1px solid var(--color-line);
+  background: var(--color-surface-raised);
+}
+.oq {
+  gap: var(--space-5);
+  max-width: 56rem;
+}
+.oq__pull {
+  font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3rem);
+}
+.oq__by {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  color: var(--color-ink-2);
+}
+.oq__by a {
+  color: var(--color-ink);
+  text-underline-offset: 0.25em;
+}
