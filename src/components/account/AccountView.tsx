@@ -231,17 +231,12 @@ export function AccountView() {
   }
 
   if (isStaff) {
+    // Staff belong in the admin. Send them there straight away, and keep a link for when that doesn't happen.
+    if (typeof window !== "undefined") window.location.replace("/admin");
     return (
       <div className="acct">
-        <div className="acct-bar">
-          <p className="acct-meta">Signed in as {session.user.email}</p>
-          <button type="button" className="btn btn--secondary" onClick={() => client.auth.signOut()}>
-            Sign out
-          </button>
-        </div>
         <p className="lede">
-          This is a staff account. Staff sign in to the staff admin, not the customer pages. Please{" "}
-          <a href="/admin">go to the staff admin</a> to continue.
+          Taking you to the admin. If nothing happens, <a href="/admin">open the admin</a>.
         </p>
       </div>
     );

@@ -595,11 +595,18 @@ function SiteHeader() {
           )}
           {customer.known && customer.email && (
             <div className="mm-account" style={{ "--i": mobileItems.length + 3 } as React.CSSProperties}>
-              <Link href="/account" className="btn btn--secondary mm-cta" onClick={closeIfSamePage} transitionTypes={NAV}>
-                Your websites
-              </Link>
+              {customer.staff ? (
+                <Link href="/admin" className="btn btn--secondary mm-cta" onClick={closeIfSamePage} transitionTypes={NAV}>
+                  Admin account
+                </Link>
+              ) : (
+                <Link href="/account" className="btn btn--secondary mm-cta" onClick={closeIfSamePage} transitionTypes={NAV}>
+                  Your websites
+                </Link>
+              )}
               <p className="mm-account__who">
-                Signed in as <span>{customer.email}</span>
+                {customer.staff ? "Admin · " : "Signed in as "}
+                <span>{customer.email}</span>
                 {" · "}
                 <button type="button" className="linkbtn" onClick={customer.signOut}>
                   Sign out

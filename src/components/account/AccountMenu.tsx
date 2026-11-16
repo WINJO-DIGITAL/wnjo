@@ -73,6 +73,8 @@ export function AccountMenu({ signedOutLink = false }: { signedOutLink?: boolean
 
   const email = session.user.email ?? "";
   const initial = (email.charAt(0) || "?").toUpperCase();
+  // Staff get their own menu: it names the admin account and leads to the admin, never the customer pages.
+  const label = roleKnown && isStaff ? "Admin account" : "Your account";
 
   return (
     <div className="account-menu" ref={wrapRef}>
@@ -84,11 +86,11 @@ export function AccountMenu({ signedOutLink = false }: { signedOutLink?: boolean
         onClick={() => setOpen((v) => !v)}
       >
         <span className="account-menu__avatar" aria-hidden="true">{initial}</span>
-        <span className="account-menu__label">Your account</span>
+        <span className="account-menu__label">{label}</span>
       </button>
       {open && (
         <div className="account-menu__panel" role="menu">
-          <p className="account-menu__who">{email}</p>
+          <p className="account-menu__who">{roleKnown && isStaff ? `Admin · ${email}` : email}</p>
           {roleKnown && !isStaff && (
             <Link href="/account" role="menuitem" className="account-menu__item" onClick={() => setOpen(false)}>
               Your websites
