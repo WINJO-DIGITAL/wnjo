@@ -582,7 +582,7 @@ npm run build && npm start
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Production origin for canonical URLs, Open Graph, sitemap and robots. On Vercel, the project's production URL is used if unset. |
 | `RESEND_API_KEY` | Server-only. Resend API key. |
-| `ENQUIRY_TO_EMAIL` | Server-only. Inbox that receives enquiries and briefs. |
+| `ENQUIRY_TO_EMAIL` | Server-only. Inboxes that receive enquiries, briefs and staff alerts. One address, or several separated by commas. |
 | `ENQUIRY_FROM_EMAIL` | Server-only. Sender on a domain verified in Resend. |
 
 ### Before launch

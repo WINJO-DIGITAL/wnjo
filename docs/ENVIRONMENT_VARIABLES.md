@@ -10,7 +10,7 @@ Never commit real values. Set them in Vercel (Project → Settings → Environme
 | `SUPABASE_SERVICE_ROLE_KEY` | server only, sensitive | Writes enquiries, quotes and other server records | Set in Vercel (production and preview). |
 | `RESEND_API_KEY` | server only, sensitive | Sends enquiry email | Set in Vercel (production and preview) to a send-only key restricted to `winjodigital.co.uk`, created 8 Nov 2026. |
 | `CRON_SECRET` | server only, sensitive | Bearer token Vercel Cron sends to `/api/cron/briefing`; requests without it are refused | Set in Vercel (production and preview), generated 7 Nov 2026. |
-| `ENQUIRY_TO_EMAIL` | server only, sensitive | Where enquiries are delivered (never shown on the website) | Set to the owner's inbox |
+| `ENQUIRY_TO_EMAIL` | server only, sensitive | Where enquiries and staff alerts are delivered (never shown on the website). One address, or several separated by commas. | Set to the owner's inboxes, for example `hello@winjodigital.co.uk, winjodigital@gmail.com` |
 | `ENQUIRY_FROM_EMAIL` | server only | Sender address (domain must be verified in Resend) | Set to `WINJO DIGITAL <enquiries@winjodigital.co.uk>` (8 Nov 2026). `winjodigital.co.uk` is verified in Resend. |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | public | Cloudflare Turnstile site key for the contact form | Unset. The form does not show the check until this and the secret are both set. |
 | `TURNSTILE_SECRET_KEY` | server only, sensitive | Checks the Turnstile token with Cloudflare | Unset. With either key missing, the check is skipped and enquiries are still accepted. |
