@@ -15932,3 +15932,51 @@ a.timeline__what:hover {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------- WINJO Refresh illustration: real mini content in the three cards, and a clearer disclaimer ---------- */
+.rf__cards i {
+  display: grid;
+  align-content: center;
+  gap: 0.15em;
+  height: auto;
+  min-height: clamp(2.6rem, 1.6rem + 3.4vw, 4.25rem);
+  padding: 0.55em 0.8em;
+  font-style: normal;
+  font-size: clamp(0.5625rem, 0.42rem + 0.62vw, 0.875rem);
+  line-height: 1.25;
+  overflow: hidden;
+}
+.rf__cards b {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rf__cards span {
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rf[data-era="second"] .rf__cards i {
+  padding-inline: 1em;
+}
+.rf__caption,
+#refresh .rf__caption {
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+.inverse .rf__caption,
+#refresh.inverse .rf__caption {
+  color: var(--color-inverse-ink);
+}
+.rf__caption strong {
+  font-weight: 600;
+}
+@media (max-width: 39.99rem) {
+  #refresh .rf__caption {
+    display: block;
+    font-size: var(--text-xs);
+  }
+}

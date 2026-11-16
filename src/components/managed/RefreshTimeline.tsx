@@ -14,6 +14,13 @@ const ERAS = [
   { id: "second", when: `Month ${REFRESH.everyMonths * 2}`, label: "Second refresh, included" },
 ] as const;
 
+/** Three small menu cards for the example restaurant, so the page reads as a finished website rather than a loading one. */
+const DISHES = [
+  ["Catch of the day", "Landed this morning"],
+  ["Sunday roast", "Served from noon"],
+  ["Private dining", "Tables for up to twelve"],
+] as const;
+
 /** The example website, drawn in CSS. Its look comes from the nearest `.rf[data-era]`. Shared by the timeline and the slider. */
 export function RefreshBrowser() {
   return (
@@ -39,9 +46,12 @@ export function RefreshBrowser() {
           <div className="rf__photo" />
         </div>
         <div className="rf__cards">
-          <i />
-          <i />
-          <i />
+          {DISHES.map(([title, line]) => (
+            <i key={title}>
+              <b>{title}</b>
+              <span>{line}</span>
+            </i>
+          ))}
         </div>
       </div>
     </div>
@@ -94,7 +104,6 @@ export function RefreshTimeline() {
           if (Math.abs(dx) > 40) pick(era + (dx < 0 ? 1 : -1));
         }}
       >
-        <p className="fine">Example business, for illustration.</p>
         <RefreshBrowser />
       </div>
       <div className="rf__timeline" role="group" aria-label="The same website over time">
@@ -105,7 +114,9 @@ export function RefreshTimeline() {
           </button>
         ))}
       </div>
-      <p className="rf__caption">An illustration. Your refresh is designed around your own business and brand.</p>
+      <p className="rf__caption">
+        <strong>An illustration.</strong> Your refresh is designed around your own business and brand.
+      </p>
       <p className="visually-hidden" role="status">
         {ERAS[era].when}: {ERAS[era].label}.
       </p>
