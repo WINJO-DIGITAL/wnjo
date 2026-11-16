@@ -264,7 +264,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
                 <div className="deck__screen">
                   <Image
                     src={p.mobile}
-                    alt={k === index ? `The ${p.name} website on a phone` : ""}
+                    alt={`The ${p.name} website on a phone`}
                     fill
                     sizes="176px"
                     preload={k === 0}

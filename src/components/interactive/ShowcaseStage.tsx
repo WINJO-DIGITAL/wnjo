@@ -180,7 +180,7 @@ export function ShowcaseStage({ items }: { items: Item[] }) {
                   <Image
                     key={p.slug}
                     src={p.desktop}
-                    alt={i === index ? `The ${p.name} website on a laptop` : ""}
+                    alt={`The ${p.name} website on a laptop`}
                     aria-hidden={i !== index}
                     sizes="(min-width: 64rem) 900px, 90vw"
                     preload={i === 0}
@@ -237,7 +237,7 @@ export function ShowcaseStage({ items }: { items: Item[] }) {
               <Image
                 key={p.slug}
                 src={p.mobile}
-                alt={i === index ? `The ${p.name} website on a phone` : ""}
+                alt={`The ${p.name} website on a phone`}
                 aria-hidden={i !== index}
                 sizes="(min-width: 64rem) 180px, 25vw"
                 preload={i === 0}

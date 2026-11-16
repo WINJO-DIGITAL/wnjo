@@ -7,6 +7,7 @@ import "server-only";
  * piece of visitor input is escaped there, and staff alerts are sent as plain text only.
  */
 import { renderEmailHtml } from "./email-layout";
+import { isProductionMail, isReservedRecipient } from "./mail-guard";
 
 type MailConfig = { apiKey: string; to: string; from: string };
 
@@ -40,6 +41,10 @@ export async function sendEmail(
   message: { to: string; subject: string; text: string; replyTo?: string; internal?: boolean },
   label = "Email",
 ): Promise<boolean> {
+  if (isProductionMail() && isReservedRecipient(message.to)) {
+    console.info(`${label} skipped: a reserved address was not emailed from production`);
+    return true;
+  }
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
   const html = message.internal ? undefined : renderEmailHtml({ subject: message.subject, text: message.text }, { siteUrl });
   try {

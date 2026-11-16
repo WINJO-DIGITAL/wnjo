@@ -12,8 +12,14 @@ Never commit real values. Set them in Vercel (Project → Settings → Environme
 | `CRON_SECRET` | server only, sensitive | Bearer token Vercel Cron sends to `/api/cron/briefing`; requests without it are refused | Set in Vercel (production and preview), generated 7 Nov 2026. |
 | `ENQUIRY_TO_EMAIL` | server only, sensitive | Where enquiries are delivered (never shown on the website) | Set to the owner's inbox |
 | `ENQUIRY_FROM_EMAIL` | server only | Sender address (domain must be verified in Resend) | Set to `WINJO DIGITAL <enquiries@winjodigital.co.uk>` (8 Nov 2026). `winjodigital.co.uk` is verified in Resend. |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | public | Cloudflare Turnstile site key for the contact form | Unset. The form does not show the check until this and the secret are both set. |
+| `TURNSTILE_SECRET_KEY` | server only, sensitive | Checks the Turnstile token with Cloudflare | Unset. With either key missing, the check is skipped and enquiries are still accepted. |
 
 Not yet configured, and required by later steps: Stripe test-mode keys, the Anthropic (Claude) API key (`ANTHROPIC_API_KEY`), and GitHub App credentials.
+
+## Contact form check (Turnstile)
+
+`NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` switch on Cloudflare Turnstile for the public contact form and the signed-in account message form. Create a Turnstile widget in Cloudflare for `winjodigital.co.uk` (and preview hosts, if previews should check too), then set both values in Vercel. Until both are set, the forms keep the hidden field and the short timer, and nothing is blocked. A message that looks like an unsolicited SEO pitch is still saved and emailed; the owner email is marked "Possible sales pitch" and is not discarded.
 
 Rules:
 - Anything prefixed `NEXT_PUBLIC_` is shipped to the browser. Only put public, row-level-security-protected values there.

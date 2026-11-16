@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { supabase } from "@/lib/supabase";
 import { planInfo } from "@/lib/portal/plan-info";
 import { contactPhoneHref } from "@/lib/site";
+import { TurnstileField, turnstileRequired } from "@/components/TurnstileField";
 import { Confirmation } from "./Confirmation";
 
 type PlanRow = { reference: string; status: string; package_code: string | null; package_name: string; business_name: string | null };
@@ -39,6 +40,7 @@ export function HelpView() {
   const [sent, setSent] = useState<string | null>(null);
   // When the form was first shown, for the same too-fast-to-be-a-person check the public contact form has.
   const startedAt = useRef(0);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   useEffect(() => {
     startedAt.current = Date.now();
@@ -83,6 +85,7 @@ export function HelpView() {
     const text = message.trim();
     if (name.trim().length < 2) return setProblem("Please tell us your name.");
     if (text.length < MESSAGE_MIN) return setProblem("Please tell us a little more, so we can help first time.");
+    if (turnstileRequired && !turnstileToken) return setProblem("Please complete the check below, then send your message.");
     setProblem(null);
     setState("sending");
     const res = await fetch("/api/enquiry", {
@@ -95,6 +98,8 @@ export function HelpView() {
         message: `${current.opens}${about ? ` [${about}]` : ""}\n\n${text}`,
         website: "",
         startedAt: startedAt.current,
+        account: true,
+        ...(turnstileRequired ? { turnstileToken } : {}),
       }),
     }).catch(() => null);
     const json = (await res?.json().catch(() => null)) as { ok?: boolean; reference?: string } | null;
@@ -179,6 +184,7 @@ export function HelpView() {
             <input id="help-name" className="acct-input" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} />
           </div>
 
+          <TurnstileField onToken={setTurnstileToken} />
           {problem && <p role="alert" className="acct-error">{problem}</p>}
           {state === "error" && (
             <p role="alert" className="acct-error">

@@ -3,6 +3,28 @@
 Working list for launching the AI-assisted website journey. Items marked **Decision** need the owner's answer before
 they can be done. Nothing here is pushed or deployed until the owner says so.
 
+## Pre-launch tidy-up (November 2026)
+
+Fixed in code, waiting for review. Nothing here is live until it is merged.
+
+- [x] **Honest design wording.** Managed websites (Core, Plus, Pro) are described as a sector design tailored to the business's content, branding and layout. Website projects (from £999, £1,999 and £2,999) are described as designed from scratch. The old "no templates" lines on the home page, About, managed websites, pricing and the FAQ are gone.
+- [x] **WINJO Refresh levels.** The FAQ now matches the plans: Core visual, Plus enhanced, Pro complete. The refresh page lists all three plans.
+- [x] **Go-live timing.** The FAQ and the terms (section 3.6, version 2026-11-16.1) say a managed website is live within 14 days of us having the goals, pages and style, the same promise as the payment screen and the welcome email.
+- [x] **Privacy notice.** Names the controller, the address, hello@winjodigital.co.uk, a lawful basis for each purpose, Supabase, Resend, Vercel, Stripe and Anthropic, retention, UK GDPR rights and the ICO complaint route.
+- [x] **Sample headlines and the DPA blanks.** The example sites no longer say "Your headline here." The DPA customer lines are labelled blanks to fill in.
+- [x] **Enquiry acknowledgement.** A contact-form enquiry emails the person a reference and what happens next, replying to hello@winjodigital.co.uk. The owner alert is unchanged if that email fails.
+- [x] **Contact-form check.** Cloudflare Turnstile is ready and does nothing until both keys are set. A likely SEO pitch is flagged on the owner email and still kept.
+- [x] **Reserved email addresses.** Production does not send to `.test`, `.example`, example.com, example.org or example.net. It logs a line and moves on.
+- [x] **Image descriptions.** Screenshots and the managed-website sample photos have a description. Logos that sit beside the business name stay without one.
+
+### Still for Nitisat, by hand
+
+- [ ] **Turnstile keys.** Create a widget at Cloudflare for winjodigital.co.uk, then set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in Vercel (production, and preview if preview forms should check too). See `docs/ENVIRONMENT_VARIABLES.md`. Until then the check is off.
+- [ ] **Confirm the privacy notice.** Anthropic's processing country is not in this repository, so the notice and the DPA do not name one. Confirm the country, and that Anthropic's contract is in place, before relying on the wording. The ICO registration number is still to be added when the confirmation email arrives.
+- [ ] **Confirm the terms change.** Version 2026-11-16.1 adds the 14-day go-live line and Anthropic as a subprocessor. Say if existing subscribers need the 30-day notice in section 17.
+- [ ] **Sample Cars emails.** Resend's stuck messages to customer@sample-cars.test and bookings@sample-cars.test are sent by the booking platform (WINJO Dispatch), for the live sample business `sample-cars-test`, booking SAMP-000001. They are not sent by this website. This website now refuses those addresses in production. Dispatch needs the same guard, and the sample business should stop emailing once that is deployed. Do not delete the booking from production as part of this change.
+- [ ] **Read the new pages.** Home, About, Work, Managed websites, Pricing, FAQ, WINJO Refresh, Privacy, Terms and the DPA.
+
 ## Done and tested
 - [x] Package prices: Core £99, Plus £149, Pro £199 (setup fees match monthly prices). Pages are priced from each plan's own band.
 - [x] Stripe payments are in GBP only (adaptive pricing off).

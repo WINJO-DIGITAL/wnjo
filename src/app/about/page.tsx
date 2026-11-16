@@ -2,19 +2,23 @@ import Link from "next/link";
 import { CtaBand, PageHero, SectionHead } from "@/components/Blocks";
 import { PhoneFrame } from "@/components/Devices";
 import { pageMetadata } from "@/lib/metadata";
+import { ONE_OFF_TIERS, formatGBP } from "@/lib/pricing";
 import { projects } from "@/lib/projects";
 import { site } from "@/lib/site";
 
 export const metadata = pageMetadata(
   "/about",
   "About",
-  "Why WINJO DIGITAL exists: bespoke websites we take long-term responsibility for, so business owners have one less thing to worry about.",
+  "Why WINJO DIGITAL exists: websites we take long-term responsibility for, so business owners have one less thing to worry about.",
 );
 
 // Each principle as a plain statement: what we do, in one sentence.
 const beliefs = [
   ["Your website, our responsibility", "If something breaks, dates or needs changing, it is ours to sort out."],
-  ["Designed around your business", "Every website is bespoke. We don't sell templates."],
+  [
+    "Designed around your business",
+    `Website projects, from ${formatGBP(ONE_OFF_TIERS.essential.from)}, are designed from scratch. A managed website starts from a sector design and is tailored to your content, branding and layout.`,
+  ],
   ["Prices on the page", "One monthly price you can see before you speak to us, confirmed in writing."],
   ["No lock-in", "Rolling monthly, with no minimum term. We'd rather earn your next month."],
   ["Plain English", "Quick answers and no jargon, from the first message onwards."],
@@ -31,7 +35,7 @@ const standards = [
 // Why we exist, as two short labelled lists rather than paragraphs. What a website needs, and how we are different.
 const needs = ["Hosting and security", "Updates and changes", "A new design every couple of years"];
 const different = [
-  "Every website looks and works differently, never a template",
+  "Website projects designed from scratch, and managed websites tailored from a sector design",
   "Booking systems and software, like the driver and operator apps we developed for EV Exec",
   "FYStay, the holiday stays platform we run ourselves",
 ];
@@ -82,7 +86,7 @@ export default function AboutPage() {
       <PageHero
         eyebrow={`About ${site.name}`}
         title={<>We don&apos;t hand over and disappear.</>}
-        lede={`${site.name} designs bespoke websites, then stays responsible for them: hosting, maintenance, updates and regular redesigns.`}
+        lede={`${site.name} designs websites, then stays responsible for them: hosting, maintenance, updates and regular redesigns.`}
       />
 
       <section className="section section--ruled">

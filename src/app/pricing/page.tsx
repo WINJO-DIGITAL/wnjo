@@ -7,12 +7,14 @@ import { PlanChooser } from "@/components/pricing/PlanChooser";
 import { pageMetadata } from "@/lib/metadata";
 import { DAY_RATE, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
-const { bronze: core, silver: pro, gold: plus } = WEBSITE_PLANS;
+const core = WEBSITE_PLANS.bronze;
+const plus = WEBSITE_PLANS.silver;
+const pro = WEBSITE_PLANS.gold;
 
 export const metadata = pageMetadata(
   "/pricing",
   "Managed website pricing",
-  `Fully managed websites on a rolling monthly subscription: ${core.name} ${formatGBP(core.monthly)}, ${pro.name} ${formatGBP(pro.monthly)} and ${plus.name} ${formatGBP(plus.monthly)} a month. Bespoke design, hosting, maintenance and support included, with no minimum term.`,
+  `Fully managed websites on a rolling monthly subscription: ${core.name} ${formatGBP(core.monthly)}, ${plus.name} ${formatGBP(plus.monthly)} and ${pro.name} ${formatGBP(pro.monthly)} a month. A sector design tailored to your business, with hosting, maintenance and support, and no minimum term.`,
 );
 
 // Always flagged up front, whichever plan is chosen.
@@ -32,7 +34,7 @@ export default function PricingPage() {
         compact
         eyebrow="Pricing"
         title={<>One monthly payment covers all of it.</>}
-        lede={`Bespoke design, hosting, maintenance and support from ${formatGBP(core.monthly)} a month. Rolling monthly, with no minimum term.`}
+        lede={`A sector design tailored to your business, with hosting, maintenance and support, from ${formatGBP(core.monthly)} a month. Rolling monthly, with no minimum term.`}
       >
         <div className="btn-row">
           <Link href="#plans" className="btn btn--primary">
@@ -62,7 +64,7 @@ export default function PricingPage() {
         <div className="container container--wide">
           <SectionHead eyebrow="Compare" title={<span id="compare-title">What each plan includes.</span>} split>
             <p>
-              {core.name} covers the essentials. {pro.name} keeps your website improving. {plus.name} adds more of our
+              {core.name} covers the essentials. {plus.name} keeps your website improving. {pro.name} adds more of our
               time and deeper search work.
             </p>
           </SectionHead>
@@ -89,7 +91,7 @@ export default function PricingPage() {
           <div className="included-panel" data-reveal>
             <p className="included-panel__label">Included in every managed plan</p>
             <ul className="checks included-panel__list" role="list">
-              <li>Bespoke design for your business</li>
+              <li>A sector design tailored to your business</li>
               <li>Managed hosting and SSL</li>
               <li>Security, updates and upkeep</li>
               <li>A real team to ask for help</li>

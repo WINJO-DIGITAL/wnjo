@@ -114,7 +114,7 @@ export function serviceSchema(baseUrl: string, page: ServicePage) {
     "managed-websites": {
       name: "Managed websites",
       serviceType: "Managed website design, hosting and maintenance",
-      description: "A bespoke website designed, hosted, maintained and updated for one monthly payment, with no minimum term.",
+      description: "A website built on a sector design and tailored to the business, then hosted, maintained and updated for one monthly payment, with no minimum term.",
       offers: plans(["bronze", "silver", "gold"]),
     },
     "website-projects": {
@@ -140,8 +140,8 @@ export function serviceSchema(baseUrl: string, page: ServicePage) {
     "winjo-refresh": {
       name: "WINJO Refresh",
       serviceType: "Website redesign",
-      description: `A planned website design and experience refresh every ${REFRESH.everyMonths} months, included in the ${WEBSITE_PLANS.silver.name} and ${WEBSITE_PLANS.gold.name} managed website plans.`,
-      offers: plans(["silver", "gold"]),
+      description: `A planned website design and experience refresh every ${REFRESH.everyMonths} months, included in every managed website plan.`,
+      offers: plans(["bronze", "silver", "gold"]),
     },
   };
   const service = services[page];
