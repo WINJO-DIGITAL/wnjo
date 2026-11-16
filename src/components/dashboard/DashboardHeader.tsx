@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AccountMenu } from "@/components/account/AccountMenu";
 import { NotificationsBell } from "@/components/account/NotificationsBell";
@@ -8,41 +9,21 @@ import { Logo } from "@/components/Logo";
 import { supabase } from "@/lib/supabase";
 
 type DashItem = { label: string; hint: string; href: string };
-type DashGroup = { label: string; items: DashItem[] };
+/** A top-level entry: either a link of its own (href) or a menu of items. */
+type DashGroup = { label: string; href?: string; items: DashItem[] };
 
-/** Client dashboard sections. Items jump to the matching part of the page. */
+/** Client dashboard sections: four plain links, one per place a customer goes. */
 const CUSTOMER: DashGroup[] = [
-  {
-    label: "Your project",
-    items: [
-      { label: "Progress", hint: "Where your website is now", href: "/account#progress" },
-      { label: "Approvals", hint: "Designs waiting for your say", href: "/account#approvals" },
-      { label: "Messages", hint: "Talk to the team", href: "/account#projects" },
-    ],
-  },
-  {
-    label: "Quotes & payments",
-    items: [
-      { label: "Your quotes", hint: "Accept or decline", href: "/account#quotes" },
-      { label: "Deposit", hint: "Pay or check your deposit", href: "/account#quotes" },
-      { label: "Plan & billing", hint: "Your plan, payments and billing page", href: "/account/billing" },
-    ],
-  },
-  {
-    label: "Help",
-    items: [
-      { label: "Contact us", hint: "Ask us anything", href: "/contact" },
-      { label: "FAQ", hint: "Quick answers", href: "/faq" },
-    ],
-  },
+  { label: "Your websites", href: "/account", items: [] },
+  { label: "Plan & billing", href: "/account/billing", items: [] },
+  { label: "Settings", href: "/account/settings", items: [] },
+  { label: "Help", href: "/account/help", items: [] },
 ];
 
 /** Staff dashboard sections. Items switch the admin view (it listens for the address hash). */
 const STAFF: DashGroup[] = [
-  {
-    label: "Overview",
-    items: [{ label: "Today", hint: "What needs you now", href: "/admin#overview" }],
-  },
+  { label: "Today", href: "/admin#overview", items: [] },
+  { label: "Customers", href: "/admin#customers", items: [] },
   {
     label: "Sales",
     items: [
@@ -90,7 +71,10 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
     window.addEventListener("hashchange", read);
     return () => window.removeEventListener("hashchange", read);
   }, []);
-  const isHere = (href: string) => href.includes("#") && href.slice(href.indexOf("#")) === (hash || "#overview") && href.startsWith("/admin");
+  const pathname = usePathname();
+  // Staff sections live in the address hash (a section may carry more after a slash); customer pages are real pages.
+  const isHere = (href: string) =>
+    href.startsWith("/admin") ? href.slice(href.indexOf("#")) === (hash || "#overview").split("/")[0] : href === pathname;
 
   useEffect(() => {
     if (openGroup === null && !mobileOpen) return;
@@ -125,63 +109,68 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
         <Link href="/" className="dash-brand" aria-label="WINJO DIGITAL home">
           <Logo />
         </Link>
-        {variant === "staff" && (
-        <nav className="dash-nav" aria-label="Staff dashboard">
-          {groups.map((group, i) => (
-            <div key={group.label} className="dash-nav__group">
-              <button
-                type="button"
-                className="dash-nav__button"
-                aria-expanded={openGroup === i}
-                aria-controls={`dash-menu-${i}`}
-                onClick={() => setOpenGroup(openGroup === i ? null : i)}
-              >
+        <nav className="dash-nav" aria-label={variant === "staff" ? "Staff dashboard" : "Your account"}>
+          {groups.map((group, i) =>
+            group.href ? (
+              <a key={group.label} href={group.href} className="dash-nav__button dash-nav__link" aria-current={isHere(group.href) ? "page" : undefined} onClick={close}>
                 {group.label}
-                <Chevron open={openGroup === i} />
-              </button>
-              {openGroup === i && (
-                <div id={`dash-menu-${i}`} className="dash-menu">
-                  {group.items.map((item) => (
-                    <a key={item.label} href={item.href} className="dash-menu__item" aria-current={variant === "staff" && isHere(item.href) ? "page" : undefined} onClick={close}>
-                      <span className="dash-menu__label">{item.label}</span>
-                      <span className="dash-menu__hint">{item.hint}</span>
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+              </a>
+            ) : (
+              <div key={group.label} className="dash-nav__group">
+                <button
+                  type="button"
+                  className="dash-nav__button"
+                  aria-expanded={openGroup === i}
+                  aria-controls={`dash-menu-${i}`}
+                  data-current={group.items.some((item) => isHere(item.href)) ? "" : undefined}
+                  onClick={() => setOpenGroup(openGroup === i ? null : i)}
+                >
+                  {group.label}
+                  <Chevron open={openGroup === i} />
+                </button>
+                {openGroup === i && (
+                  <div id={`dash-menu-${i}`} className="dash-menu">
+                    {group.items.map((item) => (
+                      <a key={item.label} href={item.href} className="dash-menu__item" aria-current={isHere(item.href) ? "page" : undefined} onClick={close}>
+                        <span className="dash-menu__label">{item.label}</span>
+                        <span className="dash-menu__hint">{item.hint}</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ),
+          )}
         </nav>
-        )}
 
         <div className="dash-header__end">
           {variant === "customer" && <NotificationsBell />}
-          <div className={variant === "staff" ? "dash-header__account" : undefined}><AccountMenu /></div>
-          {variant === "staff" && <button
-            type="button"
-            className="dash-mobile-toggle"
-            aria-expanded={mobileOpen}
-            aria-controls="dash-mobile-menu"
-            onClick={() => setMobileOpen((v) => !v)}
-          >
+          <div className="dash-header__account"><AccountMenu /></div>
+          <button type="button" className="dash-mobile-toggle" aria-expanded={mobileOpen} aria-controls="dash-mobile-menu" onClick={() => setMobileOpen((v) => !v)}>
             <span className="dash-mobile-toggle__bars" aria-hidden="true" />
             <span className="visually-hidden">Menu</span>
-          </button>}
+          </button>
         </div>
       </div>
 
-      {variant === "staff" && mobileOpen && (
-        <nav id="dash-mobile-menu" className="dash-mobile" aria-label="Staff dashboard">
-          {groups.map((group) => (
-            <div key={group.label} className="dash-mobile__group">
-              <p className="dash-mobile__title">{group.label}</p>
-              {group.items.map((item) => (
-                <a key={item.label} href={item.href} className="dash-mobile__item" aria-current={isHere(item.href) ? "page" : undefined} onClick={close}>
-                  {item.label}
-                </a>
-              ))}
-            </div>
-          ))}
+      {mobileOpen && (
+        <nav id="dash-mobile-menu" className="dash-mobile" aria-label={variant === "staff" ? "Staff dashboard" : "Your account"}>
+          {groups.map((group) =>
+            group.href ? (
+              <a key={group.label} href={group.href} className="dash-mobile__item dash-mobile__item--top" aria-current={isHere(group.href) ? "page" : undefined} onClick={close}>
+                {group.label}
+              </a>
+            ) : (
+              <div key={group.label} className="dash-mobile__group">
+                <p className="dash-mobile__title">{group.label}</p>
+                {group.items.map((item) => (
+                  <a key={item.label} href={item.href} className="dash-mobile__item" aria-current={isHere(item.href) ? "page" : undefined} onClick={close}>
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            ),
+          )}
           <button type="button" className="dash-mobile__signout" onClick={() => { close(); void supabase()?.auth.signOut(); }}>
             Sign out
           </button>

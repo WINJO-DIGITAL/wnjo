@@ -7,6 +7,7 @@ import { QuotesPanel } from "./QuotesPanel";
 import { BuildsPanel } from "./BuildsPanel";
 import { ProjectsPanel } from "./ProjectsPanel";
 import { Confirmation } from "./Confirmation";
+import { PlanSummary } from "./PlanSummary";
 
 export const STAGES = [
   { id: "brief_received", label: "Brief received", short: "Brief" },
@@ -252,13 +253,14 @@ export function AccountView() {
         <h1 className="dash-title">Your websites</h1>
       </div>
 
+      <PlanSummary client={client} />
       {loadError && <p role="alert">We couldn&apos;t load your orders. Please refresh the page.</p>}
       {depositNotice && <Confirmation title={depositNotice} />}
 
       {orders && orders.length === 0 && !hasBuilds && (
         <div className="acct-empty">
           <p className="acct-empty__title">Nothing here yet</p>
-          <p className="acct-empty__body">Orders appear here as soon as they&apos;re linked to {session.user.email}.</p>
+          <p className="acct-empty__body">Your website appears here as soon as it&apos;s linked to {session.user.email}.</p>
           <a href="/pricing" className="btn btn--primary">Choose a plan</a>
         </div>
       )}

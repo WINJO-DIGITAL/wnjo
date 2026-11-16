@@ -8,6 +8,8 @@ import { ProjectsAdmin } from "./ProjectsAdmin";
 import { AiStatus } from "./AiStatus";
 import { SubscriptionsAdmin } from "./SubscriptionsAdmin";
 import { BuildsAdmin } from "./BuildsAdmin";
+import { CustomersAdmin } from "./CustomersAdmin";
+import { OverviewAdmin } from "./OverviewAdmin";
 import { Confirmation } from "@/components/account/Confirmation";
 import { sendQueuedEmails } from "@/lib/notify-client";
 
@@ -36,11 +38,12 @@ const approvalStatus: Record<string, string> = {
 const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-type Tab = "overview" | "enquiries" | "builds" | "quotes" | "subscriptions" | "orders" | "approvals" | "projects" | "ai";
+type Tab = "overview" | "customers" | "enquiries" | "builds" | "quotes" | "subscriptions" | "orders" | "approvals" | "projects" | "ai";
 
-const TABS: Tab[] = ["overview", "enquiries", "builds", "quotes", "subscriptions", "orders", "approvals", "projects", "ai"];
+const TABS: Tab[] = ["overview", "customers", "enquiries", "builds", "quotes", "subscriptions", "orders", "approvals", "projects", "ai"];
 const TAB_INFO: Record<Tab, { group: string; title: string }> = {
   overview: { group: "Overview", title: "Today" },
+  customers: { group: "Customers", title: "Customers" },
   enquiries: { group: "Sales", title: "Enquiries" },
   builds: { group: "Sales", title: "Website builds" },
   quotes: { group: "Sales", title: "Quotes" },
@@ -54,7 +57,8 @@ const TAB_INFO: Record<Tab, { group: string; title: string }> = {
 /** The section named in the address hash (set by the dashboard menu), or the overview. */
 function tabFromHash(): Tab {
   if (typeof window === "undefined") return "overview";
-  const hash = window.location.hash.replace("#", "") as Tab;
+  // A section can carry something after a slash (#customers/<email>); the section is the part before it.
+  const hash = window.location.hash.replace("#", "").split("/")[0] as Tab;
   return TABS.includes(hash) ? hash : "overview";
 }
 
@@ -122,7 +126,8 @@ export function AdminView() {
       <div className="dash-page__head">
         <h1 className="dash-title">{TAB_INFO[tab].title}</h1>
       </div>
-      {tab === "overview" && <StaffOverview client={client} />}
+      {tab === "overview" && <OverviewAdmin client={client} />}
+      {tab === "customers" && <CustomersAdmin client={client} tenantId={membership.tenant_id} />}
       {tab === "enquiries" && <EnquiriesTable client={client} />}
       {tab === "quotes" && <QuotesTable client={client} />}
       {tab === "builds" && <BuildsAdmin client={client} />}
@@ -140,108 +145,6 @@ export function AdminView() {
       {tab === "ai" && <AiStatus client={client} />}
       {tab === "projects" && <ProjectsAdmin client={client} tenantId={membership.tenant_id} userId={session.user.id} />}
     </div>
-  );
-}
-
-type Stat = { label: string; value: string; href: string; note: string };
-
-/** The staff home: four figures that matter today, each a link to the section behind it. */
-function StaffOverview({ client }: { client: SupabaseClient }) {
-  const [stats, setStats] = useState<Stat[] | null>(null);
-  const [error, setError] = useState(false);
-  useEffect(() => {
-    const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
-    Promise.all([
-      client.from("enquiries").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
-      client.from("quotes").select("id", { count: "exact", head: true }).eq("status", "sent"),
-      client.from("orders").select("id", { count: "exact", head: true }).neq("stage", "live"),
-      client.from("deposits").select("amount_pence, quote_acceptance_id").eq("status", "paid"),
-    ]).then(([enq, quotes, orders, deposits]) => {
-      if (enq.error || quotes.error || orders.error || deposits.error) {
-        setError(true);
-        return;
-      }
-      const paid = ((deposits.data as { amount_pence: number; quote_acceptance_id: string }[]) ?? [])
-        .filter((d) => !isTestRecord(d.quote_acceptance_id))
-        .reduce((sum, d) => sum + d.amount_pence, 0);
-      setStats([
-        { label: "New enquiries", value: String(enq.count ?? 0), href: "#enquiries", note: "Last 7 days" },
-        { label: "Quotes waiting", value: String(quotes.count ?? 0), href: "#quotes", note: "Sent, not yet answered" },
-        { label: "Orders in progress", value: String(orders.count ?? 0), href: "#orders", note: "Not live yet" },
-        { label: "Deposits received", value: money.format(paid / 100), href: "#orders", note: "All time" },
-      ]);
-    });
-  }, [client]);
-  if (error) return <p role="alert">The overview couldn&apos;t be loaded.</p>;
-  if (!stats) return <p className="lede">Loading…</p>;
-  return (
-    <>
-    <div className="dash-stats">
-      {stats.map((s) => (
-        <a key={s.label} href={s.href} className="dash-stat">
-          <span className="dash-stat__label">{s.label}</span>
-          <span className="dash-stat__value">{s.value}</span>
-          <span className="dash-stat__note">{s.note}</span>
-        </a>
-      ))}
-    </div>
-    <NeedsYou client={client} />
-    </>
-  );
-}
-
-type Need = { label: string; count: number; href: string };
-
-/** What is waiting on a person right now, each linking to where it is dealt with. Only things with something to do are shown. */
-function NeedsYou({ client }: { client: SupabaseClient }) {
-  const [needs, setNeeds] = useState<Need[] | null>(null);
-  useEffect(() => {
-    const head = { count: "exact" as const, head: true };
-    Promise.all([
-      client.from("website_previews").select("id", head).eq("status", "draft"),
-      client.from("build_revisions").select("id", head).in("status", ["open", "in_progress"]),
-      client.from("website_proposals").select("id", head).eq("status", "pending_approval"),
-      client.from("website_proposals").select("id", head).eq("status", "approved"),
-      client.from("website_briefs").select("id", head).in("stage", ["brief_received", "reviewing"]),
-      client.from("quotes").select("id", head).eq("status", "sent"),
-      // Websites still in specification whose customer has sent their goals: the team should look. The line clears
-      // when the website moves on (the AI or staff take the next step).
-      client.from("website_briefs").select("id, brief").eq("stage", "specification"),
-    ]).then(([previews, changes, toApprove, toSend, briefs, quotes, specs]) => {
-      const withGoals = ((specs.data as Array<{ id: string; brief: { goals?: unknown[] } | null }>) ?? []).filter(
-        (row) => (row.brief?.goals?.length ?? 0) > 0,
-      ).length;
-      const all: Need[] = [
-        { label: "Previews to release", count: previews.count ?? 0, href: "#builds" },
-        { label: "Customer changes to make", count: changes.count ?? 0, href: "#builds" },
-        { label: "Proposals to approve", count: toApprove.count ?? 0, href: "#builds" },
-        { label: "Proposals to send", count: toSend.count ?? 0, href: "#builds" },
-        { label: "Briefs to review", count: briefs.count ?? 0, href: "#builds" },
-        { label: "Goals received, ready for the team", count: withGoals, href: "#builds" },
-        { label: "Quotes waiting", count: quotes.count ?? 0, href: "#quotes" },
-      ];
-      setNeeds(all.filter((n) => n.count > 0));
-    });
-  }, [client]);
-  if (needs === null) return null;
-  return (
-    <section className="needs" aria-labelledby="needs-title">
-      <h2 id="needs-title" className="needs__title">Needs you now</h2>
-      {needs.length === 0 ? (
-        <p className="build-card__meta">Nothing needs you right now.</p>
-      ) : (
-        <ul className="needs__list">
-          {needs.map((n) => (
-            <li key={n.label}>
-              <a href={n.href}>
-                <span>{n.label}</span>
-                <span className="needs__count">{n.count} <span aria-hidden="true">→</span></span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
   );
 }
 
@@ -273,15 +176,19 @@ function Empty({ text }: { text: string }) {
   return <p className="lede">{text}</p>;
 }
 
+const enquiryType = (r: Enquiry): string => ((r.answers as { type?: string } | null)?.type === "website" ? r.topic ?? "Website quote" : r.kind === "brief" ? "Brief" : "Contact");
+
 function EnquiriesTable({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<Enquiry[] | null>(null);
   const [error, setError] = useState(false);
+  const [search, setSearch] = useState("");
+  const [kind, setKind] = useState<"all" | "website" | "contact">("all");
   useEffect(() => {
     client
       .from("enquiries")
       .select("id, reference, kind, name, email, topic, created_at, answers")
       .order("created_at", { ascending: false })
-      .limit(100)
+      .limit(500)
       .then(({ data, error: err }) => {
         setError(Boolean(err));
         setRows(err ? null : ((data as Enquiry[]) ?? []));
@@ -290,22 +197,45 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
   if (error) return <p role="alert">Enquiries couldn&apos;t be loaded.</p>;
   if (rows === null) return <p className="lede">Loading…</p>;
   if (rows.length === 0) return <Empty text="No enquiries yet." />;
+  const q = search.trim().toLowerCase();
+  const isContact = (r: Enquiry) => enquiryType(r) === "Contact";
+  const shown = rows.filter(
+    (r) => (kind === "all" || (kind === "contact") === isContact(r)) && (!q || `${r.name} ${r.email} ${r.reference} ${r.topic ?? ""}`.toLowerCase().includes(q)),
+  );
+  const contacts = rows.filter(isContact).length;
   return (
-    <table className="admin-table">
-      <thead><tr><th scope="col">Received</th><th scope="col">Reference</th><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Email</th><th scope="col">Quote</th></tr></thead>
-      <tbody>
-        {rows.map((r) => (
-          <tr key={r.id}>
-            <td>{when.format(new Date(r.created_at))}</td>
-            <td>{r.reference}</td>
-            <td>{r.name}</td>
-            <td>{(r.answers as { type?: string } | null)?.type === "website" ? r.topic ?? "Website quote" : r.kind === "brief" ? "Brief" : "Contact"}</td>
-            <td><a href={`mailto:${r.email}`}>{r.email}</a></td>
-            <td>{(r.answers as { type?: string } | null)?.type === "website" ? <a href="#subscriptions" className="acct-meta">Payment link: Subscriptions</a> : r.kind === "brief" && r.answers ? <QuoteFromBrief client={client} enquiryId={r.id} /> : <span className="acct-meta">—</span>}</td>
-          </tr>
+    <div className="cust">
+      <div className="cust-tools cust-tools--one">
+        <label className="visually-hidden" htmlFor="enq-search">Search enquiries</label>
+        <input id="enq-search" type="search" className="acct-input" placeholder="Search by name, email or reference" value={search} onChange={(e) => setSearch(e.target.value)} />
+      </div>
+      <div className="seg" role="group" aria-label="Show">
+        {([["all", "All", rows.length], ["website", "Websites", rows.length - contacts], ["contact", "Messages", contacts]] as const).map(([id, label, count]) => (
+          <button key={id} type="button" className="seg__item" aria-pressed={kind === id} onClick={() => setKind(id)}>
+            {label} <span className="seg__count">{count}</span>
+          </button>
         ))}
-      </tbody>
-    </table>
+      </div>
+      {shown.length === 0 ? (
+        <p className="lede">No enquiry matches that.</p>
+      ) : (
+        <table className="admin-table admin-table--stack">
+          <thead><tr><th scope="col">Name</th><th scope="col">Received</th><th scope="col">Reference</th><th scope="col">Type</th><th scope="col">Email</th><th scope="col">Next step</th></tr></thead>
+          <tbody>
+            {shown.map((r) => (
+              <tr key={r.id}>
+                <td data-label="Name"><a className="cust-name" href={`#customers/${encodeURIComponent(r.email.trim().toLowerCase())}`}>{r.name}</a></td>
+                <td data-label="Received">{when.format(new Date(r.created_at))}</td>
+                <td data-label="Reference">{r.reference}</td>
+                <td data-label="Type">{enquiryType(r)}</td>
+                <td data-label="Email"><a href={`mailto:${r.email}`}>{r.email}</a></td>
+                <td data-label="Next step">{(r.answers as { type?: string } | null)?.type === "website" ? <a href="#subscriptions" className="acct-meta">Create a payment link</a> : r.kind === "brief" && r.answers ? <QuoteFromBrief client={client} enquiryId={r.id} /> : <a href={`mailto:${r.email}`} className="acct-meta">Reply by email</a>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }
 

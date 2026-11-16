@@ -36,6 +36,16 @@ const STATUS: Record<string, string> = {
   expired: "Expired",
 };
 
+type Filter = "all" | "running" | "past_due" | "requests" | "offered" | "cancelled";
+const FILTERS: { id: Filter; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "running", label: "Running" },
+  { id: "past_due", label: "Overdue" },
+  { id: "requests", label: "Asked to cancel" },
+  { id: "offered", label: "Link sent" },
+  { id: "cancelled", label: "Ended" },
+];
+
 /**
  * Website subscriptions for staff: monthly recurring revenue, each subscription's payments towards ownership, and the
  * actions that change money (payment links, price changes, cancellation), all through the server.
@@ -44,6 +54,7 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState(false);
   const [requests, setRequests] = useState<Record<string, { reason: string; created_at: string }>>({});
+  const [filter, setFilter] = useState<Filter>("all");
   const [history, setHistory] = useState<{ kind: string; reason: string; created_at: string; reference: string; name: string }[] | null>(null);
 
   const load = useCallback(() => {
@@ -104,10 +115,75 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
   const live = rows.filter((r) => r.livemode !== false);
   const mrr = monthlyRecurringPence(live);
   const active = live.filter((r) => r.kind === "subscription" && (r.status === "active" || r.status === "past_due")).length;
+  const overdue = live.filter((r) => r.status === "past_due").length;
+  const inFilter = (r: Row, f: Filter) => f === "all" || (f === "running" ? r.status === "active" || r.status === "past_due" || r.status === "paid" : f === "requests" ? Boolean(requests[r.id]) : r.status === f);
+  const count = (f: Filter) => rows.filter((r) => inFilter(r, f)).length;
+  const shown = rows.filter((r) => inFilter(r, filter));
   const setupCollected = live.filter((r) => r.payments_count > 0).reduce((s, r) => s + r.setup_pence, 0);
 
   return (
     <div className="stack" style={{ "--stack": "var(--space-6)" } as React.CSSProperties}>
+      <dl className="figures figures--lead">
+        <div><dt>Monthly recurring revenue</dt><dd>{money.format(mrr / 100)}</dd></div>
+        <div><dt>Active plans</dt><dd>{active}</dd></div>
+        <div><dt>Payments overdue</dt><dd>{overdue}</dd></div>
+        <div><dt>Setup fees collected</dt><dd>{money.format(setupCollected / 100)}</dd></div>
+      </dl>
+      <CreateLink call={call} onCreated={load} />
+      {rows.length > 0 && (
+        <div className="seg" role="group" aria-label="Show">
+          {FILTERS.filter((f) => f.id === "all" || count(f.id) > 0).map((f) => (
+            <button key={f.id} type="button" className="seg__item" aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>
+              {f.label} <span className="seg__count">{count(f.id)}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      {rows.length === 0 ? (
+        <p className="lede">No website subscriptions yet.</p>
+      ) : (
+        <table className="admin-table admin-table--subs admin-table--stack">
+          <thead>
+            <tr>
+              <th scope="col">Reference</th><th scope="col">Customer</th><th scope="col">Package</th><th scope="col">Status</th>
+              <th scope="col">Monthly</th><th scope="col">Towards ownership</th><th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {shown.map((r) => (
+              <tr key={r.id}>
+                <td data-label="Reference">
+                  {r.reference}
+                  {r.livemode === false && <span className="acct-meta"> (test)</span>}
+                </td>
+                <td data-label="Customer"><a href={`#customers/${encodeURIComponent(r.email.trim().toLowerCase())}`}>{r.business_name || r.name}</a><br /><a href={`mailto:${r.email}`} className="acct-meta">{r.email}</a></td>
+                <td data-label="Package">{r.package_name}</td>
+                <td data-label="Status">
+                  {STATUS[r.status] ?? r.status}
+                  {r.cancel_at_period_end ? ", ending" : ""}
+                  {requests[r.id] && (
+                    <>
+                      <br />
+                      <strong>Cancel requested</strong> <span className="acct-meta">{new Date(requests[r.id].created_at).toLocaleDateString("en-GB")}{requests[r.id].reason ? ` · ${requests[r.id].reason}` : ""}</span>
+                    </>
+                  )}
+                </td>
+                <td data-label="Monthly">{r.kind === "subscription" ? money.format(r.monthly_pence / 100) : money.format(r.one_off_pence / 100) + " once"}</td>
+                <td data-label="Ownership">
+                  {r.kind === "subscription"
+                    ? r.ownership_eligible_at
+                      ? `Due since ${when.format(new Date(r.ownership_eligible_at))}`
+                      : r.ownership_after_payments > 0
+                        ? `${r.payments_count} of ${r.ownership_after_payments}`
+                        : "Not applicable (rolling)"
+                    : "On full payment"}
+                </td>
+                <td data-label="Actions">{r.kind === "subscription" && (r.status === "active" || r.status === "past_due") ? <Manage row={r} call={call} onDone={load} /> : <span className="acct-meta">—</span>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       <section aria-label="Cancellation history">
         <p className="admin-label">Cancellations and failed payments</p>
         {history === null ? (
@@ -129,57 +205,6 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
           </ul>
         )}
       </section>
-      <div className="dash-stats">
-        <div className="dash-stat"><span className="dash-stat__label">Monthly recurring revenue</span><span className="dash-stat__value">{money.format(mrr / 100)}</span><span className="dash-stat__note">Active and overdue</span></div>
-        <div className="dash-stat"><span className="dash-stat__label">Active subscriptions</span><span className="dash-stat__value">{active}</span><span className="dash-stat__note">Website packages</span></div>
-        <div className="dash-stat"><span className="dash-stat__label">Setup fees collected</span><span className="dash-stat__value">{money.format(setupCollected / 100)}</span><span className="dash-stat__note">All time</span></div>
-      </div>
-      <CreateLink call={call} onCreated={load} />
-      {rows.length === 0 ? (
-        <p className="lede">No website subscriptions yet.</p>
-      ) : (
-        <table className="admin-table admin-table--subs">
-          <thead>
-            <tr>
-              <th scope="col">Reference</th><th scope="col">Customer</th><th scope="col">Package</th><th scope="col">Status</th>
-              <th scope="col">Monthly</th><th scope="col">Towards ownership</th><th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.id}>
-                <td>
-                  {r.reference}
-                  {r.livemode === false && <span className="acct-meta"> (test)</span>}
-                </td>
-                <td>{r.business_name || r.name}<br /><a href={`mailto:${r.email}`} className="acct-meta">{r.email}</a></td>
-                <td>{r.package_name}</td>
-                <td>
-                  {STATUS[r.status] ?? r.status}
-                  {r.cancel_at_period_end ? ", ending" : ""}
-                  {requests[r.id] && (
-                    <>
-                      <br />
-                      <strong>Cancel requested</strong> <span className="acct-meta">{new Date(requests[r.id].created_at).toLocaleDateString("en-GB")}{requests[r.id].reason ? ` · ${requests[r.id].reason}` : ""}</span>
-                    </>
-                  )}
-                </td>
-                <td>{r.kind === "subscription" ? money.format(r.monthly_pence / 100) : money.format(r.one_off_pence / 100) + " once"}</td>
-                <td>
-                  {r.kind === "subscription"
-                    ? r.ownership_eligible_at
-                      ? `Due since ${when.format(new Date(r.ownership_eligible_at))}`
-                      : r.ownership_after_payments > 0
-                        ? `${r.payments_count} of ${r.ownership_after_payments}`
-                        : "Not applicable (rolling)"
-                    : "On full payment"}
-                </td>
-                <td>{r.kind === "subscription" && (r.status === "active" || r.status === "past_due") ? <Manage row={r} call={call} onDone={load} /> : <span className="acct-meta">—</span>}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
     </div>
   );
 }
