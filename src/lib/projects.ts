@@ -268,6 +268,7 @@ export const heroProjects: Project[] = [
   projectBySlug("ev-exec")!,
   projectBySlug("boonma")!,
   projectBySlug("raeng-fitness")!,
+  projectBySlug("duratek")!,
 ];
 
 /**
@@ -293,5 +294,10 @@ export const OWNER_QUOTES = [
     quote:
       "From the first look, the website feels professional and looks class. It gives the business a great online presence, gets people talking and makes it easy to start attracting new clients.",
     pull: "From the first look, the website feels professional and looks class.",
+  },
+  {
+    project: projectBySlug("duratek")!,
+    quote: "Finally, a website that does our business justice.",
+    pull: "Finally, a website that does our business justice.",
   },
 ];

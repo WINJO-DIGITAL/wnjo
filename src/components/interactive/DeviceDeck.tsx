@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
-import { VisitLogo } from "@/components/VisitLogo";
 import { WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { showsAddress, type Project } from "@/lib/projects";
 
@@ -16,6 +15,7 @@ const THEME: Record<string, { bg: string; glow: string }> = {
   "ev-exec": { bg: "#e6e3dc", glow: "#c9a24b" },
   boonma: { bg: "#ece2e7", glow: "#b78fb8" },
   "raeng-fitness": { bg: "#e8e4dd", glow: "#9c958a" },
+  duratek: { bg: "#e7e3da", glow: "#b08b5a" },
 };
 const FALLBACK = { bg: "#ebe3d7", glow: "#a84a26" };
 
@@ -285,14 +285,11 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       </div>
 
       {/* The project pills sit under the device, so the headline and the phone lead. */}
-      {showsAddress(current) ? (
-        <a href={current.url} target="_blank" rel="noopener noreferrer" className="deck__visit">
-          Visit {current.host} <span aria-hidden="true">↗</span>
-          <span className="visually-hidden"> (opens in a new tab)</span>
-        </a>
-      ) : (
-        <VisitLogo name={current.name} url={current.url} logo={current.logo} />
-      )}
+      {/* A project whose address stays hidden is named instead. Its logo is already in the row below. */}
+      <a href={current.url} target="_blank" rel="noopener noreferrer" className="deck__visit">
+        Visit {showsAddress(current) ? current.host : current.name} <span aria-hidden="true">↗</span>
+        <span className="visually-hidden"> (opens in a new tab)</span>
+      </a>
 
       <div ref={railRef} className="deck__rail" role="group" aria-label="Choose a project">
         {items.map((p, k) => (

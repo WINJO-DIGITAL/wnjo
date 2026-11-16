@@ -2,7 +2,6 @@
 
 import Image, { type StaticImageData } from "next/image";
 import { useState } from "react";
-import { VisitLogo } from "@/components/VisitLogo";
 import { showsAddress } from "@/lib/projects";
 
 export type OwnerQuoteItem = {
@@ -46,18 +45,14 @@ export function OwnerQuotes({ items }: { items: OwnerQuoteItem[] }) {
           <figure key={item.slug} className="oq__item" data-active={i === active} aria-hidden={i !== active} id={`oq-${item.slug}`}>
             <blockquote>
               <p className="oq__pull">{`“${item.pull}”`}</p>
-              <p className="oq__full">{item.quote}</p>
+              {item.quote !== item.pull && <p className="oq__full">{item.quote}</p>}
             </blockquote>
             <figcaption className="oq__by">
               Owner, {item.name} · {item.location} ·{" "}
-              {showsAddress(item) ? (
-                <a href={item.url} target="_blank" rel="noopener noreferrer" tabIndex={i === active ? undefined : -1}>
-                  Visit {item.host}
-                  <span className="visually-hidden"> (opens in a new tab)</span>
-                </a>
-              ) : (
-                <VisitLogo name={item.name} url={item.url} logo={item.logo} tabIndex={i === active ? undefined : -1} />
-              )}
+              <a href={item.url} target="_blank" rel="noopener noreferrer" tabIndex={i === active ? undefined : -1}>
+                Visit {showsAddress(item) ? item.host : item.name}
+                <span className="visually-hidden"> (opens in a new tab)</span>
+              </a>
             </figcaption>
           </figure>
         ))}

@@ -3,8 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { VisitLogo } from "@/components/VisitLogo";
-import { showsAddress, type Project } from "@/lib/projects";
+import type { Project } from "@/lib/projects";
 import { LivePreview } from "./LivePreview";
 
 type Item = Pick<Project, "slug" | "name" | "sector" | "host" | "url" | "showAddress" | "desktop" | "mobile" | "walkthrough" | "logo">;
@@ -295,19 +294,16 @@ export function ShowcaseStage({ items }: { items: Item[] }) {
           <Link href={`/work#${current.slug}`} className="showcase__link showcase__link--primary">
             View project
           </Link>
-          {showsAddress(current) ? (
-            <a
-              href={current.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="showcase__link"
-              aria-label={`View live: the ${current.name} website (opens in a new tab)`}
-            >
-              View live ↗
-            </a>
-          ) : (
-            <VisitLogo name={current.name} url={current.url} logo={current.logo} />
-          )}
+          {/* The words "View live" name no address, so this is the same for every project. The logo is already in the tab. */}
+          <a
+            href={current.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="showcase__link"
+            aria-label={`View live: the ${current.name} website (opens in a new tab)`}
+          >
+            View live ↗
+          </a>
           <button
             type="button"
             className="showcase__pause"

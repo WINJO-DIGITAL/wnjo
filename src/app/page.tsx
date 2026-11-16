@@ -24,9 +24,8 @@ export const metadata: Metadata = homeMetadata();
 
 const fystay = projectBySlug("fystay")!;
 const evexec = projectBySlug("ev-exec")!;
-const duratek = projectBySlug("duratek")!;
-/** The four client projects, then our own platform. */
-const work = [...heroProjects, duratek, fystay];
+/** The four client projects (the hero's), then our own platform. */
+const work = [...heroProjects, fystay];
 
 export default function HomePage() {
   const schema = businessSchema(siteUrl() ?? "https://winjodigital.co.uk");
