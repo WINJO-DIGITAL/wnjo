@@ -13,7 +13,7 @@ const pro = WEBSITE_PLANS.gold;
 export const metadata = pageMetadata(
   "/winjo-refresh",
   "WINJO Refresh",
-  `WINJO Refresh is a planned website design and experience refresh every ${REFRESH.everyMonths} months, included in every managed website plan. Your website stays current without another redesign to organise.`,
+  `WINJO Refresh is a planned design refresh every ${REFRESH.everyMonths} months, included in every managed website plan, so your site stays current.`,
 );
 
 // What a refresh covers, as the owner has defined it.
