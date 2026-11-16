@@ -2,7 +2,6 @@
 
 import Image, { type StaticImageData } from "next/image";
 import { useState } from "react";
-import { showsAddress } from "@/lib/projects";
 
 export type OwnerQuoteItem = {
   slug: string;
@@ -50,7 +49,7 @@ export function OwnerQuotes({ items }: { items: OwnerQuoteItem[] }) {
             <figcaption className="oq__by">
               Owner, {item.name} · {item.location} ·{" "}
               <a href={item.url} target="_blank" rel="noopener noreferrer" tabIndex={i === active ? undefined : -1}>
-                Visit {showsAddress(item) ? item.host : item.name}
+                Visit {item.name}
                 <span className="visually-hidden"> (opens in a new tab)</span>
               </a>
             </figcaption>
