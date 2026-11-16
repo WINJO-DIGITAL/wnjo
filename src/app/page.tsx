@@ -53,12 +53,18 @@ export default function HomePage() {
               <span className="hero-ed__line">Your website.</span>{" "}
               <span className="serif-em">Our responsibility.</span>
             </h1>
+            <p className="lede rise" style={{ "--i": 2 } as React.CSSProperties}>
+              Design, hosting, updates and support in one monthly plan, with no minimum term.
+            </p>
             <div
               className="btn-row rise"
               style={{ "--i": 4 } as React.CSSProperties}
             >
               <Link href="/pricing" className="btn btn--primary">
-                Get your website from £99 a month
+                Get your website from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month
+              </Link>
+              <Link href="/work" className="btn btn--secondary">
+                See our work
               </Link>
             </div>
           </div>
