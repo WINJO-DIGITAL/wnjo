@@ -25,6 +25,7 @@ type Subscription = {
   last_payment_at: string | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;
+  cancelled_at: string | null;
   offer_expires_at: string | null;
   created_at: string;
 };
@@ -159,8 +160,8 @@ function Plans({ client, email }: { client: SupabaseClient; email: string }) {
             <ul className="plans__ended">
               {ended.map((r) => (
                 <li key={r.id}>
-                  <span>{planInfo(r.package_code, r.package_name).name}</span>
-                  <span>{r.reference}</span>
+                  <span>{planInfo(r.package_code, r.package_name).name} <span className="plans__ref">{r.reference}</span></span>
+                  <span>{r.cancelled_at ? `Ended ${date(r.cancelled_at)}` : "Ended"}</span>
                 </li>
               ))}
             </ul>

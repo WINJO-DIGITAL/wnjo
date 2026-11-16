@@ -223,7 +223,8 @@ export function BriefWizard({
         </div>
       </header>
 
-      {restored && (
+      {/* The first step has its own note about the details we kept, so this one waits until after it. */}
+      {restored && !(current === "about" && (savedName || savedBusiness)) && (
         <p className="wiz__restored" role="status">
           Welcome back. We kept your answers so far.
         </p>

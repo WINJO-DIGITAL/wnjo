@@ -58,6 +58,8 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [revisions, setRevisions] = useState<RevisionRow[]>([]);
   const [refresh, setRefresh] = useState(0);
+  // The website that is open. Null until the customer picks one: the newest is shown first.
+  const [openId, setOpenId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -86,19 +88,45 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
       <h2 id="acct-builds-title" className="visually-hidden">
         Your websites in progress
       </h2>
-      {briefs.map((b) => (
-        <BuildCard
-          key={b.id}
-          client={client}
-          brief={b}
-          events={events.filter((e) => e.brief_id === b.id)}
-          proposal={proposals.find((p) => p.brief_id === b.id && p.status === "sent") ?? null}
-          accepted={proposals.find((p) => p.brief_id === b.id && p.status === "accepted") ?? null}
-          revisions={revisions.filter((r) => r.brief_id === b.id)}
-          onChanged={() => setRefresh((r) => r + 1)}
-        />
-      ))}
+      {briefs.map((b) =>
+        // With more than one website, one is open at a time, so the page is never several forms long.
+        b.id === (openId ?? briefs[0].id) ? (
+          <BuildCard
+            key={b.id}
+            client={client}
+            brief={b}
+            events={events.filter((e) => e.brief_id === b.id)}
+            proposal={proposals.find((p) => p.brief_id === b.id && p.status === "sent") ?? null}
+            accepted={proposals.find((p) => p.brief_id === b.id && p.status === "accepted") ?? null}
+            revisions={revisions.filter((r) => r.brief_id === b.id)}
+            onChanged={() => setRefresh((r) => r + 1)}
+          />
+        ) : (
+          <BuildRow key={b.id} brief={b} events={events.filter((e) => e.brief_id === b.id)} onOpen={() => setOpenId(b.id)} />
+        ),
+      )}
     </section>
+  );
+}
+
+/** A website that isn't the one open: its name, where it has got to, and a way to open it. */
+function BuildRow({ brief, events, onOpen }: { brief: Brief; events: StageEvent[]; onOpen: () => void }) {
+  const path = stagePath(brief.route);
+  const lastOnPath = [...events].reverse().map((e) => e.detail.to).find((s): s is Stage => Boolean(s && path.includes(s)));
+  const step = portalStepIndex(brief.stage, lastOnPath);
+  const where = step >= PORTAL_STEPS.length ? "Live" : PORTAL_STEPS[step].label;
+  return (
+    <article className="build-row-card" aria-labelledby={`buildrow-${brief.id}`}>
+      <div>
+        <h2 id={`buildrow-${brief.id}`} className="build-row-card__title">{brief.business_name || "Your website"}</h2>
+        <p className="build-card__sub">
+          {brief.figures.package ?? "Website"} · {brief.reference} · {where}
+        </p>
+      </div>
+      <button type="button" className="btn btn--secondary" onClick={onOpen} aria-label={`Open ${brief.business_name || "this website"}`}>
+        Open
+      </button>
+    </article>
   );
 }
 
@@ -205,7 +233,7 @@ function BuildCard({
       </ol>
 
       <p className="build-card__ask">
-        <a href={`/contact?brief=${encodeURIComponent(`About my website ${brief.reference}: `)}`}>Message us about this website</a>
+        <a href={`/account/help?about=${encodeURIComponent(brief.reference)}`}>Message us about this website</a>
       </p>
 
       <div className="tabs" role="tablist" aria-label="Website sections">
