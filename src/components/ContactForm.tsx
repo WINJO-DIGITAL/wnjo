@@ -15,6 +15,7 @@ import {
 } from "@/lib/enquiry";
 import { ONE_OFF_WEBSITE, SCOPED_FROM, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { ArrowLeft, ArrowRight } from "./Icons";
+import { TurnstileField, turnstileRequired } from "./TurnstileField";
 import { useEnquirySubmit } from "./useEnquirySubmit";
 
 const isTopic = (value: unknown): value is Topic =>
@@ -310,6 +311,8 @@ function EnquiryForm({
   const [furthest, setFurthest] = useState(0);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [startedAt] = useState(() => Date.now());
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileProblem, setTurnstileProblem] = useState("");
   const [previous, setPrevious] = useState(() => (inBrowser ? readSession<{ reference?: string }>(SENT_KEY) : null));
   const { state, submit, reset } = useEnquirySubmit();
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -377,6 +380,10 @@ function EnquiryForm({
       setErrors(all);
       return goTo(STEPS.findIndex((s) => s.fields.some((k) => all[k])));
     }
+    if (turnstileRequired && !turnstileToken) {
+      setTurnstileProblem("Please complete the check below, then send your enquiry.");
+      return;
+    }
     const { name, email, topic, budget, timeline, website } = fields;
     const result = await submit({
       kind: "contact",
@@ -388,6 +395,7 @@ function EnquiryForm({
       website,
       message: composeMessage(fields),
       startedAt,
+      ...(turnstileRequired ? { turnstileToken } : {}),
     });
     if (result?.status === "success") {
       writeSession(DRAFT_KEY, null);
@@ -690,6 +698,13 @@ function EnquiryForm({
                 </div>
               ))}
             </dl>
+            <TurnstileField onToken={(token) => {
+              setTurnstileToken(token);
+              if (token) setTurnstileProblem("");
+            }} />
+            {turnstileProblem && (
+              <p className="field-error" role="alert">{turnstileProblem}</p>
+            )}
             <p className="fine">
               We use your details only to reply to you. See our <Link href="/privacy">privacy notice</Link>.
             </p>

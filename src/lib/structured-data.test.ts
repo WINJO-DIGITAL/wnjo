@@ -64,7 +64,7 @@ describe("serviceSchema", () => {
       ((serviceSchema("https://winjodigital.co.uk", page) as { offers?: { priceSpecification: { price: number } }[] }).offers ?? []).map((o) => o.priceSpecification.price);
     expect(prices("managed-websites")).toEqual([WEBSITE_PLANS.bronze.monthly, WEBSITE_PLANS.silver.monthly, WEBSITE_PLANS.gold.monthly]);
     expect(prices("website-projects")).toEqual([ONE_OFF_TIERS.essential.from, ONE_OFF_TIERS.professional.from, ONE_OFF_TIERS.premium.from]);
-    expect(prices("winjo-refresh")).toEqual([WEBSITE_PLANS.silver.monthly, WEBSITE_PLANS.gold.monthly]);
+    expect(prices("winjo-refresh")).toEqual([WEBSITE_PLANS.bronze.monthly, WEBSITE_PLANS.silver.monthly, WEBSITE_PLANS.gold.monthly]);
     expect(prices("booking-software")).toEqual([]);
     expect(prices("app-development")).toEqual([]);
   });

@@ -1,6 +1,6 @@
 # WINJO DIGITAL – Terms and Conditions
 
-Version 2026-11-10.5. Replaces 2026-11-10.4.
+Version 2026-11-16.1. Replaces 2026-11-14.2.
 
 ---
 
@@ -41,6 +41,8 @@ Booking systems, custom software and other individually scoped services are cove
 3.4 Subscriptions are rolling monthly. There is no minimum contract term. Your subscription continues until it is ended under section 8.
 
 3.5 **No ownership on a managed subscription.** A managed website subscription is a service, not a sale. You do not own the website, its code, our framework or our tools at any point while you subscribe, and monthly payments never transfer ownership of them to you. We host and maintain the website for you, and we license you to use it while your subscription is active. Section 9 explains what you receive when your subscription ends.
+
+3.6 **Going live.** Once we have your goals, the pages you want and the style you want, a managed website is live within **14 days**. If we are still waiting for something from you, the 14 days start when we have it.
 
 ## 4. Changes, support and response times
 
@@ -262,7 +264,7 @@ The design files and page layouts in the second bullet above are released once y
 - deleting or returning personal data at the end of the service;
 - audits and information on request.
 
-16.3 **Subprocessors.** The subprocessors we use are Supabase (database and sign-in, hosted in Frankfurt, Germany), Resend (email delivery, EU, Ireland), Vercel (website hosting, London) and Stripe (payments). We will tell you before we add a new one.
+16.3 **Subprocessors.** The subprocessors we use are Supabase (database and sign-in, hosted in Frankfurt, Germany), Resend (email delivery, EU, Ireland), Vercel (website hosting, London), Stripe (payments) and Anthropic (the Claude model, which drafts website wording from the brief you give us; a person checks the draft before it is published). We will tell you before we add a new one.
 
 16.4 **Retention.** We keep personal data only as long as needed for the service, the law or our accounts. When a subscription or project ends, we keep your website data for the 7-day export period in section 8.3, and then delete it within a further 30 days (so within 60 days of the end date), unless you ask us to delete it earlier or the law requires us to keep it. We do not keep separate backup copies of your website data, so deleted data is removed from our systems in the timings above. Enquiries that do not become a subscription or project are deleted **12 months** after our last contact with you. Customer and billing records that we must keep for tax and accounting purposes are kept for **6 years** after the end of the service, as UK law requires.
 

@@ -53,7 +53,7 @@ function Screen({ stage }: { stage: (typeof STAGES)[number]["id"] }) {
         <i className="ws-menu" />
       </div>
       <div className="ws-photo">{stage === "build" && <span className="ws-note">Warmer photo?</span>}</div>
-      <b className="ws-title">Your headline here.</b>
+      <b className="ws-title">Sunday lunch, booked online.</b>
       <span className="ws-btn">Book a table</span>
     </>
   );

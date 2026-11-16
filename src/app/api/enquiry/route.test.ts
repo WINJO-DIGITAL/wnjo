@@ -74,6 +74,12 @@ describe("POST /api/enquiry", () => {
     expect(sent.html).toBeUndefined();
     expect(sent.text).toContain("Budget: £2,000 to £5,000");
     expect(sent.text).toContain("Timeline: Within 1 to 3 months");
+    const ack = JSON.parse(fetchMock.mock.calls[1][1].body);
+    expect(ack.to).toEqual(["ada@example.com"]);
+    expect(ack.subject).toContain(reference);
+    expect(ack.reply_to).toBe("hello@winjodigital.co.uk");
+    expect(ack.text).toContain("WHAT HAPPENS NEXT");
+    expect(ack.text.toLowerCase()).not.toContain("working day");
   });
 
   it("accepts contact enquiries and briefs without a budget or timeline, which are optional", async () => {
@@ -116,6 +122,14 @@ describe("POST /api/enquiry", () => {
     expect((await post(contact)).status).toBe(502);
   });
 
+  it("flags a sales pitch and still sends it", async () => {
+    const res = await post({ ...contact, message: "Our SEO agency can increase your organic traffic with guest posts." });
+    expect(res.status).toBe(200);
+    const sent = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(sent.subject).toContain("Possible sales pitch");
+    expect(sent.text).toContain("The enquiry was kept, not discarded.");
+  });
+
   it("strips line breaks from the subject", async () => {
     await post({ ...contact, name: "Ada\nBcc: x@y.z" });
     expect(JSON.parse(fetchMock.mock.calls[0][1].body).subject).not.toMatch(/\n/);
@@ -154,7 +168,9 @@ describe("POST /api/enquiry with storage", () => {
     saveMock.mockResolvedValue(false);
     const res = await post(contact);
     expect(res.status).toBe(200);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    // The owner alert goes first. The acknowledgement is a second email and does not decide success.
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).reply_to).toBe("ada@example.com");
   });
 
   it("reports failure when neither saving nor email works", async () => {

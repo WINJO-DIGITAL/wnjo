@@ -6,12 +6,13 @@ import { ServiceData } from "@/components/ServiceData";
 import { pageMetadata } from "@/lib/metadata";
 import { REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
-const { silver: pro, gold: plus } = WEBSITE_PLANS;
+const core = WEBSITE_PLANS.bronze;
+const plus = WEBSITE_PLANS.silver;
 
 export const metadata = pageMetadata(
   "/winjo-refresh",
   "WINJO Refresh",
-  `WINJO Refresh is a planned website design and experience refresh every ${REFRESH.everyMonths} months, included in the ${pro.name} and ${plus.name} managed website plans. Your website stays current without another redesign to organise.`,
+  `WINJO Refresh is a planned website design and experience refresh every ${REFRESH.everyMonths} months, included in every managed website plan. Your website stays current without another redesign to organise.`,
 );
 
 // What a refresh covers, as the owner has defined it.
@@ -65,7 +66,7 @@ export default function WinjoRefreshPage() {
       <section id="covers" className="section section--ruled" aria-labelledby="covers-title">
         <div className="container container--wide">
           <SectionHead eyebrow="What you get" title={<span id="covers-title">A planned design and experience refresh.</span>} split>
-            <p>Every {REFRESH.everyMonths} months, for as long as you&apos;re on {pro.name} or {plus.name}.</p>
+            <p>Every {REFRESH.everyMonths} months, on every plan. The level depends on the plan.</p>
           </SectionHead>
           <ul role="list" className="managed-list managed-list--wide" data-reveal>
             {covers.map(([title, line]) => (
@@ -94,21 +95,26 @@ export default function WinjoRefreshPage() {
       {/* The plans that include it. */}
       <section id="plans" className="section section--ruled" aria-labelledby="plans-title">
         <div className="container container--wide">
-          <SectionHead eyebrow="Included" title={<span id="plans-title">Part of {pro.name} and {plus.name}.</span>} split>
-            <p>No extra charge. It&apos;s one of the reasons to choose them.</p>
+          <SectionHead eyebrow="Included" title={<span id="plans-title">Part of every plan.</span>} split>
+            <p>No extra charge. The refresh grows with the plan.</p>
           </SectionHead>
           <div className="home-ways" data-reveal>
-            {[pro, plus].map((plan) => (
-              <article key={plan.name} className="home-way">
-                <h3 className="home-way__name">
-                  {plan.name}: {formatGBP(plan.monthly)} a month
-                </h3>
-                <p className="home-way__text">{plan.bestFor}</p>
-                <Link href={`/pricing#${plan.name.toLowerCase()}`} className="arrow-link">
-                  See what {plan.name} includes
-                </Link>
-              </article>
-            ))}
+            {(["bronze", "silver", "gold"] as const).map((id) => {
+              const plan = WEBSITE_PLANS[id];
+              return (
+                <article key={id} className="home-way">
+                  <h3 className="home-way__name">
+                    {plan.name}: {formatGBP(plan.monthly)} a month
+                  </h3>
+                  <p className="home-way__text">
+                    {REFRESH.levels[id].name}. {plan.bestFor}
+                  </p>
+                  <Link href={`/pricing#${plan.name.toLowerCase()}`} className="arrow-link">
+                    See what {plan.name} includes
+                  </Link>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -116,10 +122,10 @@ export default function WinjoRefreshPage() {
       <CtaBand
         tone="light"
         title={<>A website that stays current.</>}
-        body={`WINJO Refresh is included in ${pro.name} and ${plus.name}, from ${formatGBP(pro.monthly)} a month with no minimum term.`}
+        body={`WINJO Refresh is included in every plan, from ${formatGBP(core.monthly)} a month, with no minimum term.`}
       >
         <Link href={`/build?plan=silver`} className="btn btn--primary">
-          Choose {pro.name}
+          Choose {plus.name}
         </Link>
         <Link href="/pricing" className="btn btn--secondary">
           Compare the plans

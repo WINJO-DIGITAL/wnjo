@@ -9,7 +9,7 @@ import { ONE_OFF_WEBSITE, SCOPED_FROM, SUBSCRIPTIONS, WEBSITE_PLANS, formatGBP }
 export const metadata = pageMetadata(
   "/website-projects",
   `Bespoke website design from ${formatGBP(ONE_OFF_WEBSITE.from)}`,
-  `Own your website: a bespoke website project from ${formatGBP(ONE_OFF_WEBSITE.from)}, yours on full payment, with optional hosting and care.`,
+  `Own your website: a project designed from scratch, from ${formatGBP(ONE_OFF_WEBSITE.from)}, yours on full payment, with optional hosting and care.`,
 );
 
 export default function WebsiteProjectsPage() {
@@ -19,7 +19,7 @@ export default function WebsiteProjectsPage() {
       <PageHero
         eyebrow="Website projects"
         title={<>Own your website.</>}
-        lede={`A bespoke website from ${formatGBP(ONE_OFF_WEBSITE.from)}, paid up front and yours on full payment.`}
+        lede={`Designed from scratch, from ${formatGBP(ONE_OFF_WEBSITE.from)}, paid up front and yours on full payment.`}
       >
         <div className="btn-row">
           <Link href="#packages" className="btn btn--primary">

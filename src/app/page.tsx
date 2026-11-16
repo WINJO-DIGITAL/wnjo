@@ -154,7 +154,7 @@ export default function HomePage() {
             Bespoke, every time.
           </h2>
           <div className="tile__aside">
-            <p className="tile__line">No templates. Each of these was designed around the business it serves.</p>
+            <p className="tile__line">Each of these was designed from scratch for the business it serves.</p>
             <p className="tile__more">
               <Link href="/work" className="arrow-link">
                 See all our work <ArrowRight />
@@ -175,7 +175,7 @@ export default function HomePage() {
                     className="home-work__shot"
                   />
                   <span className="home-work__head">
-                    <Image src={p.logo} alt="" width={28} height={28} sizes="28px" className="home-work__logo" />
+                    <Image src={p.logo} alt="" width={28} height={28} sizes="28px" className="home-work__logo" aria-hidden />
                     <span className="home-work__name">{p.name}</span>
                   </span>
                   <span className="home-work__problem">{p.sector}</span>

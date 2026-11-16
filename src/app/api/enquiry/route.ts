@@ -1,7 +1,10 @@
 import { randomBytes } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { BUDGETS, LIMITS, MIN_FILL_MS, TIMELINES, TOPICS, clean, validateEnquiry } from "@/lib/enquiry";
+import { ENQUIRY_REPLY_TO, contactAcknowledgement } from "@/lib/enquiry-ack";
+import { pitchFlags } from "@/lib/enquiry-flags";
 import { mailConfig, notificationMailConfig, sendEmail, sendEnquiryEmail } from "@/lib/mailer";
+import { verifyTurnstile } from "@/lib/turnstile";
 import { issueInstantQuote } from "@/lib/instant-quote";
 import { quoteEmail } from "@/lib/quote-email";
 import { enquiryStoreConfigured, saveEnquiry } from "@/lib/enquiry-store";
@@ -83,10 +86,21 @@ export async function POST(request: NextRequest) {
   if (body.kind === "hosting" && !fromForm) return handleHostingRequest(body, request);
 
   const kind = body.kind === "brief" ? "brief" : "contact";
+  // The public contact form asks Cloudflare to check the visitor when both keys are set. With the keys unset
+  // this does nothing. A failed check is shown to the visitor, never saved as if it had been sent.
+  if (kind === "contact") {
+    const ipForCheck = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const token = typeof body.turnstileToken === "string" ? body.turnstileToken : "";
+    if ((await verifyTurnstile(token, ipForCheck)) === "fail") {
+      return reply(403, { error: "The form check didn't complete. Please try again." });
+    }
+  }
   // Budget and timeline help, but are optional everywhere, so nobody is stopped for not knowing yet.
   const result = validateEnquiry(body, { messageRequired: kind === "contact", detailsRequired: false });
   if (!result.ok) return reply(422, { error: "Please check the highlighted fields.", fields: result.errors });
   const fields = result.data;
+
+  const flags = kind === "contact" ? pitchFlags(fields.message) : [];
 
   const lines: string[] = [
     `Name: ${fields.name}`,
@@ -115,6 +129,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (fields.message) lines.push(kind === "brief" ? "ADDITIONAL NOTES" : "GOALS", fields.message);
+  if (flags.length) lines.unshift(`Flagged for review (${flags.join("; ")}). The enquiry was kept, not discarded.`);
 
   const config = mailConfig();
   const storeOn = enquiryStoreConfigured();
@@ -134,7 +149,8 @@ export async function POST(request: NextRequest) {
 
   // Keep the enquiry first, so it survives even if the email step fails. Then email it if that's set up.
   const reference = newReference();
-  const emailSubject = `${subject.replace(/\s+/g, " ").slice(0, 180)} [${reference}]`;
+  const flaggedSubject = flags.length ? `Possible sales pitch: ${subject}` : subject;
+  const emailSubject = `${flaggedSubject.replace(/\s+/g, " ").slice(0, 180)} [${reference}]`;
   const text = [`Reference: ${reference}`, ...lines].join("\n");
   const saved = storeOn
     ? await saveEnquiry({
@@ -157,6 +173,20 @@ export async function POST(request: NextRequest) {
 
   if (!saved && !sent) {
     return reply(502, { error: "We couldn't send your message just now. Please try again shortly." });
+  }
+
+  // A short note back to the person who wrote in. A failure here is logged and does not undo the owner alert.
+  if (kind === "contact") {
+    const customerConfig = notificationMailConfig();
+    if (customerConfig) {
+      const ack = contactAcknowledgement({ name: fields.name, reference, account: body.account === true });
+      const acked = await sendEmail(
+        customerConfig,
+        { to: fields.email, subject: ack.subject, text: ack.text, replyTo: ENQUIRY_REPLY_TO },
+        "Enquiry acknowledgement",
+      );
+      if (!acked) console.error("Enquiry acknowledgement was not sent");
+    }
   }
 
   // A price brief gets its written quote straight away, by email and in the customer's account. Any failure here

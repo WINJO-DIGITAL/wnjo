@@ -16,12 +16,12 @@ import { projects } from "@/lib/projects";
 export const metadata = pageMetadata(
   "/managed-websites",
   "Managed websites",
-  `A bespoke website that we design, host, maintain, update and keep improving for one monthly payment, from ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month. No minimum term.`,
+  `A managed website built on a sector design and tailored to your business, then hosted, maintained and updated for one monthly payment, from ${formatGBP(WEBSITE_PLANS.bronze.monthly)} a month. No minimum term.`,
 );
 
 // What the subscription covers every month, from the plans' own inclusions.
 const monthly: [string, string][] = [
-  ["Bespoke design", "Designed for your business, never a template."],
+  ["Your design", "A sector design, tailored to your content, branding and layout."],
   ["Managed hosting", "Hosting and your SSL certificate, arranged and renewed for you."],
   ["Security", "Monitored, and fixed when something needs attention."],
   ["Maintenance and updates", "The technical upkeep, done without you asking."],
@@ -39,7 +39,7 @@ export default function ManagedWebsitesPage() {
       <PageHero
         eyebrow="Managed websites"
         title={<>A website built for your business, looked after by us.</>}
-        lede="From bespoke design and hosting to maintenance, updates and ongoing improvements, WINJO takes care of everything behind your online presence."
+        lede="From a tailored design and hosting to maintenance, updates and ongoing improvements, WINJO takes care of everything behind your online presence."
         visual={<CareHero site={heroSite} />}
       >
         <div className="btn-row">
@@ -74,11 +74,11 @@ export default function ManagedWebsitesPage() {
         </div>
       </section>
 
-      {/* Bespoke design, shown: one site restyled for four kinds of business. */}
+      {/* A sector design, shown: one site restyled for four kinds of business. */}
       <section id="design" className={`section section--ruled ${jost.variable} ${archivo.variable}`} aria-labelledby="design-title">
         <div className="container container--wide">
-          <SectionHead eyebrow="Bespoke design" title={<span id="design-title">Designed around your business.</span>} split>
-            <p>Pick a business and watch the website change. Yours is designed the same way: for you.</p>
+          <SectionHead eyebrow="Your design" title={<span id="design-title">Tailored to your kind of business.</span>} split>
+            <p>Pick a business and watch the sample change. A managed website works the same way: a sector design, then your content, branding and layout.</p>
           </SectionHead>
           <div data-reveal>
             <SiteStyler />

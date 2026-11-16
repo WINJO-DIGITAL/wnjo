@@ -6,6 +6,7 @@ import { contactPhoneHref } from "@/lib/site";
 export const metadata = { ...pageMetadata("/contact/not-sent", "Message not sent", "Your message didn't reach WINJO DIGITAL."), robots: { index: false } };
 
 const REASONS: Record<string, string> = {
+  "403": "The form check didn't complete. Please try again. If it keeps happening, email hello@winjodigital.co.uk.",
   "422": "Something was missing. Please give your name, a working email address and a message of at least ten characters.",
   "429": "Too many messages came from this connection. Please wait a few minutes and try again.",
 };

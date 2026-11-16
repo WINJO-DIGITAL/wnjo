@@ -369,7 +369,7 @@ export const WEBSITE_PLANS = {
     seo: "Basic SEO foundations",
     refresh: true,
     includes: [
-      "Bespoke website design",
+      "Sector design tailored to your business",
       "Up to 5 pages",
       "WINJO Visual Refresh every 24 months",
       "Managed hosting",
@@ -401,7 +401,7 @@ export const WEBSITE_PLANS = {
     refresh: true,
     includes: [
       "Everything in Core",
-      "Bespoke website up to 10 pages",
+      "Sector design, up to 10 pages",
       "Enhanced SEO foundations",
       "Local SEO foundations",
       "Google Analytics integration",
@@ -430,7 +430,7 @@ export const WEBSITE_PLANS = {
     refresh: true,
     includes: [
       "Everything in Plus",
-      "Bespoke website up to 20 pages",
+      "Sector design, up to 20 pages",
       "Advanced SEO",
       "Advanced SEO and technical optimisation",
       "Expanded AEO and GEO strategy",

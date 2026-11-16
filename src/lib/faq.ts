@@ -1,6 +1,9 @@
-import { CARE_PLANS, ONE_OFF_WEBSITE, REFRESH, SUBSCRIPTION_TERMS, WEBSITE_PLANS, formatGBP } from "./pricing";
+import { CARE_PLANS, DELIVERY, ONE_OFF_TIERS, ONE_OFF_WEBSITE, REFRESH, SUBSCRIPTION_TERMS, WEBSITE_PLANS, formatGBP } from "./pricing";
 
-const { bronze: core, silver: pro, gold: plus } = WEBSITE_PLANS;
+/** bronze is Core, silver is Plus, gold is Pro. Read the name from the object; these bindings match it. */
+const core = WEBSITE_PLANS.bronze;
+const plus = WEBSITE_PLANS.silver;
+const pro = WEBSITE_PLANS.gold;
 
 /**
  * Frequently asked questions. Answers state only what the site already commits to, with every figure taken from
@@ -24,13 +27,13 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
     q: "What is a managed website?",
     category: "getting-started",
     short: "We run it for you",
-    a: "We design and build a bespoke website for your business, then host it, maintain it, keep it secure and backed up, and make changes for you, all for one monthly payment. You run your business; we run your website.",
+    a: `We build a website on a sector design, tailored to your content, branding and layout, then host it, maintain it, keep it secure and backed up, and make changes for you, all for one monthly payment. You run your business; we run your website. A website designed from scratch is a separate project, from ${formatGBP(ONE_OFF_TIERS.essential.from)}.`,
   },
   {
     q: "What does each plan cost?",
     category: "pricing",
     short: `From ${formatGBP(core.monthly)} a month`,
-    a: `${core.name} is ${formatGBP(core.monthly)} a month for a bespoke website of up to ${core.pages} pages. ${pro.name} is ${formatGBP(pro.monthly)} for up to ${pro.pages} pages and ${plus.name} is ${formatGBP(plus.monthly)} for up to ${plus.pages}. Every plan includes hosting, an SSL certificate, security monitoring, maintenance and support. ${pro.name} and ${plus.name} add search work, performance reporting, monthly time for changes and WINJO Refresh.`,
+    a: `${core.name} is ${formatGBP(core.monthly)} a month for a website of up to ${core.pages} pages, built on a sector design. ${plus.name} is ${formatGBP(plus.monthly)} for up to ${plus.pages} pages and ${pro.name} is ${formatGBP(pro.monthly)} for up to ${pro.pages}. Every plan includes hosting, an SSL certificate, security monitoring, maintenance and support. ${plus.name} and ${pro.name} add search work, performance reporting, monthly time for changes and WINJO Refresh.`,
   },
   {
     q: "How do payments work?",
@@ -65,8 +68,8 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
   {
     q: "Is a managed website a template?",
     category: "website",
-    short: "No, bespoke",
-    a: "No. Every plan includes a website designed for your business. The plans differ in size, in how much we do each month and in the search work included, not in whether the design is your own.",
+    short: "A sector design, tailored to you",
+    a: `A managed website (${core.name}, ${plus.name} or ${pro.name}) is built on a sector design, then tailored to your content, branding and the layout you choose. It is not designed from scratch. A website project is: ${ONE_OFF_TIERS.essential.name} from ${formatGBP(ONE_OFF_TIERS.essential.from)}, ${ONE_OFF_TIERS.professional.name} from ${formatGBP(ONE_OFF_TIERS.professional.from)} and ${ONE_OFF_TIERS.premium.name} from ${formatGBP(ONE_OFF_TIERS.premium.from)}, each designed from scratch.`,
   },
   {
     q: "Can you guarantee I'll rank first on Google or appear in AI answers?",
@@ -83,8 +86,8 @@ export const faqs: { q: string; short: string; a: string; category: FaqCategory 
   {
     q: "How long does it take to launch?",
     category: "getting-started",
-    short: "A date in writing",
-    a: "It depends on the size of the website and what it needs to do. Once the scope is agreed, we confirm a delivery date in writing. We don't promise dates before that.",
+    short: `Within ${DELIVERY.liveWithinDays} days`,
+    a: `A managed website is live within ${DELIVERY.liveWithinDays} days of us having your goals, the pages you want and the style you want. That is the timing in our terms, on the payment screen and in the welcome email. A website project bought outright has its delivery date confirmed in writing once the scope is agreed.`,
   },
   {
     q: "What isn't included?",
