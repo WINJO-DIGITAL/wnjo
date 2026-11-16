@@ -21,6 +21,8 @@ export type PlanCard = {
   variant?: "inverse";
   /** false means the card shows its details but can't be picked (default true). */
   selectable?: boolean;
+  /** The button's label once the card is chosen, in select mode (default "<name> selected"). */
+  selectedCta?: string;
   /** A screenshot of one of our own sites at the top of the card, with the name of the site it shows. */
   shot?: { src: StaticImageData; alt: string; site: string };
 };
@@ -41,6 +43,7 @@ export function PlanSwiper({
   label,
   selectedId,
   onSelect,
+  ctaMode = "link",
 }: {
   plans: PlanCard[];
   initial?: string;
@@ -48,6 +51,11 @@ export function PlanSwiper({
   /** Optional: the parent holds the choice (null means nothing is chosen yet). */
   selectedId?: string | null;
   onSelect?: (id: string) => void;
+  /**
+   * What each card's button does. "link" goes to the card's own page. "select" picks the card, like the package
+   * cards do, for a flow that carries the choice on to the next step.
+   */
+  ctaMode?: "link" | "select";
 }) {
   const { trackRef, active, atStart, atEnd, scrollable, step, trackProps } =
     useDragScroll<HTMLUListElement>();
@@ -132,13 +140,24 @@ export function PlanSwiper({
                     ))}
                   </ul>
                 )}
-                <Link
-                  href={plan.href}
-                  draggable={false}
-                  className={`btn ${isSelected ? "btn--primary" : "btn--secondary"} plan__cta`}
-                >
-                  {plan.cta}
-                </Link>
+                {ctaMode === "select" ? (
+                  <button
+                    type="button"
+                    className={`btn ${isSelected ? "btn--primary" : "btn--secondary"} plan__cta`}
+                    aria-pressed={isSelected}
+                    onClick={() => choose(plan.id)}
+                  >
+                    {isSelected ? (plan.selectedCta ?? `${plan.name} selected`) : plan.cta}
+                  </button>
+                ) : (
+                  <Link
+                    href={plan.href}
+                    draggable={false}
+                    className={`btn ${isSelected ? "btn--primary" : "btn--secondary"} plan__cta`}
+                  >
+                    {plan.cta}
+                  </Link>
+                )}
               </article>
             </li>
           );

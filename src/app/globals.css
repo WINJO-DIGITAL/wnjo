@@ -16387,3 +16387,15 @@ body:has(.dash-header) {
     grid-column: 2;
   }
 }
+
+/* ---------- Plan bar: the step still to do is a readable link on the dark bar ---------- */
+.plan-bar .btn--secondary {
+  border-color: color-mix(in srgb, var(--color-inverse-ink) 55%, transparent);
+  background: transparent;
+  color: var(--color-inverse-ink);
+}
+.plan-bar .btn--primary {
+  border-color: var(--color-inverse-ink);
+  background: var(--color-inverse-ink);
+  color: var(--color-inverse-bg);
+}

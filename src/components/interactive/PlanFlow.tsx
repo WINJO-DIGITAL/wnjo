@@ -52,7 +52,14 @@ export function PlanFlow({ children }: { children: ReactNode }) {
   const state: FlowState = {
     pkg,
     care,
-    setPkg: (id) => setPkgState(id),
+    setPkg: (id) => {
+      // The first choice leads straight on to the hosting step, which is further down the page.
+      if (!pkg && !care) {
+        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.setTimeout(() => document.getElementById("care")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }), 250);
+      }
+      setPkgState(id);
+    },
     setCare: (id) => setCareState(id),
   };
 
@@ -119,6 +126,7 @@ export function HostingPicker() {
     <PlanSwiper
       plans={[...carePlanCards, ownHostingCard]}
       label="Hosting and care plans"
+      ctaMode="select"
       selectedId={care}
       onSelect={(id) => {
         if (isCare(id)) setCare(id);
@@ -142,7 +150,7 @@ function FlowBar() {
   if (care === "none") hostingText = "hosting yourself";
   else if (care)
     hostingText = `${CARE_PLANS[care].label} ${formatGBP(CARE_PLANS[care].monthly)}/month`;
-  else hostingText = "choose hosting to continue";
+  else hostingText = "choose hosting below to continue";
 
   return (
     <section className="plan-bar" aria-label="Your choice">
@@ -159,9 +167,9 @@ function FlowBar() {
             Continue
           </Link>
         ) : (
-          <span className="btn btn--secondary" aria-disabled="true">
-            Continue
-          </span>
+          <a href="#care" className="btn btn--secondary">
+            Choose hosting
+          </a>
         )}
       </div>
     </section>

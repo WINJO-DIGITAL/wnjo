@@ -35,6 +35,7 @@ export const ownHostingCard: PlanCard = {
   includes: ["Your website files handed over", "Hosted wherever you choose", "Add a plan later if you'd like"],
   href: "/build/project?care=none",
   cta: "Host it myself",
+  selectedCta: "Hosting it myself",
 };
 
 const packageOrder: PackageId[] = ["essential", "professional", "premium"];
