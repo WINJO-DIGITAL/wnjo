@@ -112,13 +112,13 @@ test("a phone shows the call and book bar; a desktop does not", async ({ browser
   const phone = await browser.newContext({ viewport: PHONE });
   const p = await phone.newPage();
   await p.goto("/e2e-site?t=electrician&n=1");
-  await expect(p.getByRole("link", { name: "Call us" })).toBeInViewport();
+  await expect(p.locator("#main").getByRole("link", { name: "Call us" })).toBeInViewport();
   await phone.close();
   const desktop = await browser.newContext({ viewport: DESKTOP });
   const d = await desktop.newPage();
   await d.goto("/e2e-site?t=electrician&n=1");
-  await expect(d.getByRole("link", { name: "Call us" })).toBeHidden();
-  await expect(d.getByRole("link", { name: "Call", exact: true })).toBeVisible();
+  await expect(d.locator("#main").getByRole("link", { name: "Call us" })).toBeHidden();
+  await expect(d.locator("#main").getByRole("link", { name: "Call", exact: true })).toBeVisible();
   await desktop.close();
 });
 
