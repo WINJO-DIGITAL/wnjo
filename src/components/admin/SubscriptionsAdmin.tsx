@@ -36,7 +36,7 @@ const STATUS: Record<string, string> = {
   expired: "Expired",
 };
 
-type Filter = "all" | "running" | "past_due" | "requests" | "offered" | "cancelled";
+type Filter = "all" | "running" | "past_due" | "requests" | "offered" | "cancelled" | "expired";
 const FILTERS: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "running", label: "Running" },
@@ -44,6 +44,7 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: "requests", label: "Asked to cancel" },
   { id: "offered", label: "Link sent" },
   { id: "cancelled", label: "Ended" },
+  { id: "expired", label: "Withdrawn or expired" },
 ];
 
 /**
@@ -116,7 +117,8 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
   const mrr = monthlyRecurringPence(live);
   const active = live.filter((r) => r.kind === "subscription" && (r.status === "active" || r.status === "past_due")).length;
   const overdue = live.filter((r) => r.status === "past_due").length;
-  const inFilter = (r: Row, f: Filter) => f === "all" || (f === "running" ? r.status === "active" || r.status === "past_due" || r.status === "paid" : f === "requests" ? Boolean(requests[r.id]) : r.status === f);
+  // Links that were withdrawn or ran out are kept as a record, out of the way: "All" is everything still in play.
+  const inFilter = (r: Row, f: Filter) => (f === "all" ? r.status !== "expired" : false) || (f === "running" ? r.status === "active" || r.status === "past_due" || r.status === "paid" : f === "requests" ? Boolean(requests[r.id]) : r.status === f);
   const count = (f: Filter) => rows.filter((r) => inFilter(r, f)).length;
   const shown = rows.filter((r) => inFilter(r, filter));
   const setupCollected = live.filter((r) => r.payments_count > 0).reduce((s, r) => s + r.setup_pence, 0);
@@ -169,7 +171,7 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
                   )}
                 </td>
                 <td data-label="Monthly">{r.kind === "subscription" ? money.format(r.monthly_pence / 100) : money.format(r.one_off_pence / 100) + " once"}</td>
-                <td data-label="Ownership">
+                <td data-label="Ownership" data-empty={r.kind === "subscription" && !r.ownership_eligible_at && r.ownership_after_payments === 0 ? "" : undefined}>
                   {r.kind === "subscription"
                     ? r.ownership_eligible_at
                       ? `Due since ${when.format(new Date(r.ownership_eligible_at))}`
@@ -178,7 +180,9 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
                         : "Not applicable (rolling)"
                     : "On full payment"}
                 </td>
-                <td data-label="Actions">{r.kind === "subscription" && (r.status === "active" || r.status === "past_due") ? <Manage row={r} call={call} onDone={load} /> : <span className="acct-meta">—</span>}</td>
+                <td data-label="Actions" data-empty={r.status === "offered" || (r.kind === "subscription" && (r.status === "active" || r.status === "past_due")) ? undefined : ""}>
+                  {r.kind === "subscription" && (r.status === "active" || r.status === "past_due") ? <Manage row={r} call={call} onDone={load} /> : r.status === "offered" ? <Withdraw row={r} call={call} onDone={load} /> : <span className="acct-meta">—</span>}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -274,6 +278,34 @@ function CreateLinkForm({ call, onCreated }: { call: Call; onCreated: () => void
         </p>
       )}
     </form>
+  );
+}
+
+/** Takes back a payment link that hasn't been paid. Asked twice, because the customer's link stops working. */
+function Withdraw({ row, call, onDone }: { row: Row; call: Call; onDone: () => void }) {
+  const [confirm, setConfirm] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const go = async () => {
+    setBusy(true);
+    const { ok, json } = await call({ action: "withdraw", id: row.id });
+    setBusy(false);
+    setConfirm(false);
+    if (ok) return onDone();
+    setNote(json.error === "not_offered" ? "This link has already been paid or withdrawn." : "The link couldn't be withdrawn. Please try again.");
+  };
+  return (
+    <div className="admin-sub-manage">
+      {confirm ? (
+        <>
+          <button type="button" className="btn btn--secondary btn--sm" disabled={busy} onClick={() => void go()}>{busy ? "Withdrawing…" : "Confirm: the link stops working"}</button>
+          <button type="button" className="btn btn--secondary btn--sm" disabled={busy} onClick={() => setConfirm(false)}>Keep it</button>
+        </>
+      ) : (
+        <button type="button" className="btn btn--secondary btn--sm" aria-label={`Withdraw payment link ${row.reference}`} onClick={() => setConfirm(true)}>Withdraw link</button>
+      )}
+      {note && <p className="acct-meta" role="alert">{note}</p>}
+    </div>
   );
 }
 

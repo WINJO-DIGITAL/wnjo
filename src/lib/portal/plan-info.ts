@@ -26,7 +26,9 @@ type CareCode = (typeof CARE)[number];
 const isCare = (code: string): code is CareCode => (CARE as readonly string[]).includes(code);
 
 export function planInfo(code: string | null | undefined, fallbackName = "Your plan"): PlanInfo {
-  const key = (code ?? "").trim();
+  // The database stores Care Plus as care_plus; the pricing file names it carePlus.
+  const raw = (code ?? "").trim();
+  const key = raw === "care_plus" ? "carePlus" : raw;
   if (isManaged(key)) {
     const plan = WEBSITE_PLANS[key];
     return {

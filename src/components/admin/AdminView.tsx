@@ -14,7 +14,7 @@ import { Confirmation } from "@/components/account/Confirmation";
 import { sendQueuedEmails } from "@/lib/notify-client";
 
 type Membership = { tenant_id: string; role: "owner" | "admin" | "staff" };
-type Enquiry = { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string; answers: unknown };
+type Enquiry = { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string; answers: unknown; handled_at: string | null };
 type QuoteRow = { id: string; reference: string; status: string; created_at: string; expires_at: string | null; quote_versions: { version: number; range_high_pence: number; range_low_pence: number }[] };
 type OrderRow = { id: string; business_name: string; project_type: string; stage: string; created_at: string };
 type ApprovalRow = {
@@ -182,11 +182,13 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<Enquiry[] | null>(null);
   const [error, setError] = useState(false);
   const [search, setSearch] = useState("");
-  const [kind, setKind] = useState<"all" | "website" | "contact">("all");
+  const [show, setShow] = useState<"open" | "done" | "all">("open");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
     client
       .from("enquiries")
-      .select("id, reference, kind, name, email, topic, created_at, answers")
+      .select("id, reference, kind, name, email, topic, created_at, answers, handled_at")
       .order("created_at", { ascending: false })
       .limit(500)
       .then(({ data, error: err }) => {
@@ -194,15 +196,31 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
         setRows(err ? null : ((data as Enquiry[]) ?? []));
       });
   }, [client]);
+
+  /** Marks an enquiry as dealt with, or reopens it. The list changes only once the database has confirmed it. */
+  const setHandled = async (row: Enquiry, done: boolean) => {
+    setBusy(row.id);
+    setFailed(false);
+    const { data: auth } = await client.auth.getSession();
+    const handled_at = done ? new Date().toISOString() : null;
+    const { data, error: err } = await client
+      .from("enquiries")
+      .update({ handled_at, handled_by: done ? auth.session?.user.id ?? null : null })
+      .eq("id", row.id)
+      .select("id");
+    setBusy(null);
+    if (err || !data || data.length === 0) return setFailed(true);
+    setRows((all) => (all ?? []).map((r) => (r.id === row.id ? { ...r, handled_at } : r)));
+  };
+
   if (error) return <p role="alert">Enquiries couldn&apos;t be loaded.</p>;
   if (rows === null) return <p className="lede">Loading…</p>;
   if (rows.length === 0) return <Empty text="No enquiries yet." />;
   const q = search.trim().toLowerCase();
-  const isContact = (r: Enquiry) => enquiryType(r) === "Contact";
+  const open = rows.filter((r) => !r.handled_at).length;
   const shown = rows.filter(
-    (r) => (kind === "all" || (kind === "contact") === isContact(r)) && (!q || `${r.name} ${r.email} ${r.reference} ${r.topic ?? ""}`.toLowerCase().includes(q)),
+    (r) => (show === "all" || (show === "open") === !r.handled_at) && (!q || `${r.name} ${r.email} ${r.reference} ${r.topic ?? ""}`.toLowerCase().includes(q)),
   );
-  const contacts = rows.filter(isContact).length;
   return (
     <div className="cust">
       <div className="cust-tools cust-tools--one">
@@ -210,17 +228,18 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
         <input id="enq-search" type="search" className="acct-input" placeholder="Search by name, email or reference" value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
       <div className="seg" role="group" aria-label="Show">
-        {([["all", "All", rows.length], ["website", "Websites", rows.length - contacts], ["contact", "Messages", contacts]] as const).map(([id, label, count]) => (
-          <button key={id} type="button" className="seg__item" aria-pressed={kind === id} onClick={() => setKind(id)}>
+        {([["open", "To answer", open], ["done", "Dealt with", rows.length - open], ["all", "All", rows.length]] as const).map(([id, label, count]) => (
+          <button key={id} type="button" className="seg__item" aria-pressed={show === id} onClick={() => setShow(id)}>
             {label} <span className="seg__count">{count}</span>
           </button>
         ))}
       </div>
+      {failed && <p role="alert">That couldn&apos;t be saved. Please try again.</p>}
       {shown.length === 0 ? (
-        <p className="lede">No enquiry matches that.</p>
+        <p className="lede">{show === "open" && !q ? "Every enquiry has been dealt with." : "No enquiry matches that."}</p>
       ) : (
         <table className="admin-table admin-table--stack">
-          <thead><tr><th scope="col">Name</th><th scope="col">Received</th><th scope="col">Reference</th><th scope="col">Type</th><th scope="col">Email</th><th scope="col">Next step</th></tr></thead>
+          <thead><tr><th scope="col">Name</th><th scope="col">Received</th><th scope="col">Reference</th><th scope="col">Type</th><th scope="col">Email</th><th scope="col">Next step</th><th scope="col"><span className="visually-hidden">Status</span></th></tr></thead>
           <tbody>
             {shown.map((r) => (
               <tr key={r.id}>
@@ -230,6 +249,11 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
                 <td data-label="Type">{enquiryType(r)}</td>
                 <td data-label="Email"><a href={`mailto:${r.email}`}>{r.email}</a></td>
                 <td data-label="Next step">{(r.answers as { type?: string } | null)?.type === "website" ? <a href="#subscriptions" className="acct-meta">Create a payment link</a> : r.kind === "brief" && r.answers ? <QuoteFromBrief client={client} enquiryId={r.id} /> : <a href={`mailto:${r.email}`} className="acct-meta">Reply by email</a>}</td>
+                <td data-label="Status">
+                  <button type="button" className="btn btn--secondary btn--sm" disabled={busy === r.id} onClick={() => void setHandled(r, !r.handled_at)}>
+                    {r.handled_at ? "Reopen" : "Mark as dealt with"}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

@@ -67,6 +67,7 @@ describe("plan information", () => {
     expect(planInfo("silver").name).toBe(WEBSITE_PLANS.silver.name);
     expect(planInfo("hosting").includes).toBe(CARE_PLANS.hosting.includes);
     expect(planInfo("gold").replyWorkingDays).toBe(1);
+    expect(planInfo("care_plus").name).toBe(CARE_PLANS.carePlus.label);
     expect(planInfo("bronze").refresh).toMatch(/every 24 months/);
   });
 

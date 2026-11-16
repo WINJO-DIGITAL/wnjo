@@ -155,7 +155,17 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   );
 }
 
+type DetailTab = "work" | "brief" | "approvals" | "history";
+const DETAIL_TABS: { id: DetailTab; label: string }[] = [
+  { id: "work", label: "Work" },
+  { id: "brief", label: "Brief" },
+  { id: "approvals", label: "Approvals" },
+  { id: "history", label: "History" },
+];
+
 function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient; row: BriefRow; call: Call; onChanged: () => void }) {
+  // The work screen opens first: it is where the next action is. The brief, the sign-offs and the history are a tap away.
+  const [tab, setTab] = useState<DetailTab>("work");
   const [events, setEvents] = useState<EventRow[]>([]);
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
@@ -200,6 +210,7 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
   };
 
   const state = approvalState(approvals);
+  const pending = APPROVAL_ORDER.filter((k) => state[k] === "pending").length;
   const b = row.brief;
   const path = stagePath(row.route);
   const accepted = proposals.find((p) => p.status === "accepted");
@@ -217,8 +228,17 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
         )}
       </div>
 
-      <div className="build-grid">
-        <div className="stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
+      <div className="tabs" role="tablist" aria-label="Website sections">
+        {DETAIL_TABS.map((t) => (
+          <button key={t.id} type="button" role="tab" id={`btab-${row.id}-${t.id}`} aria-selected={tab === t.id} aria-controls={`bpanel-${row.id}`} className="tabs__tab" onClick={() => setTab(t.id)}>
+            {t.label}
+            {t.id === "approvals" && pending > 0 && <span className="tabs__count">{pending}</span>}
+          </button>
+        ))}
+      </div>
+
+      <div id={`bpanel-${row.id}`} role="tabpanel" aria-labelledby={`btab-${row.id}-${tab}`} className="build-tabpanel">
+        {tab === "brief" && (
           <div>
             <p className="admin-label">Brief</p>
             <dl className="brief-summary">
@@ -307,7 +327,10 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
               )}
             </dl>
           </div>
+        )}
 
+        {tab === "work" && (
+        <div className="stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
           <StageControl row={row} path={path} busy={busy} onMove={(stage, note) => act({ action: "stage", stage, note }, `Moved to ${staffStageLabel(stage)}.`)} />
 
           <ExpectedDate key={`${row.id}:${row.expected_by ?? ""}`} row={row} busy={busy} act={act} />
@@ -347,11 +370,10 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
             </div>
           )}
         </div>
+        )}
 
-        <div className="stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
-          <ApprovalsPanel state={state} approvals={approvals} busy={busy} act={act} />
-          <History events={events} busy={busy} act={act} />
-        </div>
+        {tab === "approvals" && <ApprovalsPanel state={state} approvals={approvals} busy={busy} act={act} />}
+        {tab === "history" && <History events={events} busy={busy} act={act} />}
       </div>
     </section>
   );
@@ -432,6 +454,8 @@ function ApprovalsPanel({
   act: (p: Record<string, unknown>, done: string) => Promise<boolean>;
 }) {
   const [notes, setNotes] = useState<Partial<Record<ApprovalKind, string>>>({});
+  // One sign-off is open at a time: the first that is still waiting.
+  const [open, setOpen] = useState<ApprovalKind | null>(() => APPROVAL_ORDER.find((k) => state[k] === "pending") ?? null);
   const decide = async (kind: ApprovalKind, decision: "approved" | "rejected") => {
     const ok = await act({ action: "approve", kind, decision, note: notes[kind] ?? "" }, `${APPROVALS[kind].label} ${decision}.`);
     if (ok) setNotes((n) => ({ ...n, [kind]: "" }));
@@ -444,15 +468,16 @@ function ApprovalsPanel({
           const latest = approvals.find((a) => a.kind === kind);
           return (
             <li key={kind} className={`build-approval build-approval--${state[kind]}`}>
-              <div className="build-approval__head">
+              <button type="button" className="build-approval__head build-approval__toggle" aria-expanded={open === kind} onClick={() => setOpen(open === kind ? null : kind)}>
                 <strong>{APPROVALS[kind].label}</strong>
                 <span className="build-approval__state">{state[kind] === "pending" ? "Pending" : state[kind] === "approved" ? "Approved" : "Rejected"}</span>
-              </div>
+              </button>
               <p className="acct-meta">
                 {latest
                   ? `${latest.decided_by_email} · ${when.format(new Date(latest.created_at))}${latest.note ? ` · ${latest.note}` : ""}`
                   : APPROVALS[kind].hint}
               </p>
+              {open === kind && (
               <div className="build-row">
                 <input
                   className="acct-input"
@@ -469,6 +494,7 @@ function ApprovalsPanel({
                   Reject
                 </button>
               </div>
+              )}
             </li>
           );
         })}

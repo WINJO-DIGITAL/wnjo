@@ -28,14 +28,16 @@ const STAFF: DashGroup[] = [
     label: "Sales",
     items: [
       { label: "Enquiries", hint: "New leads from the site", href: "/admin#enquiries" },
-      { label: "Quotes", hint: "Sent, accepted and declined", href: "/admin#quotes" },
-      { label: "Website builds", hint: "Briefs, approvals and proposals", href: "/admin#builds" },
-      { label: "Subscriptions", hint: "Monthly websites, payments and ownership", href: "/admin#subscriptions" },
+      { label: "Website builds", hint: "Briefs, previews and approvals", href: "/admin#builds" },
+      { label: "Subscriptions", hint: "Plans, payment links and cancellations", href: "/admin#subscriptions" },
     ],
   },
+  // The quoted, bespoke-project route: quotes, staged orders, project messages and sign-offs. Kept together, apart
+  // from the monthly-website work that fills most days.
   {
-    label: "Delivery",
+    label: "Bespoke projects",
     items: [
+      { label: "Quotes", hint: "Sent, accepted and declined", href: "/admin#quotes" },
       { label: "Orders", hint: "Stages, updates and client invites", href: "/admin#orders" },
       { label: "Projects", hint: "Messages and files", href: "/admin#projects" },
       { label: "Approvals", hint: "Client sign-offs", href: "/admin#approvals" },

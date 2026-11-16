@@ -18,6 +18,7 @@ type View = {
   active: number;
   started30: number;
   enquiries7: number;
+  toAnswer: number;
   needs: Need[];
   renewals: { reference: string; who: string; email: string; at: string; pence: number }[];
   activity: Activity[];
@@ -42,7 +43,7 @@ export function OverviewAdmin({ client }: { client: SupabaseClient }) {
         .select("id, reference, kind, status, name, business_name, email, package_name, monthly_pence, cancel_at_period_end, livemode, current_period_end, first_payment_at, created_at")
         .order("created_at", { ascending: false })
         .limit(1000),
-      client.from("enquiries").select("id, reference, kind, name, email, topic, created_at").order("created_at", { ascending: false }).limit(200),
+      client.from("enquiries").select("id, reference, kind, name, email, topic, created_at, handled_at").order("created_at", { ascending: false }).limit(200),
       client.from("website_cancellation_requests").select("id", head).eq("status", "open"),
       client.from("website_previews").select("id", head).eq("status", "draft"),
       client.from("build_revisions").select("id", head).in("status", ["open", "in_progress"]),
@@ -58,7 +59,8 @@ export function OverviewAdmin({ client }: { client: SupabaseClient }) {
       if (cancelled) return;
       if (subsR.error || enqR.error) return setError(true);
       const subs = ((subsR.data as Sub[]) ?? []).filter((s) => s.livemode !== false);
-      const enquiries = (enqR.data as { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string }[]) ?? [];
+      const enquiries = (enqR.data as { id: string; reference: string; kind: string; name: string; email: string; topic: string | null; created_at: string; handled_at: string | null }[]) ?? [];
+      const toAnswer = enquiries.filter((e) => !e.handled_at).length;
       const running = subs.filter((s) => s.kind === "subscription" && (s.status === "active" || s.status === "past_due"));
       const overdue = subs.filter((s) => s.status === "past_due").length;
       const withGoals = ((specs.data as { id: string; brief: { goals?: unknown[] } | null }[]) ?? []).filter((r) => (r.brief?.goals?.length ?? 0) > 0).length;
@@ -67,6 +69,7 @@ export function OverviewAdmin({ client }: { client: SupabaseClient }) {
       const custHref = (email: string) => `#customers/${encodeURIComponent(email.trim().toLowerCase())}`;
 
       const needs: Need[] = [
+        { label: "Enquiries to answer", count: toAnswer, href: "#enquiries" },
         { label: "Payments overdue", count: overdue, href: "#subscriptions" },
         { label: "Cancellation requests to confirm", count: cancels.count ?? 0, href: "#subscriptions" },
         { label: "Previews to release", count: previews.count ?? 0, href: "#builds" },
@@ -107,6 +110,7 @@ export function OverviewAdmin({ client }: { client: SupabaseClient }) {
         active: running.length,
         started30: subs.filter((s) => s.first_payment_at && now - new Date(s.first_payment_at).getTime() <= 30 * DAY_MS).length,
         enquiries7: enquiries.filter((e) => e.created_at >= weekAgo).length,
+        toAnswer,
         needs,
         renewals,
         activity,
@@ -126,7 +130,7 @@ export function OverviewAdmin({ client }: { client: SupabaseClient }) {
         <div><dt>Monthly recurring revenue</dt><dd>{money.format(view.mrr / 100)}</dd></div>
         <div><dt><a href="#subscriptions">Active plans</a></dt><dd>{view.active}</dd></div>
         <div><dt>Started in the last 30 days</dt><dd>{view.started30}</dd></div>
-        <div><dt><a href="#enquiries">Enquiries this week</a></dt><dd>{view.enquiries7}</dd></div>
+        <div><dt><a href="#enquiries">Enquiries to answer</a></dt><dd>{view.toAnswer}</dd></div>
       </dl>
 
       <div className="today__cols">

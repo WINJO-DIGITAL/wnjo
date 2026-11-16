@@ -36,6 +36,7 @@ const pounds = (v: unknown) => (typeof v === "number" && Number.isFinite(v) && v
  *   adjusted to match the proposal; the browser never sets a price the server hasn't checked.
  * - change_price: an agreed upgrade or downgrade, from the next monthly invoice (no proration).
  * - cancel: ends the subscription at the end of the current period.
+ * - withdraw: takes back a payment link that hasn't been paid. The link stops working; nothing was ever charged.
  */
 export async function POST(request: NextRequest) {
   const db = serviceClient();
@@ -126,6 +127,23 @@ export async function POST(request: NextRequest) {
       }
     }
     return NextResponse.json({ id: created.id, reference: subReference, link, emailed });
+  }
+
+  if (body.action === "withdraw") {
+    const id = typeof body.id === "string" && UUID.test(body.id) ? body.id : null;
+    if (!id) return NextResponse.json({ error: "invalid" }, { status: 422 });
+    // Only an unpaid link can be withdrawn, and the status is checked in the same statement that changes it, so a
+    // payment landing at the same moment can never be overwritten.
+    const { data, error } = await db
+      .from("website_subscriptions")
+      .update({ status: "expired", updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .eq("tenant_id", tenantId)
+      .eq("status", "offered")
+      .select("id");
+    if (error) return NextResponse.json({ error: "failed" }, { status: 500 });
+    if (!data || data.length === 0) return NextResponse.json({ error: "not_offered" }, { status: 409 });
+    return NextResponse.json({ ok: true });
   }
 
   if (body.action === "change_price" || body.action === "cancel") {

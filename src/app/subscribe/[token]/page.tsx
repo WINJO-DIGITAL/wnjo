@@ -41,7 +41,8 @@ async function load(token: string): Promise<{ row: Row | null; expired: boolean 
     .eq("offer_token_hash", hashOfferToken(token))
     .maybeSingle();
   const row = data as Row | null;
-  return { row, expired: Boolean(row && row.status === "offered" && new Date(row.offer_expires_at).getTime() < Date.now()) };
+  // A link staff withdrew reads the same as one that ran out: it no longer works, and we will send another.
+  return { row, expired: Boolean(row && (row.status === "expired" || (row.status === "offered" && new Date(row.offer_expires_at).getTime() < Date.now()))) };
 }
 
 /** A customer's private link: the offer before payment, then their subscription and billing afterwards. */
