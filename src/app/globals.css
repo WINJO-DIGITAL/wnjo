@@ -16398,4 +16398,23 @@ body:has(.dash-header) {
   border-color: var(--color-inverse-ink);
   background: var(--color-inverse-ink);
   color: var(--color-inverse-bg);
+
+/* ---------- Owners' quotes on phones: every owner's logo in one row, the chosen one named ---------- */
+@media (max-width: 39.99rem) {
+  .oq__switch {
+    flex-wrap: nowrap;
+    gap: 0.25rem 1.1rem;
+  }
+  .oq__switch button {
+    flex: none;
+  }
+  /* Names of the others stay available to screen readers; sighted visitors get the logos. */
+  .oq__switch button[aria-pressed="false"] span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
