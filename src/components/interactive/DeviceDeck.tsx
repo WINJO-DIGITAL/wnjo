@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { VisitLogo } from "@/components/VisitLogo";
 import { WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
-import type { Project } from "@/lib/projects";
+import { showsAddress, type Project } from "@/lib/projects";
 
-type Item = Pick<Project, "slug" | "name" | "host" | "url" | "mobile" | "tablet" | "logo">;
+type Item = Pick<Project, "slug" | "name" | "host" | "url" | "showAddress" | "mobile" | "tablet" | "logo">;
 type Mode = "phone" | "tablet";
 
 /** Stage colour and glow for each project (decoration only). */
@@ -284,15 +285,14 @@ export function DeviceDeck({ items }: { items: Item[] }) {
       </div>
 
       {/* The project pills sit under the device, so the headline and the phone lead. */}
-      <a
-        href={current.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="deck__visit"
-      >
-        Visit {current.host} <span aria-hidden="true">↗</span>
-        <span className="visually-hidden"> (opens in a new tab)</span>
-      </a>
+      {showsAddress(current) ? (
+        <a href={current.url} target="_blank" rel="noopener noreferrer" className="deck__visit">
+          Visit {current.host} <span aria-hidden="true">↗</span>
+          <span className="visually-hidden"> (opens in a new tab)</span>
+        </a>
+      ) : (
+        <VisitLogo name={current.name} url={current.url} logo={current.logo} />
+      )}
 
       <div ref={railRef} className="deck__rail" role="group" aria-label="Choose a project">
         {items.map((p, k) => (

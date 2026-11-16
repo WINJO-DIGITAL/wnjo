@@ -59,6 +59,11 @@ export type Project = {
   built: string[];
   url: string;
   host: string;
+  /**
+   * When false, the site is linked but its address is never shown, until the real domain is live.
+   * Defaults to true.
+   */
+  showAddress?: boolean;
   desktop: StaticImageData;
   mobile: StaticImageData;
   /** Portrait tablet capture (3:4), used by the phone-sized hero's Tablet view. */
@@ -114,19 +119,20 @@ export const projects: Project[] = [
     sector: "Traditional Thai massage",
     industry: "beauty",
     location: "Wallasey, Wirral",
-    summary: "An independent Thai massage studio, presented with the warmth and calm of the treatment room.",
+    summary: "A family-run Thai massage studio in Wallasey, with the calm of the treatment room and treatments from £30.",
     challenge:
       "A traditional Thai massage studio wanted its website to feel like the treatment room, and booking to be simple enough that customers never need to create an account.",
     solution:
       "A warm, editorial site with clear treatments and prices, a gallery and reviews, and a booking flow where customers simply pick a treatment and a time.",
     built: [
       "Treatments and a clear price list",
-      "Online booking: pick a treatment and a time, no account needed",
+      "A booking request: pick a treatment and a time, sent by WhatsApp or text, and confirmed when the studio replies",
       "Gallery, reviews and the studio's story",
       "Essential-only cookies, with no tracking or advertising",
     ],
-    url: "https://boonma.co.uk",
+    url: "https://boonma.vercel.app",
     host: "boonma.co.uk",
+    showAddress: false,
     desktop: boonmaDesktop,
     mobile: boonmaMobile,
     tablet: boonmaTablet,
@@ -137,7 +143,7 @@ export const projects: Project[] = [
       webm: "/work/boonma-walkthrough.webm",
       poster: "/work/boonma-walkthrough.webp",
     },
-    identity: "Warm editorial serif, soft ivory and a deep plum accent.",
+    identity: "Photographic hero, cream pages and a deep plum studio section, with dark serif headlines.",
   },
   {
     slug: "raeng-fitness",
@@ -191,6 +197,7 @@ export const projects: Project[] = [
     ],
     url: "https://duratek.vercel.app",
     host: "duratek.vercel.app",
+    showAddress: false,
     desktop: duratekDesktop,
     mobile: duratekMobile,
     tablet: duratekTablet,
@@ -237,6 +244,16 @@ export const projects: Project[] = [
     identity: "Seaside warmth: terracotta, sand and an app-like mobile tab bar.",
   },
 ];
+
+/** The address may be written out. Omitted means yes. */
+export const showsAddress = (project: { showAddress?: boolean }) => project.showAddress !== false;
+
+/**
+ * Text for a fake browser bar. A hidden address shows the project name, never the host.
+ * With no name to fall back to, the bar is left empty.
+ */
+export const addressBar = (project: { name?: string; host?: string; showAddress?: boolean }) =>
+  project.showAddress === false ? (project.name ?? "") : (project.host ?? "");
 
 /** One line for a project tile: the first sentence of its summary, exactly as written. */
 export const projectLine = (p: Project) => {

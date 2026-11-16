@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { Project } from "@/lib/projects";
+import { VisitLogo } from "@/components/VisitLogo";
+import { showsAddress, type Project } from "@/lib/projects";
 import { LivePreview } from "./LivePreview";
 
-type Item = Pick<Project, "slug" | "name" | "sector" | "host" | "url" | "desktop" | "mobile" | "walkthrough" | "logo">;
+type Item = Pick<Project, "slug" | "name" | "sector" | "host" | "url" | "showAddress" | "desktop" | "mobile" | "walkthrough" | "logo">;
 
 /**
  * The laptop's base, drawn from directly above: keyboard and trackpad on a brushed
@@ -294,15 +295,19 @@ export function ShowcaseStage({ items }: { items: Item[] }) {
           <Link href={`/work#${current.slug}`} className="showcase__link showcase__link--primary">
             View project
           </Link>
-          <a
-            href={current.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="showcase__link"
-            aria-label={`View live: the ${current.name} website (opens in a new tab)`}
-          >
-            View live ↗
-          </a>
+          {showsAddress(current) ? (
+            <a
+              href={current.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="showcase__link"
+              aria-label={`View live: the ${current.name} website (opens in a new tab)`}
+            >
+              View live ↗
+            </a>
+          ) : (
+            <VisitLogo name={current.name} url={current.url} logo={current.logo} />
+          )}
           <button
             type="button"
             className="showcase__pause"

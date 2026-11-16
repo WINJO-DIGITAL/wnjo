@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { Project } from "@/lib/projects";
+import { addressBar, type Project } from "@/lib/projects";
 import styles from "../Devices.module.css";
 
 /**
@@ -22,7 +22,7 @@ const subscribeMotion = (cb: () => void) => {
   return () => mq.removeEventListener("change", cb);
 };
 
-export function CareHero({ site }: { site: Pick<Project, "name" | "host" | "walkthrough"> }) {
+export function CareHero({ site }: { site: Pick<Project, "name" | "host" | "showAddress" | "walkthrough"> }) {
   const [ours, setOurs] = useState(true);
   const reduced = useSyncExternalStore(
     subscribeMotion,
@@ -50,6 +50,8 @@ export function CareHero({ site }: { site: Pick<Project, "name" | "host" | "walk
     return () => io.disconnect();
   }, [ours, reduced]);
 
+  const bar = addressBar(site);
+
   return (
     <div className="care-hero" data-ours={ours}>
       <div className="resp__switch" role="group" aria-label="Who looks after the website">
@@ -68,7 +70,7 @@ export function CareHero({ site }: { site: Pick<Project, "name" | "host" | "walk
             <i />
             <i />
           </span>
-          <span className={styles.url}>{site.host}</span>
+          {bar && <span className={styles.url}>{bar}</span>}
         </div>
         <video
           ref={video}

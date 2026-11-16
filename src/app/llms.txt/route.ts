@@ -1,5 +1,5 @@
 import { CARE_PLANS, ONE_OFF_TIERS, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
-import { projects } from "@/lib/projects";
+import { projects, showsAddress } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -38,7 +38,7 @@ export function GET() {
     "- Custom software and app development",
     "",
     "## Our work",
-    ...projects.map((p) => `- ${p.name}: ${p.sector}. ${p.url}`),
+    ...projects.map((p) => `- ${p.name}: ${p.sector}. ${showsAddress(p) ? p.url : `${base}/work#${p.slug}`}`),
     "",
     "## Pages",
     `- [Managed websites](${base}/managed-websites)`,

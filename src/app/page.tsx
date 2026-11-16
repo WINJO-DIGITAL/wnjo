@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CtaBand } from "@/components/Blocks";
 import { ArrowRight } from "@/components/Icons";
+import { VisitLogo } from "@/components/VisitLogo";
 import { HeroShowcase } from "@/components/interactive/HeroShowcase";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
 import { RefreshTimeline } from "@/components/managed/RefreshTimeline";
@@ -14,7 +15,7 @@ import { TrustCues } from "@/components/TrustCues";
 import { WebStages } from "@/components/WebStages";
 import { ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { homeMetadata } from "@/lib/metadata";
-import { heroProjects, OWNER_QUOTES, projectBySlug, projectLine } from "@/lib/projects";
+import { heroProjects, OWNER_QUOTES, projectBySlug, projectLine, showsAddress } from "@/lib/projects";
 import { siteUrl } from "@/lib/site";
 import { businessSchema } from "@/lib/structured-data";
 
@@ -88,6 +89,7 @@ export default function HomePage() {
               location: project.location,
               url: project.url,
               host: project.host,
+              showAddress: project.showAddress,
               quote,
               pull,
             }))}
@@ -117,7 +119,14 @@ export default function HomePage() {
           <Responsibility />
           {/* Desktop only: one of the sites we look after, beside the list of jobs we take on. */}
           <figure className="managed-split__shot">
-            <BrowserFrame src={evexec.desktop} host={evexec.host} alt={`The ${evexec.name} website, looked after by WINJO`} sizes="(min-width: 64rem) 640px, 0px" />
+            <BrowserFrame
+              src={evexec.desktop}
+              host={evexec.host}
+              name={evexec.name}
+              showAddress={evexec.showAddress}
+              alt={`The ${evexec.name} website, looked after by WINJO`}
+              sizes="(min-width: 64rem) 640px, 0px"
+            />
             <figcaption>Looked after by WINJO: {evexec.name}</figcaption>
           </figure>
         </div>
@@ -211,9 +220,13 @@ export default function HomePage() {
                     <Link href={`/work#${p.slug}`}>
                       View project<span className="visually-hidden">: {p.name}</span> <ArrowRight />
                     </Link>
-                    <a href={p.url} target="_blank" rel="noopener noreferrer">
-                      View live<span className="visually-hidden">: {p.name} (opens in a new tab)</span> <span aria-hidden="true">↗</span>
-                    </a>
+                    {showsAddress(p) ? (
+                      <a href={p.url} target="_blank" rel="noopener noreferrer">
+                        View live<span className="visually-hidden">: {p.name} (opens in a new tab)</span> <span aria-hidden="true">↗</span>
+                      </a>
+                    ) : (
+                      <VisitLogo name={p.name} url={p.url} logo={p.logo} />
+                    )}
                   </p>
                 </div>
               </li>

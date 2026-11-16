@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { Project } from "@/lib/projects";
+import { addressBar, type Project } from "@/lib/projects";
 import styles from "../Devices.module.css";
 import { ArrowRight } from "../Icons";
 
 /** A project's own walkthrough clip in a browser window; the visitor switches between projects. */
-export type ClipItem = Pick<Project, "slug" | "name" | "host" | "walkthrough"> & { what: string; href: string };
+export type ClipItem = Pick<Project, "slug" | "name" | "host" | "showAddress" | "walkthrough"> & { what: string; href: string };
 
 const subscribeMotion = (cb: () => void) => {
   const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -24,6 +24,7 @@ export function ClipShowcase({ items }: { items: ClipItem[] }) {
   const [index, setIndex] = useState(0);
   const video = useRef<HTMLVideoElement>(null);
   const current = items[index];
+  const bar = addressBar(current);
 
   // Plays only while on screen (and never on its own with reduced motion).
   useEffect(() => {
@@ -56,7 +57,7 @@ export function ClipShowcase({ items }: { items: ClipItem[] }) {
             <i />
             <i />
           </span>
-          <span className={styles.url}>{current.host}</span>
+          {bar && <span className={styles.url}>{bar}</span>}
         </div>
         <video
           key={current.slug}

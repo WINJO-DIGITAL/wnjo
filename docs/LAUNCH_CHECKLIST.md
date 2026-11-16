@@ -20,7 +20,7 @@ Fixed in code, waiting for review. Nothing here is live until it is merged.
 ### Still for Nitisat, by hand
 
 - [ ] **Turnstile keys.** Create a widget at Cloudflare for winjodigital.co.uk, then set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in Vercel (production, and preview if preview forms should check too). See `docs/ENVIRONMENT_VARIABLES.md`. Until then the check is off.
-- [ ] **Confirm the privacy notice.** Anthropic's processing country is not in this repository, so the notice and the DPA do not name one. Confirm the country, and that Anthropic's contract is in place, before relying on the wording. The ICO registration number is still to be added when the confirmation email arrives.
+- [ ] **Confirm the privacy notice.** Anthropic's processing country is not in this repository, so the notice and the DPA do not name one. Confirm the country, and that Anthropic's contract is in place, before relying on the wording. The ICO registration number ZC301156 (registered 12 November 2026) is on the privacy notice and the DPA.
 - [ ] **Confirm the terms change.** Version 2026-11-16.1 adds the 14-day go-live line and Anthropic as a subprocessor. Say if existing subscribers need the 30-day notice in section 17.
 - [ ] **Sample Cars emails.** Resend's stuck messages to customer@sample-cars.test and bookings@sample-cars.test are sent by the booking platform (WINJO Dispatch), for the live sample business `sample-cars-test`, booking SAMP-000001. They are not sent by this website. This website now refuses those addresses in production. Dispatch needs the same guard, and the sample business should stop emailing once that is deployed. Do not delete the booking from production as part of this change.
 - [ ] **Read the new pages.** Home, About, Work, Managed websites, Pricing, FAQ, WINJO Refresh, Privacy, Terms and the DPA.
@@ -111,8 +111,8 @@ The AI is Claude Haiku 5.5 (owner, 14 November 2026). Grok was dropped and its c
 - [x] **Run the template test against Haiku:** confirmed by the owner 15 November: all eleven templates ran on claude-haiku-5-5, 44 of 44 passed the checks, about 50p in total. on the Admin AI panel, tap "Run the template test". It writes each template once with Haiku and reports how many pass the checks and what each costs. Needs `ANTHROPIC_API_KEY` in Vercel and a redeploy. (Also in `src/lib/site-template/eval.test.ts`, for running on a computer.)
 
 ## Decisions needed from the owner
-- [x] ICO data protection fee: registered and Direct Debit set up (owner, 12 Nov). Application number C2085772. The ICO sends the registration confirmation within three working days, with the registration number.
-- [x] ICO registration number on the privacy page: done for now. The owner will pass on the number from the ICO's confirmation email, and it goes on the privacy page then.
+- [x] ICO data protection fee: registered and Direct Debit set up (owner, 12 Nov). Application number C2085772. Registration number ZC301156, registered 12 November 2026.
+- [x] ICO registration number ZC301156 is on the privacy notice and the DPA.
 - [x] Privacy note: the 30-day retention of unsent briefs is on the privacy page.
 - [x] Ownership line when due: "Ownership is available to you now. Message us whenever you'd like to talk it through."
 - [x] Ending care: message only.

@@ -7,7 +7,7 @@ import { ShowcaseStage } from "./ShowcaseStage";
 
 type Item = Pick<
   Project,
-  "slug" | "name" | "sector" | "host" | "url" | "desktop" | "mobile" | "tablet" | "walkthrough" | "logo"
+  "slug" | "name" | "sector" | "host" | "url" | "showAddress" | "desktop" | "mobile" | "tablet" | "walkthrough" | "logo"
 >;
 
 /** The phone hero shows these three clients; the laptop showcase keeps the full set. */
