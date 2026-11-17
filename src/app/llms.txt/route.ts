@@ -38,7 +38,7 @@ export function GET() {
     "- Custom software and app development",
     "",
     "## Our work",
-    ...projects.map((p) => `- ${p.name}: ${p.sector}. ${showsAddress(p) ? p.url : `${base}/work#${p.slug}`}`),
+    ...projects.map((p) => `- ${p.name}: ${p.sector}${p.inDevelopment ? " (in development)" : ""}. ${showsAddress(p) ? p.url : `${base}/work#${p.slug}`}`),
     "",
     "## Pages",
     `- [Managed websites](${base}/managed-websites)`,

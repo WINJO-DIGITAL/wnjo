@@ -49,6 +49,8 @@ export type Project = {
   /** The portfolio filter group: the kind of business, for visitors looking for work like theirs. */
   industry: Industry;
   location: string;
+  /** True while it is still being built. It stays out of the homepage and is labelled "in development" wherever it appears. */
+  inDevelopment?: boolean;
   /** One line: what the business or product is. */
   summary: string;
   /** The need the project addressed, phrased from what the business does. No invented history. */
@@ -214,6 +216,7 @@ export const projects: Project[] = [
     slug: "fystay",
     name: "FYStay",
     kind: "product",
+    inDevelopment: true,
     sector: "Holiday stays platform",
     industry: "hospitality",
     location: "Blackpool & the Fylde Coast",

@@ -23,17 +23,15 @@ import { businessSchema } from "@/lib/structured-data";
 // Title and description come from the root layout; the canonical URL and og:url are added here.
 export const metadata: Metadata = homeMetadata();
 
-const fystay = projectBySlug("fystay")!;
 const evexec = projectBySlug("ev-exec")!;
 /** The four client projects (the hero's), then our own platform. */
-const work = [...heroProjects, fystay];
+const work = heroProjects;
 /** Where each site's second and third pictures start down its full-page capture, picked to show a real section each. */
 const WORK_SECTIONS: Record<string, [number, number]> = {
   "ev-exec": [25, 52],
   boonma: [40, 88],
   "raeng-fitness": [25, 40],
   duratek: [55, 72],
-  fystay: [25, 70],
 };
 
 export default function HomePage() {

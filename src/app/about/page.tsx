@@ -37,7 +37,7 @@ const needs = ["Hosting and security", "Updates and changes", "A new design ever
 const different = [
   "Website projects designed from scratch, and managed websites tailored from a sector design",
   "Booking systems and software, like the driver and operator apps we developed for EV Exec",
-  "FYStay, the holiday stays platform we run ourselves",
+  "FYStay, our own holiday stays platform, still in development",
 ];
 
 /** A small picture of each standard, drawn in code (decorative: the text says it all). */

@@ -26,7 +26,7 @@ export const metadata = pageMetadata(
 
 const clips: ClipItem[] = [
   { ...evexec, what: "Airport transfer booking, with driver and operator apps", href: "/booking-software" },
-  { ...fystay, what: "A holiday stays platform with a host dashboard", href: "/work#fystay" },
+  { ...fystay, what: "A holiday stays platform with a host dashboard, in development", href: "/work#fystay" },
 ];
 
 // What the visitor wants to replace, handed to the enquiry form as the start of a brief.

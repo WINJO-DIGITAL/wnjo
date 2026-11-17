@@ -12,7 +12,7 @@ import { PortfolioFilter } from "@/components/interactive/PortfolioFilter";
 export const metadata = pageMetadata(
   "/work",
   "Our work",
-  "Bespoke websites we designed, built and look after: EV Exec, Boonma, RAENG Fitness, Duratek and our own platform, FYStay.",
+  "Bespoke websites we designed, built and look after: EV Exec, Boonma, RAENG Fitness and Duratek, plus FYStay, our own platform, which is still in development.",
 );
 
 export default function WorkPage() {
@@ -69,7 +69,7 @@ export default function WorkPage() {
                     </h2>
                     <div>
                       <span className={`tag${p.kind === "product" ? " tag--accent" : ""}`}>
-                        {p.kind === "product" ? "Our own platform" : "Client website"}
+                        {p.kind === "product" ? (p.inDevelopment ? "Our own platform, in development" : "Our own platform") : "Client website"}
                       </span>
                     </div>
                     <p className="muted">{p.summary}</p>

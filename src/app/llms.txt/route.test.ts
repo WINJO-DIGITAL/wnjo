@@ -12,5 +12,8 @@ describe("llms.txt", () => {
     expect(text).toContain("https://www.evexec.co.uk");
     expect(text).toContain("https://raengfitness.co.uk");
     expect(text).toContain("https://www.fystay.co.uk");
+    // An unfinished project says so, and finished ones do not.
+    expect(text).toContain("FYStay: Holiday stays platform (in development).");
+    expect(text).not.toMatch(/EV Exec: [^\n]*in development/);
   });
 });

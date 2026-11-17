@@ -19,6 +19,8 @@ describe("OWNER_QUOTES", () => {
 describe("Duratek in the hero and the owners' quotes", () => {
   it("is one of the hero's projects, once, after RAENG Fitness", () => {
     expect(heroProjects.map((p) => p.slug)).toEqual(["ev-exec", "boonma", "raeng-fitness", "duratek"]);
+    expect(heroProjects.some((p) => p.inDevelopment)).toBe(false);
+    expect(projectBySlug("fystay")?.inDevelopment).toBe(true);
   });
 
   it("has the owner's quote, credited like the others", () => {
