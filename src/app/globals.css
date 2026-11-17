@@ -13904,6 +13904,76 @@ body:has(.pv, .sitepv) .site-footer {
   color: var(--color-accent);
 }
 
+/* The journey line under the hero button: today, preview, live within 14 days. The first step is already marked. */
+.deck__journey {
+  position: relative;
+  width: 100%;
+  margin: 14px 0 0;
+  padding: 14px 2px 0;
+}
+.deck__journey .deck__steps {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 500 min(12px, 3.2vw) / 1.2 var(--font-sans);
+  color: var(--color-ink-3);
+}
+.deck__journey::before {
+  content: "";
+  position: absolute;
+  inset: 0 2px auto;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-line-strong);
+}
+.deck__journey-fill {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  width: 7%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-accent);
+}
+.deck__steps li {
+  position: relative;
+}
+/* A short mark on the line for each step. */
+.deck__steps li::before {
+  content: "";
+  position: absolute;
+  top: -17px;
+  width: 2px;
+  height: 9px;
+  border-radius: 1px;
+  background: var(--color-line-strong);
+}
+.deck__steps li:first-of-type {
+  color: var(--color-ink);
+}
+.deck__steps li:first-of-type::before {
+  left: 0;
+  background: var(--color-accent);
+}
+.deck__steps li:nth-of-type(2)::before {
+  left: 50%;
+}
+.deck__steps li:last-of-type::before {
+  right: 0;
+}
+/* Holding the button fills the line towards "live". */
+@media (prefers-reduced-motion: no-preference) {
+  .deck__journey-fill {
+    transition: width 0.5s var(--ease);
+  }
+  .deck__cta.is-held .deck__journey-fill {
+    width: 100%;
+    transition: width 1.4s linear;
+  }
+}
+
 /* Finish: a moment on arrival, a finer price card, a quieter month, a tighter end to the hero, and a hairline to the next part. */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes hero-underline {
