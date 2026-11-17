@@ -309,19 +309,48 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         ))}
       </div>
 
-      <div className="deck__cta">
-        <Link href="/pricing" className="deck__btn">
-          <span className="deck__btn-main">GET YOUR WEBSITE</span>
-          <span className="deck__btn-price">
-            From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/Month</span>
-          </span>
-        </Link>
-        <ul className="deck__bullets" role="list">
-          <li>Cancel any time, with no notice</li>
-          <li>No Minimum Term</li>
-          <li>Ongoing Support</li>
-        </ul>
-      </div>
+      <HeroCta />
+    </div>
+  );
+}
+
+/**
+ * The hero button. It leans a few pixels towards the finger while it is pressed (or towards the cursor on a computer),
+ * then settles back with a small spring when let go. Nothing changes where a tap goes, and it stays still for anyone
+ * who has asked for less motion. The lean is set as two CSS variables, so the page does not re-render as it moves.
+ */
+function HeroCta() {
+  const link = useRef<HTMLAnchorElement>(null);
+  const lean = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    const el = link.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const box = el.getBoundingClientRect();
+    const across = Math.max(-1, Math.min(1, (e.clientX - (box.left + box.width / 2)) / (box.width / 2)));
+    const down = Math.max(-1, Math.min(1, (e.clientY - (box.top + box.height / 2)) / (box.height / 2)));
+    el.style.setProperty("--mx", `${(across * 6).toFixed(1)}px`);
+    el.style.setProperty("--my", `${(down * 3).toFixed(1)}px`);
+    el.classList.add("is-leaning");
+  };
+  const settle = () => {
+    const el = link.current;
+    if (!el) return;
+    el.style.removeProperty("--mx");
+    el.style.removeProperty("--my");
+    el.classList.remove("is-leaning");
+  };
+  return (
+    <div className="deck__cta">
+      <Link ref={link} href="/pricing" className="deck__btn" onPointerDown={lean} onPointerMove={lean} onPointerUp={settle} onPointerCancel={settle} onPointerLeave={settle}>
+        <span className="deck__btn-main">GET YOUR WEBSITE</span>
+        <span className="deck__btn-price">
+          From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/Month</span>
+        </span>
+      </Link>
+      <ul className="deck__bullets" role="list">
+        <li>Cancel any time, with no notice</li>
+        <li>No Minimum Term</li>
+        <li>Ongoing Support</li>
+      </ul>
     </div>
   );
 }

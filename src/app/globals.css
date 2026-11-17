@@ -8687,9 +8687,14 @@ ol.bs {
     inset 0 1px 0 rgb(255 255 255 / 0.1);
   -webkit-tap-highlight-color: transparent;
 }
-/* Press feedback: the button gives a little when pressed. */
-.deck__btn { transition: transform 0.12s ease; }
-.deck__btn:active { transform: scale(0.96); }
+/* Press feedback: the button leans towards the finger or cursor (--mx, --my) and gives a little when pressed. Letting go
+   settles it back with a small spring. */
+.deck__btn {
+  transform: translate(var(--mx, 0px), var(--my, 0px));
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.deck__btn.is-leaning { transition: transform 0.08s linear; }
+.deck__btn:active { transform: translate(var(--mx, 0px), var(--my, 0px)) scale(0.965); }
 @media (prefers-reduced-motion: reduce) { .deck__btn { transition: none; } }
 
 /* Two lines in one button: the action, then the example it prices (it follows the swipe). */
