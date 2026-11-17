@@ -15,5 +15,6 @@
  * 2026-11-16.1 states that a managed website is live within 14 days of us having the goals, pages and style, and adds
  * Anthropic to the subprocessor list.
  * 2026-11-16.2 adds the Core inclusions that every managed plan now includes. Prices are unchanged.
+ * 2026-11-17.1 narrows section 9.3 to what the website pack holds: no rendered web pages or exported images are promised.
  */
-export const QUOTE_TERMS_VERSION = "2026-11-16.2";
+export const QUOTE_TERMS_VERSION = "2026-11-17.1";

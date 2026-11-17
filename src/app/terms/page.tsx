@@ -17,7 +17,7 @@ export default function TermsPage() {
       <section className="section--tight" style={{ paddingTop: 0 }}>
         <div className="container container--wide">
           <div className="prose">
-            <p className="fine">Version {QUOTE_TERMS_VERSION}. Last updated 16 November 2026.</p>
+            <p className="fine">Version {QUOTE_TERMS_VERSION}. Last updated 17 November 2026.</p>
             {renderLegal(readLegal("terms"))}
           </div>
         </div>

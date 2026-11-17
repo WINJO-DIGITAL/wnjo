@@ -1,6 +1,6 @@
 # WINJO DIGITAL – Terms and Conditions
 
-Version 2026-11-16.2. Replaces 2026-11-16.1.
+Version 2026-11-17.1. Replaces 2026-11-16.2.
 
 ---
 
@@ -163,11 +163,11 @@ We will confirm the date in writing straight away. There is no cancellation fee.
 
 9.3 **What you receive when your subscription ends.**
 - A **copy of your content** in standard formats: the text, images and documents you supplied, and the wording we wrote for your website.
-- **Design files and page layouts** for your website, in a form that can be opened in standard tools (for example, exported images, a copy of the page structure, and a list of fonts and colour values).
+- **Design details and page layout** for your website, in a form that can be opened in standard tools: a copy of the page structure, and a list of the fonts and colour values used.
 - **Your bespoke design assets** that you have paid for in your plan: custom artwork, logos and images created for you.
-- **Exported website pages** where they can be produced without our framework.
+- **Your website pack**, which holds the wording for every page, the photos and logo you supplied, and the design details above. Rendered web pages are not included: they are produced by our framework (section 9.4), so your website keeps running on our hosting while your subscription is active.
 
-The design files and page layouts in the second bullet above are released once you have paid for **3 months** of your subscription. Your content (including the wording we wrote for your website) and the assets you have paid for in the third bullet are released in every case.
+The design details and page layout in the second bullet above are released once you have paid for **3 months** of your subscription. Your content (including the wording we wrote for your website) and the assets you have paid for in the third bullet are released in every case.
 
 9.4 **What cannot be released.** Our framework, and any code that depends on it, are not included and are not released.
 
