@@ -8694,6 +8694,14 @@ ol.bs {
   transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .deck__btn.is-leaning { transition: transform 0.08s linear; }
+/* A finger resting on the button must not select its text or open the link preview (iOS shows a cream box over the words). */
+.deck__btn,
+.deck__btn * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.deck__btn { touch-action: manipulation; }
 .deck__btn:active { transform: translate(var(--mx, 0px), var(--my, 0px)) scale(0.965); }
 @media (prefers-reduced-motion: reduce) { .deck__btn { transition: none; } }
 
@@ -16403,6 +16411,7 @@ body:has(.dash-header) {
   border-color: var(--color-inverse-ink);
   background: var(--color-inverse-ink);
   color: var(--color-inverse-bg);
+}
 
 /* ---------- Owners' quotes on phones: all four owners in an even 2 x 2 grid, each with its name shown ---------- */
 @media (max-width: 39.99rem) {
