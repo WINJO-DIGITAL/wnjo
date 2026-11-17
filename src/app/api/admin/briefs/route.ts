@@ -22,6 +22,8 @@ import { HANDOVER_CHECKLIST, missingChecklist } from "@/lib/handover-pack";
 import { createHandoverPack, type PackBrief } from "@/lib/handover-pack-store";
 import { revisionTransition, stageAfterResolve, type RevisionStatus } from "@/lib/build-revisions";
 import { serviceClient } from "@/lib/quote-store";
+import { buildHandoffBrief } from "@/lib/website-handoff";
+import type { BriefFile, WebsiteBrief } from "@/lib/website-brief";
 import { staffFromRequest, type Staff } from "@/lib/staff-auth";
 
 export const runtime = "nodejs";
@@ -31,7 +33,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const note = (v: unknown, max = 2000) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const fail = (status: number, error: string) => NextResponse.json({ error }, { status });
 
-type Brief = { id: string; tenant_id: string; reference: string; email: string; name: string; route: Route; stage: Stage; brief: { files?: { path: string; name: string }[] } };
+type Brief = { id: string; tenant_id: string; reference: string; email: string; name: string; route: Route; stage: Stage; brief: { files?: BriefFile[] } };
 
 async function loadBrief(db: SupabaseClient, staff: Staff, id: unknown): Promise<Brief | null> {
   if (typeof id !== "string" || !UUID.test(id)) return null;
@@ -66,6 +68,7 @@ async function logEvent(db: SupabaseClient, staff: Staff, briefId: string, kind:
  * - approve: record a quality, pricing, contract or publication decision.
  * - note: add an internal note to the history.
  * - file_link: a one-minute download link for a file attached to the brief.
+ * - handoff: the whole brief as Markdown, ready to paste into a CLAUDE.md, with hour-long download links for the files.
  * - handover_pack: build the website pack for a website bought outright and return a ten-minute download link.
  * - handover: hand a paid website over. Needs the whole handover checklist ticked.
  * - proposal_save: create or edit a draft proposal.
@@ -141,6 +144,31 @@ export async function POST(request: NextRequest) {
     if (!text) return fail(422, "Write a note first.");
     await logEvent(db, staff, brief.id, "note", { text });
     return NextResponse.json({ ok: true });
+  }
+
+  if (body.action === "handoff") {
+    const { data: extra } = await db.from("website_briefs").select("business_name, figures, created_at").eq("id", brief.id).maybeSingle();
+    const more = (extra as { business_name: string | null; figures: { package?: string } | null; created_at: string } | null) ?? { business_name: null, figures: null, created_at: "" };
+    const files = await Promise.all(
+      (brief.brief.files ?? []).map(async (f) => {
+        const { data } = await db.storage.from(BRIEF_BUCKET).createSignedUrl(f.path, 3600, { download: f.name });
+        return { name: f.name, type: f.type, size: f.size, role: f.role, alt: f.alt, url: data?.signedUrl };
+      }),
+    );
+    const site = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk").replace(/\/+$/, "");
+    const markdown = buildHandoffBrief({
+      reference: brief.reference,
+      businessName: more.business_name || brief.name,
+      contactName: brief.name,
+      email: brief.email,
+      plan: more.figures?.package ?? (brief.route === "proposal" ? "Bespoke" : "Website"),
+      sentOn: more.created_at ? more.created_at.slice(0, 10).split("-").reverse().join("/") : undefined,
+      brief: brief.brief as WebsiteBrief,
+      files,
+      adminUrl: `${site}/admin#builds`,
+    });
+    await logEvent(db, staff, brief.id, "note", { note: "The brief was copied for a hand-built website." });
+    return NextResponse.json({ markdown });
   }
 
   if (body.action === "file_link") {

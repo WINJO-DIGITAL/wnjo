@@ -32,6 +32,15 @@ This is the owner's flow, confirmed 17 November 2026, and what the code does.
 
 Two things are deliberately different from this flow and unchanged: a bespoke build that needs a written quote still goes brief, then proposal, then deposit, because the price isn't known until it is written; and the AI never moves a build past "Website generation" or publishes anything.
 
+## Build mode: AI drafts, or the owner builds
+
+A switch in Admin, Website builds (owners and admins only) sets how new websites are made. It is stored per agency in `tenant_settings.website_build_mode`.
+
+- **The AI builds a draft (auto).** The flow above, as it is.
+- **I build them myself (manual).** Nothing is built automatically: the payment webhook, the goals form and the daily sweep all leave the website alone. The owner is told when a customer signs up (the "New ... subscription" alert) and when they send their goals. The goals email is then the whole brief, ready to paste into a CLAUDE.md (`src/lib/website-handoff.ts`). The same brief, with working download links for the customer's files, is behind **Copy brief for Claude** on the website's Brief tab. The AI is still available by hand on any website (Regenerate), so the owner can use it for a first draft.
+- Switching back to automatic means the next sweep drafts any paid website that has its goals and no draft yet.
+- A website built by hand is released to the customer the same way as any other: the owner uses Admin to move it on, and the four approvals before going live are unchanged.
+
 ## Templates
 
 A website is one of **eight styles**, and the words inside are the customer's own. The style is the design; the business is the content. Any business can wear any style.

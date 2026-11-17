@@ -28,7 +28,9 @@ vi.mock("@/lib/quote-store", () => ({
 }));
 vi.mock("@/lib/rate-limit-shared", () => ({ LIMITS_PER_ROUTE: { briefFeedback: { max: 20, windowSeconds: 600 } }, sharedRateLimited: async () => false }));
 vi.mock("@/lib/staff-auth", () => ({ customerFromRequest: async () => (state.signedIn ? { userId: "c1", email: "owner@shop.co.uk" } : null) }));
-vi.mock("@/lib/mailer", () => ({ mailConfig: () => null, sendEnquiryEmail: async () => true, notificationMailConfig: () => null, sendEmail: async () => true }));
+const mail = { on: false, sent: [] as { subject: string; text: string }[], mode: "auto" as "auto" | "manual" };
+vi.mock("@/lib/mailer", () => ({ mailConfig: () => (mail.on ? { apiKey: "k", to: "owner@w.co.uk", from: "f@w.co.uk" } : null), sendEnquiryEmail: async (_c: unknown, m: { subject: string; text: string }) => (mail.sent.push(m), true), notificationMailConfig: () => null, sendEmail: async () => true }));
+vi.mock("@/lib/website-build-mode", () => ({ getBuildMode: async () => mail.mode }));
 vi.mock("@/lib/brief-store", () => ({ confirmBriefFiles: async (_d: unknown, _id: string, b: unknown) => b }));
 
 import { issueBriefPass, briefPassKey } from "@/lib/brief-pass";
@@ -45,6 +47,9 @@ beforeEach(() => {
   state.writes = [];
   state.signedIn = true;
   afterJobs.length = 0;
+  mail.on = false;
+  mail.sent = [];
+  mail.mode = "auto";
   drafts.mockClear();
   vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "test-service-key");
 });
@@ -60,6 +65,33 @@ describe("the details form and the plan's page limit", () => {
     expect(afterJobs).toHaveLength(1);
     await afterJobs[0]();
     expect(drafts).toHaveBeenCalledTimes(1);
+  });
+
+  it("emails the owner a plain summary when the AI is building the website", async () => {
+    mail.on = true;
+    expect((await send(pages(3))).status).toBe(200);
+    expect(mail.sent).toHaveLength(1);
+    expect(mail.sent[0].subject).toMatch(/^Brief details from Shop/);
+    expect(mail.sent[0].text).not.toContain("Never invent");
+  });
+
+  it("emails the owner the whole brief, ready to paste, when they build websites themselves", async () => {
+    mail.on = true;
+    mail.mode = "manual";
+    expect((await send(pages(3))).status).toBe(200);
+    expect(mail.sent).toHaveLength(1);
+    expect(mail.sent[0].subject).toBe("New website for you to build: Shop [WNJO-ABC123]");
+    expect(mail.sent[0].text).toContain("# Website brief: Shop");
+    expect(mail.sent[0].text).toContain("Never invent prices, opening hours, testimonials");
+    expect(mail.sent[0].text).toContain("Nothing has been built");
+  });
+
+  it("keeps the usual email for a bespoke build that hasn't paid, even in manual mode", async () => {
+    mail.on = true;
+    mail.mode = "manual";
+    state.brief = { ...(row("Core") as object), route: "proposal", stage: "brief_received" };
+    await send(pages(3));
+    expect(mail.sent[0].subject).toMatch(/^Ready to quote: brief/);
   });
 
   it("does not start a draft for a brief that hasn't been paid for, or that was refused", async () => {

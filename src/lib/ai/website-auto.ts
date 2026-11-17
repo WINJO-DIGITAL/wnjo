@@ -8,6 +8,7 @@ import { GENERAL_PRESET, presetFor } from "@/lib/site-template/presets";
 import type { RawAnswers, SiteAnswers } from "@/lib/site-template/answers";
 import type { Look } from "@/lib/site-template/schema";
 import type { WebsiteBrief } from "@/lib/website-brief";
+import { getBuildMode, type BuildMode } from "@/lib/website-build-mode";
 import { alertOwner, buildFailedMessage, readyForReviewMessage } from "./owner-alerts";
 import { logEvent, runPlanStep, runPreviewStep, type Actor } from "./website-ai-service";
 import { SupabaseWebsiteAiStore } from "./website-ai-store";
@@ -49,8 +50,12 @@ export async function runAutoDrafts(db: SupabaseClient, provider: AiProvider | n
     .limit(limit * 5);
   let attempted = 0;
   let drafted = 0;
+  // In manual mode the owner builds each website themselves, so the AI waits. Read once per agency.
+  const modes = new Map<string, BuildMode>();
   for (const brief of (data ?? []) as BriefRow[]) {
     if (attempted >= limit) break;
+    if (!modes.has(brief.tenant_id)) modes.set(brief.tenant_id, await getBuildMode(db, brief.tenant_id));
+    if (modes.get(brief.tenant_id) === "manual") continue;
     if (!(await needsDraft(db, brief))) continue;
     if (!(await claim(db, brief))) continue;
     attempted += 1;

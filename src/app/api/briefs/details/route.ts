@@ -9,6 +9,8 @@ import { providerFromEnv } from "@/lib/ai/agent-runtime";
 import { runAutoDrafts } from "@/lib/ai/website-auto";
 import { BRIEF_VERSION, DRAFT_ID_RE, cleanBrief, formatBrief, validateBrief, validateProfile } from "@/lib/website-brief";
 import { confirmBriefFiles } from "@/lib/brief-store";
+import { getBuildMode } from "@/lib/website-build-mode";
+import { buildHandoffBrief } from "@/lib/website-handoff";
 import { clean } from "@/lib/enquiry";
 import { DETAIL_LIMITS } from "@/lib/website-enquiry";
 
@@ -123,17 +125,45 @@ export async function POST(request: NextRequest) {
 
   const config = mailConfig();
   if (config) {
-    await sendEnquiryEmail(config, {
-      subject: `${bespoke ? "Ready to quote: brief" : "Brief details"} from ${businessName || name || row.name} [${row.reference}]`,
-      text: [
-        `${name || row.name} has told us about their website.`,
-        ...(bespoke ? ["Next: write the proposal in Admin, Website builds. They have not paid anything yet."] : []),
-        ...(businessName ? [`Business: ${businessName}`] : []),
-        "",
-        formatBrief(brief),
-      ].join("\n"),
-      replyTo: customer?.email ?? row.email,
-    });
+    const manual = !bespoke && (await getBuildMode(db, row.tenant_id)) === "manual";
+    if (manual) {
+      // The owner builds this website themselves: the email is the brief, ready to paste into a CLAUDE.md.
+      const site = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk").replace(/\/+$/, "");
+      await sendEnquiryEmail(config, {
+        subject: `New website for you to build: ${businessName || name || row.name} [${row.reference}]`,
+        text: [
+          "The customer has paid and sent their goals. Nothing has been built: you have switched to building websites yourself.",
+          "Copy everything below the line into a CLAUDE.md. The same brief, with working download links for their files, is in Admin, Website builds.",
+          "",
+          "----------------------------------------",
+          "",
+          buildHandoffBrief({
+            reference: row.reference,
+            businessName: businessName || row.name,
+            contactName: name || row.name,
+            email: customer?.email ?? row.email,
+            plan: row.figures?.package ?? "Website",
+            sentOn: new Date().toISOString().slice(0, 10).split("-").reverse().join("/"),
+            brief: saved,
+            files: brief.files.map((f) => ({ name: f.name, type: f.type, size: f.size, role: f.role, alt: f.alt })),
+            adminUrl: `${site}/admin#builds`,
+          }),
+        ].join("\n"),
+        replyTo: customer?.email ?? row.email,
+      });
+    } else {
+      await sendEnquiryEmail(config, {
+        subject: `${bespoke ? "Ready to quote: brief" : "Brief details"} from ${businessName || name || row.name} [${row.reference}]`,
+        text: [
+          `${name || row.name} has told us about their website.`,
+          ...(bespoke ? ["Next: write the proposal in Admin, Website builds. They have not paid anything yet."] : []),
+          ...(businessName ? [`Business: ${businessName}`] : []),
+          "",
+          formatBrief(brief),
+        ].join("\n"),
+        replyTo: customer?.email ?? row.email,
+      });
+    }
   }
   // Someone who answered straight after the short form gets a note that their answers are with us.
   const customerConfig = notificationMailConfig();

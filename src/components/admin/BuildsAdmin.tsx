@@ -69,6 +69,56 @@ type Call = (payload: Record<string, unknown>, url?: string) => Promise<{ ok: bo
  * Website builds for staff: each brief, its stage, the four approvals and (for bespoke briefs) the proposal. Reads
  * through row-level security; every change goes through the server, which records who made it.
  */
+/**
+ * How new websites are made. Automatic: the AI plans, picks a style and builds a draft as soon as the customer sends
+ * their goals. Manual: nothing is built; the owner is emailed the brief and builds it themselves. Owners and admins only.
+ */
+function BuildModeSwitch({ client }: { client: SupabaseClient }) {
+  const [mode, setMode] = useState<"auto" | "manual" | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const token = useCallback(async () => (await client.auth.getSession()).data.session?.access_token ?? null, [client]);
+  useEffect(() => {
+    void (async () => {
+      const t = await token();
+      if (!t) return;
+      const res = await fetch("/api/admin/build-mode", { headers: { Authorization: `Bearer ${t}` } });
+      const json = (await res.json().catch(() => ({}))) as { mode?: "auto" | "manual" };
+      if (res.ok && json.mode) setMode(json.mode);
+    })();
+  }, [token]);
+  const choose = async (next: "auto" | "manual") => {
+    if (next === mode) return;
+    setBusy(true);
+    setMessage(null);
+    const t = await token();
+    const res = t ? await fetch("/api/admin/build-mode", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${t}` }, body: JSON.stringify({ mode: next }) }) : null;
+    setBusy(false);
+    if (res?.ok) setMode(next);
+    else setMessage(res?.status === 403 ? "Only an owner or admin can change this." : "That didn't save. Please try again.");
+  };
+  if (mode === null) return null;
+  return (
+    <fieldset className="admin-mode" disabled={busy}>
+      <legend className="admin-label">How new websites are made</legend>
+      <div className="admin-actions" role="radiogroup" aria-label="How new websites are made">
+        <button type="button" role="radio" aria-checked={mode === "auto"} className={mode === "auto" ? "btn btn--primary" : "btn btn--secondary"} onClick={() => void choose("auto")}>
+          The AI builds a draft
+        </button>
+        <button type="button" role="radio" aria-checked={mode === "manual"} className={mode === "manual" ? "btn btn--primary" : "btn btn--secondary"} onClick={() => void choose("manual")}>
+          I build them myself
+        </button>
+      </div>
+      <p className="acct-meta">
+        {mode === "auto"
+          ? "When a customer pays and sends their goals, the AI plans, picks a style, builds a draft and emails you to review it."
+          : "When a customer pays and sends their goals, nothing is built. You are emailed the brief, ready to paste into a CLAUDE.md, and build it yourself."}
+      </p>
+      {message && <p role="alert" className="acct-meta">{message}</p>}
+    </fieldset>
+  );
+}
+
 export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<BriefRow[] | null>(null);
   const [error, setError] = useState(false);
@@ -106,11 +156,17 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
 
   if (error) return <p role="alert">Website builds couldn&apos;t be loaded.</p>;
   if (rows === null) return <p className="lede">Loading…</p>;
-  if (rows.length === 0) return <p className="lede">No briefs yet. They appear here when someone sends one from Get started.</p>;
+  if (rows.length === 0) return (
+    <div className="stack" style={{ "--stack": "var(--space-6)" } as React.CSSProperties}>
+      <BuildModeSwitch client={client} />
+      <p className="lede">No briefs yet. They appear here when someone sends one from Get started.</p>
+    </div>
+  );
 
   const current = rows.find((r) => r.id === selected) ?? null;
   return (
     <div className="stack" style={{ "--stack": "var(--space-6)", minWidth: 0 } as React.CSSProperties}>
+      <BuildModeSwitch client={client} />
       <div className="table-wrap" role="region" aria-label="Website briefs" tabIndex={0}>
       <table className="admin-table admin-table--list">
         <thead>
@@ -167,6 +223,44 @@ const DETAIL_TABS: { id: DetailTab; label: string }[] = [
   { id: "approvals", label: "Approvals" },
   { id: "history", label: "History" },
 ];
+
+/**
+ * The whole brief as Markdown, for building this website by hand: copy it into a CLAUDE.md. It carries the customer's own
+ * words, the rules that keep a hand-built site honest, and hour-long download links for their files.
+ */
+function HandoffBrief({ row, call }: { row: BriefRow; call: Call }) {
+  const [markdown, setMarkdown] = useState<string | null>(null);
+  const [state, setState] = useState<"idle" | "busy" | "copied" | "failed">("idle");
+  const make = async () => {
+    setState("busy");
+    const r = await call({ action: "handoff", briefId: row.id });
+    const text = typeof r.json.markdown === "string" ? r.json.markdown : null;
+    if (!r.ok || !text) {
+      setState("failed");
+      return;
+    }
+    setMarkdown(text);
+    try {
+      await navigator.clipboard.writeText(text);
+      setState("copied");
+    } catch {
+      // Some browsers refuse without a tap on the text itself: it is shown below to copy by hand.
+      setState("idle");
+    }
+  };
+  return (
+    <div className="stack" style={{ "--stack": "var(--space-2)", marginBottom: "var(--space-4)" } as React.CSSProperties}>
+      <div className="admin-actions">
+        <button type="button" className="btn btn--primary" disabled={state === "busy"} onClick={() => void make()}>
+          {state === "busy" ? "Making the brief…" : state === "copied" ? "Copied. Paste it into a CLAUDE.md" : "Copy brief for Claude"}
+        </button>
+      </div>
+      <p className="acct-meta">Everything this customer told us, with the rules for a hand-built website, as one block to paste into a CLAUDE.md.</p>
+      {state === "failed" && <p role="alert" className="acct-meta">The brief couldn&apos;t be made. Please try again.</p>}
+      {markdown && <textarea className="acct-input" readOnly rows={12} value={markdown} aria-label="The brief, ready to copy" onFocus={(e) => e.currentTarget.select()} />}
+    </div>
+  );
+}
 
 function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient; row: BriefRow; call: Call; onChanged: () => void }) {
   // The work screen opens first: it is where the next action is. The brief, the sign-offs and the history are a tap away.
@@ -255,6 +349,7 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
         {tab === "brief" && (
           <div>
             <p className="admin-label">Brief</p>
+            <HandoffBrief row={row} call={call} />
             <dl className="brief-summary">
               <div><dt>Customer</dt><dd>{row.name || "–"}</dd></div>
               {extrasRows(b.extras).map(([label, value]) => (

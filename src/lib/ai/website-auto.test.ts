@@ -28,6 +28,8 @@ vi.mock("@/lib/site-template/build-service", () => ({
     return state.buildOk ? { ok: true, version: 1, checksOk: state.checksOk, issues: state.checksOk ? 0 : 2, costPence: 1 } : { ok: false, status: 502, error: "build down" };
   },
 }));
+const mode = { value: "auto" as "auto" | "manual" };
+vi.mock("@/lib/website-build-mode", () => ({ getBuildMode: async () => mode.value }));
 vi.mock("./owner-alerts", async (original) => ({
   ...(await original<typeof import("./owner-alerts")>()),
   alertOwner: async (_w: unknown, m: { subject: string }) => void alerts.push(m.subject),
@@ -66,6 +68,7 @@ const fakeDb = (briefs: B[], withSite: string[] = []) =>
 const provider = (sector = "barber", look = "bold") => ({ name: "x", model: "m", complete: async () => ({ kind: "final" as const, text: JSON.stringify({ sector, look }), usage: { inputTokens: 0, outputTokens: 0, costPence: 1 } }) });
 
 beforeEach(() => {
+  mode.value = "auto";
   steps.length = 0;
   alerts.length = 0;
   Object.assign(state, { planned: [], planFails: false, buildOk: true, checksOk: true, failedEvents: 0, startedFirst: null });
@@ -75,6 +78,20 @@ describe("automatic first drafts", () => {
   it("does nothing without an AI key", async () => {
     expect(await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: withGoals }]), null)).toEqual({ attempted: 0, drafted: 0 });
     expect(steps).toEqual([]);
+  });
+
+  it("builds nothing in manual mode: the owner builds the website, so the AI waits", async () => {
+    mode.value = "manual";
+    expect(await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: withGoals }, { id: "b2", tenant_id: "t", brief: ownWords }]), provider())).toEqual({ attempted: 0, drafted: 0 });
+    expect(steps).toEqual([]);
+    expect(alerts).toEqual([]);
+  });
+
+  it("goes back to drafting when the switch goes back to automatic", async () => {
+    mode.value = "manual";
+    await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: ownWords }]), provider());
+    mode.value = "auto";
+    expect((await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: ownWords }]), provider("general", "executive"))).drafted).toBe(1);
   });
 
   it("waits for a website paid for through the short checkout until its goals are in", async () => {
