@@ -61,6 +61,8 @@ A website is one of **eight styles**, and the words inside are the customer's ow
 - The customer's theme colour works in every style. All eight pass a contrast check (WCAG AA) with every theme colour, with and without photos, and hold at 320 to 1920 px wide with a 60-character name, twelve services and seven pages.
 - The AI picks the style from the plan (`choose.ts`). A style the customer chose is kept.
 - **Content kits.** Eleven sector kits (barber, café, electrician and so on) carry the questions, tick-boxes and the wording rules for that kind of business. A twelfth, the **general** kit, is for any business that describes itself in its own words (a taxi firm, a florist): hours and areas are optional, the wording is neutral, and it says only what the customer said. It is never offered as a tile. The AI picks a specific sector only when it is plainly the same kind of business.
+- A business that ticked no facts of its own gets a strip of large figures made only from what it told us: when it is available, how many services it listed and how many places it covers (a count only from three up).
+- Bands and changeovers give a page life without photographs: Boutique has waves, Clinic soft curves, Athletic diagonal cuts and an ink band.
 - A multi-page home page is more than a headline: it also shows a taste of the About page (the customer's own first sentences, never repeating the hero), where they work and when they are open. Those stay on their own pages too.
 - A template is only used once it has a sample build that passes every check.
 

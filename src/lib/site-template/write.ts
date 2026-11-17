@@ -186,6 +186,21 @@ export function parseCopy(text: string): ParsedCopy {
   };
 }
 
+/**
+ * Large figures made only from what the customer gave us, for a business that ticked no facts of its own: when they are
+ * available (their words, if short), how many services they listed and how many places they cover. A count is shown only
+ * from three up, so "2 services" never makes a small business look small. Nothing here is a claim: each is true by
+ * construction.
+ */
+export function figuresFrom(facts: CustomerFacts): { value: string; label: string }[] {
+  const out: { value: string; label: string }[] = [];
+  const when = availabilityOf(facts);
+  if (when && when.length <= FIELD_LIMITS.factValue) out.push({ value: when, label: "Available" });
+  if (facts.services.length >= 3) out.push({ value: String(facts.services.length), label: "Services offered" });
+  if ((facts.areas?.length ?? 0) >= 3) out.push({ value: String(facts.areas!.length), label: "Areas covered" });
+  return out;
+}
+
 /** When the customer says they are available, in their own words. Never a time we worked out ourselves. */
 export function availabilityOf(facts: CustomerFacts): string | null {
   const note = facts.details?.find((d) => /available/i.test(d.label))?.value?.trim();
@@ -331,9 +346,11 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
       case "gallery":
         if (input.images?.length) sections.push({ kind: "gallery", heading: copy.headings.gallery, images: input.images.map((im) => ({ src: im.src, alt: im.alt.trim() || `${facts.businessName} photo` })) });
         break;
-      case "facts":
-        if (facts.highlights?.length) sections.push({ kind: "facts", items: facts.highlights.slice(0, 4) });
+      case "facts": {
+        const items = [...(facts.highlights ?? []), ...(preset.id === "general" ? figuresFrom(facts) : [])].slice(0, 4);
+        if (items.length) sections.push({ kind: "facts", items });
         break;
+      }
       case "area": {
         const hasPlace = preset.areaSource === "areas" ? Boolean(facts.areas?.length) : Boolean(facts.address || facts.areas?.length);
         const text = withAreas(copy.area, preset.areaSource === "areas" ? undefined : facts.areas);

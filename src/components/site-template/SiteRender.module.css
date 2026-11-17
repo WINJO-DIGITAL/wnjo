@@ -3152,3 +3152,108 @@
 .site[data-look="boutique"] .faq summary::after {
   color: var(--deep);
 }
+
+/* ---- Changeovers: the page reads as bands, and each style has its own edge between them. No photographs needed. ---- */
+
+/* Clinic: soft curves. Services on white, hours and the place on a sage band, the request on a deep green band. */
+.site[data-look="clinic"] {
+  --deep: #1f3a33;
+  --sage: #dcebe3;
+  --curve-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 80V50C240 8 480 8 720 40s480 36 720-8V80z'/%3E%3C/svg%3E");
+  --curve-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 80V22C300 72 600 72 900 40S1300 6 1440 30V80z'/%3E%3C/svg%3E");
+}
+.site[data-look="clinic"] section:has(> .menu),
+.site[data-look="clinic"] .info,
+.site[data-look="clinic"] .book {
+  position: relative;
+  max-width: none;
+  margin: var(--wave-h) 0 0;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  padding-inline: max(var(--pad), calc((100% - 68rem) / 2 + var(--pad)));
+}
+.site[data-look="clinic"] section:has(> .menu)::before,
+.site[data-look="clinic"] .info::before,
+.site[data-look="clinic"] .book::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% - 1px);
+  height: var(--wave-h);
+  background: var(--flow-bg);
+  -webkit-mask: var(--wave) center bottom / 100% 100% no-repeat;
+  mask: var(--wave) center bottom / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.site[data-look="clinic"] section:has(> .menu) {
+  --flow-bg: #ffffff;
+  --wave: var(--curve-a);
+  --wave-h: clamp(26px, 3.6vw, 52px);
+  background: #ffffff;
+}
+.site[data-look="clinic"] section:has(> .menu) .menu li {
+  background: #eef3ef;
+  box-shadow: none;
+}
+.site[data-look="clinic"] .info {
+  --flow-bg: var(--sage);
+  --wave: var(--curve-b);
+  --wave-h: clamp(30px, 4vw, 58px);
+  background: var(--sage);
+}
+.site[data-look="clinic"] .book {
+  --flow-bg: var(--deep);
+  --wave: var(--curve-a);
+  --wave-h: clamp(34px, 4.4vw, 64px);
+  background: var(--deep);
+  color: #ffffff;
+}
+.site[data-look="clinic"] .book h2,
+.site[data-look="clinic"] .book .contact a {
+  color: #ffffff;
+}
+.site[data-look="clinic"] .book .bookIntro h2,
+.site[data-look="clinic"] .book .body {
+  color: rgb(255 255 255 / 0.86);
+}
+.site[data-look="clinic"] .book .form,
+.site[data-look="clinic"] .book .form label {
+  color: var(--ink);
+}
+
+/* Athletic: crisp diagonal cuts. Services on a white band, the request on an ink band, the edges cut at an angle. */
+.site[data-look="athletic"] {
+  --cut: clamp(1.5rem, 4vw, 3.5rem);
+}
+.site[data-look="athletic"] section:has(> .menu),
+.site[data-look="athletic"] .book {
+  max-width: none;
+  padding-inline: max(var(--pad), calc((100% - 80rem) / 2 + var(--pad)));
+  padding-top: calc(clamp(3rem, 7vw, 5.5rem) + var(--cut));
+  border-top: 0;
+}
+.site[data-look="athletic"] section:has(> .menu) {
+  background: #ffffff;
+  clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%);
+}
+.site[data-look="athletic"] section:has(> .menu) .menu li {
+  background: var(--paper);
+}
+.site[data-look="athletic"] .book {
+  background: #111111;
+  color: #f4f0e8;
+  clip-path: polygon(0 0, 100% var(--cut), 100% 100%, 0 100%);
+}
+.site[data-look="athletic"] .book h2[data-eyebrow]::before {
+  color: rgb(244 240 232 / 0.6);
+}
+.site[data-look="athletic"] .book .bookIntro .body {
+  color: #d8d3c8;
+}
+.site[data-look="athletic"] .book .contact a {
+  color: #ffffff;
+}
+.site[data-look="athletic"] .book .form,
+.site[data-look="athletic"] .book .form label {
+  color: var(--ink);
+}

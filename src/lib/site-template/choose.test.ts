@@ -8,7 +8,7 @@ import { ALL_LOOKS, answersFromProfile, buildableSectors, buildChoicePrompt, par
 import { GENERAL_PRESET, SECTOR_PRESETS, presetFor } from "./presets";
 import { parseAnswers } from "./answers";
 import { checkSite } from "./checks";
-import { assembleSite, defaultCopy, tidyIntro } from "./write";
+import { assembleSite, defaultCopy, figuresFrom, tidyIntro } from "./write";
 
 const plan: WebsitePlan = {
   summary: "A friendly site that gets local homeowners to ask for a quote.",
@@ -106,7 +106,7 @@ describe("the general template", () => {
     const input = { preset: GENERAL_PRESET, facts: parsed.facts, look: "executive" as const, colour: parsed.colour };
     const site = assembleSite(input, defaultCopy(input));
     expect(checkSite(site, parsed.facts, GENERAL_PRESET).issues).toEqual([]);
-    expect(site.sections.map((s) => s.kind)).toEqual(["hero", "services", "area", "enquiry", "cta"]);
+    expect(site.sections.map((s) => s.kind)).toEqual(["hero", "services", "facts", "area", "enquiry", "cta"]);
   });
 
   it("shows the customer's own service descriptions as they wrote them", () => {
@@ -160,6 +160,27 @@ describe("the general template", () => {
     const noneInput = { preset: GENERAL_PRESET, facts: none.facts, look: "executive" as const, colour: none.colour };
     const noneArea = assembleSite(noneInput, defaultCopy(noneInput)).sections.find((x) => x.kind === "area");
     expect(noneArea && noneArea.kind === "area" && noneArea.text).not.toMatch(/Available/);
+    expect(checkSite(assembleSite(input, defaultCopy(input)), parsed.facts, GENERAL_PRESET).issues).toEqual([]);
+  });
+
+  it("shows large figures made only from the customer's own facts, on the home page", () => {
+    const a = answersFromProfile(taxi(), "Daz'd Cabs")!;
+    const parsed = parseAnswers(a, GENERAL_PRESET, { colour: "#1f3a34" });
+    if (!parsed.ok) throw new Error("fixture");
+    const input = { preset: GENERAL_PRESET, facts: parsed.facts, look: "executive" as const, colour: parsed.colour };
+    const facts = assembleSite(input, defaultCopy(input)).sections.find((x) => x.kind === "facts");
+    expect(facts && facts.kind === "facts" && facts.items).toEqual([
+      { value: "24 hours", label: "Available" },
+      { value: "3", label: "Services offered" },
+    ]);
+    // Three or more of each is a count worth showing; fewer is left out rather than making a small list look small.
+    const many = figuresFrom({ ...parsed.facts, services: ["a", "b", "c", "d"].map((name) => ({ name })), areas: ["Blackpool", "Fleetwood", "Preston"] });
+    expect(many).toEqual([
+      { value: "24 hours", label: "Available" },
+      { value: "4", label: "Services offered" },
+      { value: "3", label: "Areas covered" },
+    ]);
+    expect(figuresFrom({ businessName: "X", services: [{ name: "a" }, { name: "b" }] })).toEqual([]);
     expect(checkSite(assembleSite(input, defaultCopy(input)), parsed.facts, GENERAL_PRESET).issues).toEqual([]);
   });
 
