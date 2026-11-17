@@ -290,7 +290,7 @@ export const OWNER_QUOTES = [
     project: projectBySlug("boonma")!,
     quote:
       "Clients find a treatment, see the price and book a time, all from their phone. It feels like our studio.",
-    pull: "It feels like our studio.",
+    pull: "Clients find a treatment, see the price and book a time, all from their phone.",
   },
   {
     project: projectBySlug("raeng-fitness")!,
