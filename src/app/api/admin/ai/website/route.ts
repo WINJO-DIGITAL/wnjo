@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { RawAnswers } from "@/lib/site-template/answers";
 import { providerFromEnv } from "@/lib/ai/agent-runtime";
+import { regenerateWebsite } from "@/lib/ai/website-auto";
 import { releasePreview, runPlanStep, runPreviewStep, withdrawPreview } from "@/lib/ai/website-ai-service";
 import { previewReadyEmail } from "@/lib/build-emails";
 import { notificationMailConfig, sendEmail } from "@/lib/mailer";
@@ -22,6 +23,7 @@ const fail = (status: number, error: string) => NextResponse.json({ error }, { s
  * Staff actions for the AI website steps.
  * - plan: the AI drafts the website plan from the brief.
  * - preview: the AI writes the pages of the latest plan as a draft preview. An optional `change` applies a customer's request.
+ * - regenerate: starts the website again from the customer's answers: a new plan, a new template choice and a new build. A draft only.
  * - release: a person sends a draft preview to the customer. Nothing the AI writes reaches a customer without this.
  * - withdraw: takes a released preview back.
  * - link: the private address of a preview, for staff to review it.
@@ -47,6 +49,15 @@ export async function POST(request: NextRequest) {
     if (!provider) return fail(503, "The AI service isn't connected yet. It needs a provider key.");
     const change = typeof body.change === "string" ? body.change.slice(0, 1000) : undefined;
     const result = body.action === "plan" ? await runPlanStep(db, staff, provider, briefId) : await runPreviewStep(db, staff, provider, briefId, change);
+    return result.ok ? NextResponse.json(result) : fail(result.status, result.error);
+  }
+
+  if (body.action === "regenerate") {
+    const briefId = id("briefId");
+    if (!briefId) return fail(422, "invalid");
+    const provider = providerFromEnv();
+    if (!provider) return fail(503, "The AI service isn't connected yet. It needs a provider key.");
+    const result = await regenerateWebsite(db, provider, staff, briefId);
     return result.ok ? NextResponse.json(result) : fail(result.status, result.error);
   }
 

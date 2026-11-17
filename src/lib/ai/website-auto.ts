@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AiProvider } from "./provider";
 import { parseAnswers } from "@/lib/site-template/answers";
 import { runSiteBuildStep } from "@/lib/site-template/build-service";
-import { ALL_LOOKS, answersFromProfile, buildableSectors, pickTemplate } from "@/lib/site-template/choose";
+import { ALL_LOOKS, NO_TEMPLATE, answersFromProfile, buildableSectors, pickTemplate } from "@/lib/site-template/choose";
 import { presetFor } from "@/lib/site-template/presets";
 import type { RawAnswers, SiteAnswers } from "@/lib/site-template/answers";
 import type { Look } from "@/lib/site-template/schema";
@@ -101,8 +101,12 @@ async function claim(db: SupabaseClient, brief: BriefRow): Promise<boolean> {
   return !first?.detail?.token || first.detail.token === token;
 }
 
-export async function draftWebsite(db: SupabaseClient, provider: AiProvider, brief: BriefRow): Promise<"drafted" | "waiting" | "failed"> {
-  const actor: Actor = { userId: null, email: null, tenantId: brief.tenant_id, kind: "system" };
+/** `fresh` makes a new plan instead of reusing the last. `by` is the person regenerating, who sees the result and needs no email. */
+export type DraftOptions = { fresh?: boolean; by?: Actor };
+
+export async function draftWebsite(db: SupabaseClient, provider: AiProvider, brief: BriefRow, options: DraftOptions = {}): Promise<"drafted" | "waiting" | "failed"> {
+  const actor: Actor = options.by ?? { userId: null, email: null, tenantId: brief.tenant_id, kind: "system" };
+  const alert: typeof alertOwner = options.by ? async () => {} : alertOwner;
   const businessName = brief.business_name || brief.name;
   const who = { reference: brief.reference, businessName, email: brief.email };
   const site = brief.brief?.site ?? null;
@@ -122,7 +126,7 @@ export async function draftWebsite(db: SupabaseClient, provider: AiProvider, bri
 
   // Step 1: the plan.
   const store = new SupabaseWebsiteAiStore(db, brief.tenant_id, null);
-  let plan = await store.latestPlan(brief.id);
+  let plan = options.fresh ? null : await store.latestPlan(brief.id);
   if (!plan) {
     const made = await runPlanStep(db, actor, provider, brief.id);
     if (!made.ok) return await failed(db, brief, who, made.error);
@@ -130,14 +134,16 @@ export async function draftWebsite(db: SupabaseClient, provider: AiProvider, bri
   }
   if (!plan) return await failed(db, brief, who, "The plan could not be read back.");
 
-  // No template fits what they told us (for example, opening hours are needed and weren't given in a form we can use):
-  // a text-only draft, as before.
-  if (!answers || sectors.length === 0) {
+  const textDraft = async (): Promise<"drafted" | "failed"> => {
     const preview = await runPreviewStep(db, actor, provider, brief.id);
     if (!preview.ok) return await failed(db, brief, who, preview.error);
-    await alertOwner(who, readyForReviewMessage({ ...who, checksOk: true, issues: 0, kind: "text" }));
+    await alert(who, readyForReviewMessage({ ...who, checksOk: true, issues: 0, kind: "text" }));
     return "drafted";
-  }
+  };
+
+  // No template fits what they told us (for example, opening hours are needed and weren't given in a form we can use):
+  // a text-only draft, as before.
+  if (!answers || sectors.length === 0) return await textDraft();
 
   // Step 2: the template. The customer's own look is kept; anything they left open, the AI chooses from the plan.
   const asked = ALL_LOOKS.includes(answers.look as Look) ? (answers.look as Look) : null;
@@ -148,7 +154,13 @@ export async function draftWebsite(db: SupabaseClient, provider: AiProvider, bri
     plan: plan.plan,
     sectors,
     looks: asked ? [asked] : ALL_LOOKS,
+    allowNone: !site,
   });
+  // The AI says no template suits this kind of business: a text-only draft is better than a poor fit.
+  if (picked.ok && picked.choice.sector === NO_TEMPLATE) {
+    await logEvent(db, actor, brief.id, "ai", { step: "template", ok: true, sector: NO_TEMPLATE, costPence: picked.costPence, by: "ai" });
+    return await textDraft();
+  }
   if (!picked.ok) {
     // A customer's sector with the look left to the AI still builds: the sector's own look is used.
     if (!site) return await failed(db, brief, who, picked.reason);
@@ -161,7 +173,7 @@ export async function draftWebsite(db: SupabaseClient, provider: AiProvider, bri
   if (!result.ok) return await failed(db, brief, who, result.error);
 
   // Step 4: tell the owner.
-  await alertOwner(who, readyForReviewMessage({ ...who, checksOk: result.checksOk, issues: result.issues, sector: choice.sector, look: choice.look, kind: "template" }));
+  await alert(who, readyForReviewMessage({ ...who, checksOk: result.checksOk, issues: result.issues, sector: choice.sector, look: choice.look, kind: "template" }));
   return "drafted";
 }
 
@@ -169,4 +181,21 @@ export async function draftWebsite(db: SupabaseClient, provider: AiProvider, bri
 async function failed(db: SupabaseClient, brief: BriefRow, who: { reference: string; businessName: string; email: string }, reason: string): Promise<"failed"> {
   if ((await failedTries(db, brief.id)) >= MAX_FAILED_TRIES) await alertOwner(who, buildFailedMessage(who, reason));
   return "failed";
+}
+
+/** Staff regenerate a website from scratch: a new plan, a new template choice and a new build. It makes a draft only. */
+export async function regenerateWebsite(db: SupabaseClient, provider: AiProvider, by: Actor, briefId: string): Promise<{ ok: true; outcome: "drafted" | "waiting" | "failed" } | { ok: false; status: number; error: string }> {
+  const { data } = await db
+    .from("website_briefs")
+    .select("id, tenant_id, reference, email, name, business_name, brief")
+    .eq("id", briefId)
+    .eq("tenant_id", by.tenantId)
+    .maybeSingle();
+  const brief = data as BriefRow | null;
+  if (!brief) return { ok: false, status: 404, error: "not_found" };
+  if (!brief.brief?.site && !brief.brief?.goals?.length) return { ok: false, status: 409, error: "The customer hasn't sent their goals yet." };
+  const outcome = await draftWebsite(db, provider, brief, { fresh: true, by });
+  if (outcome === "waiting") return { ok: false, status: 409, error: "The customer's answers aren't complete enough to build a template site yet." };
+  if (outcome === "failed") return { ok: false, status: 502, error: "The AI couldn't finish the website. The reason is in the website's history." };
+  return { ok: true, outcome };
 }

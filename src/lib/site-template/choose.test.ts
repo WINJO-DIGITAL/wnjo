@@ -70,6 +70,21 @@ describe("the choice prompt and its checks", () => {
   });
 });
 
+describe("when no sector suits the business", () => {
+  it("lets the model say none, only when allowed, and tells it so", () => {
+    expect(parseChoice('{"sector":"none","look":"warm"}', ["cleaning"], ALL_LOOKS, true)).toMatchObject({ ok: true, choice: { sector: "none" } });
+    expect(parseChoice('{"sector":"none","look":"warm"}', ["cleaning"], ALL_LOOKS).ok).toBe(false);
+    expect(buildChoicePrompt(input({ allowNone: true }))).toContain('answer "none"');
+    expect(buildChoicePrompt(input())).not.toContain('answer "none"');
+  });
+
+  it("still asks the model when it is the only sector, so it can decline it", async () => {
+    const p = scripted('{"sector":"none","look":"bold"}');
+    expect(await pickTemplate(p, input({ sectors: ["cleaning"], looks: ["bold"], allowNone: true }))).toMatchObject({ ok: true, choice: { sector: "none" } });
+    expect(p.calls).toBe(1);
+  });
+});
+
 describe("picking the template", () => {
   it("asks the model once and uses its answer", async () => {
     const p = scripted('{"sector":"plumber","look":"warm"}');

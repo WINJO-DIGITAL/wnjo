@@ -33,7 +33,7 @@ vi.mock("./owner-alerts", async (original) => ({
   alertOwner: async (_w: unknown, m: { subject: string }) => void alerts.push(m.subject),
 }));
 
-import { MAX_FAILED_TRIES, runAutoDrafts } from "./website-auto";
+import { MAX_FAILED_TRIES, regenerateWebsite, runAutoDrafts } from "./website-auto";
 
 const withGoals = { goals: ["enquiries"] };
 const week = (["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const).map((day) => (day === "Sun" ? { day, closed: true } : { day, open: "09:00", close: "18:00" }));
@@ -150,5 +150,40 @@ describe("automatic first drafts", () => {
     state.startedFirst = "someone-else";
     expect(await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: ownWords }]), provider())).toEqual({ attempted: 0, drafted: 0 });
     expect(steps.some((s) => s.startsWith("plan"))).toBe(false);
+  });
+
+  it("makes a text draft instead of forcing a poor fit when the AI says no template suits the business", async () => {
+    const r = await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: ownWords }]), provider("none", "warm"));
+    expect(r.drafted).toBe(1);
+    expect(steps.filter((s) => !s.startsWith("event:"))).toEqual(["plan:system", "preview"]);
+  });
+});
+
+describe("regenerating a website", () => {
+  const staff = { userId: "u1", email: "o@w.co.uk", tenantId: "t", kind: "staff" as const };
+  const withBrief = (brief: unknown, hasPlan = true) => {
+    state.planned = hasPlan ? ["b1"] : [];
+    return fakeDb([{ id: "b1", tenant_id: "t", brief }], ["b1"]);
+  };
+  const single = (brief: unknown) => {
+    const db = withBrief(brief) as unknown as { from: (t: string) => Record<string, unknown> };
+    const from = db.from;
+    db.from = (t: string) => {
+      const b = from(t);
+      if (t === "website_briefs") b.maybeSingle = async () => ({ data: full({ id: "b1", tenant_id: "t", brief }) });
+      return b;
+    };
+    return db as never;
+  };
+
+  it("starts again from a new plan even when a plan, a preview and a build already exist, and sends no email", async () => {
+    const r = await regenerateWebsite(single(ownWords), provider("cleaning", "bold"), staff, "b1");
+    expect(r).toEqual({ ok: true, outcome: "drafted" });
+    expect(steps.filter((s) => !s.startsWith("event:"))).toEqual(["plan:staff", "site:staff:cleaning:bold"]);
+    expect(alerts).toEqual([]);
+  });
+
+  it("refuses a website whose customer hasn't sent their goals", async () => {
+    expect(await regenerateWebsite(single({ goals: [] }), provider(), staff, "b1")).toMatchObject({ ok: false, status: 409 });
   });
 });

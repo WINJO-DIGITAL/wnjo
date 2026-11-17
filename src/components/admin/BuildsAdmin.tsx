@@ -883,6 +883,16 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
             <button type="button" className="btn btn--secondary" disabled={busy !== null || !latestPlan} onClick={() => void run("preview", { action: "preview", briefId: row.id, change: change || undefined }, "Preview drafted.")}>
               {busy === "preview" ? "Writing pages…" : "Write the preview"}
             </button>
+            <button
+              type="button"
+              className="btn btn--primary"
+              disabled={busy !== null}
+              onClick={() => {
+                if (window.confirm("Start this website again from the customer's answers? It makes a new plan, picks the template again and builds a new draft. The customer sees nothing until you release it.")) void run("regenerate", { action: "regenerate", briefId: row.id }, "Website regenerated. Review the new draft below.");
+              }}
+            >
+              {busy === "regenerate" ? "Regenerating…" : "Regenerate the website"}
+            </button>
           </div>
           {openChanges.length > 0 && (
             <label className="acct-label">

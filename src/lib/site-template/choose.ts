@@ -52,7 +52,11 @@ export type ChoiceInput = {
   sectors: string[];
   /** The looks the model may pick from. */
   looks: readonly Look[];
+  /** The model may answer "none" when no sector suits the business, for example a taxi firm. A person's own sector never allows it. */
+  allowNone?: boolean;
 };
+
+export const NO_TEMPLATE = "none";
 
 export const CHOICE_SYSTEM =
   "You are a senior web designer at WINJO DIGITAL, a UK web design agency. You choose which of our website templates " +
@@ -71,6 +75,7 @@ export function buildChoicePrompt(input: ChoiceInput): string {
     `Tone: ${input.plan.tone}`,
     `Pages: ${input.plan.pages.map((p) => p.title).join(", ")}`,
     "",
+    input.allowNone ? `If none of these sectors suits the business, answer "${NO_TEMPLATE}" for the sector: a poor fit is worse than no template.` : "",
     "Sectors you may choose from:",
     ...input.sectors.map((id) => `- ${id}: ${SECTOR_PRESETS[id]?.label ?? id}. ${SECTOR_PRESETS[id]?.voice ?? ""}`.trim()),
     "",
@@ -86,11 +91,12 @@ export function buildChoicePrompt(input: ChoiceInput): string {
 export type Choice = { sector: string; look: Look };
 
 /** Checks a model reply. Strict: anything outside the lists is rejected, never repaired. */
-export function parseChoice(text: string, sectors: string[], looks: readonly Look[]): { ok: true; choice: Choice } | { ok: false; reason: string } {
+export function parseChoice(text: string, sectors: string[], looks: readonly Look[], allowNone = false): { ok: true; choice: Choice } | { ok: false; reason: string } {
   const raw = extractJson(text) as Record<string, unknown> | null;
   if (!raw || typeof raw !== "object") return { ok: false, reason: "The reply was not JSON." };
   const sector = typeof raw.sector === "string" ? raw.sector.trim().toLowerCase() : "";
   const look = typeof raw.look === "string" ? raw.look.trim().toLowerCase() : "";
+  if (allowNone && sector === NO_TEMPLATE) return { ok: true, choice: { sector: NO_TEMPLATE, look: looks[0] } };
   if (!sectors.includes(sector)) return { ok: false, reason: `"${sector}" is not one of the sectors offered.` };
   if (!(looks as readonly string[]).includes(look)) return { ok: false, reason: `"${look}" is not one of the looks offered.` };
   return { ok: true, choice: { sector, look: look as Look } };
@@ -104,7 +110,7 @@ export type ChoiceResult = { ok: true; choice: Choice; costPence: number } | { o
  */
 export async function pickTemplate(provider: AiProvider, input: ChoiceInput): Promise<ChoiceResult> {
   if (input.sectors.length === 0) return { ok: false, reason: "No template fits these answers.", costPence: 0 };
-  if (input.sectors.length === 1 && input.looks.length === 1) return { ok: true, choice: { sector: input.sectors[0], look: input.looks[0] }, costPence: 0 };
+  if (input.sectors.length === 1 && input.looks.length === 1 && !input.allowNone) return { ok: true, choice: { sector: input.sectors[0], look: input.looks[0] }, costPence: 0 };
   const prompt = buildChoicePrompt(input);
   let next = prompt;
   let costPence = 0;
@@ -118,7 +124,7 @@ export async function pickTemplate(provider: AiProvider, input: ChoiceInput): Pr
     }
     costPence += reply.usage.costPence;
     if (reply.kind !== "final") return { ok: false, reason: "The AI service asked for a tool, which this step does not use.", costPence };
-    const parsed = parseChoice(reply.text, input.sectors, input.looks);
+    const parsed = parseChoice(reply.text, input.sectors, input.looks, input.allowNone);
     if (parsed.ok) return { ok: true, choice: parsed.choice, costPence };
     next = `${prompt}\n\nYour last reply was rejected: ${parsed.reason} Reply again with only the JSON.`;
   }
