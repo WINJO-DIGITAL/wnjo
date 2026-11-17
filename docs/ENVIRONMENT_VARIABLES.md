@@ -30,7 +30,7 @@ Rules:
 - Main domain: `winjodigital.co.uk` (Vercel, verified). `www.winjodigital.co.uk` redirects to it with a 308.
 - Old domain: `wnjoweb.co.uk` and `www.wnjoweb.co.uk` are attached to the same Vercel project and redirect to `winjodigital.co.uk` with a 308, keeping the path (restored 8 November 2026; they had been returning Vercel's 404). Their DNS stays at IONOS, pointing at Vercel.
 - Resend sending domain: `winjodigital.co.uk` (eu-west-1), verified, sending enabled.
-- Customer correspondence goes through the website. The owner's email address is never published on the site.
+- Customer correspondence goes through the website. `hello@winjodigital.co.uk` is the public contact address (confirmed by the owner, 17 November 2026); the private inbox list in `ENQUIRY_TO_EMAIL` is never shown.
 
 ## Website subscriptions (Stage 6, preview)
 
@@ -47,6 +47,8 @@ Rules:
   booking (Stage 4). Until then it offers callbacks only.
 
 ### Fixed: live Stripe webhook URL (8 November 2026)
+
+**Current live endpoint (checked in Stripe, 17 November 2026): `we_1UbJZCLEEs7hslju5yR67qpm`**, "WINJO DIGITAL website (live)", enabled, URL `https://winjodigital.co.uk/api/stripe/webhook`, with the five subscription and checkout events. It replaced the endpoint named below, which is kept only as history. `STRIPE_WEBHOOK_SECRET_LIVE` in Vercel is its signing secret.
 
 The live webhook endpoint (`we_1UZKdaFZtOV6mSdmHzzgDd3z`) pointed at the old domain, which now redirects; Stripe does
 not follow redirects. It was changed to `https://winjodigital.co.uk/api/stripe/webhook` with the owner's approval.
