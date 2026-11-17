@@ -3416,3 +3416,93 @@
   font-style: italic;
   font-size: 1.5rem;
 }
+
+/* ---- Heritage on its own structure: everything is a brass plaque. A poster for the top of the page, services on a narrow
+   framed price board, facts, hours and the place as plaques, the request in a brass-framed panel, quotes in frames. ---- */
+
+/* A plaque: a brass line with a finer line inside it. */
+.site[data-look="heritage"] section:has(> .menu),
+.site[data-look="heritage"] .facts p,
+.site[data-look="heritage"] .info > .section,
+.site[data-look="heritage"] .reviews blockquote,
+.site[data-look="heritage"] .closing {
+  border: 1px solid var(--brass);
+  outline: 1px solid rgb(201 165 106 / 0.45);
+  outline-offset: -7px;
+  border-radius: 2px;
+}
+
+/* The poster: the headline large and centred over a double rule, the actions beneath. */
+.site[data-look="heritage"] .hero h1::after {
+  content: "";
+  display: block;
+  width: 7rem;
+  height: 5px;
+  margin: 1.1rem auto 0;
+  border-block: 1px solid var(--brass);
+}
+.site[data-look="heritage"] .hero .heroCopy p {
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+/* Services: a narrow price board, the heading inside the frame and the items in one column with leaders. */
+.site[data-look="heritage"] section:has(> .menu) {
+  width: calc(100% - 2 * var(--pad));
+  max-width: 46rem;
+  margin: clamp(2.5rem, 6vw, 4rem) auto;
+  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 3.5rem);
+  background: #1a1a1d;
+}
+.site[data-look="heritage"] .menu,
+.site[data-look="heritage"] .menu[data-wide] {
+  grid-template-columns: 1fr;
+}
+.site[data-look="heritage"] section:has(> .menu) .menu li {
+  padding: 1.1rem 0 0.9rem;
+}
+
+/* Facts: three plaques, the figure in brass. */
+.site[data-look="heritage"] .facts {
+  max-width: 62rem;
+  margin: clamp(2rem, 5vw, 3.5rem) auto;
+  padding-inline: var(--pad);
+  gap: 1rem;
+  border: 0;
+}
+.site[data-look="heritage"] .facts p {
+  padding: 1.5rem 1.25rem;
+  background: #1a1a1d;
+  text-align: center;
+}
+
+/* Hours and the place: two plaques. */
+.site[data-look="heritage"] .info {
+  gap: 1rem;
+  max-width: 62rem;
+}
+.site[data-look="heritage"] .info > .section {
+  background: #1a1a1d;
+  padding: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+/* The request: a brass-framed panel. */
+.site[data-look="heritage"] .book {
+  width: calc(100% - 2 * var(--pad));
+  max-width: 62rem;
+  margin: clamp(2.5rem, 6vw, 4rem) auto;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  border: 1px solid var(--brass);
+  outline: 1px solid rgb(201 165 106 / 0.45);
+  outline-offset: -7px;
+  border-radius: 2px;
+  background: #151517;
+}
+
+/* Quotes in frames. */
+.site[data-look="heritage"] .reviews blockquote {
+  background: #1a1a1d;
+}
+.site[data-look="heritage"] .closing {
+  background: #151517;
+}
