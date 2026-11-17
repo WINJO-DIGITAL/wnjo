@@ -11539,8 +11539,8 @@ body:has(.dash-header) .site-footer {
 }
 .build-revisions li {
   display: grid;
-  gap: var(--space-2);
-  padding: var(--space-3) 0;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
   border-top: 1px solid var(--color-line);
   font-size: var(--text-sm);
 }
@@ -11570,6 +11570,21 @@ body:has(.dash-header) .site-footer {
 .build-revision__reply {
   margin: 0;
   color: var(--color-ink-2);
+}
+/* A row of buttons in the staff screens. It wraps on a phone, with room between each button and the line above. */
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin-top: var(--space-3);
+}
+.admin-actions .acct-label {
+  display: grid;
+  gap: var(--space-1);
+}
+.build-revisions li .admin-actions {
+  margin-top: var(--space-1);
 }
 
 /* ===== Client portal, calmer: one next step, four steps, tabs, bell ===== */
