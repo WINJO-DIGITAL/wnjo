@@ -14,7 +14,7 @@ export const STAGES = {
   proposal: { label: "Proposal", customer: "Your proposal is being prepared." },
   awaiting_payment: { label: "Payment", customer: "Ready for your first payment." },
   // Customers never see the AI step by name. Staff see the plain description so they know what the step is.
-  specification: { label: "Building your website", staffLabel: "AI processing", customer: "Your website is being designed by our team." },
+  specification: { label: "Building your website", staffLabel: "Being built", customer: "Your website is being designed by our team." },
   building: { label: "Website generation", customer: "Your website is being built." },
   preview: { label: "Awaiting customer review", customer: "Your private preview is ready for you to review." },
   changes: { label: "Changes requested", customer: "We're making the changes you asked for." },
