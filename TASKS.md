@@ -56,6 +56,12 @@ Measured: all 90 browser tests, 1,510 unit tests, axe clean on all eight styles 
 
 Scores are still my judgement. What stops 90 now: art direction needs the owner's own photographs (the stand-in photo is one barber shot in every style), and a second typeface per style is not done.
 
+## Fifth round (17 Nov): second typefaces and graphics for every no-photo hero
+
+Athletic now sets text in Inter under its Archivo headings, Executive in Hanken Grotesk under Jost, Tradesman in DM Sans under Archivo, Clinic in Nunito under Figtree (all faces already in the build, so no new downloads). The other five no-photo heroes draw their own graphic: Boutique soft curves, Executive gold corner brackets, Hearth a woven check, Heritage a brass sunburst, Tradesman hazard chevrons. Every style now has a graphic, motion, a photo grade, a second typeface and twelve colours. Verified again: 90 browser tests, 1,510 unit tests, axe clean (photo and no photo, desktop and phone), 96 colour combinations pass contrast.
+
+Rescored: Athletic 79, Precision 78, Boutique 77, Executive 76, Hearth 76, Heritage 76, Tradesman 76, Clinic 75. Still judgement. The remaining gap to 90 is the owner's own photography per business and per-sector imagery; nothing left in this list can be closed with code alone.
+
 ## The systemic weakness (Part 10)
 
 Every style still renders the same sequence: hero, gallery or menu, hours, find us, request form, questions. Different skins, same skeleton. Two fixes are planned at system level rather than per style:
