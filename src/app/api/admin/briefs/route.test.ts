@@ -47,6 +47,7 @@ beforeEach(() => {
     website_briefs: { id: BRIEF, tenant_id: "t1", reference: "WNJO-ABC123", email: "c@example.com", name: "C", route: "proposal", stage: "approval", brief: { files: [{ path: "drafts/x/a.png", name: "a.png" }] } },
     build_approvals: [],
     website_proposals: [],
+    website_site_builds: [{ id: "b1" }],
   };
 });
 
@@ -93,6 +94,16 @@ describe("staff build actions", () => {
     expect(pricing).toMatchObject({ decided_by: "u1", decided_by_role: "owner", decision: "approved" });
     expect(String(pricing.note)).toMatch(/automatically/);
     expect(writes.find((w) => w.table === "website_briefs")?.payload).toEqual({ stage: "live" });
+  });
+
+  it("go live: refuses when no build is released, and writes nothing", async () => {
+    role = "owner";
+    tables.website_briefs = { ...(tables.website_briefs as object), route: "package", stage: "approval", figures: { mode: "monthly" } };
+    tables.website_site_builds = [];
+    const res = await post({ action: "go-live", qualityChecked: true });
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toMatch(/No website build is released/);
+    expect(writes).toEqual([]);
   });
 
   it("go live: staff can't, and nothing is written", async () => {

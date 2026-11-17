@@ -127,11 +127,13 @@ export async function POST(request: NextRequest) {
   // Publication. The database still refuses Live without all four approvals, so this only ever does what Approvals would.
   if (body.action === "go-live") {
     if (staff.role === "staff") return fail(403, "Only an owner or admin can put a website live.");
-    const [{ data: approvals }, { data: accepted }] = await Promise.all([
+    const [{ data: approvals }, { data: accepted }, { data: released }] = await Promise.all([
       db.from("build_approvals").select("kind, decision, created_at").eq("brief_id", brief.id),
       db.from("website_proposals").select("id").eq("brief_id", brief.id).eq("status", "accepted").limit(1),
+      db.from("website_site_builds").select("id").eq("brief_id", brief.id).eq("status", "released").limit(1),
     ]);
     const plan = goLivePlan({
+      buildReleased: (released ?? []).length > 0,
       stage: brief.stage,
       route: brief.route,
       oneOff: brief.figures?.mode === "oneOff",

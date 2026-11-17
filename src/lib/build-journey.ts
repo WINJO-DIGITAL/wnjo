@@ -116,10 +116,13 @@ export function goLivePlan(ctx: {
   proposalAccepted: boolean;
   approvals: ApprovalRecord[];
   qualityChecked: boolean;
+  buildReleased: boolean;
 }): { ok: true; record: ApprovalKind[] } | { ok: false; reason: string } {
   if (ctx.stage !== "approval") {
     return { ok: false, reason: "A website can go live once the customer has approved their preview (stage: Awaiting WINJO approval)." };
   }
+  // The customer's address serves only a released build, so there must be one before the website can go live.
+  if (!ctx.buildReleased) return { ok: false, reason: "No website build is released yet. Release a build in the website's build list first." };
   const state = approvalState(ctx.approvals);
   const rejected = APPROVAL_ORDER.filter((k) => state[k] === "rejected");
   if (rejected.length) {

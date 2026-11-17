@@ -370,6 +370,8 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
   const [events, setEvents] = useState<EventRow[]>([]);
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  // Whether a build is released: the live address serves only that build, so going live needs one.
+  const [releasedBuild, setReleasedBuild] = useState(false);
   const [revisions, setRevisions] = useState<RevisionRow[]>([]);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -380,7 +382,9 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
       client.from("build_approvals").select("id, kind, decision, note, decided_by_email, decided_by_role, proposal_id, created_at").eq("brief_id", row.id).order("created_at", { ascending: false }),
       client.from("website_proposals").select("id, reference, status, source, summary, lines, setup_pence, monthly_pence, one_off_pence, customer_note, created_at").eq("brief_id", row.id).order("created_at", { ascending: false }),
       client.from("build_revisions").select("id, brief_id, number, status, request, response, created_at, resolved_at").eq("brief_id", row.id).order("number", { ascending: false }),
-    ]).then(([e, a, p, r]) => {
+      client.from("website_site_builds").select("id").eq("brief_id", row.id).eq("status", "released").limit(1),
+    ]).then(([e, a, p, r, released]) => {
+      setReleasedBuild(((released.data as unknown[]) ?? []).length > 0);
       setEvents((e.data as EventRow[]) ?? []);
       setApprovals((a.data as Approval[]) ?? []);
       setProposals((p.data as Proposal[]) ?? []);
@@ -550,6 +554,7 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
               busy={busy}
               call={call}
               qualityApproved={state.quality === "approved"}
+              buildReleased={releasedBuild}
               proposalAccepted={Boolean(accepted)}
               onGoLive={(qualityChecked) => act({ action: "go-live", qualityChecked }, "The website is live.")}
             />
@@ -661,6 +666,7 @@ function GoLivePanel({
   busy,
   call,
   qualityApproved,
+  buildReleased,
   proposalAccepted,
   onGoLive,
 }: {
@@ -668,6 +674,7 @@ function GoLivePanel({
   busy: boolean;
   call: Call;
   qualityApproved: boolean;
+  buildReleased: boolean;
   proposalAccepted: boolean;
   onGoLive: (qualityChecked: boolean) => Promise<boolean>;
 }) {
@@ -679,12 +686,13 @@ function GoLivePanel({
   const customerApproved = row.stage === "approval" || live;
   const items: { done: boolean; text: string }[] = [
     { done: customerApproved, text: "Customer has approved their website" },
+    { done: buildReleased, text: "A website build is released" },
     ...(bespoke ? [{ done: proposalAccepted, text: "Proposal accepted" }] : []),
     ...(needsFinalPayment ? [{ done: Boolean(row.balance_paid_at), text: "Final payment received" }] : []),
     { done: addresses !== null && addresses > 0, text: addresses === 0 ? "No website address attached yet" : "Website address attached" },
   ];
   // The address is the one thing that doesn't block: a website can be made live first and given its address after.
-  const ready = customerApproved && (!bespoke || proposalAccepted) && (!needsFinalPayment || Boolean(row.balance_paid_at));
+  const ready = customerApproved && buildReleased && (!bespoke || proposalAccepted) && (!needsFinalPayment || Boolean(row.balance_paid_at));
   const canPress = !live && ready && (qualityApproved || checked);
   return (
     <div className="stack" style={{ "--stack": "var(--space-3)" } as React.CSSProperties}>

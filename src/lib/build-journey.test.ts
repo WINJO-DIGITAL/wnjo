@@ -125,6 +125,7 @@ describe("goLivePlan", () => {
     proposalAccepted: false,
     approvals: [],
     qualityChecked: true,
+    buildReleased: true,
   };
   const approved = (kind: "quality" | "pricing" | "contract" | "publication") => ({ kind, decision: "approved" as const, created_at: "2026-11-17T10:00:00Z" });
 
@@ -139,6 +140,10 @@ describe("goLivePlan", () => {
   it("needs the checked tick unless quality is already approved", () => {
     expect(goLivePlan({ ...base, qualityChecked: false })).toMatchObject({ ok: false, reason: expect.stringMatching(/checked the website/) });
     expect(goLivePlan({ ...base, qualityChecked: false, approvals: [approved("quality")] }).ok).toBe(true);
+  });
+
+  it("needs a released build, because the live address serves only that", () => {
+    expect(goLivePlan({ ...base, buildReleased: false })).toMatchObject({ ok: false, reason: expect.stringMatching(/No website build is released/) });
   });
 
   it("only goes live once the customer has approved their preview", () => {
