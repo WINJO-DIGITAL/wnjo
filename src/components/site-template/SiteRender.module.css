@@ -2264,3 +2264,150 @@
 .site[data-look="executive"] .hero[data-variant="photo"] .heroCopy h1 {
   text-shadow: 0 2px 30px rgb(0 0 0 / 0.5);
 }
+
+/* Hearth (café): a menu board with a double frame, a hand-drawn scribble under headings, a touch of paper grain. */
+.site[data-look="hearth"] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+}
+.site[data-look="hearth"] .section > h2::after {
+  content: "";
+  display: block;
+  width: 5.5rem;
+  height: 0.6rem;
+  margin-top: 0.7rem;
+  background: var(--accent-text);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 88 10' preserveAspectRatio='none'%3E%3Cpath d='M1 6C9 1 14 9 22 5s13 4 22 0 13 5 22 1 12 3 21 0' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 88 10' preserveAspectRatio='none'%3E%3Cpath d='M1 6C9 1 14 9 22 5s13 4 22 0 13 5 22 1 12 3 21 0' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+.site[data-look="hearth"] section:has(> .menu) {
+  margin-block: 1rem;
+  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 3.5rem);
+  background: rgb(255 255 255 / 0.045);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  outline: 1px solid var(--line);
+  outline-offset: -10px;
+  max-width: calc(68rem - 2 * var(--pad));
+}
+.site[data-look="hearth"] .menu li {
+  padding-block: 0.85rem;
+  border-bottom: 0;
+}
+.site[data-look="hearth"] .menuName {
+  font-style: italic;
+}
+.site[data-look="hearth"] .reviews blockquote {
+  padding: 1.5rem;
+  background: rgb(255 255 255 / 0.05);
+  border-radius: 18px;
+}
+.site[data-look="hearth"] .reviews p {
+  font-family: var(--head);
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+/* Heritage (barber): matted brass-framed photographs, a diamond ornament before the footer, a ruled price list. */
+.site[data-look="heritage"] .gallery img {
+  padding: 0.45rem;
+  background: #1d1d20;
+  border: 1px solid var(--brass);
+  object-fit: cover;
+}
+.site[data-look="heritage"] .wall img {
+  padding: 0.45rem;
+  background: #1d1d20;
+  border: 1px solid var(--brass);
+}
+.site[data-look="heritage"] .foot {
+  position: relative;
+  padding-top: 3.5rem;
+}
+.site[data-look="heritage"] .foot::before {
+  content: "◆";
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-inline: 1rem;
+  background: #101012;
+  color: var(--brass);
+  font-size: 0.7rem;
+  line-height: 1;
+}
+.site[data-look="heritage"] .foot::after {
+  content: "";
+  position: absolute;
+  top: calc(1rem + 0.35rem);
+  left: var(--pad);
+  right: var(--pad);
+  border-top: 1px solid var(--line);
+  z-index: 0;
+}
+.site[data-look="heritage"] .foot::before {
+  z-index: 1;
+}
+.site[data-look="heritage"] .menu li:last-child {
+  border-bottom: 3px double var(--brass);
+}
+.site[data-look="heritage"] .reviews blockquote {
+  border: 1px solid var(--brass);
+  padding: 1.5rem;
+  text-align: center;
+}
+.site[data-look="heritage"] .reviews p {
+  font-family: var(--head);
+  font-size: 1.35rem;
+  font-style: italic;
+  text-transform: none;
+}
+
+/* Tradesman: a cut edge under the top of the page, a big call button, thick-ruled form fields. */
+.site[data-look="tradesman"] .hero {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 2.2rem), 0 100%);
+  padding-bottom: calc(var(--pad) + 2.2rem);
+  margin-bottom: -1px;
+}
+.site[data-look="tradesman"] .hero .btnGhost {
+  border-width: 2px;
+  border-color: var(--hazard);
+  font-size: 1.05rem;
+}
+.site[data-look="tradesman"] .form {
+  border: 2px solid #0f1b2d;
+  border-top: 0.5rem solid var(--hazard);
+  box-shadow: none;
+}
+.site[data-look="tradesman"] .form label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.site[data-look="tradesman"] .form input,
+.site[data-look="tradesman"] .form textarea {
+  border: 2px solid #0f1b2d;
+  background: #fff;
+}
+.site[data-look="tradesman"] .reviews blockquote {
+  padding: 1.25rem 1.5rem;
+  background: #f4f6f9;
+  border-left: 0.4rem solid var(--hazard);
+}
+
+/* Clinic: soft colour washes behind the page and quiet review cards. */
+.site[data-look="clinic"] {
+  background-image: radial-gradient(60rem 28rem at 0% 0%, #dcebe3 0%, transparent 70%), radial-gradient(50rem 30rem at 100% 38%, #e3eee8 0%, transparent 70%), radial-gradient(60rem 30rem at 0% 78%, #dcebe3 0%, transparent 70%);
+  background-repeat: no-repeat;
+}
+.site[data-look="clinic"] .reviews blockquote {
+  padding: 1.5rem 1.6rem;
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 2px 14px rgb(31 58 51 / 0.07);
+}
+.site[data-look="clinic"] .reviews p {
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
