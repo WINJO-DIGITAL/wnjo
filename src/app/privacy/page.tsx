@@ -12,7 +12,8 @@ export const metadata = pageMetadata(
 /*
  * Facts in this notice come from the terms, the data processing agreement and the code
  * (Supabase, Resend, Vercel, Stripe, and Anthropic's Claude for website drafts).
- * Anthropic's processing country is not recorded in this repository.
+ * Anthropic processes under its Data Processing Addendum, with the UK Addendum for transfers outside the UK.
+ * Its cloud providers operate worldwide, so processing may be outside the UK, including in the United States.
  */
 export default function PrivacyPage() {
   return (
@@ -123,7 +124,12 @@ export default function PrivacyPage() {
                   </tr>
                   <tr>
                     <th scope="row">Anthropic</th>
-                    <td>The Claude model drafts website wording from a brief. A person checks the draft before it is published.</td>
+                    <td>
+                      The Claude model drafts website wording from a brief. A person checks the draft before it is published.
+                      Anthropic processes this under its Data Processing Addendum, which includes the UK Addendum to the EU
+                      Standard Contractual Clauses for transfers outside the UK. Anthropic runs its services on cloud providers
+                      worldwide, so the information may be processed outside the UK, including in the United States.
+                    </td>
                   </tr>
                 </tbody>
               </table>

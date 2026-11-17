@@ -418,7 +418,7 @@ The providers below are those used to run WINJO's services for customer websites
 | Supabase Inc. | Database, authentication and file storage | Frankfurt, Germany (AWS eu-central-1). Confirmed from the project settings |
 | Resend Inc. | Transactional email (enquiries, quotes, notifications) | EU (Ireland), eu-west-1, per the sending domain configuration |
 | Stripe, Inc. | Payment processing (checkout and billing portal) | Stripe processes card payments as its own controller; WINJO's role is limited to payment records. Listed for transparency |
-| Anthropic, PBC | Drafts website wording from a customer's brief (Claude). A person reviews the draft before it is published | We will confirm the location in writing before this provider handles a customer's personal data |
+| Anthropic, PBC | Drafts website wording from a customer's brief (Claude). A person reviews the draft before it is published | Processes under Anthropic's Data Processing Addendum, including the UK Addendum to the EU Standard Contractual Clauses for transfers outside the UK. Its cloud providers operate worldwide, so processing may be outside the UK, including in the United States (clause 9) |
 
 WINJO shall notify the Customer of relevant changes in accordance with section 8.
 
