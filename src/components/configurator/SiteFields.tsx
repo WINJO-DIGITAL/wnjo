@@ -20,6 +20,12 @@ export const SITE_COLOURS = [
   { hex: "#2b2b2b", label: "Charcoal" },
   { hex: "#a84a26", label: "Terracotta" },
   { hex: "#3d3a7a", label: "Indigo" },
+  { hex: "#0f5257", label: "Teal" },
+  { hex: "#5b2a5e", label: "Plum" },
+  { hex: "#4e342e", label: "Cocoa" },
+  { hex: "#3f5a2b", label: "Moss" },
+  { hex: "#8a3b12", label: "Rust" },
+  { hex: "#14213d", label: "Midnight" },
 ] as const;
 
 const SECTOR_HINT: Record<string, string> = {
