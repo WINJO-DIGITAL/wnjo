@@ -148,6 +148,21 @@ describe("the general template", () => {
     expect(tidyIntro("One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen and", 18, 300)).not.toMatch(/\band\.$/);
   });
 
+  it("shows the customer's own availability on the area section, and invents none when they gave none", () => {
+    const a = answersFromProfile(taxi(), "Daz'd Cabs")!;
+    const parsed = parseAnswers(a, GENERAL_PRESET, { colour: "#1f3a34" });
+    if (!parsed.ok) throw new Error("fixture");
+    const input = { preset: GENERAL_PRESET, facts: parsed.facts, look: "executive" as const, colour: parsed.colour };
+    const area = assembleSite(input, defaultCopy(input)).sections.find((x) => x.kind === "area");
+    expect(area && area.kind === "area" && area.text).toMatch(/Available: 24 hours\.$/);
+    const none = parseAnswers(answersFromProfile(taxi({ hours: "" }), "Daz'd Cabs")!, GENERAL_PRESET, { colour: "#1f3a34" });
+    if (!none.ok) throw new Error("fixture");
+    const noneInput = { preset: GENERAL_PRESET, facts: none.facts, look: "executive" as const, colour: none.colour };
+    const noneArea = assembleSite(noneInput, defaultCopy(noneInput)).sections.find((x) => x.kind === "area");
+    expect(noneArea && noneArea.kind === "area" && noneArea.text).not.toMatch(/Available/);
+    expect(checkSite(assembleSite(input, defaultCopy(input)), parsed.facts, GENERAL_PRESET).issues).toEqual([]);
+  });
+
   it("refuses a licence or cover the customer never mentioned", () => {
     const a = answersFromProfile(taxi({ proof: "", differentiator: "Friendly local service." }), "Daz'd Cabs")!;
     const parsed = parseAnswers(a, GENERAL_PRESET, { colour: "#1f3a34" });

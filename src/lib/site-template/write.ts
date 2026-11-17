@@ -186,6 +186,12 @@ export function parseCopy(text: string): ParsedCopy {
   };
 }
 
+/** When the customer says they are available, in their own words. Never a time we worked out ourselves. */
+export function availabilityOf(facts: CustomerFacts): string | null {
+  const note = facts.details?.find((d) => /available/i.test(d.label))?.value?.trim();
+  return note && note.length <= 80 ? note.replace(/[.!?]+$/, "") : null;
+}
+
 /**
  * The customer's own words as an intro, ending where a thought ends. The first sentence if it fits; otherwise as many of its
  * comma-separated parts as fit, so it never stops mid-phrase ("…convenient pre-bookings and"). Only the customer's words.
@@ -333,7 +339,9 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
         const text = withAreas(copy.area, preset.areaSource === "areas" ? undefined : facts.areas);
         if (hasPlace && text.trim()) {
           const heading = preset.areaSource === "address" && !facts.address && facts.areas?.length ? "Areas we cover" : copy.headings.area;
-          sections.push({ kind: "area", heading, text });
+          // The customer's own availability (for example "24 hours"), in their words, so a visitor sees when they can go.
+          const when = availabilityOf(facts);
+          sections.push({ kind: "area", heading, text: when ? `${text} Available: ${when}.` : text });
         }
         break;
       }
