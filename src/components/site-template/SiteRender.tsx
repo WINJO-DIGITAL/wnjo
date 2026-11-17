@@ -131,6 +131,11 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
               <img className={css.heroImg} src={photo} alt="" />
             )}
             <div className={css.heroCopy}>
+              {/* With no photograph, the logo leads the page: it is the one picture the customer gave us. */}
+              {logo && !(photo && s.variant !== "plain") && (
+                // eslint-disable-next-line @next/next/no-img-element -- customer logos come from private storage, not the image optimiser
+                <img className={css.heroLogo} src={logo} alt={business.name} />
+              )}
               <h1>{s.headline}</h1>
               <p>{s.intro}</p>
               <span className={css.heroActions}>

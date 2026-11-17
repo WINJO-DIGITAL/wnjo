@@ -57,7 +57,7 @@ export async function loadLiveSite(db: SupabaseClient, host: string): Promise<Li
 }
 
 /** The widest a picture is ever shown, by where it is used, so a phone never downloads a 20 MB original. */
-export const PHOTO_WIDTHS = { hero: 1600, gallery: 900, logo: 400 } as const;
+export const PHOTO_WIDTHS = { hero: 1600, gallery: 900, logo: 800 } as const;
 export const MAX_PHOTO_WIDTH = 1800;
 export const MIN_PHOTO_WIDTH = 200;
 

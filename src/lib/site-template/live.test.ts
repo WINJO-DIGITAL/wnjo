@@ -57,7 +57,7 @@ describe("livePhotoUrls", () => {
     const urls = livePhotoUrls(content(), files);
     expect(urls.get(photoRef("drafts/x/hero.jpg"))).toBe("/photo?f=drafts%2Fx%2Fhero.jpg&w=1600");
     expect(urls.get(photoRef("drafts/x/one.jpg"))).toBe("/photo?f=drafts%2Fx%2Fone.jpg&w=900");
-    expect(urls.get(photoRef("drafts/x/logo.png"))).toBe("/photo?f=drafts%2Fx%2Flogo.png&w=400");
+    expect(urls.get(photoRef("drafts/x/logo.png"))).toBe("/photo?f=drafts%2Fx%2Flogo.png&w=800");
   });
   it("gives no link to a file that isn't this website's own", () => {
     expect(livePhotoUrls(content(), files).has(photoRef("drafts/other/stolen.jpg"))).toBe(false);

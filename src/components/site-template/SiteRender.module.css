@@ -892,9 +892,9 @@
 
 .logoImg {
   display: block;
-  height: 2.5rem;
+  height: 2.75rem;
   width: auto;
-  max-width: 12rem;
+  max-width: 14rem;
   object-fit: contain;
   margin-right: auto;
 }
@@ -2447,4 +2447,19 @@
     linear-gradient(160deg, #1b1c21, #0e0f12 70%);
   outline: 1px solid color-mix(in srgb, var(--accent-text) 28%, transparent);
   outline-offset: -1.1rem;
+}
+
+/* A logo that leads a page with no photograph: large enough to read, in the customer's own shape. */
+.heroLogo {
+  display: block;
+  width: min(100%, 26rem);
+  height: auto;
+  max-height: 14rem;
+  object-fit: contain;
+  border-radius: var(--radius);
+  margin-bottom: 0.75rem;
+}
+.site[data-look="executive"] .heroLogo,
+.site[data-look="heritage"] .heroLogo {
+  margin-inline: auto;
 }
