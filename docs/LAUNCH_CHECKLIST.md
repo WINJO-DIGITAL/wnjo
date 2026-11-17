@@ -5,7 +5,6 @@ Only jobs still to do. Completed work is not listed here. Nothing here is pushed
 ## Handover pack
 
 - [ ] **Try one pack on a test website.** Build a test outright website, pay in test mode, download the pack as staff, hand over, then download it as the customer.
-- [ ] **Terms 9.3.** It mentions "exported website pages", which the pack does not include. Either produce them by hand on request, or narrow the wording at the next terms update.
 
 ## Before launch
 
