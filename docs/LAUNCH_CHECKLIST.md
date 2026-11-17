@@ -81,7 +81,7 @@ These four were completed by the owner on 17 November 2026 (ticked here to match
 
 - [x] Handover checklist (six items) enforced on the server before a website bought outright can be handed over.
 - [x] Website pack built and downloadable by staff and, after handover, by the customer.
-- [ ] **Apply `supabase/migrations/20261117090000_handover_packs_bucket.sql`** in the Supabase SQL editor (creates the private `handover-packs` bucket). Without it the pack can't be saved.
+- [x] **Apply `supabase/migrations/20261117090000_handover_packs_bucket.sql`** in the Supabase SQL editor (creates the private `handover-packs` bucket). Without it the pack can't be saved. Applied to production on main and checked: the bucket is private, limited to 50 MB and zip files only.
 - [ ] **Try one pack on a test website:** build a test outright website, pay in test mode, download the pack as staff, hand over, and download it as the customer.
 - [ ] Terms 9.3 mention "exported website pages". The pack does not include rendered pages, so either produce them by hand on request or narrow the wording at the next terms update.
 
