@@ -3929,3 +3929,63 @@
   display: block;
   align-self: start;
 }
+
+/* ---- Executive, refined: services as ruled rows (any number of them sits well), larger figures, areas as a ruled row. ---- */
+.site[data-look="executive"] .hero h1 {
+  font-size: clamp(2.6rem, 5.4vw, 4.6rem);
+  line-height: 1.04;
+}
+@media (min-width: 900px) {
+  .site[data-look="executive"] section:has(> .menu) {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr);
+    column-gap: clamp(2rem, 6vw, 5rem);
+    align-items: start;
+  }
+  .site[data-look="executive"] section:has(> .menu) > h2 {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+  .site[data-look="executive"] section:has(> .menu) > .menu,
+  .site[data-look="executive"] section:has(> .menu) > .more {
+    grid-column: 2;
+  }
+}
+.site[data-look="executive"] section:has(> .menu) .menu,
+.site[data-look="executive"] section:has(> .menu) .menu[data-wide] {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.site[data-look="executive"] section:has(> .menu) .menu li {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid rgb(201 181 125 / 0.45);
+  padding: 1.5rem 0;
+}
+.site[data-look="executive"] section:has(> .menu) .menu li:last-child {
+  border-bottom: 1px solid rgb(201 181 125 / 0.45);
+}
+.site[data-look="executive"] section:has(> .menu) .menuName {
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+}
+.site[data-look="executive"] .facts b {
+  font-size: clamp(1.6rem, 6.4vw, 3.6rem);
+  font-weight: 300;
+  overflow-wrap: anywhere;
+}
+.site[data-look="executive"] .facts p {
+  min-width: 0;
+  padding-inline: clamp(0.5rem, 2vw, 1.25rem);
+}
+.site[data-look="executive"] .facts span {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  overflow-wrap: anywhere;
+}
+.site[data-look="executive"] .info > .section {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid rgb(201 181 125 / 0.45);
+  padding-inline: 0;
+}
