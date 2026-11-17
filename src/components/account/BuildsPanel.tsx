@@ -14,6 +14,7 @@ import { BriefWizard, type WizardApi } from "./BriefWizard";
 import { Confirmation } from "./Confirmation";
 import { FeedbackCard } from "./FeedbackCard";
 import { PayBalanceCard } from "./PayBalanceCard";
+import { DOMAIN_COPY, askDomain } from "@/lib/domain-choice";
 import { PayCard } from "./PayCard";
 
 type Brief = {
@@ -27,6 +28,8 @@ type Brief = {
   figures: { package?: string; mode?: string };
   expected_by: string | null;
   balance_paid_at: string | null;
+  domain_choice: "have" | "help" | null;
+  domain_name: string | null;
   handed_over_at: string | null;
   created_at: string;
   updated_at: string;
@@ -64,7 +67,7 @@ export function BuildsPanel({ client, onFound }: { client: SupabaseClient; onFou
   useEffect(() => {
     let cancelled = false;
     void Promise.all([
-      client.from("website_briefs").select("id, reference, name, business_name, route, stage, brief, figures, expected_by, balance_paid_at, handed_over_at, created_at, updated_at").order("created_at", { ascending: false }),
+      client.from("website_briefs").select("id, reference, name, business_name, route, stage, brief, figures, expected_by, balance_paid_at, handed_over_at, domain_choice, domain_name, created_at, updated_at").order("created_at", { ascending: false }),
       client.from("website_brief_events").select("brief_id, kind, detail, created_at").order("created_at"),
       client.from("website_proposals").select("id, brief_id, reference, status, summary, lines, setup_pence, monthly_pence, one_off_pence").order("created_at", { ascending: false }),
       client.from("build_revisions").select("id, brief_id, number, status, request, response, created_at, resolved_at").order("number"),
@@ -271,6 +274,7 @@ function BuildCard({
             {outright && brief.balance_paid_at && !brief.handed_over_at && (
               <p className="build-card__meta">Your final payment is in. We&apos;re getting your website ready to hand over to you.</p>
             )}
+            {askDomain(brief.stage) && <DomainCard client={client} briefId={brief.id} answer={brief.domain_choice ? { choice: brief.domain_choice, name: brief.domain_name } : null} onChanged={onChanged} />}
             {outright && brief.handed_over_at && (
               <>
                 <p className="build-card__meta">Your website has been handed over to you.</p>
@@ -421,6 +425,63 @@ function PreviewLink({ client, briefId }: { client: SupabaseClient; briefId: str
       </button>
       {error && <p className="field-error" role="alert">{error}</p>}
     </div>
+  );
+}
+
+/** "Your website address": a yes or no question, then the address if they have one. Saved on the server. */
+function DomainCard({ client, briefId, answer, onChanged }: { client: SupabaseClient; briefId: string; answer: { choice: "have" | "help"; name: string | null } | null; onChanged: () => void }) {
+  const [choice, setChoice] = useState<"have" | "help" | null>(answer?.choice ?? null);
+  const [name, setName] = useState(answer?.name ?? "");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(!!answer);
+
+  const save = async () => {
+    setBusy(true);
+    setError(null);
+    const { data } = await client.auth.getSession();
+    const token = data.session?.access_token;
+    const res = token
+      ? await fetch("/api/briefs/domain", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ briefId, choice, name }) }).catch(() => null)
+      : null;
+    const json = (await res?.json().catch(() => null)) as { error?: string } | null;
+    setBusy(false);
+    if (!res?.ok) {
+      setError(json?.error ?? "We couldn't save that. Please try again.");
+      return;
+    }
+    setSaved(true);
+    onChanged();
+  };
+
+  if (saved && answer) {
+    return (
+      <div className="build-card__meta">
+        <p className="admin-label">{DOMAIN_COPY.heading}</p>
+        <p>{answer.choice === "have" ? `You're using ${answer.name}.` : "We'll help you get a web address."}</p>
+        <button type="button" className="linkbtn" onClick={() => setSaved(false)}>Change</button>
+      </div>
+    );
+  }
+
+  return (
+    <fieldset className="build-card__meta">
+      <legend className="admin-label">{DOMAIN_COPY.heading}</legend>
+      <p>{DOMAIN_COPY.question}</p>
+      <label className="acct-check"><input type="radio" name={`domain-${briefId}`} checked={choice === "have"} onChange={() => setChoice("have")} /> {DOMAIN_COPY.yes}</label>
+      <label className="acct-check"><input type="radio" name={`domain-${briefId}`} checked={choice === "help"} onChange={() => setChoice("help")} /> {DOMAIN_COPY.help}</label>
+      {choice === "have" && (
+        <>
+          <label className="acct-label" htmlFor={`domain-name-${briefId}`}>Your web address</label>
+          <input id={`domain-name-${briefId}`} className="acct-input" value={name} placeholder="hartleyandsons.co.uk" maxLength={253} onChange={(e) => setName(e.target.value)} />
+          <p className="acct-meta">{DOMAIN_COPY.ask}</p>
+        </>
+      )}
+      {error && <p className="field-error" role="alert">{error}</p>}
+      <button type="button" className="btn btn--primary" disabled={busy || !choice} onClick={() => void save()}>
+        {busy ? "Saving…" : "Save"}
+      </button>
+    </fieldset>
   );
 }
 

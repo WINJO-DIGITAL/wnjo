@@ -37,6 +37,9 @@ type BriefRow = {
   expected_by: string | null;
   balance_paid_at: string | null;
   handed_over_at: string | null;
+  domain_choice: "have" | "help" | null;
+  domain_name: string | null;
+  domain_answered_at: string | null;
   created_at: string;
 };
 type EventRow = { id: string; kind: string; detail: Record<string, unknown>; actor_type: string; actor_email: string | null; created_at: string };
@@ -78,7 +81,7 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   const load = useCallback(() => {
     client
       .from("website_briefs")
-      .select("id, reference, name, business_name, email, route, stage, version, brief, figures, expected_by, balance_paid_at, handed_over_at, created_at")
+      .select("id, reference, name, business_name, email, route, stage, version, brief, figures, expected_by, balance_paid_at, handed_over_at, domain_choice, domain_name, domain_answered_at, created_at")
       .order("created_at", { ascending: false })
       .limit(200)
       .then(({ data, error: err }) => {
@@ -962,7 +965,7 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
           )}
         </div>
       )}
-      {siteBuilds.some((b) => b.status === "released") && <LiveAddress briefId={row.id} stage={row.stage} call={call} />}
+      {siteBuilds.some((b) => b.status === "released") && <LiveAddress briefId={row.id} stage={row.stage} call={call} answer={row.domain_choice ? { choice: row.domain_choice, name: row.domain_name } : null} />}
       {message && <p role={message.ok ? "status" : "alert"} className={message.ok ? "acct-meta" : "field-error"}>{message.text}</p>}
     </div>
   );
@@ -972,7 +975,7 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
  * The addresses a customer's live website is served on. Attaching one publishes nothing by itself: visitors see the
  * site only once the website is approved and marked live. Attach the address in Vercel and point its DNS first.
  */
-function LiveAddress({ briefId, stage, call }: { briefId: string; stage: string; call: Call }) {
+function LiveAddress({ briefId, stage, call, answer }: { briefId: string; stage: string; call: Call; answer: { choice: "have" | "help"; name: string | null } | null }) {
   const [domains, setDomains] = useState<{ hostname: string }[]>([]);
   const [address, setAddress] = useState("");
   const [busy, setBusy] = useState(false);
@@ -1007,6 +1010,11 @@ function LiveAddress({ briefId, stage, call }: { briefId: string; stage: string;
     <div>
       <p className="admin-label">Live address</p>
       <p className="acct-meta">{stage === "live" ? "Visitors see the website on these addresses." : "Nothing shows on these until the website is approved and live."}</p>
+      {answer && (
+        <p className="acct-meta">
+          Customer&apos;s answer: {answer.choice === "have" ? <>they already use <strong>{answer.name}</strong>.</> : "they want help getting a web address."}
+        </p>
+      )}
       {domains.length > 0 && (
         <ul className="build-lines" role="list">
           {domains.map((d) => (
