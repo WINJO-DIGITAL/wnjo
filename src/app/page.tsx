@@ -67,9 +67,8 @@ export default function HomePage() {
               className="btn-row rise"
               style={{ "--i": 4 } as React.CSSProperties}
             >
-              <Link href="/pricing" className="btn btn--primary btn--stacked">
-                <span>Get started</span>
-                <span className="btn__sub">From {formatGBP(WEBSITE_PLANS.bronze.monthly)}/month</span>
+              <Link href="/pricing" className="btn btn--primary">
+                Get your website from {formatGBP(WEBSITE_PLANS.bronze.monthly)} a month
               </Link>
               <Link href="/work" className="btn btn--secondary">
                 See our work

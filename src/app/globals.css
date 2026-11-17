@@ -14428,19 +14428,6 @@ body:has(.pv, .sitepv) .site-footer {
   color: var(--color-accent);
 }
 
-/* The desktop hero button says the same as the phone one: the action first, the starting price quieter under it. */
-.btn--stacked {
-  flex-direction: column;
-  gap: 4px;
-  padding-block: 14px;
-  line-height: 1.1;
-}
-.btn--stacked .btn__sub {
-  font-size: 0.78em;
-  font-weight: 600;
-  color: #f0b48f;
-}
-
 /* Phones: the client logos sit in one soft capsule, all the same size. The chosen one is lifted, not outlined. */
 @media (max-width: 39.99rem) {
   .deck .deck__rail {

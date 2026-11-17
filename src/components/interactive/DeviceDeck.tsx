@@ -369,9 +369,9 @@ function HeroCta() {
   return (
     <div className="deck__cta">
       <Link ref={link} href="/pricing" className={`deck__btn${launching ? " is-launching" : ""}`} onClick={open} onPointerDown={lean} onPointerMove={lean} onPointerUp={settle} onPointerCancel={settle} onPointerLeave={settle}>
-        <span className="deck__btn-main">Get started</span>
+        <span className="deck__btn-main">GET YOUR WEBSITE</span>
         <span className="deck__btn-price">
-          From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/month</span>
+          From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/Month</span>
         </span>
       </Link>
       <ul className="deck__bullets" role="list">
