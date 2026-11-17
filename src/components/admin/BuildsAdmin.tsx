@@ -41,6 +41,8 @@ type BriefRow = {
   domain_choice: "have" | "help" | null;
   domain_name: string | null;
   domain_answered_at: string | null;
+  manual_preview_url: string | null;
+  manual_preview_at: string | null;
   created_at: string;
 };
 type EventRow = { id: string; kind: string; detail: Record<string, unknown>; actor_type: string; actor_email: string | null; created_at: string };
@@ -132,7 +134,7 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   const load = useCallback(() => {
     client
       .from("website_briefs")
-      .select("id, reference, name, business_name, email, route, stage, version, brief, figures, expected_by, balance_paid_at, handed_over_at, domain_choice, domain_name, domain_answered_at, created_at")
+      .select("id, reference, name, business_name, email, route, stage, version, brief, figures, expected_by, balance_paid_at, handed_over_at, domain_choice, domain_name, domain_answered_at, manual_preview_url, manual_preview_at, created_at")
       .order("created_at", { ascending: false })
       .limit(200)
       .then(({ data, error: err }) => {
@@ -258,6 +260,78 @@ function HandoffBrief({ row, call }: { row: BriefRow; call: Call }) {
       <p className="acct-meta">Everything this customer told us, with the rules for a hand-built website, as one block to paste into a CLAUDE.md.</p>
       {state === "failed" && <p role="alert" className="acct-meta">The brief couldn&apos;t be made. Please try again.</p>}
       {markdown && <textarea className="acct-input" readOnly rows={12} value={markdown} aria-label="The brief, ready to copy" onFocus={(e) => e.currentTarget.select()} />}
+    </div>
+  );
+}
+
+/**
+ * A website the owner builds by hand. Copy the brief, build it, paste its address here, and the customer sees it as their
+ * preview in their account: they can look at it, approve it or ask for changes, exactly as with any other preview. The
+ * address is only shown to the signed-in owner of the website, and an owner can take it back at any time.
+ */
+function HandBuilt({ row, call, onChanged }: { row: BriefRow; call: Call; onChanged: () => void }) {
+  const [url, setUrl] = useState(row.manual_preview_url ?? "");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const paid = ["specification", "building", "preview", "changes", "approval"].includes(row.stage);
+  const open = ["specification", "building", "preview", "changes"].includes(row.stage);
+  if (!paid) return null;
+  const send = async () => {
+    setBusy(true);
+    setMessage(null);
+    const r = await call({ action: "manual_release", briefId: row.id, url });
+    setBusy(false);
+    setMessage({ ok: r.ok, text: r.ok ? "Sent. The customer can see it in their account, and they have been emailed." : String(r.json.error ?? "That didn't work.") });
+    if (r.ok) onChanged();
+  };
+  const takeBack = async () => {
+    setBusy(true);
+    setMessage(null);
+    const r = await call({ action: "manual_withdraw", briefId: row.id });
+    setBusy(false);
+    setMessage({ ok: r.ok, text: r.ok ? "Taken back. The customer no longer has the address." : String(r.json.error ?? "That didn't work.") });
+    if (r.ok) {
+      setUrl("");
+      onChanged();
+    }
+  };
+  return (
+    <div className="stack" style={{ "--stack": "var(--space-3)" } as React.CSSProperties}>
+      <p className="admin-label">Built by hand</p>
+      <HandoffBrief row={row} call={call} />
+      {open ? (
+        <>
+          <label className="acct-label">
+            Address of the finished website
+            <input className="acct-input" type="url" inputMode="url" placeholder="https://" value={url} maxLength={500} onChange={(e) => setUrl(e.target.value)} />
+          </label>
+          <p className="acct-meta">
+            The customer is shown this as their preview, in their account, once you send it. They can approve it or ask for changes. Keep it unlisted and out of search (a Vercel preview address already is), and they will only be given it after signing in.
+          </p>
+          <div className="admin-actions">
+            <button type="button" className="btn btn--primary" disabled={busy || !url.trim()} onClick={() => void send()}>
+              {row.manual_preview_url ? "Send the new address" : "Send to the customer"}
+            </button>
+            {row.manual_preview_url && (
+              <>
+                <a className="btn btn--secondary" href={row.manual_preview_url} target="_blank" rel="noopener noreferrer">
+                  Open what they see
+                </a>
+                <button type="button" className="btn btn--secondary" disabled={busy} onClick={() => void takeBack()}>
+                  Take it back
+                </button>
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        row.manual_preview_url && <p className="acct-meta">With the customer: {row.manual_preview_url}</p>
+      )}
+      {message && (
+        <p role={message.ok ? "status" : "alert"} className="acct-meta">
+          {message.text}
+        </p>
+      )}
     </div>
   );
 }
@@ -443,6 +517,8 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
           <StageControl row={row} path={path} busy={busy} onMove={(stage, note) => act({ action: "stage", stage, note }, `Moved to ${staffStageLabel(stage)}.`)} />
 
           <ExpectedDate key={`${row.id}:${row.expected_by ?? ""}`} row={row} busy={busy} act={act} />
+
+          <HandBuilt row={row} call={call} onChanged={onChanged} />
 
           <AiPanel client={client} row={row} revisions={revisions} call={call} onChanged={onChanged} />
 

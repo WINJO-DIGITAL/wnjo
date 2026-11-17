@@ -25,8 +25,8 @@ export async function POST(request: NextRequest) {
   const briefId = typeof body.briefId === "string" && UUID.test(body.briefId) ? body.briefId : null;
   if (!briefId) return fail(422, "invalid");
 
-  const { data: brief } = await db.from("website_briefs").select("id, email").eq("id", briefId).maybeSingle();
-  const owner = brief as { id: string; email: string } | null;
+  const { data: brief } = await db.from("website_briefs").select("id, email, manual_preview_url, manual_preview_at").eq("id", briefId).maybeSingle();
+  const owner = brief as { id: string; email: string; manual_preview_url: string | null; manual_preview_at: string | null } | null;
   if (!owner || owner.email.toLowerCase() !== customer.email) return fail(404, "not_found");
 
   // The newest released version wins, whether it is a words-only preview or a template build.
@@ -40,6 +40,9 @@ export async function POST(request: NextRequest) {
   ].filter((c): c is Released & { path: string } => c !== null);
   candidates.sort((a, b) => (b.released_at ?? "").localeCompare(a.released_at ?? ""));
   const pick = candidates[0];
+  // A website the owner built by hand, sent as an address: it counts like any other release, and the newest wins.
+  const manual = owner.manual_preview_url && owner.manual_preview_url.startsWith("https://") ? { url: owner.manual_preview_url, at: owner.manual_preview_at ?? "" } : null;
+  if (manual && (!pick || manual.at >= (pick.released_at ?? ""))) return NextResponse.json({ url: manual.url, external: true });
   if (!pick) return fail(404, "not_found");
   return NextResponse.json({ url: `${new URL(request.url).origin}/${pick.path}/${pick.access_token}` });
 }

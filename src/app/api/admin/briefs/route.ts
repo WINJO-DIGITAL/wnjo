@@ -17,12 +17,13 @@ import {
   type Stage,
 } from "@/lib/build-journey";
 import { notificationMailConfig, sendEmail } from "@/lib/mailer";
-import { handedOverEmail, previewReadyAgainEmail, proposalReadyEmail } from "@/lib/build-emails";
+import { handedOverEmail, previewReadyAgainEmail, previewReadyEmail, proposalReadyEmail } from "@/lib/build-emails";
 import { HANDOVER_CHECKLIST, missingChecklist } from "@/lib/handover-pack";
 import { createHandoverPack, type PackBrief } from "@/lib/handover-pack-store";
 import { revisionTransition, stageAfterResolve, type RevisionStatus } from "@/lib/build-revisions";
 import { serviceClient } from "@/lib/quote-store";
 import { buildHandoffBrief } from "@/lib/website-handoff";
+import { cleanPreviewUrl, MANUAL_PREVIEW_STAGES } from "@/lib/manual-preview";
 import type { BriefFile, WebsiteBrief } from "@/lib/website-brief";
 import { staffFromRequest, type Staff } from "@/lib/staff-auth";
 
@@ -67,6 +68,8 @@ async function logEvent(db: SupabaseClient, staff: Staff, briefId: string, kind:
  *   proposal).
  * - approve: record a quality, pricing, contract or publication decision.
  * - note: add an internal note to the history.
+ * - manual_release: send a hand-built website to the customer as an https address. The build moves to "Awaiting customer review"
+ *   (or stays there, for a new version) and the customer is emailed. manual_withdraw takes it back.
  * - file_link: a one-minute download link for a file attached to the brief.
  * - handoff: the whole brief as Markdown, ready to paste into a CLAUDE.md, with hour-long download links for the files.
  * - handover_pack: build the website pack for a website bought outright and return a ten-minute download link.
@@ -143,6 +146,39 @@ export async function POST(request: NextRequest) {
     const text = note(body.text);
     if (!text) return fail(422, "Write a note first.");
     await logEvent(db, staff, brief.id, "note", { text });
+    return NextResponse.json({ ok: true });
+  }
+
+  if (body.action === "manual_release") {
+    const cleaned = cleanPreviewUrl(body.url);
+    if (!cleaned.ok) return fail(422, cleaned.reason);
+    if (!(MANUAL_PREVIEW_STAGES as readonly string[]).includes(brief.stage)) return fail(409, "A website can be sent to the customer once they have paid, and before it goes live.");
+    const again = brief.stage === "preview" || brief.stage === "changes";
+    const now = new Date().toISOString();
+    const { error } = await db.from("website_briefs").update({ manual_preview_url: cleaned.url, manual_preview_at: now }).eq("id", brief.id).eq("tenant_id", staff.tenantId);
+    if (error) return fail(500, "The address couldn't be saved.");
+    let stage: Stage = brief.stage;
+    if (brief.stage !== "preview") {
+      const { data: moved } = await db.from("website_briefs").update({ stage: "preview" }).eq("id", brief.id).eq("stage", brief.stage).select("id");
+      if (Array.isArray(moved) && moved.length) stage = "preview";
+    }
+    await logEvent(db, staff, brief.id, "preview", { action: "released", kind: "manual", host: new URL(cleaned.url).host });
+    if (stage !== brief.stage) await logEvent(db, staff, brief.id, "stage", { from: brief.stage, to: stage, note: "A hand-built website was sent to the customer." });
+    const config = notificationMailConfig();
+    if (config) {
+      const site = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk").replace(/\/+$/, "");
+      const { data: who } = await db.from("website_briefs").select("name, email, reference").eq("id", brief.id).maybeSingle();
+      const person = (who as { name: string; email: string; reference: string } | null) ?? { name: brief.name, email: brief.email, reference: brief.reference };
+      const email = (again ? previewReadyAgainEmail : previewReadyEmail)({ name: person.name, reference: person.reference, accountUrl: `${site}/account` });
+      await sendEmail(config, { to: person.email, subject: email.subject, text: email.text }, "Preview ready");
+    }
+    return NextResponse.json({ ok: true, stage, url: cleaned.url });
+  }
+
+  if (body.action === "manual_withdraw") {
+    const { error } = await db.from("website_briefs").update({ manual_preview_url: null }).eq("id", brief.id).eq("tenant_id", staff.tenantId);
+    if (error) return fail(500, "It couldn't be taken back.");
+    await logEvent(db, staff, brief.id, "preview", { action: "withdrawn", kind: "manual" });
     return NextResponse.json({ ok: true });
   }
 

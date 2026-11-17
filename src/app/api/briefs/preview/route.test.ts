@@ -54,4 +54,31 @@ describe("a customer's preview address", () => {
     state.preview = { access_token: "pvtoken", released_at: "2026-11-13T10:00:00Z" };
     expect((await (await call()).json()).url).toContain("/preview/pvtoken");
   });
+
+  describe("a website the owner built by hand", () => {
+    it("is the customer's preview, once the owner has sent its address", async () => {
+      state.brief = { id: "b1", email: "Owner@Shop.co.uk", manual_preview_url: "https://dazs-cabs.vercel.app/", manual_preview_at: "2026-11-17T10:00:00Z" };
+      expect(await (await call()).json()).toEqual({ url: "https://dazs-cabs.vercel.app/", external: true });
+    });
+
+    it("loses to a template build released after it, and wins against one released before", async () => {
+      state.brief = { id: "b1", email: "Owner@Shop.co.uk", manual_preview_url: "https://dazs-cabs.vercel.app/", manual_preview_at: "2026-11-17T10:00:00Z" };
+      state.site = { access_token: "newer", released_at: "2026-11-17T11:00:00Z" };
+      expect(await (await call()).json()).toEqual({ url: "https://winjo.test/site-preview/newer" });
+      state.site = { access_token: "older", released_at: "2026-11-16T11:00:00Z" };
+      expect((await (await call()).json()).external).toBe(true);
+    });
+
+    it("is never handed out for someone else's website, or when it isn't https", async () => {
+      state.brief = { id: "b1", email: "other@shop.co.uk", manual_preview_url: "https://dazs-cabs.vercel.app/", manual_preview_at: "x" };
+      expect((await call()).status).toBe(404);
+      state.brief = { id: "b1", email: "Owner@Shop.co.uk", manual_preview_url: "http://insecure.example.com", manual_preview_at: "x" };
+      expect((await call()).status).toBe(404);
+    });
+
+    it("is gone once the owner takes it back", async () => {
+      state.brief = { id: "b1", email: "Owner@Shop.co.uk", manual_preview_url: null, manual_preview_at: "2026-11-17T10:00:00Z" };
+      expect((await call()).status).toBe(404);
+    });
+  });
 });

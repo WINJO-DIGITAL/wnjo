@@ -187,4 +187,49 @@ describe("the website pack", () => {
     tables.website_briefs = { ...(tables.website_briefs as object), route: "package" };
     expect((await post({ action: "handover_pack" })).status).toBe(422);
   });
+
+  describe("a website the owner built by hand", () => {
+    beforeEach(() => {
+      tables.website_briefs = { id: BRIEF, tenant_id: "t1", reference: "WNJO-ABC123", email: "c@example.com", name: "C", route: "package", stage: "specification", brief: { files: [] } };
+    });
+
+    it("is sent to the customer as an address: saved, the build moves to their review, and the step is recorded", async () => {
+      const res = await post({ action: "manual_release", url: "https://dazs-cabs.vercel.app" });
+      expect(res.status).toBe(200);
+      expect(await res.json()).toMatchObject({ ok: true, stage: "preview", url: "https://dazs-cabs.vercel.app/" });
+      const updates = writes.filter((w) => w.table === "website_briefs" && w.op === "update").map((w) => w.payload as Record<string, unknown>);
+      expect(updates[0]).toMatchObject({ manual_preview_url: "https://dazs-cabs.vercel.app/" });
+      expect(updates.some((u) => u.stage === "preview")).toBe(true);
+      expect(writes.some((w) => w.table === "website_brief_events" && (w.payload as Record<string, unknown>).kind === "preview")).toBe(true);
+    });
+
+    it("refuses an address that isn't https, and saves nothing", async () => {
+      for (const url of ["http://x.example.com", "javascript:alert(1)", "https://user:pw@x.example.com", ""]) {
+        const res = await post({ action: "manual_release", url });
+        expect(res.status).toBe(422);
+      }
+      expect(writes).toEqual([]);
+    });
+
+    it("can only be sent once the customer has paid, and before it is live", async () => {
+      for (const stage of ["brief_received", "awaiting_payment", "approval", "live"]) {
+        (tables.website_briefs as Record<string, unknown>).stage = stage;
+        expect((await post({ action: "manual_release", url: "https://x.example.com" })).status).toBe(409);
+      }
+    });
+
+    it("keeps the build at the customer's review when a new version is sent", async () => {
+      (tables.website_briefs as Record<string, unknown>).stage = "changes";
+      expect(await (await post({ action: "manual_release", url: "https://x.example.com" })).json()).toMatchObject({ ok: true, stage: "preview" });
+      (tables.website_briefs as Record<string, unknown>).stage = "preview";
+      writes = [];
+      expect(await (await post({ action: "manual_release", url: "https://x.example.com/v2" })).json()).toMatchObject({ ok: true, stage: "preview" });
+      expect(writes.filter((w) => w.table === "website_briefs" && (w.payload as Record<string, unknown>).stage).length).toBe(0);
+    });
+
+    it("can be taken back", async () => {
+      expect((await post({ action: "manual_withdraw" })).status).toBe(200);
+      expect((writes.find((w) => w.table === "website_briefs" && w.op === "update")?.payload as Record<string, unknown>)).toEqual({ manual_preview_url: null });
+    });
+  });
 });
