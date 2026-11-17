@@ -53,6 +53,21 @@ describe("checkSite", () => {
     expect(result.ok).toBe(true);
   });
 
+  it("allows a taste of the About page on the home page of a site that has an About page, but nothing else of the page's own", () => {
+    const aboutOn = (extra: Partial<SiteContent> = {}): SiteContent => {
+      const c = good();
+      c.sections.splice(2, 0, { kind: "about", heading: "About us", text: "A family barber shop.", points: [] });
+      return { ...c, pages: [{ slug: "about", title: "About", sections: [{ kind: "pagehead", headline: "About us", intro: "Who we are." }, { kind: "about", heading: "About us", text: "A family barber shop.", points: [] }] }], ...extra };
+    };
+    expect(codes(aboutOn())).not.toContain("section-not-in-preset");
+    // On a one-page site there is no About page for it to be a taste of.
+    expect(codes(aboutOn({ pages: undefined }))).toContain("section-not-in-preset");
+    // A page heading is never on the home page.
+    const withHead = aboutOn();
+    withHead.sections.unshift({ kind: "pagehead", headline: "Home", intro: "Welcome." });
+    expect(codes(withHead)).toContain("section-not-in-preset");
+  });
+
   it("flags a missing required section", () => {
     const c = good();
     c.sections = c.sections.filter((s) => s.kind !== "hours");

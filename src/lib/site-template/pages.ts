@@ -90,6 +90,18 @@ export function aboutSection(facts: CustomerFacts, heading = "About us", image?:
   return { kind: "about", heading, text: facts.about.trim(), points: (facts.details ?? []).map((d) => ({ label: d.label, text: d.value })), ...(image ? { image } : {}) };
 }
 
+/** The first sentences of the customer's own words, whole, up to a length: what the home page shows of the About page. */
+export function leadingSentences(text: string, max: number): string {
+  const sentences = text.replace(/\s+/g, " ").trim().match(/[^.!?]+[.!?]+(?:\s|$)|[^.!?]+$/g) ?? [];
+  let out = "";
+  for (const raw of sentences) {
+    const next = `${out}${out ? " " : ""}${raw.trim()}`;
+    if (next.length > max) break;
+    out = next;
+  }
+  return out || (sentences[0] ?? "").trim().slice(0, max);
+}
+
 export type PageHeads = Partial<Record<PageKind, { headline: string; intro: string }>>;
 export type Layout = { sections: Section[]; pages: SitePage[]; missing: PageKind[] };
 
@@ -105,6 +117,14 @@ export function layoutPages(preset: SectorPreset, chosen: readonly PageKind[], f
   const has = (k: PageKind) => chosen.includes(k);
   const bucket: Record<PageKind, Section[]> = { home: [], services: [], prices: [], about: [], gallery: [], faq: [], contact: [] };
   let cta: Section | null = null;
+  // The home page shows a taste of the About page, in the customer's own words, so it is more than a headline and a list.
+  // It never opens by repeating the sentence the top of the page already says.
+  const heroIntro = flat.find((x) => x.kind === "hero");
+  const spoken = heroIntro && heroIntro.kind === "hero" ? heroIntro.intro.replace(/[.!?\s]+$/, "") : "";
+  const aboutTeaser: Section | null =
+    about && about.kind === "about" && has("about")
+      ? { ...about, points: [], image: undefined, text: leadingSentences(spoken && about.text.startsWith(spoken) ? about.text.slice(spoken.length).replace(/^[.!?\s]+/, "") : about.text, 260) }
+      : null;
 
   for (const s of flat) {
     switch (s.kind) {
@@ -117,6 +137,7 @@ export function layoutPages(preset: SectorPreset, chosen: readonly PageKind[], f
           bucket.services.push(s);
           bucket.home.push({ ...s, teaser: 3 });
         } else bucket.home.push(s);
+        if (aboutTeaser && aboutTeaser.kind === "about" && aboutTeaser.text) bucket.home.push(aboutTeaser);
         // The Prices page lists only the services the customer gave a price for, exactly as they gave it.
         if (has("prices")) {
           const priced = s.items.filter((item) => item.price?.trim());
@@ -125,6 +146,10 @@ export function layoutPages(preset: SectorPreset, chosen: readonly PageKind[], f
         break;
       case "hours":
       case "area":
+        // Where they are and when they are open are what a visitor looks for first, so they are on the home page as well.
+        bucket.home.push(s);
+        if (has("contact")) bucket.contact.push(s);
+        break;
       case "enquiry":
         (has("contact") ? bucket.contact : bucket.home).push(s);
         break;

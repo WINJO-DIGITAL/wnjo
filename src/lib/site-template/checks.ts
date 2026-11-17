@@ -228,7 +228,8 @@ export function checkSite(
       const at = `${page.where}[${i}]`;
       if (!SECTION_KINDS.includes(s.kind)) return flag("unknown-section", `Unknown section "${String(s.kind)}".`, at);
       if (s.kind === "pagehead" || s.kind === "about") {
-        if (page.isHome) return flag("section-not-in-preset", `The home page has no "${s.kind}" section.`, at);
+        // A page heading is never on the home page. The About block may be, as a taste of the About page, on a site that has one.
+        if (page.isHome && (s.kind === "pagehead" || !(content.pages?.length))) return flag("section-not-in-preset", `The home page has no "${s.kind}" section.`, at);
         if (s.kind === "pagehead" && i !== 0) flag("section-order", "A page's heading comes first.", at);
         if (!isFilled(s)) flag("empty-section", `The "${s.kind}" section is empty.`, at);
         return;

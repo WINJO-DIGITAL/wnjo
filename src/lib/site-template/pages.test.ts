@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseAnswers } from "./answers";
-import { aboutSection, choosePages, firstPages, layoutPages, MAX_TEMPLATE_PAGES, pageKindFor, pageTitle, PAGE_KINDS, type PageKind } from "./pages";
+import { aboutSection, choosePages, firstPages, layoutPages, leadingSentences, MAX_TEMPLATE_PAGES, pageKindFor, pageTitle, PAGE_KINDS, type PageKind } from "./pages";
 import { BARBER_PRESET, SECTOR_PRESETS } from "./presets";
 import { SAMPLE_ANSWERS, SAMPLES } from "./sample";
 import type { Section } from "./schema";
@@ -92,6 +92,40 @@ describe("laying the sections out across pages", () => {
     expect(kinds(l.sections)).toContain("services");
   });
 
+  it("also shows where they are and when they are open on Home, which a visitor looks for first, and keeps them on Contact", () => {
+    const l = lay(["home", "contact"]);
+    expect(kinds(l.sections)).toEqual(expect.arrayContaining(["hours", "area"]));
+    expect(kinds(l.pages[0].sections)).toEqual(expect.arrayContaining(["hours", "area"]));
+    expect(kinds(l.sections)).not.toContain("enquiry");
+  });
+
+  it("gives Home a taste of the About page, in the customer's own words and no more", () => {
+    const words = "A family barber shop on the high street. We have cut hair here since the shop opened. Everyone is welcome. We also offer hot towel shaves on request, booked by phone.";
+    const long = aboutSection({ ...parsed.facts, about: words });
+    const l = layoutPages(preset, ["home", "services", "about"], flat, {}, long);
+    const teaser = l.sections.find((s) => s.kind === "about");
+    expect(teaser && teaser.kind === "about" && teaser.text).toBeTruthy();
+    expect(teaser && teaser.kind === "about" && teaser.points).toEqual([]);
+    expect(teaser && teaser.kind === "about" && words.includes(teaser.text.replace(/\.$/, ""))).toBe(true);
+    // The About page itself still has everything, with the points.
+    const page = l.pages.find((p) => p.slug === "about");
+    expect(page?.sections.some((s) => s.kind === "about" && s.points.length > 0)).toBe(true);
+  });
+
+  it("doesn't open the About teaser with the sentence the hero already says", () => {
+    const hero = flat.find((x) => x.kind === "hero");
+    if (!hero || hero.kind !== "hero") throw new Error("fixture");
+    const words = "A family barber shop on the high street. We have cut hair here since the shop opened. Everyone is welcome.";
+    const l = layoutPages(preset, ["home", "about"], [{ ...hero, intro: "A family barber shop on the high street." }, ...flat.filter((x) => x.kind !== "hero")], {}, aboutSection({ ...parsed.facts, about: words }));
+    const teaser = l.sections.find((x) => x.kind === "about");
+    expect(teaser && teaser.kind === "about" && teaser.text).toBe("We have cut hair here since the shop opened. Everyone is welcome.");
+  });
+
+  it("shows no About teaser when there is no About page, and none on a one-page site", () => {
+    expect(kinds(lay(["home", "services"]).sections)).not.toContain("about");
+    expect(kinds(lay(["home"]).sections)).not.toContain("about");
+  });
+
   it("gives Home a short teaser of the services when they have their own page", () => {
     const l = lay(["home", "services"]);
     const home = l.sections.find((s) => s.kind === "services");
@@ -133,6 +167,14 @@ describe("laying the sections out across pages", () => {
     const l = lay(["home", "contact"]);
     expect(kinds(l.sections)).toContain("faq");
     expect(kinds(l.sections)).toContain("gallery");
+  });
+});
+
+describe("the first sentences of the customer's words", () => {
+  it("keeps whole sentences up to the length, never a cut one", () => {
+    expect(leadingSentences("A family barber shop. We cut hair. We also shave beards on request.", 40)).toBe("A family barber shop. We cut hair.");
+    expect(leadingSentences("One long sentence that goes on and on without stopping for anyone at all.", 20)).toBe("One long sentence th");
+    expect(leadingSentences("", 40)).toBe("");
   });
 });
 
