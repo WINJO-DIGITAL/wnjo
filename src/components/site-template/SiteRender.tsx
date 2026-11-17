@@ -248,7 +248,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
         return (
           <section key={i} id="gallery" className={css.section} aria-label={solo ? s.heading : undefined}>
             {head(s.heading, "Gallery")}
-            <div className={css.gallery} data-count={Math.min(images.length, 6)}>
+            <div className={css.gallery} data-count={Math.min(images.length, 6)} tabIndex={0} role="group" aria-label={`${s.heading}: photos`}>
               {images.map((im, j) => (
                 // eslint-disable-next-line @next/next/no-img-element -- see the hero image
                 <img key={j} src={im.src} alt={im.alt} loading="lazy" />

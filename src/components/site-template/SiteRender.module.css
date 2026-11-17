@@ -97,13 +97,20 @@
 .btn:hover {
   filter: brightness(1.08);
 }
+/* A two-tone ring (white inside, ink outside) shows on any background: the theme colour alone vanishes on its own buttons and on dark pages. */
 .btn:focus-visible,
+.btnGhost:focus-visible,
+.more:focus-visible,
 .site a:focus-visible,
+.site button:focus-visible,
 .site input:focus-visible,
+.site select:focus-visible,
 .site textarea:focus-visible,
-.site summary:focus-visible {
-  outline: 3px solid var(--accent);
+.site summary:focus-visible,
+.gallery:focus-visible {
+  outline: 3px solid #ffffff;
   outline-offset: 2px;
+  box-shadow: 0 0 0 6px #161616;
 }
 
 .heroActions {
@@ -4007,4 +4014,16 @@
 }
 .site[data-look="clinic"] .closing h2 {
   font-size: clamp(1.9rem, 4vw, 3rem);
+}
+
+/* Anyone who has asked for less motion gets none: no transitions, no smooth scrolling, no animation. */
+@media (prefers-reduced-motion: reduce) {
+  .site,
+  .site *,
+  .site *::before,
+  .site *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
 }

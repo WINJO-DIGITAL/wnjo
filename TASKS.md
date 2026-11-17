@@ -44,6 +44,10 @@ Every style now has its own structure, but none is honestly at 90. What holds th
 3. Reusability (15%): content-length stress is tested; colour swatches are contrast-checked, but only six swatches and one typeface per style.
 4. Interactions: only hover and the FAQ accordion; no deliberate per-style motion.
 
+## Shared engineering done
+
+- Accessibility, all eight styles: two-tone focus ring (white inside, ink outside) that shows on any background, now on selects, buttons and the photo gallery; the scrolling gallery is keyboard-focusable and labelled; reduced-motion switches off every transition and animation.
+
 ## Known issues
 
 - Nav-overlap checker flags a very long business name on Tradesman (1024 to 1100px) and Executive (1100 to 1280px); checked by eye, the buttons wrap to a second row and nothing overlaps, so both are false positives.
