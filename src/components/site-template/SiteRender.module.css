@@ -972,156 +972,346 @@
    colour arrives as --accent in every one of them.
    ========================================================================== */
 
-/* ---- Athletic (from RAENG Fitness): black and white, wide heavy capitals, hard edges, solid bands ---- */
+/* ---- Athletic (from RAENG Fitness's live site): warm paper and ink, bold sentence-case type, every section a small label
+   and a big heading on the left with white rounded cards on the right, hairlines between sections, pill buttons ---- */
 .site[data-look="athletic"] {
-  --paper: #f6f4ef;
-  --ink: #0b0b0b;
-  --muted: #57544e;
-  --line: #d6d2c9;
-  --radius: 0;
+  --paper: #f4f0e8;
+  --ink: #111111;
+  --muted: #5d5a54;
+  --line: #d9d4c9;
+  --radius: 10px;
+  --card: #ffffff;
   --head: var(--tpl-font-archivo, "Arial Black", system-ui, sans-serif);
   --body: var(--tpl-font-archivo, var(--system));
-  --head-weight: 800;
-  --head-case: uppercase;
-  --head-track: -0.02em;
-  font-stretch: 100%;
+  --head-weight: 700;
+  --head-case: none;
+  --head-track: -0.03em;
 }
 .site[data-look="athletic"] h1,
-.site[data-look="athletic"] h2,
-.site[data-look="athletic"] .logo {
-  font-stretch: 112%;
+.site[data-look="athletic"] h2 {
+  line-height: 1.04;
 }
+.site[data-look="athletic"] h2 {
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  margin: 0;
+}
+.site[data-look="athletic"] h2[data-eyebrow]::before {
+  content: attr(data-eyebrow);
+  display: block;
+  margin-bottom: 1rem;
+  font-family: var(--body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* The header: paper, a pill to book. On a wide screen the logo sits in the middle. */
 .site[data-look="athletic"] .nav {
-  background: #0b0b0b;
-  color: #f6f4ef;
-  border-bottom: 0;
+  background: var(--paper);
   backdrop-filter: none;
+  border-bottom: 0;
+  padding-block: 1rem;
 }
-.site[data-look="athletic"] .nav .logo {
-  color: #f6f4ef;
+.site[data-look="athletic"] .logo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 .site[data-look="athletic"] .links a {
-  color: #a9a59d;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-.site[data-look="athletic"] .links a:hover,
-.site[data-look="athletic"] .links a[aria-current="page"] {
-  color: #fff;
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 500;
 }
 .site[data-look="athletic"] .btn,
 .site[data-look="athletic"] .btnGhost {
-  padding: 1rem 1.6rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 0.85rem 1.5rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
 }
 .site[data-look="athletic"] .btnGhost {
-  border-width: 2px;
+  border: 1px solid var(--ink);
 }
-.site[data-look="athletic"] .hero[data-variant="photo"] .heroImg {
-  filter: grayscale(1) contrast(1.08);
+@media (min-width: 56rem) {
+  /* The menu on the left, the logo in the middle, the buttons on the right. A grid, so nothing can overlap: a long menu
+     scrolls and a long name is cut, rather than one running into the other. */
+  .site[data-look="athletic"] .nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    column-gap: 1rem;
+  }
+  .site[data-look="athletic"] .nav .links {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    overflow-x: auto;
+    min-width: 0;
+  }
+  .site[data-look="athletic"] .nav .logo,
+  .site[data-look="athletic"] .nav .logoImg {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    max-width: min(24rem, 38vw);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .site[data-look="athletic"] .nav .call {
+    grid-column: 4;
+    grid-row: 1;
+  }
+  .site[data-look="athletic"] .nav .btn {
+    grid-column: 5;
+    grid-row: 1;
+  }
 }
-.site[data-look="athletic"] .hero[data-variant="photo"]::after {
-  background: linear-gradient(to top, rgb(11 11 11 / 0.88), rgb(11 11 11 / 0.2) 75%);
-}
-.site[data-look="athletic"] .hero h1 {
-  font-size: clamp(2.6rem, 9vw, 6rem);
-  line-height: 0.98;
+
+/* The top of the page: an inset, rounded panel, the headline low on the left, a white pill and a plain link. */
+.site[data-look="athletic"] .hero {
+  margin: 0.5rem var(--pad) 0;
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: min(76vh, 40rem);
 }
 .site[data-look="athletic"] .hero[data-variant="plain"] {
-  background: #0b0b0b;
-  color: #f6f4ef;
+  background: #111111;
+  color: #f4f0e8;
+  align-items: end;
 }
+.site[data-look="athletic"] .hero[data-variant="photo"]::after {
+  background: linear-gradient(to top, rgb(17 17 17 / 0.82), rgb(17 17 17 / 0.05) 70%);
+}
+.site[data-look="athletic"] .hero h1 {
+  font-size: clamp(2.6rem, 8vw, 5.2rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.site[data-look="athletic"] .hero .btn,
 .site[data-look="athletic"] .hero[data-variant="plain"] .btn {
-  background: #f6f4ef;
-  color: #0b0b0b;
+  background: #ffffff;
+  color: #111111;
 }
-.site[data-look="athletic"] .section h2 {
-  padding-bottom: 0.7rem;
-  border-bottom: 3px solid #0b0b0b;
+.site[data-look="athletic"] .hero .btnGhost {
+  border: 0;
+  padding-inline: 0.25rem;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+.site[data-look="athletic"] .hero .btnGhost::after {
+  content: " ↗";
+  text-decoration: none;
+  display: inline-block;
+}
+.site[data-look="athletic"] .hero .btnGhost:hover {
+  background: transparent;
+}
+
+/* Every section is a row: the label and heading on the left, the content on the right, a hairline between rows. */
+.site[data-look="athletic"] .section {
+  max-width: 80rem;
+  padding-block: clamp(3rem, 7vw, 5.5rem);
+  border-top: 1px solid var(--line);
+}
+.site[data-look="athletic"] .hero + .section {
+  border-top: 0;
+}
+@media (min-width: 56rem) {
+  .site[data-look="athletic"] .section {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+    row-gap: 1.25rem;
+    align-items: start;
+  }
+  .site[data-look="athletic"] .section > h2 {
+    grid-column: 1;
+    grid-row: 1;
+    position: sticky;
+    top: 6rem;
+  }
+  .site[data-look="athletic"] .section > :not(h2) {
+    grid-column: 2;
+  }
+  /* A page that has its own heading above (Services, About) gives its content the whole width. */
+  .site[data-look="athletic"] .section:not(:has(> h2)) > * {
+    grid-column: 1 / -1;
+  }
+  .site[data-look="athletic"] .book > .bookIntro {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .site[data-look="athletic"] .book > :not(.bookIntro) {
+    grid-column: 2;
+  }
+}
+
+/* The cards: white, rounded, a name and a price, a line of description. */
+.site[data-look="athletic"] .menu,
+.site[data-look="athletic"] .menu[data-wide] {
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
 }
 .site[data-look="athletic"] .menu li {
-  border-bottom: 1px solid #0b0b0b;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem 1rem;
+  padding: 1.15rem 1.35rem;
+  background: #ffffff;
+  border: 0;
+  border-radius: 10px;
 }
 .site[data-look="athletic"] .menu li::before {
   display: none;
 }
 .site[data-look="athletic"] .menuName {
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  font-weight: 650;
+  font-size: 1.05rem;
 }
 .site[data-look="athletic"] .price {
-  color: #0b0b0b;
-  font-weight: 800;
+  grid-column: 2;
+  color: var(--ink);
+  font-weight: 700;
 }
-.site[data-look="athletic"] .facts {
+.site[data-look="athletic"] .faq {
   max-width: none;
-  margin: 0;
-  background: #0b0b0b;
-  color: #f6f4ef;
+  display: grid;
+  gap: 0.5rem;
+}
+.site[data-look="athletic"] .faq details {
+  background: #ffffff;
   border: 0;
-  padding-inline: var(--pad);
+  border-radius: 10px;
+  padding-inline: 1.35rem;
 }
-.site[data-look="athletic"] .facts b {
-  color: #f6f4ef;
-  font-size: clamp(1.3rem, 5.2vw, 3.4rem);
-  overflow-wrap: anywhere;
+.site[data-look="athletic"] .faq summary::after {
+  color: var(--ink);
 }
-.site[data-look="athletic"] .facts span {
-  color: #a9a59d;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.74rem;
+.site[data-look="athletic"] .hours {
+  max-width: none;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 0.4rem 1.35rem;
+}
+/* Hours and where to find them are rows like every other section, not a pair of boxes. */
+.site[data-look="athletic"] .info {
+  display: contents;
 }
 .site[data-look="athletic"] .info > .section {
+  width: auto;
+  margin: 0 auto;
   background: transparent;
-  border: 2px solid #0b0b0b;
+  border-radius: 0;
+  border-top: 1px solid var(--line);
+  padding: clamp(3rem, 7vw, 5.5rem) var(--pad);
+}
+.site[data-look="athletic"] .info .hours {
+  background: #ffffff;
+  padding: 0.4rem 1.35rem;
+}
+.site[data-look="athletic"] .map {
+  border-radius: 12px;
+}
+.site[data-look="athletic"] .gallery img,
+.site[data-look="athletic"] .wall img {
+  border-radius: 12px;
+}
+.site[data-look="athletic"] .facts {
+  max-width: 80rem;
+  margin: 0 auto;
+  border: 0;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+}
+.site[data-look="athletic"] .facts p {
+  padding: 1.15rem 1.35rem;
+  background: #ffffff;
+  border-radius: 10px;
+}
+.site[data-look="athletic"] .facts b {
+  color: var(--ink);
+}
+.site[data-look="athletic"] .reviews blockquote {
+  padding: 1.35rem;
+  background: #ffffff;
+  border-radius: 10px;
 }
 .site[data-look="athletic"] .more {
-  border-radius: 0;
-  border: 2px solid #0b0b0b;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.78rem;
+  border-color: var(--ink);
+  font-size: 0.85rem;
 }
-.site[data-look="athletic"] .gallery img {
-  filter: grayscale(1);
-  transition: filter 0.3s;
+.site[data-look="athletic"] .form {
+  border: 0;
+  border-radius: 14px;
 }
-.site[data-look="athletic"] .gallery img:hover {
-  filter: none;
+.site[data-look="athletic"] .form input,
+.site[data-look="athletic"] .form textarea {
+  border-radius: 8px;
 }
+
+/* The close: the question on the left, one black pill on the right. */
 .site[data-look="athletic"] .closing {
-  margin: 0;
-  background: #0b0b0b;
-  color: #f6f4ef;
+  display: grid;
+  justify-items: start;
+  align-items: center;
+  text-align: left;
+  gap: 1.5rem;
+  margin: 0 auto;
+  max-width: 80rem;
+  padding: clamp(3rem, 7vw, 5.5rem) var(--pad);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 0;
+  border-top: 1px solid var(--line);
 }
 .site[data-look="athletic"] .closing h2 {
-  font-size: clamp(2.4rem, 8vw, 5.5rem);
-  max-width: 14ch;
-  border: 0;
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  max-width: none;
 }
 .site[data-look="athletic"] .closing .btn {
-  background: #f6f4ef;
-  color: #0b0b0b;
+  background: #111111;
+  color: #ffffff;
+  padding: 1.1rem 2.2rem;
+  font-size: 1rem;
 }
+@media (min-width: 56rem) {
+  .site[data-look="athletic"] .closing {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+  }
+}
+
 .site[data-look="athletic"] .foot {
-  background: #0b0b0b;
-  color: #a9a59d;
-  border-top: 1px solid #333331;
+  background: #ffffff;
+  color: var(--ink);
+  border-top: 0;
 }
 .site[data-look="athletic"] .foot .logo {
-  color: #f6f4ef;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+.site[data-look="athletic"] .footHead {
+  color: var(--muted);
+  font-weight: 600;
+}
+.site[data-look="athletic"] .foot a:hover {
+  text-decoration: underline;
 }
 .site[data-look="athletic"] .pagehead {
-  background: #0b0b0b;
-  color: #f6f4ef;
+  background: transparent;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
 }
+.site[data-look="athletic"] .dock .btn,
+.site[data-look="athletic"] .dock .btnGhost {
+  border-radius: 999px;
+}
+
 
 /* ---- Precision (from Duratek): deep navy and green, light large type, cool hairlines, plenty of air ---- */
 .site[data-look="precision"] {
@@ -2107,60 +2297,6 @@
 }
 
 /* ---- Signature details from the portfolio sites ---- */
-
-/* Athletic (RAENG): the split button, an inset hero, hairline rules between sections instead of boxes. */
-.site[data-look="athletic"] .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 1.4rem;
-  padding: 0.4rem 0.4rem 0.4rem 1.4rem;
-}
-.site[data-look="athletic"] .btn::after {
-  content: "→";
-  display: inline-grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: #0b0b0b;
-  color: #f6f4ef;
-  font-size: 1.05rem;
-  letter-spacing: 0;
-  transition: transform 0.2s;
-}
-.site[data-look="athletic"] .btn:hover::after {
-  transform: translateX(2px);
-}
-.site[data-look="athletic"] .nav .btn {
-  padding: 0.25rem 0.25rem 0.25rem 1rem;
-  gap: 0.9rem;
-}
-.site[data-look="athletic"] .nav .btn::after {
-  width: 2rem;
-  height: 2rem;
-}
-.site[data-look="athletic"] .hero[data-variant="photo"] {
-  margin: 1rem var(--pad) 0;
-  border-radius: 6px;
-  overflow: hidden;
-}
-.site[data-look="athletic"] .section {
-  border-top: 1px solid #0b0b0b;
-}
-.site[data-look="athletic"] .section h2 {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-.site[data-look="athletic"] .hero + .section {
-  border-top: 0;
-}
-.site[data-look="athletic"] .info > .section {
-  border: 2px solid #0b0b0b;
-}
-.site[data-look="athletic"] .hero h1 {
-  text-transform: none;
-  letter-spacing: -0.035em;
-  font-stretch: 100%;
-}
 
 /* Precision (Duratek): a frosted nav, the gallery as a strip of tall slices that open on hover, a large wordmark in the footer. */
 .site[data-look="precision"] .nav {

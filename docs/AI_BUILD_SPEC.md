@@ -48,7 +48,7 @@ A website is one of **eight styles**, and the words inside are the customer's ow
 
 | Style | From | Feel |
 | --- | --- | --- |
-| Athletic | RAENG Fitness | black and white, wide heavy type, split arrow button, hairline rules |
+| Athletic | RAENG Fitness | paper and ink, bold sentence-case type, every section a label and heading on the left with white rounded cards on the right, pill buttons, centred logo |
 | Precision | Duratek | navy and green, light large type, a strip of gallery slices that open on hover |
 | Boutique | Boonma | cream, a friendly serif, flowing wave edges between sections |
 | Executive | EV Exec | charcoal and gold, centred, services as gold-ruled cards |

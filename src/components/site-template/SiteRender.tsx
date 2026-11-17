@@ -117,7 +117,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
   const multi = (content.pages?.length ?? 0) > 0;
   // A page that is one main section under its own title (About, Services, Gallery, FAQs) doesn't repeat the title as a second heading.
   const solo = current.slug !== "" && current.sections.filter((x) => x.kind !== "pagehead" && x.kind !== "cta").length === 1;
-  const head = (text: string) => (solo ? null : <h2>{text}</h2>);
+  const head = (text: string, label?: string) => (solo ? null : <h2 data-eyebrow={label}>{text}</h2>);
   const bookOn = bookingSlug(content);
   // Every "book" button goes to the form, on this page or on the page that holds it.
   const bookHref = bookOn === null || bookOn === current.slug ? "#book" : `${pageHref(bookOn)}#book`;
@@ -193,7 +193,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
       case "services":
         return (
           <section key={i} id="services" className={css.section} aria-label={solo ? s.heading : undefined}>
-            {head(s.heading)}
+            {head(s.heading, "Services")}
             <ul className={css.menu} data-wide={!s.teaser && s.items.length > 5 ? "" : undefined}>
               {(s.teaser ? s.items.slice(0, s.teaser) : s.items).map((it, j) => (
                 <li key={j}>
@@ -213,7 +213,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
       case "hours":
         return (
           <section key={i} id="hours" className={css.section}>
-            <h2>{s.heading}</h2>
+            <h2 data-eyebrow="Opening hours">{s.heading}</h2>
             <dl className={css.hours}>
               {s.items.map((h, j) => (
                 <div key={j} data-closed={h.closed ? "" : undefined}>
@@ -235,7 +235,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
           const caption = (alt: string) => (alt && !alt.toLowerCase().startsWith(`${business.name.toLowerCase()} photo`) ? alt : null);
           return (
             <section key={i} id="gallery" className={css.section} aria-label={solo ? s.heading : undefined}>
-              {head(s.heading)}
+              {head(s.heading, "Gallery")}
               <div className={css.wall}>
                 {images.map((im, j) => (
                   <figure key={j}>
@@ -250,7 +250,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
         }
         return (
           <section key={i} id="gallery" className={css.section} aria-label={solo ? s.heading : undefined}>
-            {head(s.heading)}
+            {head(s.heading, "Gallery")}
             <div className={css.gallery} data-count={Math.min(images.length, 6)}>
               {images.map((im, j) => (
                 // eslint-disable-next-line @next/next/no-img-element -- see the hero image
@@ -274,7 +274,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
       case "area":
         return (
           <section key={i} id="find-us" className={css.section}>
-            <h2>{s.heading}</h2>
+            <h2 data-eyebrow="Find us">{s.heading}</h2>
             <p className={css.body}>{s.text}</p>
             {business.address && (
               <a className={css.more} href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`}>
@@ -290,7 +290,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
         return (
           <section key={i} id="book" className={`${css.section} ${css.book}`}>
             <div className={css.bookIntro}>
-              <h2>{s.heading}</h2>
+              <h2 data-eyebrow="Get in touch">{s.heading}</h2>
               <p className={css.body}>{s.intro}</p>
               {(business.phone || business.email) && (
                 <p className={css.contact}>
@@ -357,7 +357,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
       case "faq":
         return (
           <section key={i} id="faq" className={css.section} aria-label={solo ? s.heading : undefined}>
-            {head(s.heading)}
+            {head(s.heading, "Questions")}
             <div className={css.faq}>
               {s.items.map((q, j) => (
                 <details key={j}>
@@ -406,7 +406,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
         return (
           <section key={i} id="about" className={`${css.section} ${css.about}`} data-photo={photo ? "" : undefined} aria-label={solo ? s.heading : undefined}>
             <div className={css.aboutText}>
-              {head(s.heading)}
+              {head(s.heading, "About")}
               {s.text && <p className={css.body}>{s.text}</p>}
               {s.points.length > 0 && (
                 <dl className={css.points}>
@@ -484,7 +484,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
 
       {current.slug === "" && reviews.length > 0 && (
         <section id="reviews" className={css.section}>
-          <h2>Reviews</h2>
+          <h2 data-eyebrow="Reviews">Reviews</h2>
           <ul className={css.reviews} role="list">
             {reviews.map((review) => (
               <li key={`${review.name}-${review.quote.slice(0, 24)}`}>
