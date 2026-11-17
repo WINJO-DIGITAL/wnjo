@@ -375,9 +375,9 @@ function HeroCta() {
         </span>
       </Link>
       <ul className="deck__bullets" role="list">
-        <li>Cancel any time, with no notice</li>
-        <li>No minimum term</li>
-        <li>Ongoing support</li>
+        <li>Cancel Any Time, With No Notice</li>
+        <li>No Minimum Term</li>
+        <li>Ongoing Support</li>
       </ul>
     </div>
   );
