@@ -147,7 +147,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
             )}
             <div className={css.heroCopy}>
               {/* With no photograph, the logo leads the page: it is the one picture the customer gave us. */}
-              {logo && !(photo && s.variant !== "plain") && (
+              {logo && theme.look !== "executive" && !(photo && s.variant !== "plain") && (
                 // eslint-disable-next-line @next/next/no-img-element -- customer logos come from private storage, not the image optimiser
                 <img className={css.heroLogo} src={logo} alt={business.name} />
               )}
@@ -173,12 +173,8 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
             </div>
             {/* A feature card beside the headline, as on a portfolio site: the logo or name, what they do, where, and the number. */}
             <aside className={css.heroCard} aria-label={business.name}>
-              {logo ? (
-                // eslint-disable-next-line @next/next/no-img-element -- customer logos come from private storage, not the image optimiser
-                <img src={logo} alt={business.name} />
-              ) : (
-                <b>{business.name}</b>
-              )}
+              {/* The logo is already in the header: the card carries the name, so it is not shown twice. */}
+              <b>{business.name}</b>
               {business.tagline && <p>{business.tagline}</p>}
               {business.areas && business.areas.length > 0 && (
                 <ul>
