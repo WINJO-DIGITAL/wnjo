@@ -30,7 +30,7 @@ preview or production until the owner asks.
 ## Decisions from the owner (recorded)
 
 - **Phone:** the EV Exec business number is shared by both companies. It is shown only as a "Call us" button, never as digits. It is set in the environment as `NEXT_PUBLIC_CONTACT_PHONE` and no call link appears until it is set.
-- **Email:** never shown or linked as an address. "Email us" opens the enquiry form.
+- **Email:** `hello@winjodigital.co.uk` is the correct public contact address (confirmed by the owner, 17 Nov 2026). It appears on the contact page, privacy notice and legal pages. "Email us" buttons still open the enquiry form.
 - **VAT:** WNJO is not VAT registered. The shared VAT note and the terms say so.
 - **Payment terms:** 50% deposit on acceptance, 50% once the owner has reviewed the finished site and before it goes live. Otherwise standard industry terms.
 - **Trust:** no years-in-business or launch-count claims. Reviews from clients and a Google Business profile come later.
