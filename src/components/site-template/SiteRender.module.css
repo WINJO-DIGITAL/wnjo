@@ -3611,6 +3611,8 @@
 .site[data-look="clinic"] .hero,
 .site[data-look="clinic"][data-layout] .hero[data-variant] {
   margin: 0;
+  width: 100%;
+  max-width: none;
   border-radius: 0;
   overflow: visible;
   min-height: 0;
@@ -3650,9 +3652,7 @@
 @media (min-width: 900px) {
   .site[data-look="clinic"] .hero[data-variant="photo"] {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    max-width: 78rem;
-    margin-inline: auto;
-    background: transparent;
+    padding-inline: max(var(--pad), calc((100% - 76rem) / 2 + var(--pad)));
   }
   .site[data-look="clinic"] .hero[data-variant="photo"] .heroImg {
     grid-column: 2;
@@ -3988,4 +3988,23 @@
   border: 0;
   border-top: 1px solid rgb(201 181 125 / 0.45);
   padding-inline: 0;
+}
+
+/* ---- Clinic, second round: the arch from the hero comes back in the gallery and the closing band, so the page has one shape. ---- */
+.site[data-look="clinic"] .hero h1 {
+  font-size: clamp(2.5rem, 5.4vw, 4.6rem);
+}
+.site[data-look="clinic"] .hero .heroCopy p {
+  font-size: 1.25rem;
+  max-width: 28rem;
+}
+.site[data-look="clinic"] .gallery img:first-child {
+  border-radius: 999px 999px 24px 24px;
+}
+.site[data-look="clinic"] .closing {
+  border-radius: 999px 999px 32px 32px;
+  padding-top: clamp(4rem, 9vw, 7rem);
+}
+.site[data-look="clinic"] .closing h2 {
+  font-size: clamp(1.9rem, 4vw, 3rem);
 }

@@ -17,7 +17,7 @@ const FLOWS: Record<string, Kind[]> = {
   hearth: ["services", "gallery", "about", "hours", "area", "facts"],
   heritage: ["services", "gallery", "facts", "about", "hours", "area"],
   tradesman: ["facts", "services", "area", "hours", "about", "gallery"],
-  clinic: ["facts", "services", "about", "hours", "area", "gallery"],
+  clinic: ["facts", "services", "about", "gallery", "hours", "area"],
 };
 
 const TAIL: Kind[] = ["enquiry", "faq", "cta"];

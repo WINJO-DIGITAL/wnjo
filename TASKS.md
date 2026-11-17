@@ -26,7 +26,7 @@ The eight styles live in `src/lib/site-template/styles.ts` and are drawn by `src
 | Precision | 73 | Figures framed by rules, services panel as heading beside list, areas and hours as ruled rows instead of sand boxes |
 | Boutique | 72 | Larger serif headline, figures between gold rules, hours and the place stacked inside their cards |
 | Executive | 71 | Services as gold-ruled rows beside the heading (any count sits well), larger figures that scale on phones, areas as a ruled row, larger headline |
-| Clinic | 63 | Arch photo beside the words, treatments as a heading-left list-right split with hairlines, figures without cards, sage closing band |
+| Clinic | 68 | Arch photo beside the words, treatments as a heading-left list-right split with hairlines, figures without cards, sage closing band; second round: the arch returns in the gallery's lead image and the closing band, larger headline, gallery placed before hours, full-width hero |
 
 ## The systemic weakness (Part 10)
 
