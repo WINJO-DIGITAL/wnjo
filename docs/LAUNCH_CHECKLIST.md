@@ -94,7 +94,7 @@ These four were completed by the owner on 17 November 2026 (ticked here to match
 - [x] Website pack built and downloadable by staff and, after handover, by the customer.
 - [x] **Apply `supabase/migrations/20261117090000_handover_packs_bucket.sql`** in the Supabase SQL editor (creates the private `handover-packs` bucket). Checked live 17 November: bucket present, private, zip only.
 - [ ] **Try one pack on a test website:** build a test outright website, pay in test mode, download the pack as staff, hand over, and download it as the customer.
-- [ ] Terms 9.3 mention "exported website pages". The pack does not include rendered pages, so either produce them by hand on request or narrow the wording at the next terms update.
+- [x] Terms 9.3 mention "exported website pages". Done: terms version 2026-11-17.1 narrows 9.3 to what the pack holds (no rendered web pages or exported images promised), and `content/legal/terms.md` no longer says "exported website pages". Checked 17 November 2026.
 
 ## Before launch
 - [x] **AI quality checks (14 November, not yet on main):** built for template sites (see `docs/AI_QUALITY_PLAN.md`). One clear next step, plain English (filler phrases and long sentences), a headline of at most 8 words, an intro of at most 18 and no sentence over 18, a description for search, a copied-wording check (7 words in a row, against a list that starts empty), three rounds of retry then a person, and a £1 ceiling per website. The owner decided on 14 November: £1, and the word limits from the longest sample site. Both limits sit in `src/lib/ai/limits.ts`. Not yet covered: the free-form plan and page steps for a bespoke website get the retry and the ceiling but not the content checks; the page title is not checked.
