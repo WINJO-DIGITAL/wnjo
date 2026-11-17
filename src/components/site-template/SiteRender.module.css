@@ -3506,3 +3506,100 @@
 .site[data-look="heritage"] .closing {
   background: #151517;
 }
+
+/* ---- Tradesman on its own structure: a job sheet. Hard-edged cards with a solid yellow offset, a yellow figures band, a navy hours panel and a yellow call-to-action slab. ---- */
+.site[data-look="tradesman"] .menu {
+  gap: 1.75rem 1.5rem;
+  padding-bottom: 0.5rem;
+}
+.site[data-look="tradesman"] .menu li {
+  margin-bottom: 0;
+  padding: 1.35rem 1.5rem 1.25rem;
+  background: #fff;
+  border: 2px solid #0f1b2d;
+  border-left-width: 2px;
+  box-shadow: 0.45rem 0.45rem 0 var(--hazard);
+}
+.site[data-look="tradesman"] .menuName {
+  font-size: 1.05rem;
+}
+
+/* Figures: a yellow band cut at an angle, navy figures between navy rules. */
+.site[data-look="tradesman"] .facts {
+  background: var(--hazard);
+  color: #0f1b2d;
+  padding-block: 2.75rem;
+  clip-path: polygon(0 1.6rem, 100% 0, 100% calc(100% - 1.6rem), 0 100%);
+  margin-block: -0.5rem;
+}
+.site[data-look="tradesman"] .facts p {
+  border-left: 3px solid #0f1b2d;
+  padding-left: 1.25rem;
+  text-align: left;
+}
+.site[data-look="tradesman"] .facts b {
+  color: #0f1b2d;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1;
+}
+.site[data-look="tradesman"] .facts span {
+  color: #0f1b2d;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.8rem;
+}
+
+/* Hours and the place: the first a navy panel, the second a sheet with a yellow offset. */
+.site[data-look="tradesman"] .info > .section:first-child:not(:last-child) {
+  background: #0f1b2d;
+  color: #fff;
+  border: 2px solid #0f1b2d;
+  border-top: 0.4rem solid var(--hazard);
+}
+.site[data-look="tradesman"] .info > .section:first-child:not(:last-child) * {
+  color: inherit;
+  border-color: rgb(255 255 255 / 0.22);
+}
+.site[data-look="tradesman"] .info > .section:last-child,
+.site[data-look="tradesman"] .info > .section:only-child {
+  background: #fff;
+  border: 2px solid #0f1b2d;
+  box-shadow: 0.45rem 0.45rem 0 var(--hazard);
+}
+
+/* The request form and quotes pick up the same offset. */
+.site[data-look="tradesman"] .form {
+  box-shadow: 0.55rem 0.55rem 0 var(--hazard);
+}
+.site[data-look="tradesman"] .reviews blockquote {
+  background: #fff;
+  border: 2px solid #0f1b2d;
+  border-left: 2px solid #0f1b2d;
+  box-shadow: 0.4rem 0.4rem 0 var(--hazard);
+}
+
+/* The closing slab: yellow, with a navy button. */
+.site[data-look="tradesman"] .closing {
+  background: var(--hazard);
+  color: #0f1b2d;
+  border-top: 0;
+  clip-path: polygon(0 1.6rem, 100% 0, 100% 100%, 0 100%);
+  padding-top: calc(var(--pad) + 1.6rem);
+}
+.site[data-look="tradesman"] .closing .btn {
+  background: #0f1b2d;
+  color: #fff;
+}
+
+/* Tradesman: a very long business name shortens with an ellipsis rather than running under the links. */
+.site[data-look="tradesman"] .nav .logo {
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.site[data-look="tradesman"] .links {
+  gap: 1rem;
+}
