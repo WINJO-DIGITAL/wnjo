@@ -8705,6 +8705,37 @@ ol.bs {
 .deck__btn:active { transform: translate(var(--mx, 0px), var(--my, 0px)) scale(0.965); }
 @media (prefers-reduced-motion: reduce) { .deck__btn { transition: none; } }
 
+/* While pressed the button warms to the brand terracotta, and the price turns cream so it stays readable on it. The
+   dark colour is a gradient, which can't fade, so the terracotta is a layer behind the words that fades in. */
+.deck__btn {
+  position: relative;
+  isolation: isolate;
+}
+.deck__btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--color-accent);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.deck__btn:active::before {
+  opacity: 1;
+}
+.deck__btn .deck__btn-price {
+  transition: color 0.12s ease;
+}
+.deck__btn:active .deck__btn-price,
+.deck__btn:active .deck__btn-price .deck__unit {
+  color: #f6f0e6;
+}
+@media (prefers-reduced-motion: reduce) {
+  .deck__btn::before,
+  .deck__btn .deck__btn-price { transition: none; }
+}
+
 /* Two lines in one button: the action, then the example it prices (it follows the swipe). */
 .deck__btn-text {
   display: grid;
