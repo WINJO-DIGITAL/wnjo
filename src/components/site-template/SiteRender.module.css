@@ -3603,3 +3603,141 @@
 .site[data-look="tradesman"] .links {
   gap: 1rem;
 }
+
+/* ---- Clinic on its own structure: calm and editorial. The photograph is an arch beside the words, treatments are a quiet list
+   with the heading to its left, and figures sit on the sage band with no cards around them. ---- */
+
+/* The top of the page: words on a soft wash, the photograph as an arch. */
+.site[data-look="clinic"] .hero,
+.site[data-look="clinic"][data-layout] .hero[data-variant] {
+  margin: 0;
+  border-radius: 0;
+  overflow: visible;
+  min-height: 0;
+  background: linear-gradient(175deg, #e3efe8, var(--paper) 90%);
+  color: var(--ink);
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding: clamp(2rem, 6vw, 4.5rem) var(--pad);
+}
+.site[data-look="clinic"] .hero[data-variant="photo"]::after {
+  display: none;
+}
+.site[data-look="clinic"] .hero[data-variant="photo"] .heroImg {
+  position: static;
+  z-index: auto;
+  grid-row: 1;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  border-radius: 999px 999px 28px 28px;
+  box-shadow: 0 18px 50px rgb(31 58 51 / 0.14);
+}
+.site[data-look="clinic"] .hero .heroCopy {
+  grid-row: 2;
+  max-width: 36rem;
+}
+.site[data-look="clinic"] .hero h1 {
+  font-size: clamp(2.3rem, 4.8vw, 4rem);
+  line-height: 1.05;
+}
+.site[data-look="clinic"] .hero .btnGhost {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+@media (min-width: 900px) {
+  .site[data-look="clinic"] .hero[data-variant="photo"] {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    max-width: 78rem;
+    margin-inline: auto;
+    background: transparent;
+  }
+  .site[data-look="clinic"] .hero[data-variant="photo"] .heroImg {
+    grid-column: 2;
+    aspect-ratio: 4 / 5;
+    max-height: 36rem;
+  }
+  .site[data-look="clinic"] .hero[data-variant="photo"] .heroCopy {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+/* Treatments: the heading on the left, a quiet list on the right, hairlines between. */
+@media (min-width: 900px) {
+  .site[data-look="clinic"] section:has(> .menu) {
+    display: grid;
+    grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
+    column-gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+  .site[data-look="clinic"] section:has(> .menu) > h2,
+  .site[data-look="clinic"] section:has(> .menu) > :first-child:not(.menu) {
+    grid-column: 1;
+    position: sticky;
+    top: 6rem;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+  .site[data-look="clinic"] section:has(> .menu) > .menu,
+  .site[data-look="clinic"] section:has(> .menu) > .more {
+    grid-column: 2;
+  }
+  .site[data-look="clinic"] section:has(> .menu) > .more {
+    justify-self: start;
+  }
+}
+.site[data-look="clinic"] section:has(> .menu) .menu,
+.site[data-look="clinic"] section:has(> .menu) .menu[data-wide] {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.site[data-look="clinic"] section:has(> .menu) .menu li {
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 1.35rem 0;
+  box-shadow: none;
+}
+.site[data-look="clinic"] section:has(> .menu) .menu li:first-child {
+  border-top: 1px solid var(--line);
+}
+.site[data-look="clinic"] .menuName {
+  font-size: 1.15rem;
+}
+
+/* Figures: large, between hairlines, on the page itself. */
+.site[data-look="clinic"] .facts {
+  max-width: 68rem;
+  margin: clamp(2rem, 5vw, 3.5rem) auto 0;
+  padding-inline: var(--pad);
+  gap: 0;
+}
+.site[data-look="clinic"] .facts p {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 1rem 1.5rem;
+  border-left: 1px solid var(--line);
+}
+.site[data-look="clinic"] .facts p:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+.site[data-look="clinic"] .facts b {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Soft panels get a little more breathing room, and the closing band is a quiet sage. */
+.site[data-look="clinic"] .info > .section {
+  padding: clamp(1.75rem, 4vw, 2.5rem);
+}
+.site[data-look="clinic"] .closing {
+  background: var(--sage);
+  box-shadow: none;
+}
