@@ -102,6 +102,35 @@ export function stageBlocker(
   return null;
 }
 
+/**
+ * The one-click launch. The customer has approved their preview and paid, so Pricing and Contract are already settled
+ * and are recorded for them; the person pressing Go live signs off Quality (if nobody has) and Publication. Returns the
+ * approvals to record, or the reason the website can't go live yet. Nothing is skipped silently: a rejected approval
+ * must be dealt with in the Approvals tab first, and a bespoke website needs its accepted proposal and final payment.
+ */
+export function goLivePlan(ctx: {
+  stage: Stage;
+  route: Route;
+  oneOff: boolean;
+  balancePaid: boolean;
+  proposalAccepted: boolean;
+  approvals: ApprovalRecord[];
+  qualityChecked: boolean;
+}): { ok: true; record: ApprovalKind[] } | { ok: false; reason: string } {
+  if (ctx.stage !== "approval") {
+    return { ok: false, reason: "A website can go live once the customer has approved their preview (stage: Awaiting WINJO approval)." };
+  }
+  const state = approvalState(ctx.approvals);
+  const rejected = APPROVAL_ORDER.filter((k) => state[k] === "rejected");
+  if (rejected.length) {
+    return { ok: false, reason: `${rejected.map((k) => APPROVALS[k].label).join(", ")} was rejected. Settle it in the Approvals tab first.` };
+  }
+  if (ctx.route === "proposal" && !ctx.proposalAccepted) return { ok: false, reason: "The customer must accept an approved proposal first." };
+  if (ctx.route === "proposal" && ctx.oneOff && !ctx.balancePaid) return { ok: false, reason: "The customer's final payment hasn't been received yet." };
+  if (state.quality !== "approved" && !ctx.qualityChecked) return { ok: false, reason: "Tick that you have checked the website first." };
+  return { ok: true, record: APPROVAL_ORDER.filter((k) => state[k] !== "approved") };
+}
+
 /** How far along the customer's path a stage is, for the progress line. Off-path stages keep the last position. */
 export function progressIndex(route: Route, stage: Stage, lastOnPath?: Stage): number {
   const path = stagePath(route);

@@ -544,6 +544,17 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
         <div className="stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
           <StageControl row={row} path={path} busy={busy} onMove={(stage, note) => act({ action: "stage", stage, note }, `Moved to ${staffStageLabel(stage)}.`)} />
 
+          {GO_LIVE_STAGES.includes(row.stage) && (
+            <GoLivePanel
+              row={row}
+              busy={busy}
+              call={call}
+              qualityApproved={state.quality === "approved"}
+              proposalAccepted={Boolean(accepted)}
+              onGoLive={(qualityChecked) => act({ action: "go-live", qualityChecked }, "The website is live.")}
+            />
+          )}
+
           <ExpectedDate key={`${row.id}:${row.expected_by ?? ""}`} row={row} busy={busy} act={act} />
 
           <HandBuilt row={row} call={call} onChanged={onChanged} />
@@ -632,6 +643,77 @@ function HandoverPanel({ row, busy, act, onPack }: { row: BriefRow; busy: boolea
         </>
       ) : (
         <p className="acct-meta">Waiting for the customer to approve the website and pay the final 50%.</p>
+      )}
+    </div>
+  );
+}
+
+/** The stages where a website is being checked or is live: the address can be attached from the preview on. */
+const GO_LIVE_STAGES: Stage[] = ["preview", "changes", "approval", "live"];
+
+/**
+ * The one place to put a website live. It shows what is settled, takes the website's address, and gives one button.
+ * Pricing and Contract are recorded for the customer once they have approved and paid; the person pressing the button
+ * signs off Quality (tick) and Publication. Owner or admin only; the server checks.
+ */
+function GoLivePanel({
+  row,
+  busy,
+  call,
+  qualityApproved,
+  proposalAccepted,
+  onGoLive,
+}: {
+  row: BriefRow;
+  busy: boolean;
+  call: Call;
+  qualityApproved: boolean;
+  proposalAccepted: boolean;
+  onGoLive: (qualityChecked: boolean) => Promise<boolean>;
+}) {
+  const [checked, setChecked] = useState(false);
+  const [addresses, setAddresses] = useState<number | null>(null);
+  const bespoke = row.route === "proposal";
+  const needsFinalPayment = bespoke && row.figures.mode === "oneOff";
+  const live = row.stage === "live";
+  const customerApproved = row.stage === "approval" || live;
+  const items: { done: boolean; text: string }[] = [
+    { done: customerApproved, text: "Customer has approved their website" },
+    ...(bespoke ? [{ done: proposalAccepted, text: "Proposal accepted" }] : []),
+    ...(needsFinalPayment ? [{ done: Boolean(row.balance_paid_at), text: "Final payment received" }] : []),
+    { done: addresses !== null && addresses > 0, text: addresses === 0 ? "No website address attached yet" : "Website address attached" },
+  ];
+  // The address is the one thing that doesn't block: a website can be made live first and given its address after.
+  const ready = customerApproved && (!bespoke || proposalAccepted) && (!needsFinalPayment || Boolean(row.balance_paid_at));
+  const canPress = !live && ready && (qualityApproved || checked);
+  return (
+    <div className="stack" style={{ "--stack": "var(--space-3)" } as React.CSSProperties}>
+      <p className="admin-label">Go live</p>
+      <ul className="build-lines" role="list">
+        {items.map((i) => (
+          <li key={i.text}>
+            {i.done ? "Done: " : "Waiting: "}
+            {i.text}
+          </li>
+        ))}
+      </ul>
+      <LiveAddress briefId={row.id} stage={row.stage} call={call} answer={row.domain_choice ? { choice: row.domain_choice, name: row.domain_name } : null} onCount={setAddresses} />
+      {live ? (
+        <p className="acct-meta">This website is live.</p>
+      ) : (
+        <>
+          {!qualityApproved && (
+            <label className="acct-check">
+              <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} /> I have checked the website
+            </label>
+          )}
+          <div className="admin-actions">
+            <button type="button" className="btn btn--primary" disabled={busy || !canPress} onClick={() => void onGoLive(checked)}>
+              Go live
+            </button>
+          </div>
+          {!ready && <p className="acct-meta">Go live opens once everything above is done.</p>}
+        </>
       )}
     </div>
   );
@@ -1185,7 +1267,6 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
           )}
         </div>
       )}
-      {siteBuilds.some((b) => b.status === "released") && <LiveAddress briefId={row.id} stage={row.stage} call={call} answer={row.domain_choice ? { choice: row.domain_choice, name: row.domain_name } : null} />}
       {message && <p role={message.ok ? "status" : "alert"} className={message.ok ? "acct-meta" : "field-error"}>{message.text}</p>}
     </div>
   );
@@ -1195,7 +1276,7 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
  * The addresses a customer's live website is served on. Attaching one publishes nothing by itself: visitors see the
  * site only once the website is approved and marked live. Attach the address in Vercel and point its DNS first.
  */
-function LiveAddress({ briefId, stage, call, answer }: { briefId: string; stage: string; call: Call; answer: { choice: "have" | "help"; name: string | null } | null }) {
+function LiveAddress({ briefId, stage, call, answer, onCount }: { briefId: string; stage: string; call: Call; answer: { choice: "have" | "help"; name: string | null } | null; onCount?: (n: number) => void }) {
   const [domains, setDomains] = useState<{ hostname: string }[]>([]);
   const [address, setAddress] = useState("");
   const [busy, setBusy] = useState(false);
@@ -1205,7 +1286,11 @@ function LiveAddress({ briefId, stage, call, answer }: { briefId: string; stage:
   useEffect(() => {
     let cancelled = false;
     void call({ action: "site-domains", briefId }, "/api/admin/ai/website").then((r) => {
-      if (!cancelled && r.ok && Array.isArray(r.json.domains)) setDomains(r.json.domains as { hostname: string }[]);
+      if (!cancelled && r.ok && Array.isArray(r.json.domains)) {
+        const list = r.json.domains as { hostname: string }[];
+        setDomains(list);
+        onCount?.(list.length);
+      }
     });
     return () => {
       cancelled = true;

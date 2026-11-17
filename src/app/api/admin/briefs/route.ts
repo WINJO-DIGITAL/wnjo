@@ -7,6 +7,7 @@ import {
   STAGES,
   canDecide,
   cleanProposal,
+  goLivePlan,
   proposalTransition,
   stageBlocker,
   type ApprovalKind,
@@ -34,13 +35,24 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const note = (v: unknown, max = 2000) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const fail = (status: number, error: string) => NextResponse.json({ error }, { status });
 
-type Brief = { id: string; tenant_id: string; reference: string; email: string; name: string; route: Route; stage: Stage; brief: { files?: BriefFile[] } };
+type Brief = {
+  id: string;
+  tenant_id: string;
+  reference: string;
+  email: string;
+  name: string;
+  route: Route;
+  stage: Stage;
+  brief: { files?: BriefFile[] };
+  balance_paid_at?: string | null;
+  figures?: { mode?: string } | null;
+};
 
 async function loadBrief(db: SupabaseClient, staff: Staff, id: unknown): Promise<Brief | null> {
   if (typeof id !== "string" || !UUID.test(id)) return null;
   const { data } = await db
     .from("website_briefs")
-    .select("id, tenant_id, reference, email, name, route, stage, brief")
+    .select("id, tenant_id, reference, email, name, route, stage, brief, balance_paid_at, figures")
     .eq("id", id)
     .eq("tenant_id", staff.tenantId)
     .maybeSingle();
@@ -107,6 +119,47 @@ export async function POST(request: NextRequest) {
     const { error } = await db.from("website_briefs").update({ stage: target }).eq("id", brief.id).eq("stage", brief.stage);
     if (error) return fail(409, error.code === "42501" ? "The approvals for going live aren't complete." : "The stage couldn't be changed.");
     await logEvent(db, staff, brief.id, "stage", { from: brief.stage, to: target, note: note(body.note, 500) });
+    return NextResponse.json({ ok: true });
+  }
+
+  // One click to launch. The customer has approved the preview and paid, so Pricing and Contract are recorded for them
+  // (noted as automatic in the history); the owner or admin pressing Go live signs off Quality, if nobody has, and
+  // Publication. The database still refuses Live without all four approvals, so this only ever does what Approvals would.
+  if (body.action === "go-live") {
+    if (staff.role === "staff") return fail(403, "Only an owner or admin can put a website live.");
+    const [{ data: approvals }, { data: accepted }] = await Promise.all([
+      db.from("build_approvals").select("kind, decision, created_at").eq("brief_id", brief.id),
+      db.from("website_proposals").select("id").eq("brief_id", brief.id).eq("status", "accepted").limit(1),
+    ]);
+    const plan = goLivePlan({
+      stage: brief.stage,
+      route: brief.route,
+      oneOff: brief.figures?.mode === "oneOff",
+      balancePaid: Boolean(brief.balance_paid_at),
+      proposalAccepted: (accepted ?? []).length > 0,
+      approvals: (approvals ?? []) as ApprovalRecord[],
+      qualityChecked: body.qualityChecked === true,
+    });
+    if (!plan.ok) return fail(409, plan.reason);
+    for (const kind of plan.record) {
+      const automatic = kind === "pricing" || kind === "contract";
+      const text = automatic ? "Recorded automatically at go live: the customer approved their website and paid." : "Recorded at go live.";
+      const { error } = await db.from("build_approvals").insert({
+        tenant_id: staff.tenantId,
+        brief_id: brief.id,
+        kind,
+        decision: "approved",
+        note: text,
+        decided_by: staff.userId,
+        decided_by_email: staff.email,
+        decided_by_role: staff.role,
+      });
+      if (error) return fail(500, "The approvals couldn't be recorded, so the website has not gone live.");
+      await logEvent(db, staff, brief.id, "approval", { kind, decision: "approved", note: text });
+    }
+    const { error } = await db.from("website_briefs").update({ stage: "live" }).eq("id", brief.id).eq("stage", brief.stage);
+    if (error) return fail(409, error.code === "42501" ? "The approvals for going live aren't complete." : "The website couldn't be put live.");
+    await logEvent(db, staff, brief.id, "stage", { from: brief.stage, to: "live", note: "Go live" });
     return NextResponse.json({ ok: true });
   }
 

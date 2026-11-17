@@ -7,6 +7,7 @@ import {
   proposalTransition,
   routeFor,
   stageBlocker,
+  goLivePlan,
   stagePath,
   type ApprovalRecord,
 } from "./build-journey";
@@ -112,5 +113,51 @@ describe("proposals", () => {
     expect(cleanProposal({ lines: [{ label: "x", amount: -1, kind: "one_off" }] }).ok).toBe(false);
     expect(cleanProposal({ lines: [{ label: "x", amount: 0, kind: "one_off" }] }).ok).toBe(false);
     expect(cleanProposal({ lines: [{ label: "x", amount: 10, kind: "discount" }] }).ok).toBe(false);
+  });
+});
+
+describe("goLivePlan", () => {
+  const base = {
+    stage: "approval" as const,
+    route: "package" as const,
+    oneOff: false,
+    balancePaid: false,
+    proposalAccepted: false,
+    approvals: [],
+    qualityChecked: true,
+  };
+  const approved = (kind: "quality" | "pricing" | "contract" | "publication") => ({ kind, decision: "approved" as const, created_at: "2026-11-17T10:00:00Z" });
+
+  it("records all four when nothing has been signed off yet", () => {
+    expect(goLivePlan(base)).toEqual({ ok: true, record: ["quality", "pricing", "contract", "publication"] });
+  });
+
+  it("records only what is still missing", () => {
+    expect(goLivePlan({ ...base, approvals: [approved("quality"), approved("pricing")] })).toEqual({ ok: true, record: ["contract", "publication"] });
+  });
+
+  it("needs the checked tick unless quality is already approved", () => {
+    expect(goLivePlan({ ...base, qualityChecked: false })).toMatchObject({ ok: false, reason: expect.stringMatching(/checked the website/) });
+    expect(goLivePlan({ ...base, qualityChecked: false, approvals: [approved("quality")] }).ok).toBe(true);
+  });
+
+  it("only goes live once the customer has approved their preview", () => {
+    for (const stage of ["preview", "changes", "building", "live", "on_hold"] as const) {
+      expect(goLivePlan({ ...base, stage }).ok).toBe(false);
+    }
+  });
+
+  it("stops on a rejected approval instead of overriding it", () => {
+    const rejected = { kind: "quality" as const, decision: "rejected" as const, created_at: "2026-11-17T11:00:00Z" };
+    expect(goLivePlan({ ...base, approvals: [approved("quality"), rejected] })).toMatchObject({ ok: false, reason: expect.stringMatching(/Quality was rejected/) });
+  });
+
+  it("a bespoke website needs its accepted proposal and, when bought outright, its final payment", () => {
+    const bespoke = { ...base, route: "proposal" as const };
+    expect(goLivePlan(bespoke)).toMatchObject({ ok: false, reason: expect.stringMatching(/accept/) });
+    const accepted = { ...bespoke, proposalAccepted: true };
+    expect(goLivePlan(accepted).ok).toBe(true);
+    expect(goLivePlan({ ...accepted, oneOff: true })).toMatchObject({ ok: false, reason: expect.stringMatching(/final payment/) });
+    expect(goLivePlan({ ...accepted, oneOff: true, balancePaid: true }).ok).toBe(true);
   });
 });

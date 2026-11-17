@@ -82,6 +82,43 @@ describe("staff build actions", () => {
     expect(writes).toEqual([]);
   });
 
+  it("go live: an owner records the missing approvals and then the website goes live", async () => {
+    role = "owner";
+    tables.website_briefs = { ...(tables.website_briefs as object), route: "package", stage: "approval", figures: { mode: "monthly" } };
+    const res = await post({ action: "go-live", qualityChecked: true });
+    expect(res.status).toBe(200);
+    const kinds = writes.filter((w) => w.table === "build_approvals").map((w) => (w.payload as { kind: string }).kind);
+    expect(kinds).toEqual(["quality", "pricing", "contract", "publication"]);
+    const pricing = writes.find((w) => w.table === "build_approvals" && (w.payload as { kind: string }).kind === "pricing")?.payload as Record<string, unknown>;
+    expect(pricing).toMatchObject({ decided_by: "u1", decided_by_role: "owner", decision: "approved" });
+    expect(String(pricing.note)).toMatch(/automatically/);
+    expect(writes.find((w) => w.table === "website_briefs")?.payload).toEqual({ stage: "live" });
+  });
+
+  it("go live: staff can't, and nothing is written", async () => {
+    role = "staff";
+    expect((await post({ action: "go-live", qualityChecked: true })).status).toBe(403);
+    expect(writes).toEqual([]);
+  });
+
+  it("go live: needs the checked tick, and writes nothing without it", async () => {
+    role = "owner";
+    tables.website_briefs = { ...(tables.website_briefs as object), route: "package", stage: "approval", figures: { mode: "monthly" } };
+    const res = await post({ action: "go-live" });
+    expect(res.status).toBe(409);
+    expect(writes).toEqual([]);
+  });
+
+  it("go live: a bespoke website bought outright waits for its final payment", async () => {
+    role = "owner";
+    tables.website_briefs = { ...(tables.website_briefs as object), route: "proposal", stage: "approval", figures: { mode: "oneOff" }, balance_paid_at: null };
+    tables.website_proposals = [{ id: "p" }];
+    const res = await post({ action: "go-live", qualityChecked: true });
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toMatch(/final payment/);
+    expect(writes).toEqual([]);
+  });
+
   it("won't move a bespoke brief to payment before the proposal is accepted", async () => {
     tables.website_briefs = { ...(tables.website_briefs as object), stage: "proposal" };
     const res = await post({ action: "stage", stage: "awaiting_payment" });
