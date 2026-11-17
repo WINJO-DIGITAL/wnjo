@@ -16014,8 +16014,16 @@ a.timeline__what:hover {
     text-align: center;
     text-wrap: balance;
   }
+  /* Bigger phones: the room comes from tighter gaps around the logos and the price button (not from the ticks), and the
+     stage takes it. 474px is everything that is not the stage, with about 15px kept clear below the three ticks. */
   .hero-ed--work .deck {
-    --deck-fixed: 496px;
+    --deck-fixed: 474px;
+  }
+  .hero-ed--work .deck__cta {
+    padding-top: 12px;
+  }
+  .hero-ed--work .deck__visit {
+    margin-top: 2px;
   }
 }
 
