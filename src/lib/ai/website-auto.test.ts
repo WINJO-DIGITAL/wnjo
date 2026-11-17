@@ -83,27 +83,27 @@ describe("automatic first drafts", () => {
   });
 
   it("plans first, then builds the template the customer chose, with the AI choosing the look, and tells the owner", async () => {
-    const r = await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: { goals: [], site: siteAnswers } }]), provider("barber", "classic"));
+    const r = await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: { goals: [], site: siteAnswers } }]), provider("barber", "heritage"));
     expect(r).toEqual({ attempted: 1, drafted: 1 });
-    expect(steps.filter((s) => !s.startsWith("event:started"))).toEqual(["plan:system", "event:template", "site:system:barber:classic"]);
+    expect(steps.filter((s) => !s.startsWith("event:started"))).toEqual(["plan:system", "event:template", "site:system:barber:heritage"]);
     expect(alerts).toEqual(["Ready for your review: Biz [WNJO-1]"]);
   });
 
   it("never overrules the sector a customer ticked, even if the model names another", async () => {
-    await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: { goals: [], site: siteAnswers } }]), provider("plumber", "classic"));
+    await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: { goals: [], site: siteAnswers } }]), provider("plumber", "heritage"));
     expect(steps.some((s) => s.startsWith("site:system:barber:"))).toBe(true);
   });
 
   it("keeps a look the customer chose, with no model call to choose it", async () => {
-    const chosen = { ...siteAnswers, answers: { ...siteAnswers.answers, look: "minimal" } };
-    await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: { goals: [], site: chosen } }]), provider("barber", "bold"));
-    expect(steps).toContain("site:system:barber:minimal");
+    const chosen = { ...siteAnswers, answers: { ...siteAnswers.answers, look: "clinic" } };
+    await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: { goals: [], site: chosen } }]), provider("barber", "athletic"));
+    expect(steps).toContain("site:system:barber:clinic");
   });
 
   it("chooses the template itself for a customer who described their own kind of business", async () => {
-    const r = await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: ownWords }]), provider("cleaning", "warm"));
+    const r = await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: ownWords }]), provider("cleaning", "boutique"));
     expect(r.drafted).toBe(1);
-    expect(steps).toContain("site:system:cleaning:warm");
+    expect(steps).toContain("site:system:cleaning:boutique");
   });
 
   it("falls back to a text draft when no template can be built from what they told us", async () => {
@@ -132,7 +132,7 @@ describe("automatic first drafts", () => {
 
   it("stops at the limit", async () => {
     const briefs = ["b1", "b2", "b3", "b4"].map((id) => ({ id, tenant_id: "t", brief: ownWords }));
-    const r = await runAutoDrafts(fakeDb(briefs), provider("cleaning", "warm"), 2);
+    const r = await runAutoDrafts(fakeDb(briefs), provider("cleaning", "boutique"), 2);
     expect(r.attempted).toBe(2);
   });
 
@@ -153,7 +153,7 @@ describe("automatic first drafts", () => {
   });
 
   it("makes a text draft instead of forcing a poor fit when the AI says no template suits the business", async () => {
-    const r = await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: ownWords }]), provider("none", "warm"));
+    const r = await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: ownWords }]), provider("none", "boutique"));
     expect(r.drafted).toBe(1);
     expect(steps.filter((s) => !s.startsWith("event:"))).toEqual(["plan:system", "preview"]);
   });
@@ -177,9 +177,9 @@ describe("regenerating a website", () => {
   };
 
   it("starts again from a new plan even when a plan, a preview and a build already exist, and sends no email", async () => {
-    const r = await regenerateWebsite(single(ownWords), provider("cleaning", "bold"), staff, "b1");
+    const r = await regenerateWebsite(single(ownWords), provider("cleaning", "tradesman"), staff, "b1");
     expect(r).toEqual({ ok: true, outcome: "drafted" });
-    expect(steps.filter((s) => !s.startsWith("event:"))).toEqual(["plan:staff", "site:staff:cleaning:bold"]);
+    expect(steps.filter((s) => !s.startsWith("event:"))).toEqual(["plan:staff", "site:staff:cleaning:tradesman"]);
     expect(alerts).toEqual([]);
   });
 

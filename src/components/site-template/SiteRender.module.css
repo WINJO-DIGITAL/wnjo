@@ -404,7 +404,7 @@
   display: grid;
   gap: 1.1rem;
   padding: clamp(1.25rem, 4vw, 2.25rem);
-  background: #fff;
+  background: var(--card, #fff);
   border: 1px solid var(--line);
   border-radius: calc(var(--radius) + 6px);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 12px 32px -16px rgb(0 0 0 / 0.14);
@@ -961,4 +961,1046 @@
 .faqMore a {
   color: var(--ink);
   font-weight: 600;
+}
+
+/* ==========================================================================
+   The eight styles. Each is a whole design: its own type, shapes, spacing, and its own way of drawing the top of the
+   page, the lists, the facts and the closing band. They change how a site looks, never what it says. The customer's
+   colour arrives as --accent in every one of them.
+   ========================================================================== */
+
+/* ---- Athletic (from RAENG Fitness): black and white, wide heavy capitals, hard edges, solid bands ---- */
+.site[data-look="athletic"] {
+  --paper: #f6f4ef;
+  --ink: #0b0b0b;
+  --muted: #57544e;
+  --line: #d6d2c9;
+  --radius: 0;
+  --head: var(--tpl-font-archivo, "Arial Black", system-ui, sans-serif);
+  --body: var(--tpl-font-archivo, var(--system));
+  --head-weight: 800;
+  --head-case: uppercase;
+  --head-track: -0.02em;
+  font-stretch: 100%;
+}
+.site[data-look="athletic"] h1,
+.site[data-look="athletic"] h2,
+.site[data-look="athletic"] .logo {
+  font-stretch: 112%;
+}
+.site[data-look="athletic"] .nav {
+  background: #0b0b0b;
+  color: #f6f4ef;
+  border-bottom: 0;
+  backdrop-filter: none;
+}
+.site[data-look="athletic"] .nav .logo {
+  color: #f6f4ef;
+}
+.site[data-look="athletic"] .links a {
+  color: #a9a59d;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.site[data-look="athletic"] .links a:hover,
+.site[data-look="athletic"] .links a[aria-current="page"] {
+  color: #fff;
+}
+.site[data-look="athletic"] .btn,
+.site[data-look="athletic"] .btnGhost {
+  padding: 1rem 1.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.site[data-look="athletic"] .btnGhost {
+  border-width: 2px;
+}
+.site[data-look="athletic"] .hero[data-variant="photo"] .heroImg {
+  filter: grayscale(1) contrast(1.08);
+}
+.site[data-look="athletic"] .hero[data-variant="photo"]::after {
+  background: linear-gradient(to top, rgb(11 11 11 / 0.88), rgb(11 11 11 / 0.2) 75%);
+}
+.site[data-look="athletic"] .hero h1 {
+  font-size: clamp(2.6rem, 9vw, 6rem);
+  line-height: 0.98;
+}
+.site[data-look="athletic"] .hero[data-variant="plain"] {
+  background: #0b0b0b;
+  color: #f6f4ef;
+}
+.site[data-look="athletic"] .hero[data-variant="plain"] .btn {
+  background: #f6f4ef;
+  color: #0b0b0b;
+}
+.site[data-look="athletic"] .section h2 {
+  padding-bottom: 0.7rem;
+  border-bottom: 3px solid #0b0b0b;
+}
+.site[data-look="athletic"] .menu li {
+  border-bottom: 1px solid #0b0b0b;
+}
+.site[data-look="athletic"] .menu li::before {
+  display: none;
+}
+.site[data-look="athletic"] .menuName {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.site[data-look="athletic"] .price {
+  color: #0b0b0b;
+  font-weight: 800;
+}
+.site[data-look="athletic"] .facts {
+  max-width: none;
+  margin: 0;
+  background: #0b0b0b;
+  color: #f6f4ef;
+  border: 0;
+  padding-inline: var(--pad);
+}
+.site[data-look="athletic"] .facts b {
+  color: #f6f4ef;
+  font-size: clamp(1.3rem, 5.2vw, 3.4rem);
+  overflow-wrap: anywhere;
+}
+.site[data-look="athletic"] .facts span {
+  color: #a9a59d;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+}
+.site[data-look="athletic"] .info > .section {
+  background: transparent;
+  border: 2px solid #0b0b0b;
+}
+.site[data-look="athletic"] .more {
+  border-radius: 0;
+  border: 2px solid #0b0b0b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.78rem;
+}
+.site[data-look="athletic"] .gallery img {
+  filter: grayscale(1);
+  transition: filter 0.3s;
+}
+.site[data-look="athletic"] .gallery img:hover {
+  filter: none;
+}
+.site[data-look="athletic"] .closing {
+  margin: 0;
+  background: #0b0b0b;
+  color: #f6f4ef;
+}
+.site[data-look="athletic"] .closing h2 {
+  font-size: clamp(2.4rem, 8vw, 5.5rem);
+  max-width: 14ch;
+  border: 0;
+}
+.site[data-look="athletic"] .closing .btn {
+  background: #f6f4ef;
+  color: #0b0b0b;
+}
+.site[data-look="athletic"] .foot {
+  background: #0b0b0b;
+  color: #a9a59d;
+  border-top: 1px solid #333331;
+}
+.site[data-look="athletic"] .foot .logo {
+  color: #f6f4ef;
+}
+.site[data-look="athletic"] .pagehead {
+  background: #0b0b0b;
+  color: #f6f4ef;
+}
+
+/* ---- Precision (from Duratek): deep navy and green, light large type, cool hairlines, plenty of air ---- */
+.site[data-look="precision"] {
+  --paper: #f7f6f2;
+  --ink: #18364c;
+  --muted: #5a6b78;
+  --line: #e1e6ea;
+  --radius: 4px;
+  --head: var(--tpl-font-manrope, var(--system));
+  --body: var(--tpl-font-dmsans, var(--system));
+  --head-weight: 300;
+  --head-case: none;
+  --head-track: -0.035em;
+}
+.site[data-look="precision"] h1 {
+  font-size: clamp(2.6rem, 6.4vw, 5.2rem);
+  line-height: 1.04;
+}
+.site[data-look="precision"] h2 {
+  font-size: clamp(1.9rem, 4vw, 3rem);
+}
+.site[data-look="precision"] .nav {
+  background: #fff;
+  backdrop-filter: none;
+}
+.site[data-look="precision"] .logo {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.site[data-look="precision"] .btn,
+.site[data-look="precision"] .btnGhost {
+  padding: 0.95rem 1.5rem;
+  font-weight: 500;
+}
+.site[data-look="precision"] .hero[data-variant="photo"]::after {
+  background: linear-gradient(95deg, rgb(24 54 76 / 0.92), rgb(24 54 76 / 0.45) 60%, rgb(24 54 76 / 0.1));
+}
+.site[data-look="precision"] .hero[data-variant="plain"] {
+  background: #18364c;
+  color: #fff;
+}
+.site[data-look="precision"] .hero[data-variant="plain"] .btn {
+  background: #fff;
+  color: #18364c;
+}
+.site[data-look="precision"] .menu {
+  gap: 0 4rem;
+}
+.site[data-look="precision"] .menu li {
+  padding: 1.35rem 0;
+}
+.site[data-look="precision"] .menu li::before {
+  display: none;
+}
+.site[data-look="precision"] .menuName {
+  font-weight: 500;
+}
+.site[data-look="precision"] .price {
+  font-weight: 400;
+  color: #18364c;
+  font-feature-settings: "tnum";
+}
+.site[data-look="precision"] .facts {
+  max-width: 68rem;
+  gap: 0;
+  padding-inline: 0;
+  margin-inline: auto;
+  border: 0;
+}
+.site[data-look="precision"] .facts p {
+  padding: 0.5rem 1.75rem;
+  border-left: 1px solid var(--line);
+}
+.site[data-look="precision"] .facts b {
+  font-weight: 300;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  letter-spacing: -0.04em;
+  color: #18364c;
+}
+.site[data-look="precision"] .info > .section {
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.site[data-look="precision"] .gallery img {
+  border-radius: 2px;
+}
+.site[data-look="precision"] .closing {
+  margin: 0;
+  background: #18364c;
+  color: #fff;
+}
+.site[data-look="precision"] .closing .btn {
+  background: #54ae51;
+  color: #0f2230;
+}
+.site[data-look="precision"] .foot {
+  background: #112839;
+  color: #b9c6d0;
+  border: 0;
+}
+.site[data-look="precision"] .foot .logo,
+.site[data-look="precision"] .foot a:hover {
+  color: #fff;
+}
+.site[data-look="precision"] .pagehead {
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+
+/* ---- Boutique (from Boonma): cream and plum, a friendly serif, soft rounded shapes, a gentle wave ---- */
+.site[data-look="boutique"] {
+  --paper: #fff8ea;
+  --ink: #2b1a12;
+  --muted: #6f4c32;
+  --line: rgb(91 57 26 / 0.2);
+  --radius: 12px;
+  --head: var(--tpl-font-youngserif, Georgia, serif);
+  --body: var(--tpl-font-hanken, var(--system));
+  --head-weight: 400;
+  --head-case: none;
+  --head-track: -0.01em;
+}
+.site[data-look="boutique"] .nav {
+  background: #fffaf0;
+  backdrop-filter: none;
+}
+.site[data-look="boutique"] .btn,
+.site[data-look="boutique"] .btnGhost {
+  border-radius: 999px;
+  padding: 0.9rem 1.6rem;
+}
+.site[data-look="boutique"] .hero[data-variant="photo"] {
+  margin: 1rem var(--pad) 0;
+  border-radius: 28px;
+  overflow: hidden;
+  min-height: min(72vh, 38rem);
+}
+.site[data-look="boutique"] .hero[data-variant="photo"]::after {
+  background: linear-gradient(to top, rgb(43 26 18 / 0.78), rgb(43 26 18 / 0.05) 65%);
+}
+.site[data-look="boutique"] .hero[data-variant="plain"] {
+  background: #fbecd0;
+  color: #2b1a12;
+  border-radius: 0 0 50% 50% / 0 0 3rem 3rem;
+}
+.site[data-look="boutique"] .hero[data-variant="plain"] .btn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.site[data-look="boutique"] .menu {
+  gap: 1rem;
+}
+.site[data-look="boutique"] .menu li {
+  background: #fffaf0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.15rem 1.35rem;
+}
+.site[data-look="boutique"] .menu li::before {
+  display: none;
+}
+.site[data-look="boutique"] .menuName {
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: 1.25rem;
+}
+.site[data-look="boutique"] .price {
+  padding: 0.2rem 0.7rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: 999px;
+  font-size: 0.95rem;
+}
+.site[data-look="boutique"] .facts {
+  border: 0;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+.site[data-look="boutique"] .facts p {
+  padding: 1.1rem 1.25rem;
+  background: #fbecd0;
+  border-radius: 20px;
+}
+.site[data-look="boutique"] .facts b {
+  color: #2b1a12;
+}
+.site[data-look="boutique"] .info > .section {
+  background: #fffaf0;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+}
+.site[data-look="boutique"] .gallery img {
+  border-radius: 24px;
+}
+.site[data-look="boutique"] .closing {
+  border-radius: 32px;
+}
+.site[data-look="boutique"] .foot {
+  background: #fbecd0;
+  color: #6f4c32;
+  border: 0;
+}
+.site[data-look="boutique"] .pagehead {
+  background: #fbecd0;
+  border-radius: 0 0 50% 50% / 0 0 2.5rem 2.5rem;
+}
+
+/* ---- Executive (from EV Exec): charcoal and gold, light refined type, centred, quiet ---- */
+.site[data-look="executive"] {
+  --paper: #0e0f12;
+  --ink: #f1ede4;
+  --muted: #a9a59b;
+  --line: rgb(255 255 255 / 0.14);
+  --radius: 2px;
+  --head: var(--tpl-font-jost, var(--system));
+  --body: var(--tpl-font-jost, var(--system));
+  --head-weight: 300;
+  --head-case: none;
+  --head-track: -0.01em;
+  --accent-text: color-mix(in srgb, var(--accent) 25%, #f3e3b4);
+}
+.site[data-look="executive"] .nav {
+  background: rgb(14 15 18 / 0.9);
+  border-bottom-color: rgb(255 255 255 / 0.1);
+}
+.site[data-look="executive"] .logo {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+.site[data-look="executive"] .links a {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.74rem;
+}
+.site[data-look="executive"] .btn,
+.site[data-look="executive"] .btnGhost {
+  padding: 0.95rem 1.7rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.site[data-look="executive"] h2 {
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--accent-text);
+  margin-bottom: 1.75rem;
+}
+.site[data-look="executive"] h1 {
+  font-size: clamp(2.6rem, 7vw, 5.4rem);
+  letter-spacing: -0.02em;
+}
+.site[data-look="executive"] .hero {
+  align-items: center;
+  text-align: center;
+}
+.site[data-look="executive"] .heroCopy {
+  justify-items: center;
+  margin: 0 auto;
+}
+.site[data-look="executive"] .heroActions {
+  justify-content: center;
+}
+.site[data-look="executive"] .hero[data-variant="photo"]::after {
+  background: radial-gradient(ellipse at center, rgb(14 15 18 / 0.45), rgb(14 15 18 / 0.82));
+}
+.site[data-look="executive"] .hero[data-variant="plain"] {
+  background: linear-gradient(160deg, #1b1c21, #0e0f12 70%);
+  color: #f1ede4;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.site[data-look="executive"] .hero[data-variant="plain"] .btn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.site[data-look="executive"] .menu li {
+  padding: 1.4rem 0;
+  border-bottom-color: var(--line);
+}
+.site[data-look="executive"] .menu li::before {
+  display: none;
+}
+.site[data-look="executive"] .menuName {
+  font-weight: 400;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.site[data-look="executive"] .price {
+  color: var(--accent-text);
+  font-weight: 300;
+  font-size: 1.3rem;
+}
+.site[data-look="executive"] .facts {
+  border-color: var(--line);
+  text-align: center;
+}
+.site[data-look="executive"] .facts b {
+  color: var(--accent-text);
+  font-weight: 300;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+}
+.site[data-look="executive"] .info > .section {
+  background: #15161a;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 2px;
+}
+.site[data-look="executive"] .more {
+  color: var(--accent-text);
+  border-radius: 2px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.74rem;
+}
+.site[data-look="executive"] .gallery img {
+  border-radius: 2px;
+  filter: saturate(0.85) contrast(1.05);
+}
+.site[data-look="executive"] .closing {
+  background: #15161a;
+  color: #f1ede4;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 2px;
+}
+.site[data-look="executive"] .closing .btn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.site[data-look="executive"] .foot {
+  background: #08090b;
+  border-top-color: var(--line);
+}
+.site[data-look="executive"] .pagehead {
+  background: #15161a;
+  text-align: center;
+}
+.site[data-look="executive"] .link,
+.site[data-look="executive"] .contact a,
+.site[data-look="executive"] .reviews footer {
+  color: var(--accent-text);
+}
+
+/* ---- Hearth (from the café sample): warm browns, a classic serif, soft cards, inviting ---- */
+.site[data-look="hearth"] {
+  --paper: #2a1d17;
+  --ink: #f6ead8;
+  --muted: rgb(246 234 216 / 0.72);
+  --line: rgb(246 234 216 / 0.16);
+  --radius: 10px;
+  --head: var(--tpl-font-classic, Georgia, serif);
+  --body: var(--tpl-font-body, var(--system));
+  --head-weight: 500;
+  --head-case: none;
+  --head-track: -0.02em;
+  --accent-text: color-mix(in srgb, var(--accent) 28%, #ffd8b0);
+}
+.site[data-look="hearth"] .nav {
+  background: rgb(42 29 23 / 0.92);
+  border-bottom-color: var(--line);
+}
+.site[data-look="hearth"] .logo {
+  font-style: italic;
+  font-size: 1.3rem;
+}
+.site[data-look="hearth"] h1 {
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  font-style: italic;
+}
+.site[data-look="hearth"] .btn {
+  border-radius: 999px;
+  padding: 0.9rem 1.6rem;
+}
+.site[data-look="hearth"] .btnGhost {
+  border-radius: 999px;
+}
+.site[data-look="hearth"] .hero[data-variant="photo"]::after {
+  background: linear-gradient(to top, rgb(32 21 15 / 0.92), rgb(42 29 23 / 0.12) 70%);
+}
+.site[data-look="hearth"] .hero[data-variant="plain"] {
+  background: radial-gradient(circle at 70% 30%, color-mix(in srgb, var(--accent) 60%, #2a1d17), #2a1d17 70%);
+  color: #f6ead8;
+}
+.site[data-look="hearth"] .hero[data-variant="plain"] .btn {
+  background: #f6ead8;
+  color: #2a1d17;
+}
+.site[data-look="hearth"] .menuName {
+  font-family: var(--head);
+  font-weight: 500;
+  font-size: 1.3rem;
+}
+.site[data-look="hearth"] .menu li::before {
+  border-bottom-color: rgb(246 234 216 / 0.35);
+}
+.site[data-look="hearth"] .price {
+  color: var(--accent-text);
+  font-family: var(--head);
+  font-size: 1.25rem;
+}
+.site[data-look="hearth"] .facts {
+  border: 0;
+  gap: 1rem;
+}
+.site[data-look="hearth"] .facts p {
+  padding: 1.25rem 1.4rem;
+  background: rgb(255 255 255 / 0.06);
+  border-radius: 16px;
+}
+.site[data-look="hearth"] .facts b {
+  color: var(--accent-text);
+  font-style: italic;
+  font-weight: 500;
+}
+.site[data-look="hearth"] .info > .section {
+  background: rgb(255 255 255 / 0.06);
+  border-radius: 20px;
+}
+.site[data-look="hearth"] .gallery img {
+  border-radius: 18px;
+}
+.site[data-look="hearth"] .closing {
+  border-radius: 28px;
+}
+.site[data-look="hearth"] .closing h2 {
+  font-style: italic;
+}
+.site[data-look="hearth"] .foot {
+  background: #20150f;
+  border-top-color: var(--line);
+}
+.site[data-look="hearth"] .pagehead {
+  background: rgb(255 255 255 / 0.05);
+}
+.site[data-look="hearth"] .link,
+.site[data-look="hearth"] .contact a {
+  color: var(--accent-text);
+}
+
+/* ---- Heritage (from the barber sample): near-black and brass, capital serif, centred, ruled and traditional ---- */
+.site[data-look="heritage"] {
+  --paper: #161618;
+  --ink: #efe9df;
+  --muted: rgb(239 233 223 / 0.7);
+  --line: rgb(201 165 106 / 0.28);
+  --radius: 2px;
+  --head: var(--tpl-font-cormorant, Georgia, serif);
+  --body: var(--tpl-font-body, var(--system));
+  --head-weight: 600;
+  --head-case: uppercase;
+  --head-track: 0.05em;
+  --brass: #c9a56a;
+  --accent-text: color-mix(in srgb, var(--accent) 35%, #e9cf9f);
+}
+.site[data-look="heritage"] .nav {
+  background: rgb(22 22 24 / 0.94);
+  border-bottom: 1px solid var(--line);
+}
+.site[data-look="heritage"] .logo {
+  font-size: 1.35rem;
+  color: var(--brass);
+}
+.site[data-look="heritage"] .links a {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+}
+.site[data-look="heritage"] h1 {
+  font-size: clamp(2.8rem, 8vw, 5.8rem);
+  line-height: 1;
+}
+.site[data-look="heritage"] .btn,
+.site[data-look="heritage"] .btnGhost {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.78rem;
+  padding: 1rem 1.6rem;
+}
+.site[data-look="heritage"] .hero {
+  align-items: center;
+  text-align: center;
+  outline: 1px solid var(--brass);
+  outline-offset: -1.1rem;
+}
+.site[data-look="heritage"] .heroCopy {
+  margin: 0 auto;
+  justify-items: center;
+}
+.site[data-look="heritage"] .heroActions {
+  justify-content: center;
+}
+.site[data-look="heritage"] .hero[data-variant="photo"] .heroImg {
+  filter: grayscale(0.55) sepia(0.2) contrast(1.05);
+}
+.site[data-look="heritage"] .hero[data-variant="photo"]::after {
+  background: linear-gradient(to top, rgb(22 22 24 / 0.88), rgb(22 22 24 / 0.4));
+}
+.site[data-look="heritage"] .hero[data-variant="plain"] {
+  background: linear-gradient(165deg, #2a2724, #161618 75%);
+  color: #efe9df;
+}
+.site[data-look="heritage"] .hero[data-variant="plain"] .btn {
+  background: var(--brass);
+  color: #161618;
+}
+.site[data-look="heritage"] .section {
+  text-align: center;
+}
+.site[data-look="heritage"] .section > h2 {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  justify-content: center;
+  font-size: clamp(1.5rem, 3.4vw, 2.2rem);
+}
+.site[data-look="heritage"] .section > h2::before,
+.site[data-look="heritage"] .section > h2::after {
+  content: "";
+  flex: 1;
+  max-width: 7rem;
+  border-top: 1px solid var(--brass);
+}
+.site[data-look="heritage"] .menu li {
+  text-align: left;
+  border-bottom-color: var(--line);
+}
+.site[data-look="heritage"] .menu li::before {
+  border-bottom-color: rgb(201 165 106 / 0.5);
+}
+.site[data-look="heritage"] .menuName {
+  font-family: var(--head);
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.site[data-look="heritage"] .price {
+  color: var(--brass);
+  font-family: var(--head);
+  font-size: 1.3rem;
+}
+.site[data-look="heritage"] .facts {
+  border-block: 3px double var(--brass);
+  text-align: center;
+}
+.site[data-look="heritage"] .facts b {
+  color: var(--brass);
+}
+.site[data-look="heritage"] .info > .section {
+  background: transparent;
+  border: 1px solid var(--brass);
+  border-radius: 2px;
+  text-align: left;
+}
+.site[data-look="heritage"] .more {
+  border-radius: 2px;
+  border-color: var(--brass);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+}
+.site[data-look="heritage"] .gallery img {
+  border-radius: 2px;
+  filter: grayscale(0.4) sepia(0.15);
+}
+.site[data-look="heritage"] .closing {
+  background: transparent;
+  color: #efe9df;
+  border: 3px double var(--brass);
+  border-radius: 2px;
+}
+.site[data-look="heritage"] .closing .btn {
+  background: var(--brass);
+  color: #161618;
+}
+.site[data-look="heritage"] .foot {
+  text-align: center;
+  justify-items: center;
+  border-top: 1px solid var(--line);
+  background: #101012;
+}
+.site[data-look="heritage"] .foot div {
+  justify-items: center;
+}
+.site[data-look="heritage"] .pagehead {
+  background: #1d1d20;
+  text-align: center;
+  border-bottom: 1px solid var(--brass);
+}
+.site[data-look="heritage"] .link,
+.site[data-look="heritage"] .contact a {
+  color: var(--brass);
+}
+
+/* ---- Tradesman (from the electrician sample): white and navy, heavy capitals, a hazard stripe in the theme colour ---- */
+.site[data-look="tradesman"] {
+  --paper: #ffffff;
+  --ink: #0f1b2d;
+  --muted: #4b5668;
+  --line: #d9dee6;
+  --radius: 2px;
+  --head: var(--tpl-font-archivo, "Arial Black", system-ui, sans-serif);
+  --body: var(--tpl-font-archivo, var(--system));
+  --head-weight: 800;
+  --head-case: uppercase;
+  --head-track: -0.01em;
+  --hazard: #f5c400;
+  --stripe: repeating-linear-gradient(-45deg, var(--hazard) 0 0.8rem, #0f1b2d 0.8rem 1.6rem);
+}
+.site[data-look="tradesman"] .nav {
+  background: #fff;
+  backdrop-filter: none;
+  border-top: 0.55rem solid transparent;
+  border-image: var(--stripe) 1;
+  border-image-slice: 1;
+  border-bottom: 1px solid var(--line);
+}
+.site[data-look="tradesman"] .links a {
+  font-weight: 600;
+  color: #0f1b2d;
+  font-size: 0.86rem;
+}
+.site[data-look="tradesman"] .btn,
+.site[data-look="tradesman"] .btnGhost {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 800;
+  padding: 1rem 1.5rem;
+}
+.site[data-look="tradesman"] .hero[data-variant="photo"]::after {
+  background: linear-gradient(95deg, rgb(15 27 45 / 0.9), rgb(15 27 45 / 0.55) 55%, rgb(15 27 45 / 0.15));
+}
+.site[data-look="tradesman"] .hero {
+  align-items: center;
+}
+.site[data-look="tradesman"] .hero[data-variant="plain"] {
+  background: #0f1b2d;
+  color: #fff;
+  border-bottom: 0.7rem solid transparent;
+  border-image: var(--stripe) 1;
+}
+.site[data-look="tradesman"] .hero[data-variant="plain"] .btn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.site[data-look="tradesman"] .section h2 {
+  position: relative;
+  padding-left: 1.1rem;
+}
+.site[data-look="tradesman"] .section h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  bottom: 0.1em;
+  width: 0.4rem;
+  background: var(--hazard);
+}
+.site[data-look="tradesman"] .menu li {
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--line);
+  border-left: 0.4rem solid var(--hazard);
+  margin-bottom: 0.6rem;
+  background: #f4f6f9;
+}
+.site[data-look="tradesman"] .menu li::before {
+  display: none;
+}
+.site[data-look="tradesman"] .menu {
+  gap: 0 1.5rem;
+}
+.site[data-look="tradesman"] .menuName {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.site[data-look="tradesman"] .price {
+  color: #0f1b2d;
+  font-weight: 800;
+  background: color-mix(in srgb, var(--hazard) 35%, #fff);
+  padding: 0.15rem 0.6rem;
+}
+.site[data-look="tradesman"] .facts {
+  max-width: none;
+  margin: 0;
+  background: #0f1b2d;
+  color: #fff;
+  border: 0;
+}
+.site[data-look="tradesman"] .facts b {
+  color: var(--hazard);
+}
+.site[data-look="tradesman"] .facts span {
+  color: #b6c0d0;
+}
+.site[data-look="tradesman"] .info > .section {
+  background: #f4f6f9;
+  border: 1px solid var(--line);
+  border-top: 0.4rem solid var(--hazard);
+}
+.site[data-look="tradesman"] .more {
+  border-radius: 2px;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+.site[data-look="tradesman"] .closing {
+  margin: 0;
+  background: #0f1b2d;
+  color: #fff;
+  border-radius: 0;
+  border-top: 0.7rem solid transparent;
+  border-image: var(--stripe) 1;
+}
+.site[data-look="tradesman"] .closing .btn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.site[data-look="tradesman"] .foot {
+  background: #0a1422;
+  color: #b6c0d0;
+  border: 0;
+}
+.site[data-look="tradesman"] .foot .logo {
+  color: #fff;
+}
+.site[data-look="tradesman"] .pagehead {
+  background: #0f1b2d;
+  color: #fff;
+}
+
+/* ---- Clinic (from the physio sample): soft sage and deep green, rounded, calm and airy ---- */
+.site[data-look="clinic"] {
+  --paper: #eef3ef;
+  --ink: #1f3a33;
+  --muted: #557069;
+  --line: #d3e0d9;
+  --radius: 14px;
+  --head: var(--tpl-font-figtree, var(--system));
+  --body: var(--tpl-font-figtree, var(--system));
+  --head-weight: 600;
+  --head-case: none;
+  --head-track: -0.015em;
+}
+.site[data-look="clinic"] .nav {
+  background: rgb(255 255 255 / 0.9);
+  border-bottom: 0;
+  box-shadow: 0 1px 0 var(--line), 0 8px 24px rgb(31 58 51 / 0.05);
+}
+.site[data-look="clinic"] .btn,
+.site[data-look="clinic"] .btnGhost {
+  border-radius: 999px;
+  padding: 0.9rem 1.55rem;
+}
+.site[data-look="clinic"] .hero[data-variant="photo"] {
+  margin: 1rem var(--pad) 0;
+  border-radius: 32px;
+  overflow: hidden;
+  min-height: min(70vh, 36rem);
+}
+.site[data-look="clinic"] .hero[data-variant="photo"]::after {
+  background: linear-gradient(to top, rgb(31 58 51 / 0.72), rgb(31 58 51 / 0.05) 70%);
+}
+.site[data-look="clinic"] .hero[data-variant="plain"] {
+  background: linear-gradient(170deg, #cfe3d8, #eef3ef 85%);
+  color: #1f3a33;
+}
+.site[data-look="clinic"] .hero[data-variant="plain"] .btn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.site[data-look="clinic"] .menu {
+  gap: 1rem;
+}
+.site[data-look="clinic"] .menu li {
+  background: #fff;
+  border: 0;
+  border-radius: 18px;
+  padding: 1.2rem 1.4rem;
+  box-shadow: 0 2px 14px rgb(31 58 51 / 0.07);
+}
+.site[data-look="clinic"] .menu li::before {
+  display: none;
+}
+.site[data-look="clinic"] .price {
+  font-weight: 600;
+}
+.site[data-look="clinic"] .facts {
+  border: 0;
+  gap: 1rem;
+}
+.site[data-look="clinic"] .facts p {
+  padding: 1.25rem 1.4rem;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 2px 14px rgb(31 58 51 / 0.07);
+}
+.site[data-look="clinic"] .info > .section {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 2px 14px rgb(31 58 51 / 0.07);
+}
+.site[data-look="clinic"] .gallery img {
+  border-radius: 24px;
+}
+.site[data-look="clinic"] .closing {
+  background: #fff;
+  color: #1f3a33;
+  border-radius: 32px;
+  box-shadow: 0 2px 14px rgb(31 58 51 / 0.07);
+}
+.site[data-look="clinic"] .closing .btn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.site[data-look="clinic"] .foot {
+  border-top-color: var(--line);
+}
+.site[data-look="clinic"] .pagehead {
+  background: linear-gradient(170deg, #cfe3d8, #eef3ef 90%);
+  border-radius: 0 0 32px 32px;
+}
+
+/* The dark styles: the request form is a dark panel, buttons use the light tint of the theme colour so they stand out, and
+   the dark theme colour a customer picks never has to carry text on its own. */
+.site[data-look="executive"] {
+  --card: #17181c;
+}
+.site[data-look="hearth"] {
+  --card: #35261e;
+}
+.site[data-look="heritage"] {
+  --card: #1d1d20;
+}
+.site[data-look="executive"] .form,
+.site[data-look="hearth"] .form,
+.site[data-look="heritage"] .form {
+  box-shadow: none;
+}
+.site[data-look="executive"] .btn,
+.site[data-look="hearth"] .btn,
+.site[data-look="heritage"] .btn,
+.site[data-look="executive"] .hero[data-variant="plain"] .btn,
+.site[data-look="executive"] .closing .btn {
+  background: var(--accent-text);
+  color: #141414;
+}
+.site[data-look="heritage"] .btn,
+.site[data-look="heritage"] .hero[data-variant="plain"] .btn,
+.site[data-look="heritage"] .closing .btn {
+  background: var(--brass);
+}
+.site[data-look="hearth"] .closing {
+  background: color-mix(in srgb, var(--accent) 70%, #20150f);
+  color: #f6ead8;
+}
+.site[data-look="hearth"] .closing .btn,
+.site[data-look="hearth"] .hero[data-variant="plain"] .btn {
+  background: #f6ead8;
+  color: #2a1d17;
+}
+.site[data-look="executive"] .sent,
+.site[data-look="hearth"] .sent,
+.site[data-look="heritage"] .sent {
+  background: var(--card);
+}
+.site[data-look="executive"] .whatsapp,
+.site[data-look="hearth"] .whatsapp,
+.site[data-look="heritage"] .whatsapp {
+  background: var(--accent-text);
+  color: #141414;
+}
+
+.site[data-look="heritage"] .form,
+.site[data-look="heritage"] .info > .section {
+  text-align: left;
+}
+.site[data-look="heritage"] .bookIntro {
+  text-align: left;
+  justify-items: start;
 }

@@ -5,10 +5,13 @@
  */
 
 /** The kinds of section a template can have. A sector preset chooses which ones appear, and in what order. */
+import { LEGACY_LOOKS, STYLES } from "./styles";
+
 export const SECTION_KINDS = ["hero", "services", "hours", "gallery", "facts", "area", "enquiry", "faq", "cta", "pagehead", "about"] as const;
 export type SectionKind = (typeof SECTION_KINDS)[number];
 
-export const LOOKS = ["minimal", "warm", "bold", "classic"] as const;
+/** The design of a site: one of the eight styles. The four older looks still draw, so sites built with them keep their look. */
+export const LOOKS = [...STYLES, ...LEGACY_LOOKS] as const;
 export type Look = (typeof LOOKS)[number];
 
 /**

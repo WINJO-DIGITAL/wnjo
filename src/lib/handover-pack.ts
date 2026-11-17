@@ -26,13 +26,21 @@ export function missingChecklist(ticked: unknown): string[] {
 
 /** The typefaces each look uses (see `site-template/fonts.ts`). */
 export const LOOK_FONTS: Record<Look, string> = {
+  athletic: "Archivo (wide capitals) throughout",
+  precision: "Manrope for headings, DM Sans for text",
+  boutique: "Young Serif for headings, Hanken Grotesk for text",
+  executive: "Jost throughout",
+  hearth: "Playfair Display for headings, Inter for text",
+  heritage: "Cormorant Garamond (capitals) for headings, Inter for text",
+  tradesman: "Archivo (capitals) throughout",
+  clinic: "Figtree throughout",
   classic: "Playfair Display for headings, Inter for text",
   warm: "Nunito throughout",
   bold: "Barlow Condensed (capitals) for headings, Inter for text",
   minimal: "Inter throughout",
 };
 
-const FONT_SOURCES = "All four typefaces are open source (SIL Open Font Licence) and free to download from fonts.google.com.";
+const FONT_SOURCES = "All the typefaces are open source (SIL Open Font Licence) and free to download from fonts.google.com.";
 
 function sectionLines(s: Section): string[] {
   switch (s.kind) {

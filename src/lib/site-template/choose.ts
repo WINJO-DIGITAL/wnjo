@@ -9,14 +9,10 @@ import { extractJson, type WebsitePlan } from "@/lib/ai/website-plan";
 import { GOALS, type WebsiteBrief } from "@/lib/website-brief";
 import { parseAnswers, type RawAnswers } from "./answers";
 import { SECTOR_PRESETS } from "./presets";
-import { LOOKS, type Look } from "./schema";
+import type { Look } from "./schema";
+import { STYLES, STYLE_INFO } from "./styles";
 
-const LOOK_NOTES: Record<Look, string> = {
-  minimal: "clean and quiet, lots of white space",
-  warm: "friendly and welcoming, softer colours",
-  bold: "strong and confident, high contrast",
-  classic: "traditional and trustworthy, understated",
-};
+const LOOK_NOTES = (look: Look): string => (look in STYLE_INFO ? `${STYLE_INFO[look as keyof typeof STYLE_INFO].blurb} Tone: ${STYLE_INFO[look as keyof typeof STYLE_INFO].tone}.` : look);
 
 /**
  * The answers a template needs, taken from what a customer told us when they typed their own kind of business. Hours are
@@ -80,7 +76,7 @@ export function buildChoicePrompt(input: ChoiceInput): string {
     ...input.sectors.map((id) => `- ${id}: ${SECTOR_PRESETS[id]?.label ?? id}. ${SECTOR_PRESETS[id]?.voice ?? ""}`.trim()),
     "",
     "Looks you may choose from:",
-    ...input.looks.map((look) => `- ${look}: ${LOOK_NOTES[look]}`),
+    ...input.looks.map((look) => `- ${look}: ${LOOK_NOTES(look)}`),
     "",
     'Reply with JSON in exactly this shape: {"sector": string, "look": string}',
   ]
@@ -131,4 +127,5 @@ export async function pickTemplate(provider: AiProvider, input: ChoiceInput): Pr
   return { ok: false, reason: "The AI could not settle on a template.", costPence };
 }
 
-export const ALL_LOOKS: readonly Look[] = LOOKS;
+/** The eight designs the AI chooses between. */
+export const ALL_LOOKS: readonly Look[] = STYLES;

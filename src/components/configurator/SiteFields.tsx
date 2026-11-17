@@ -3,13 +3,14 @@
 import { useId, useState } from "react";
 import { DAYS, type DayAnswer, type RawAnswers } from "@/lib/site-template/answers";
 import { ABOUT_QUESTION, BUSINESS_GROUPS, SECTOR_PRESETS, type BusinessGroup } from "@/lib/site-template/presets";
-import { defaultLayout, LAYOUTS, LOOKS, type Layout, type Look } from "@/lib/site-template/schema";
+import { defaultLayout, LAYOUTS, type Layout, type Look } from "@/lib/site-template/schema";
+import { STYLES, STYLE_INFO } from "@/lib/site-template/styles";
 import { CUSTOMERS, FIRST_ACTIONS, PROFILE_LIMITS, TONES, type BusinessProfile, type FirstAction, type WebsiteBrief } from "@/lib/website-brief";
 import type { BriefChange } from "./BriefSteps";
 import styles from "./Configurator.module.css";
 
 const LAYOUT_LABELS: Record<Layout, string> = { showcase: "Photo first", split: "Side by side", essentials: "Details first" };
-const LOOK_LABELS: Record<Look, string> = { minimal: "Clean and minimal", warm: "Warm and friendly", bold: "Bold", classic: "Classic" };
+const LOOK_LABELS: Record<Look, string> = { ...Object.fromEntries(STYLES.map((id) => [id, STYLE_INFO[id].label])), minimal: "Clean and minimal", warm: "Warm and friendly", bold: "Bold", classic: "Classic" } as Record<Look, string>;
 
 /** Theme colours the customer can pick. Dark enough for white text, so every look stays readable. */
 export const SITE_COLOURS = [
@@ -297,7 +298,7 @@ export function SiteFields({ brief, onChange, errors, businessName }: { brief: W
           <fieldset className={styles.group}>
             <legend className={styles.legend}>Look and colour</legend>
             <div className="brief-chips" role="group" aria-label="Look">
-              {LOOKS.map((l) => (
+              {STYLES.map((l) => (
                 <button key={l} type="button" className="brief-chip" aria-pressed={(answers.look ?? preset.defaultLook) === l} onClick={() => set({ look: l })}>
                   {LOOK_LABELS[l]}
                 </button>

@@ -11,6 +11,7 @@ import { checkSite, describeIssues, FILLER_PHRASES, type CheckIssue } from "./ch
 import { variantFor } from "./copy-variants";
 import { aboutSection, layoutPages, PAGE_KINDS, pageTitle, type PageHeads, type PageKind } from "./pages";
 import type { SectorPreset } from "./presets";
+import { STYLES, STYLE_INFO } from "./styles";
 import type { CustomerFacts, GalleryImage, Layout, Look, Section, SiteContent } from "./schema";
 import { defaultLayout, FIELD_LIMITS, WORD_LIMITS } from "./schema";
 import { cutWords, wordCount } from "./text";
@@ -65,11 +66,12 @@ const shapeFor = (pages: readonly PageKind[]): string => {
 };
 
 const LOOK_TONE: Record<Look, string> = {
+  ...Object.fromEntries(STYLES.map((id) => [id, STYLE_INFO[id].tone])),
   minimal: "calm and understated",
   warm: "warm and friendly",
   bold: "direct and confident",
   classic: "traditional and assured",
-};
+} as Record<Look, string>;
 
 /** The sector's own rules (for example, no promised cures), stated up front so a draft doesn't break them. A claim the customer ticked is theirs to make, so its rule is left out. */
 function sectorRules(input: WriteInput): string[] {

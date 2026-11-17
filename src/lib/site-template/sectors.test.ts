@@ -122,7 +122,7 @@ describe("answers by sector", () => {
     if (r.ok) {
       expect(r.facts.areas).toEqual(["Leeds", "Wakefield", "Harrogate"]);
       expect(r.facts.hours).toBeUndefined();
-      expect(r.look).toBe("bold");
+      expect(r.look).toBe("tradesman");
     }
   });
 
@@ -137,7 +137,7 @@ describe("answers by sector", () => {
     expect(missing.ok === false && missing.errors.areas).toBe("Add the areas you cover.");
     const cafe = parse({ businessName: "Harbour", servicesText: "Flat white £3.20", about: "A small harbour café.", hours: week, email: "hi@harbour.example" }, CAFE_PRESET);
     expect(cafe.ok).toBe(true);
-    if (cafe.ok) expect(cafe.look).toBe("warm");
+    if (cafe.ok) expect(cafe.look).toBe("hearth");
   });
 
   it("still needs hours for a café, and for a barber", () => {

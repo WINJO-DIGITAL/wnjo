@@ -22,8 +22,8 @@ const scripted = (...texts: string[]): AiProvider & { calls: number } => {
 };
 const input = (over: Partial<Parameters<typeof pickTemplate>[1]> = {}) => ({ businessName: "Hartley Electrical", businessType: "electrician", brief, plan, sectors: ["electrician", "plumber"], looks: ALL_LOOKS, ...over });
 
-describe("there are 44 templates: eleven sectors in four looks", () => {
-  it("counts them", () => expect(Object.keys(SECTOR_PRESETS).length * ALL_LOOKS.length).toBe(44));
+describe("there are eight styles, and the AI chooses between exactly those", () => {
+  it("counts them", () => expect(ALL_LOOKS).toHaveLength(8));
 });
 
 describe("answers from a customer's own words", () => {
@@ -55,12 +55,12 @@ describe("the choice prompt and its checks", () => {
     const p = buildChoicePrompt(input({ sectors: ["electrician"] }));
     expect(p).toContain("- electrician:");
     expect(p).not.toContain("- barber:");
-    expect(p).toContain("- minimal:");
+    expect(p).toContain("- athletic:");
     expect(p).toContain(plan.summary);
   });
 
   it("accepts a sector and a look from the lists, in any case or fence", () => {
-    expect(parseChoice('```json\n{"sector":"Electrician","look":"BOLD"}\n```', ["electrician"], ALL_LOOKS)).toEqual({ ok: true, choice: { sector: "electrician", look: "bold" } });
+    expect(parseChoice('```json\n{"sector":"Electrician","look":"ATHLETIC"}\n```', ["electrician"], ALL_LOOKS)).toEqual({ ok: true, choice: { sector: "electrician", look: "athletic" } });
   });
 
   it("refuses anything else, rather than repairing it", () => {
@@ -72,30 +72,30 @@ describe("the choice prompt and its checks", () => {
 
 describe("when no sector suits the business", () => {
   it("lets the model say none, only when allowed, and tells it so", () => {
-    expect(parseChoice('{"sector":"none","look":"warm"}', ["cleaning"], ALL_LOOKS, true)).toMatchObject({ ok: true, choice: { sector: "none" } });
-    expect(parseChoice('{"sector":"none","look":"warm"}', ["cleaning"], ALL_LOOKS).ok).toBe(false);
+    expect(parseChoice('{"sector":"none","look":"boutique"}', ["cleaning"], ALL_LOOKS, true)).toMatchObject({ ok: true, choice: { sector: "none" } });
+    expect(parseChoice('{"sector":"none","look":"boutique"}', ["cleaning"], ALL_LOOKS).ok).toBe(false);
     expect(buildChoicePrompt(input({ allowNone: true }))).toContain('answer "none"');
     expect(buildChoicePrompt(input())).not.toContain('answer "none"');
   });
 
   it("still asks the model when it is the only sector, so it can decline it", async () => {
     const p = scripted('{"sector":"none","look":"bold"}');
-    expect(await pickTemplate(p, input({ sectors: ["cleaning"], looks: ["bold"], allowNone: true }))).toMatchObject({ ok: true, choice: { sector: "none" } });
+    expect(await pickTemplate(p, input({ sectors: ["cleaning"], looks: ["athletic"], allowNone: true }))).toMatchObject({ ok: true, choice: { sector: "none" } });
     expect(p.calls).toBe(1);
   });
 });
 
 describe("picking the template", () => {
   it("asks the model once and uses its answer", async () => {
-    const p = scripted('{"sector":"plumber","look":"warm"}');
-    expect(await pickTemplate(p, input())).toEqual({ ok: true, choice: { sector: "plumber", look: "warm" }, costPence: 1 });
+    const p = scripted('{"sector":"plumber","look":"boutique"}');
+    expect(await pickTemplate(p, input())).toEqual({ ok: true, choice: { sector: "plumber", look: "boutique" }, costPence: 1 });
     expect(p.calls).toBe(1);
   });
 
   it("tries once more with the reason when the first reply is outside the lists", async () => {
-    const p = scripted('{"sector":"barber","look":"warm"}', '{"sector":"electrician","look":"classic"}');
+    const p = scripted('{"sector":"barber","look":"boutique"}', '{"sector":"electrician","look":"heritage"}');
     const r = await pickTemplate(p, input());
-    expect(r).toMatchObject({ ok: true, choice: { sector: "electrician", look: "classic" }, costPence: 2 });
+    expect(r).toMatchObject({ ok: true, choice: { sector: "electrician", look: "heritage" }, costPence: 2 });
   });
 
   it("gives up after two bad replies, so a person decides", async () => {
@@ -105,7 +105,7 @@ describe("picking the template", () => {
 
   it("makes no call when there is nothing to choose", async () => {
     const p = scripted("unused");
-    expect(await pickTemplate(p, input({ sectors: ["electrician"], looks: ["bold"] }))).toEqual({ ok: true, choice: { sector: "electrician", look: "bold" }, costPence: 0 });
+    expect(await pickTemplate(p, input({ sectors: ["electrician"], looks: ["athletic"] }))).toEqual({ ok: true, choice: { sector: "electrician", look: "athletic" }, costPence: 0 });
     expect(p.calls).toBe(0);
   });
 

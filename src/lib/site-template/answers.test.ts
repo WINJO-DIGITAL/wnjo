@@ -131,7 +131,7 @@ describe("parseAnswers", () => {
     expect(r.ok).toBe(true);
     if (r.ok) {
       expect(r.colour).toBe("#222222");
-      expect(r.look).toBe("classic");
+      expect(r.look).toBe("heritage");
       expect(r.facts.highlights).toHaveLength(1);
     }
   });
