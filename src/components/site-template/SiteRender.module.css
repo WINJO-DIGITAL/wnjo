@@ -4126,3 +4126,13 @@
 .site[data-look="tradesman"] .facts b {
   font-size: clamp(1.5rem, 5vw, 3rem);
 }
+
+/* ---- Photographic grade: each style tones the customer's photos in its own way. A light touch, done in the browser; the files are never changed. ---- */
+.site[data-look="athletic"] :is(.heroImg, .gallery img, .wall img, .aboutImg) { filter: contrast(1.08) saturate(1.05); }
+.site[data-look="precision"] :is(.heroImg, .gallery img, .wall img, .aboutImg) { filter: saturate(0.88) contrast(1.04); }
+.site[data-look="boutique"] :is(.heroImg, .gallery img, .wall img, .aboutImg) { filter: saturate(1.06) sepia(0.08); }
+.site[data-look="executive"] :is(.heroImg, .gallery img, .wall img, .aboutImg) { filter: saturate(0.82) contrast(1.06) brightness(0.97); }
+.site[data-look="hearth"] :is(.heroImg, .gallery img, .wall img, .aboutImg) { filter: sepia(0.14) saturate(1.06); }
+.site[data-look="heritage"] :is(.heroImg, .gallery img, .wall img, .aboutImg) { filter: sepia(0.26) contrast(1.05) saturate(0.9); }
+.site[data-look="tradesman"] :is(.heroImg, .gallery img, .wall img, .aboutImg) { filter: contrast(1.1) saturate(1.04); }
+.site[data-look="clinic"] :is(.heroImg, .gallery img, .wall img, .aboutImg) { filter: brightness(1.04) saturate(0.94); }

@@ -37,6 +37,25 @@ The eight styles live in `src/lib/site-template/styles.ts` and are drawn by `src
 - Mobile performance cause: largest paint 4.6 s in Lighthouse's throttled-mobile run, although the hero image itself loads in about 0.2 s. The wait is render-blocking CSS (about 70 KB, every style's rules ship to every site) and a 91 KB font. Real fix, not done: ship only the chosen style's CSS. Adding `fetchpriority="high"` to the hero image made no measurable difference; kept as harmless.
 - Score stays 74. Technical, responsive and accessibility are now measured and strong; the remaining gap is imagery and per-style motion.
 
+## Fourth round, all styles (17 Nov, local; not pushed)
+
+Done for every style: opening motion (transform only, own movement per style, off under reduced motion); photographic grade (a light CSS tone per style, files untouched); twelve theme colours instead of six, every one passing axe contrast in all eight styles with and without photos (96 combinations). No-photo heroes now draw a graphic: Athletic speed lines, Precision drafting grid, Clinic arches (the other five already had framed or banded compositions). Athletic header and hours/find-us band fixed. A phone overflow on Tradesman (long figure word, for example "Emergency") fixed: four plumbing browser tests were failing on main before this and now pass.
+
+Measured: all 90 browser tests, 1,510 unit tests, axe clean on all eight styles at 1280 and 390 px (with and without photos), Lighthouse desktop 99-100, mobile 82 (observed largest paint 218 ms; the 4.5 s is Lighthouse's throttled simulation, and the stylesheet is 49 KB compressed, so splitting it per style would not change it; decided against).
+
+| Style | Score | Basis |
+| --- | --- | --- |
+| Athletic | 78 | Merged band, header fix, speed-line hero, motion, grade |
+| Boutique | 76 | Motion, grade, colours |
+| Precision | 77 | Drafting-grid hero, motion, grade, colours |
+| Executive | 75 | Motion, grade, colours |
+| Hearth | 75 | Motion, grade, colours |
+| Heritage | 75 | Motion, grade, colours |
+| Tradesman | 75 | Overflow fix, motion, grade, colours |
+| Clinic | 73 | Arch hero, motion, grade, colours |
+
+Scores are still my judgement. What stops 90 now: art direction needs the owner's own photographs (the stand-in photo is one barber shot in every style), and a second typeface per style is not done.
+
 ## The systemic weakness (Part 10)
 
 Every style still renders the same sequence: hero, gallery or menu, hours, find us, request form, questions. Different skins, same skeleton. Two fixes are planned at system level rather than per style:
