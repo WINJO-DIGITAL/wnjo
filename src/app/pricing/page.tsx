@@ -15,7 +15,7 @@ const pro = WEBSITE_PLANS.gold;
 export const metadata = pageMetadata(
   "/pricing",
   "Managed website pricing",
-  `Fully managed websites on a rolling monthly subscription: ${core.name} ${formatGBP(core.monthly)}, ${plus.name} ${formatGBP(plus.monthly)} and ${pro.name} ${formatGBP(pro.monthly)} a month. A sector design tailored to your business, with hosting, maintenance and support, and no minimum term.`,
+  `Managed websites on a rolling monthly plan: ${core.name} ${formatGBP(core.monthly)}, ${plus.name} ${formatGBP(plus.monthly)} and ${pro.name} ${formatGBP(pro.monthly)} a month, with hosting and support. No minimum term.`,
 );
 
 // Always flagged up front, whichever plan is chosen.

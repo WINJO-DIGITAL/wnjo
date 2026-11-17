@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/metadata";
 export const metadata = pageMetadata(
   "/cookies",
   "Cookies",
-  "What this website stores in your browser, and why.",
+  "What this website stores in your browser, and why. There are no analytics, advertising or tracking cookies.",
 );
 
 /*

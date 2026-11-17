@@ -21,7 +21,7 @@ export const viewport: Viewport = { themeColor: "#E8EADE" };
 export const metadata = pageMetadata(
   "/app-development",
   "Custom software and app development",
-  "Custom software development for businesses: web and mobile apps, customer portals, SaaS platforms, internal tools, integrations and business automation, built around the way you operate.",
+  "Custom software for businesses: web and mobile apps, customer portals, internal tools, integrations and automation, built around how you work.",
 );
 
 const clips: ClipItem[] = [

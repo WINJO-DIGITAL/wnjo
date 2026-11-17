@@ -14,8 +14,8 @@ export type Article = {
 export const articles: Article[] = [
   {
     slug: "how-ordering-a-website-works",
-    title: "What happens when you order a website from WINJO DIGITAL",
-    description: "Each step from choosing a plan to launch for a managed website, and how owning your website outright differs: the first payment, your goals, design and build, launch and ongoing care.",
+    title: "What happens when you order a website from us",
+    description: "Each step from choosing a plan to launch, and how owning your website outright differs: the first payment, your goals, design, build, launch and care.",
     published: "2026-11-07",
     sections: [
       {

@@ -89,7 +89,7 @@ export function CareHero({ site }: { site: Pick<Project, "name" | "host" | "show
       </figure>
 
       {/* Swipes sideways on phones; one row on larger screens. */}
-      <ul role="list" className="care-hero__jobs" aria-label={ours ? "With WINJO" : "On your own"}>
+      <ul role="list" className="care-hero__jobs" tabIndex={0} aria-label={ours ? "With WINJO" : "On your own"}>
         {JOBS.map((j, i) => (
           <li key={j.job} style={{ "--i": i } as React.CSSProperties}>
             <span className="care-hero__job">{j.job}</span>
