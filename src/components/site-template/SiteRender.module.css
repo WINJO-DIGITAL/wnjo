@@ -1044,37 +1044,37 @@
   border: 1px solid var(--ink);
 }
 @media (min-width: 56rem) {
-  /* The menu on the left, the logo in the middle, the buttons on the right. A grid, so nothing can overlap: a long menu
+  /* The logo on the left, the menu beside it, the buttons on the right. A grid, so nothing can overlap: a long menu
      scrolls and a long name is cut, rather than one running into the other. */
   .site[data-look="athletic"] .nav {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto auto;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
     align-items: center;
-    column-gap: 1rem;
+    column-gap: 2rem;
+  }
+  .site[data-look="athletic"] .nav .logo,
+  .site[data-look="athletic"] .nav .logoImg {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    max-width: min(20rem, 30vw);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .site[data-look="athletic"] .nav .links {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 1;
     margin: 0;
     overflow-x: auto;
     min-width: 0;
   }
-  .site[data-look="athletic"] .nav .logo,
-  .site[data-look="athletic"] .nav .logoImg {
-    grid-column: 2;
-    grid-row: 1;
-    margin: 0;
-    max-width: min(24rem, 38vw);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
   .site[data-look="athletic"] .nav .call {
-    grid-column: 4;
+    grid-column: 3;
     grid-row: 1;
   }
   .site[data-look="athletic"] .nav .btn {
-    grid-column: 5;
+    grid-column: 4;
     grid-row: 1;
   }
 }

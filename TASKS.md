@@ -28,6 +28,12 @@ The eight styles live in `src/lib/site-template/styles.ts` and are drawn by `src
 | Executive | 71 | Services as gold-ruled rows beside the heading (any count sits well), larger figures that scale on phones, areas as a ruled row, larger headline |
 | Clinic | 68 | Arch photo beside the words, treatments as a heading-left list-right split with hairlines, figures without cards, sage closing band; second round: the arch returns in the gallery's lead image and the closing band, larger headline, gallery placed before hours, full-width hero |
 
+## Athletic pilot, third round (17 Nov)
+
+- Hours and find us share one band beside each other on wide screens (merged to main, `e045283`).
+- Header: logo left, menu beside it, buttons right. The centred logo used to clip the menu ("Find us" was cut off on every desktop render).
+- Checked: desktop and phone, the three hero layouts (showcase, split, essentials). Not measured: Lighthouse, axe. Score stays 74 until measured; the remaining gap is imagery and per-style motion, not layout.
+
 ## The systemic weakness (Part 10)
 
 Every style still renders the same sequence: hero, gallery or menu, hours, find us, request form, questions. Different skins, same skeleton. Two fixes are planned at system level rather than per style:
