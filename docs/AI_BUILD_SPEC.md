@@ -50,7 +50,7 @@ A website is one of **eight styles**, and the words inside are the customer's ow
 | --- | --- | --- |
 | Athletic | RAENG Fitness | paper and ink, bold sentence-case type, every section a label and heading on the left with white rounded cards on the right, pill buttons, centred logo |
 | Precision | Duratek | a frosted navy header over a full-width top of the page, light type with an accent line under each heading, inset rounded panels in cream, sand and navy, the gallery as slices that open on hover, a navy footer with a large wordmark |
-| Boutique | Boonma | cream, a friendly serif, flowing wave edges between sections |
+| Boutique | Boonma | a blush panel with the photograph running to the screen edge, the menu with a gold rule and dotted leaders, serif prices, two-column rows, flowing wave edges between bands |
 | Executive | EV Exec | charcoal and gold, centred, services as gold-ruled cards |
 | Hearth | café sample | warm browns, italic serif, a framed menu board, paper grain |
 | Heritage | barber sample | near-black and brass, framed hero, matted photographs, ruled headings |
