@@ -3889,3 +3889,43 @@
     grid-column: 2;
   }
 }
+
+/* ---- Boutique, refined: a larger serif headline, figures set between gold rules, and hours and the place stacked inside their cards. ---- */
+.site[data-look="boutique"] .hero h1 {
+  font-size: clamp(2.6rem, 5.6vw, 5rem);
+  line-height: 0.98;
+}
+.site[data-look="boutique"] .facts {
+  max-width: 62rem;
+  margin: clamp(2rem, 5vw, 3.5rem) auto;
+  padding: 1.75rem var(--pad);
+  gap: 0;
+  border-block: 1px solid var(--gold, #c9a56a);
+  text-align: center;
+}
+.site[data-look="boutique"] .facts p {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0.5rem 1.5rem;
+  border-left: 1px solid rgb(201 165 106 / 0.55);
+}
+.site[data-look="boutique"] .facts p:first-child {
+  border-left: 0;
+}
+.site[data-look="boutique"] .facts b {
+  font-size: clamp(1.8rem, 4.4vw, 3rem);
+  line-height: 1.05;
+}
+.site[data-look="boutique"] .facts span {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+}
+.site[data-look="boutique"] .info {
+  align-items: start;
+}
+.site[data-look="boutique"] .info > .section:not(.book):not(:has(> .gallery)) {
+  display: block;
+  align-self: start;
+}
