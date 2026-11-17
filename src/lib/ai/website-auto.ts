@@ -1,60 +1,172 @@
+import { randomUUID } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AiProvider } from "./provider";
 import { parseAnswers } from "@/lib/site-template/answers";
 import { runSiteBuildStep } from "@/lib/site-template/build-service";
+import { ALL_LOOKS, answersFromProfile, buildableSectors, pickTemplate } from "@/lib/site-template/choose";
 import { presetFor } from "@/lib/site-template/presets";
-import type { SiteAnswers } from "@/lib/site-template/answers";
-import { runPlanStep, runPreviewStep, type Actor } from "./website-ai-service";
+import type { RawAnswers, SiteAnswers } from "@/lib/site-template/answers";
+import type { Look } from "@/lib/site-template/schema";
+import type { WebsiteBrief } from "@/lib/website-brief";
+import { alertOwner, buildFailedMessage, readyForReviewMessage } from "./owner-alerts";
+import { logEvent, runPlanStep, runPreviewStep, type Actor } from "./website-ai-service";
+import { SupabaseWebsiteAiStore } from "./website-ai-store";
+
+/** Two failed tries at one website, then it is left for the owner rather than spending more. */
+export const MAX_FAILED_TRIES = 2;
+const CLAIM_WINDOW_MS = 10 * 60_000;
+const FALLBACK_COLOUR = "#1f3a34";
+
+type BriefRow = {
+  id: string;
+  tenant_id: string;
+  reference: string;
+  email: string;
+  name: string;
+  business_name: string | null;
+  brief: (Partial<WebsiteBrief> & { site?: SiteAnswers | null }) | null;
+};
 
 /**
- * The first draft after a payment: for builds waiting at "AI processing" with no plan yet, the AI drafts the plan and then
- * the preview. It only ever drafts. A person releases a preview to the customer, so nothing here is seen by a customer.
- * With no AI key, nothing runs and the builds wait for staff. Bounded per call, so a slow model can't pile up work.
+ * The automatic first draft. Once a paying customer has sent their goals, the AI works through the same steps every
+ * time, and a person sees the result before the customer does:
+ *
+ *   1. plan the website from the goals,
+ *   2. choose the template (one of eleven sectors in one of four looks) that fits the plan,
+ *   3. build it from the customer's answers, and run the automatic checks,
+ *   4. email the owner that it is ready for review (or needs a look).
+ *
+ * It only ever drafts. The owner releases a build to the customer, so nothing here is seen by a customer. With no AI
+ * key, nothing runs and the builds wait for staff. Bounded per call, so a slow model can't pile up work.
  */
 export async function runAutoDrafts(db: SupabaseClient, provider: AiProvider | null, limit = 2): Promise<{ attempted: number; drafted: number }> {
   if (!provider) return { attempted: 0, drafted: 0 };
   const { data } = await db
     .from("website_briefs")
-    .select("id, tenant_id, brief")
-    .eq("stage", "specification")
+    .select("id, tenant_id, reference, email, name, business_name, brief")
+    .in("stage", ["specification", "building"])
     .order("created_at", { ascending: true })
-    .limit(limit * 3);
-  const briefs = (data ?? []) as { id: string; tenant_id: string; brief: { goals?: unknown[]; site?: SiteAnswers | null } | null }[];
+    .limit(limit * 5);
   let attempted = 0;
   let drafted = 0;
-  for (const brief of briefs) {
+  for (const brief of (data ?? []) as BriefRow[]) {
     if (attempted >= limit) break;
-    const site = brief.brief?.site;
-    if (site) {
-      // A template site: built from the sector answers once they are complete, and only once.
-      const preset = presetFor(site.sector);
-      if (!preset || !parseAnswers(site.answers, preset, { colour: "#1f3a34" }).ok) continue;
-      const { data: built } = await db.from("website_site_builds").select("id").eq("brief_id", brief.id).limit(1).maybeSingle();
-      if (built) continue;
-      attempted += 1;
-      const actor: Actor = { userId: null, email: null, tenantId: brief.tenant_id, kind: "system" };
-      try {
-        const result = await runSiteBuildStep(db, actor, provider, brief.id, { sector: site.sector, answers: site.answers });
-        if (result.ok) drafted += 1;
-      } catch (error) {
-        console.error(`Automatic site draft failed: ${error instanceof Error ? error.message : "unknown"}`);
-      }
-      continue;
-    }
-    // A short checkout pays before the brief is filled in. Nothing is drafted until the customer has told us their goals.
-    if (!brief.brief?.goals?.length) continue;
-    const { data: existing } = await db.from("website_plans").select("id").eq("brief_id", brief.id).limit(1).maybeSingle();
-    if (existing) continue;
+    if (!(await needsDraft(db, brief))) continue;
+    if (!(await claim(db, brief))) continue;
     attempted += 1;
-    const actor: Actor = { userId: null, email: null, tenantId: brief.tenant_id, kind: "system" };
     try {
-      const plan = await runPlanStep(db, actor, provider, brief.id);
-      if (!plan.ok) continue;
-      const preview = await runPreviewStep(db, actor, provider, brief.id);
-      if (preview.ok) drafted += 1;
+      if ((await draftWebsite(db, provider, brief)) === "drafted") drafted += 1;
     } catch (error) {
       console.error(`Automatic draft failed: ${error instanceof Error ? error.message : "unknown"}`);
     }
   }
   return { attempted, drafted };
+}
+
+/** A paid website the customer has told us about, with no draft yet and tries left. */
+async function needsDraft(db: SupabaseClient, brief: BriefRow): Promise<boolean> {
+  const hasAnswers = Boolean(brief.brief?.site) || Boolean(brief.brief?.goals?.length);
+  if (!hasAnswers) return false; // A short checkout pays before the brief is filled in. Nothing is drafted until the goals are in.
+  const [{ data: built }, { data: previewed }] = await Promise.all([
+    db.from("website_site_builds").select("id").eq("brief_id", brief.id).limit(1).maybeSingle(),
+    db.from("website_previews").select("id").eq("brief_id", brief.id).limit(1).maybeSingle(),
+  ]);
+  if (built || previewed) return false;
+  return (await failedTries(db, brief.id)) < MAX_FAILED_TRIES;
+}
+
+async function failedTries(db: SupabaseClient, briefId: string): Promise<number> {
+  const { data } = await db.from("website_brief_events").select("detail").eq("brief_id", briefId).eq("kind", "ai").eq("actor_type", "system").limit(20);
+  return ((data ?? []) as { detail: { ok?: boolean; step?: string } | null }[]).filter((e) => e.detail?.ok === false && e.detail.step !== "template").length;
+}
+
+/**
+ * Two things can start a draft at once: the customer sending their goals, and the daily sweep. The first to write a
+ * "started" note wins; the other leaves the website alone. A claim lapses after ten minutes, in case a run died.
+ */
+async function claim(db: SupabaseClient, brief: BriefRow): Promise<boolean> {
+  const token = randomUUID();
+  const actor: Actor = { userId: null, email: null, tenantId: brief.tenant_id, kind: "system" };
+  await logEvent(db, actor, brief.id, "ai", { step: "started", token });
+  const since = new Date(Date.now() - CLAIM_WINDOW_MS).toISOString();
+  const { data } = await db
+    .from("website_brief_events")
+    .select("detail")
+    .eq("brief_id", brief.id)
+    .eq("kind", "ai")
+    .gte("created_at", since)
+    .order("created_at", { ascending: true })
+    .limit(20);
+  const first = ((data ?? []) as { detail: { step?: string; token?: string } | null }[]).find((e) => e.detail?.step === "started");
+  return !first?.detail?.token || first.detail.token === token;
+}
+
+export async function draftWebsite(db: SupabaseClient, provider: AiProvider, brief: BriefRow): Promise<"drafted" | "waiting" | "failed"> {
+  const actor: Actor = { userId: null, email: null, tenantId: brief.tenant_id, kind: "system" };
+  const businessName = brief.business_name || brief.name;
+  const who = { reference: brief.reference, businessName, email: brief.email };
+  const site = brief.brief?.site ?? null;
+
+  // What can be built, from what the customer told us. A customer who ticked a sector keeps it.
+  let answers: RawAnswers | null;
+  let sectors: string[];
+  if (site) {
+    const preset = presetFor(site.sector);
+    if (!preset || !parseAnswers(site.answers, preset, { colour: FALLBACK_COLOUR }).ok) return "waiting";
+    answers = site.answers;
+    sectors = [site.sector];
+  } else {
+    answers = brief.brief ? answersFromProfile(brief.brief as WebsiteBrief, businessName) : null;
+    sectors = answers ? buildableSectors(answers) : [];
+  }
+
+  // Step 1: the plan.
+  const store = new SupabaseWebsiteAiStore(db, brief.tenant_id, null);
+  let plan = await store.latestPlan(brief.id);
+  if (!plan) {
+    const made = await runPlanStep(db, actor, provider, brief.id);
+    if (!made.ok) return await failed(db, brief, who, made.error);
+    plan = await store.latestPlan(brief.id);
+  }
+  if (!plan) return await failed(db, brief, who, "The plan could not be read back.");
+
+  // No template fits what they told us (for example, opening hours are needed and weren't given in a form we can use):
+  // a text-only draft, as before.
+  if (!answers || sectors.length === 0) {
+    const preview = await runPreviewStep(db, actor, provider, brief.id);
+    if (!preview.ok) return await failed(db, brief, who, preview.error);
+    await alertOwner(who, readyForReviewMessage({ ...who, checksOk: true, issues: 0, kind: "text" }));
+    return "drafted";
+  }
+
+  // Step 2: the template. The customer's own look is kept; anything they left open, the AI chooses from the plan.
+  const asked = ALL_LOOKS.includes(answers.look as Look) ? (answers.look as Look) : null;
+  const picked = await pickTemplate(provider, {
+    businessName,
+    businessType: site ? (presetFor(site.sector)?.label ?? site.sector) : (brief.brief?.otherBusinessType ?? ""),
+    brief: { goals: brief.brief?.goals ?? [], goalNote: brief.brief?.goalNote ?? "", style: brief.brief?.style ?? null, colours: brief.brief?.colours ?? "" },
+    plan: plan.plan,
+    sectors,
+    looks: asked ? [asked] : ALL_LOOKS,
+  });
+  if (!picked.ok) {
+    // A customer's sector with the look left to the AI still builds: the sector's own look is used.
+    if (!site) return await failed(db, brief, who, picked.reason);
+  }
+  const choice = picked.ok ? picked.choice : { sector: site!.sector, look: asked ?? presetFor(site!.sector)!.defaultLook };
+  await logEvent(db, actor, brief.id, "ai", { step: "template", ok: picked.ok, sector: choice.sector, look: choice.look, costPence: picked.costPence, by: sectors.length === 1 && site ? "customer" : "ai" });
+
+  // Step 3: the build and its checks.
+  const result = await runSiteBuildStep(db, actor, provider, brief.id, { sector: choice.sector, answers: { ...answers, look: choice.look } });
+  if (!result.ok) return await failed(db, brief, who, result.error);
+
+  // Step 4: tell the owner.
+  await alertOwner(who, readyForReviewMessage({ ...who, checksOk: result.checksOk, issues: result.issues, sector: choice.sector, look: choice.look, kind: "template" }));
+  return "drafted";
+}
+
+/** A failed try is recorded by the step itself. On the last try the owner is told, so a stuck website isn't silent. */
+async function failed(db: SupabaseClient, brief: BriefRow, who: { reference: string; businessName: string; email: string }, reason: string): Promise<"failed"> {
+  if ((await failedTries(db, brief.id)) >= MAX_FAILED_TRIES) await alertOwner(who, buildFailedMessage(who, reason));
+  return "failed";
 }

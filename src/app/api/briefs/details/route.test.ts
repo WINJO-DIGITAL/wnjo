@@ -2,6 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const state: { brief: unknown; writes: { table: string; op: string }[]; signedIn: boolean } = { brief: null, writes: [], signedIn: true };
 vi.mock("server-only", () => ({}));
+const afterJobs: (() => unknown)[] = [];
+vi.mock("next/server", async (original) => ({ ...(await original<typeof import("next/server")>()), after: (job: () => unknown) => void afterJobs.push(job) }));
+vi.mock("@/lib/ai/agent-runtime", () => ({ providerFromEnv: () => null }));
+const drafts = vi.fn(async () => ({ attempted: 0, drafted: 0 }));
+vi.mock("@/lib/ai/website-auto", () => ({ runAutoDrafts: (...args: unknown[]) => (drafts as (...a: unknown[]) => unknown)(...args) }));
 
 vi.mock("@/lib/quote-store", () => ({
   serviceClient: () => ({
@@ -39,6 +44,8 @@ beforeEach(() => {
   state.brief = row("Core");
   state.writes = [];
   state.signedIn = true;
+  afterJobs.length = 0;
+  drafts.mockClear();
   vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "test-service-key");
 });
 
@@ -46,6 +53,21 @@ describe("the details form and the plan's page limit", () => {
   it("saves a brief within the plan's limit", async () => {
     expect((await send(pages(5))).status).toBe(200);
     expect(state.writes.some((w) => w.table === "website_briefs" && w.op === "update")).toBe(true);
+  });
+
+  it("hands a paid website to the AI as soon as its goals are sent", async () => {
+    expect((await send(pages(3))).status).toBe(200);
+    expect(afterJobs).toHaveLength(1);
+    await afterJobs[0]();
+    expect(drafts).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not start a draft for a brief that hasn't been paid for, or that was refused", async () => {
+    state.brief = { ...(row("Core") as object), stage: "brief_received" };
+    await send(pages(3));
+    state.brief = row("Core");
+    await send(pages(9));
+    expect(afterJobs).toHaveLength(0);
   });
 
   it("refuses more pages than Core covers, says how many to remove, and saves nothing", async () => {

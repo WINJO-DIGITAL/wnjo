@@ -16,16 +16,21 @@ A customer pays for a managed website, answers a short set of questions, and get
 
 ## The flow
 
-1. **Customer pays.** The existing checkout takes the first payment. Nothing changes here.
-2. **Customer picks a sector.** A set of tick-box cards (Barber, Café, Electrician, Physio, and so on). Picking one selects a template.
-3. **Customer answers the questions.** Tick boxes wherever possible. See "The questions" below.
-4. **Build job is queued.** The customer's answers are stored as a build job, with the template id.
-5. **The AI fills the template.** For each section of the template, the model writes the wording and chooses options from the allowed list. Output must match the template's schema.
-6. **Checks run.** See "Checks" below. A build that fails is retried once with the failure reason, then flagged for the owner.
-7. **Preview is saved.** A private preview is rendered from the template plus the content. Only the owner can open it.
-8. **Owner reviews in the admin.** The build appears under "Needs you now". The owner either approves it, or writes a revision note. A revision note re-runs step 5 with the note added.
-9. **Customer sees the preview.** The customer can request changes in their account. Each request is a new revision, and the owner reviews it again.
-10. **Owner approves, site goes live.** The existing release step is used.
+This is the owner's flow, confirmed 17 November 2026, and what the code does.
+
+1. **Customer pays their plan first.** A plan button opens the short checkout (name, business, email), then Stripe. Nothing else is asked before payment. The build moves to "AI processing".
+2. **Customer fills in their goals in their account.** Goals, pages, look, business details and uploads. Sending them saves the brief and starts step 3 at once.
+3. **The system picks it up automatically.** Sending the goals (`POST /api/briefs/details`) starts the draft straight away, after the reply. The daily sweep and the payment webhook run the same code for anything missed, so nothing waits on a person.
+4. **The AI plans the website** from the goals: pages, sections, tone.
+5. **The AI picks the template** that fits the plan: one of eleven sectors in one of four looks, 44 in all. A sector the customer ticked is never overruled, and a look they chose is kept. For a customer who typed their own kind of business, the AI picks from the sectors that can be built from their answers without inventing anything (opening hours are never guessed). If none can, a text-only draft is made instead.
+6. **The AI builds the site and the checks run.** The checks are the list under "Checks". A reply outside the allowed lists gets one retry; a build that fails is tried once more, then left for the owner.
+7. **The owner is emailed** that it is ready for review ("Ready for your review"), or that it needs a look because checks failed, or that it could not be built. Nothing has reached the customer.
+8. **The owner reviews in Admin, Website builds.** They approve it, or write a change note and the AI rewrites it. They can go back and forth with the AI as often as needed.
+9. **The owner releases it to the customer.** Only then does the customer see it, and they are emailed.
+10. **The customer reviews it** in their account: approve the preview, or ask for changes. Each request is a numbered revision that goes back to the owner at step 8.
+11. **Owner approves, site goes live.** The four approvals (quality, pricing, contract, publication) are unchanged.
+
+Two things are deliberately different from this flow and unchanged: a bespoke build that needs a written quote still goes brief, then proposal, then deposit, because the price isn't known until it is written; and the AI never moves a build past "Website generation" or publishes anything.
 
 ## Templates
 

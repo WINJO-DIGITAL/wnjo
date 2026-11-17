@@ -1,10 +1,12 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 import { mailConfig, notificationMailConfig, sendEmail, sendEnquiryEmail } from "@/lib/mailer";
 import { serviceClient } from "@/lib/quote-store";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { PASS_ROUTE, PASS_STAGE, briefCaller } from "@/lib/brief-access";
 import { briefReceivedEmail } from "@/lib/build-emails";
 import { pagesAllowedFor } from "@/lib/ai/website-ai-service";
+import { providerFromEnv } from "@/lib/ai/agent-runtime";
+import { runAutoDrafts } from "@/lib/ai/website-auto";
 import { BRIEF_VERSION, DRAFT_ID_RE, cleanBrief, formatBrief, validateBrief, validateProfile } from "@/lib/website-brief";
 import { confirmBriefFiles } from "@/lib/brief-store";
 import { clean } from "@/lib/enquiry";
@@ -12,6 +14,8 @@ import { DETAIL_LIMITS } from "@/lib/website-enquiry";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// The first draft runs after the reply, and writing a website can take a while.
+export const maxDuration = 300;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const fail = (status: number, error: string, extra: Record<string, unknown> = {}) => NextResponse.json({ error, ...extra }, { status });
@@ -137,6 +141,19 @@ export async function POST(request: NextRequest) {
     const site = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
     const note = briefReceivedEmail({ name: name || row.name, reference: row.reference, accountUrl: `${site.replace(/\/+$/, "")}/account` });
     await sendEmail(customerConfig, { to: row.email, subject: note.subject, text: note.text }, "Brief received");
+  }
+  // The goals are in, so the system picks the website up straight away: plan, template, build, checks, and an email
+  // to the owner when it is ready to review. It runs after the reply, so the customer isn't kept waiting, and only
+  // drafts: nothing reaches the customer until the owner releases it. With no AI key it does nothing, and the daily
+  // sweep (or staff) start it later.
+  if (row.stage === "specification") {
+    after(async () => {
+      try {
+        await runAutoDrafts(db, providerFromEnv());
+      } catch {
+        console.error("Automatic draft after the goals were sent failed");
+      }
+    });
   }
   return NextResponse.json({ ok: true, version });
 }
