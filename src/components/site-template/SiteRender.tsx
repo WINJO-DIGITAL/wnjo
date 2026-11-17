@@ -413,7 +413,17 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                   {s.points.map((pt, j) => (
                     <div key={j}>
                       <dt>{pt.label}</dt>
-                      <dd>{pt.text}</dd>
+                      {/* A line of proof is one fact per line, not one run-on paragraph. */}
+                      <dd>
+                        {pt.text
+                          .split(/(?<=[.!?])\s+/)
+                          .filter(Boolean)
+                          .map((line, k) => (
+                            <span key={k} className={css.proofLine}>
+                              {line}
+                            </span>
+                          ))}
+                      </dd>
                     </div>
                   ))}
                 </dl>

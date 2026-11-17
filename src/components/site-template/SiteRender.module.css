@@ -3257,3 +3257,8 @@
 .site[data-look="athletic"] .book .form label {
   color: var(--ink);
 }
+
+/* A customer's list of proof reads one fact per line. */
+.proofLine {
+  display: block;
+}

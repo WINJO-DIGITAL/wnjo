@@ -184,6 +184,13 @@ describe("the general template", () => {
     expect(checkSite(assembleSite(input, defaultCopy(input)), parsed.facts, GENERAL_PRESET).issues).toEqual([]);
   });
 
+  it("never cuts the customer's own words mid-sentence when they are long", () => {
+    const long = "We drive local people across Fylde every day. ".repeat(12) + "Then we stop.";
+    const a = answersFromProfile(taxi({ about: long, differentiator: "" }), "Daz's Cabs")!;
+    expect(a.about!.length).toBeLessThanOrEqual(400);
+    expect(a.about!.endsWith(".")).toBe(true);
+  });
+
   it("refuses a licence or cover the customer never mentioned", () => {
     const a = answersFromProfile(taxi({ proof: "", differentiator: "Friendly local service." }), "Daz'd Cabs")!;
     const parsed = parseAnswers(a, GENERAL_PRESET, { colour: "#1f3a34" });

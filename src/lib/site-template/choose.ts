@@ -9,6 +9,7 @@ import { extractJson, type WebsitePlan } from "@/lib/ai/website-plan";
 import { GOALS, type WebsiteBrief } from "@/lib/website-brief";
 import { parseAnswers, type RawAnswers } from "./answers";
 import { GENERAL_PRESET, SECTOR_PRESETS, presetFor } from "./presets";
+import { leadingSentences } from "./pages";
 import type { Look } from "./schema";
 import { STYLES, STYLE_INFO } from "./styles";
 
@@ -53,7 +54,8 @@ export function answersFromProfile(brief: WebsiteBrief, businessName: string): R
     servicesText: serviceLines(p.services),
     phone: p.phone,
     email: p.email,
-    about: cutWords([p.differentiator, p.about].filter(Boolean).join(" "), 400),
+    // Whole sentences only: a long answer is shortened at the end of a sentence, never in the middle of one.
+    about: leadingSentences([p.differentiator, p.about].filter(Boolean).join(" "), 400),
     areas: p.areas
       .split(/[,;\n]/)
       .map((a) => a.trim())
