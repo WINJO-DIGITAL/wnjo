@@ -18,7 +18,8 @@ export function SettingsView() {
     return () => data.subscription.unsubscribe();
   }, [client]);
 
-  if (!client || session === undefined) return <p className="lede">Loading…</p>;
+  if (!client) return <p className="lede">Customer accounts aren&apos;t switched on yet. Please check back soon.</p>;
+  if (session === undefined) return <p className="lede">Loading…</p>;
   if (!session) {
     return (
       <p className="lede">

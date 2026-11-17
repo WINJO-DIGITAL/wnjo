@@ -72,10 +72,11 @@ export async function POST(request: NextRequest) {
   }
 
   // Spam signals: a hidden field humans never fill, and implausibly fast completion.
-  // Respond as if accepted so automated senders learn nothing.
+  // Respond as if accepted so automated senders learn nothing. The reply carries a reference shaped like a real one,
+  // so a person who simply typed very fast never sees a thank-you page with a blank reference.
   const startedAt = Number(body.startedAt);
   if (clean(body.website, 200) !== "" || !Number.isFinite(startedAt) || Date.now() - startedAt < MIN_FILL_MS) {
-    return reply(200, { ok: true });
+    return reply(200, { ok: true, reference: newReference() });
   }
 
   // The website calculator (/build) sends its own shape: answers, details and what to do next.
