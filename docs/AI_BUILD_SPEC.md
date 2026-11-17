@@ -34,11 +34,24 @@ Two things are deliberately different from this flow and unchanged: a bespoke bu
 
 ## Templates
 
-- A template is a fixed page layout for one sector: sections in order, each with a type (hero, services list, prices table, gallery, booking, opening hours, contact, testimonials, and so on).
-- Each section has a schema: which fields it has, how long each field can be, and which options are allowed.
-- Each template has a small set of visual variants (colour theme, type pairing, corner style), chosen from tick boxes.
-- The owner builds the first three templates: **Barber, Café, Electrician**. These match the existing site styler designs, so the look already exists.
-- A template is only added once it has a sample build that passes every check.
+A website is one of **eight styles**, and the words inside are the customer's own. The style is the design; the business is the content. Any business can wear any style.
+
+| Style | From | Feel |
+| --- | --- | --- |
+| Athletic | RAENG Fitness | black and white, wide heavy type, split arrow button, hairline rules |
+| Precision | Duratek | navy and green, light large type, a strip of gallery slices that open on hover |
+| Boutique | Boonma | cream, a friendly serif, flowing wave edges between sections |
+| Executive | EV Exec | charcoal and gold, centred, services as gold-ruled cards |
+| Hearth | café sample | warm browns, italic serif, a framed menu board, paper grain |
+| Heritage | barber sample | near-black and brass, framed hero, matted photographs, ruled headings |
+| Tradesman | electrician sample | white and navy, hazard stripe, cut-edge hero, heavy form fields |
+| Clinic | physio sample | sage and green, rounded, soft washes, airy |
+
+- A style is a whole design (type, shapes, the top of the page, lists, facts, form, closing band), not a recolour. They live in `SiteRender.module.css` and are registered in `src/lib/site-template/styles.ts`. The four older looks still draw, so earlier sites keep their look.
+- The customer's theme colour works in every style. All eight pass a contrast check (WCAG AA) with every theme colour, with and without photos, and hold at 320 to 1920 px wide with a 60-character name, twelve services and seven pages.
+- The AI picks the style from the plan (`choose.ts`). A style the customer chose is kept.
+- **Content kits.** Eleven sector kits (barber, café, electrician and so on) carry the questions, tick-boxes and the wording rules for that kind of business. A twelfth, the **general** kit, is for any business that describes itself in its own words (a taxi firm, a florist): hours and areas are optional, the wording is neutral, and it says only what the customer said. It is never offered as a tile. The AI picks a specific sector only when it is plainly the same kind of business.
+- A template is only used once it has a sample build that passes every check.
 
 ## The questions
 

@@ -735,10 +735,13 @@
 
 @media (min-width: 48rem) {
   .nav {
-    flex-wrap: nowrap;
+    /* A long business name, or many pages, wraps the header onto a second line instead of pushing the buttons off screen. */
+    flex-wrap: wrap;
   }
   .links {
     order: 0;
+    flex: 0 1 auto;
+    min-width: 0;
     flex-basis: auto;
     overflow: visible;
     margin: 0;
@@ -2410,4 +2413,29 @@
 .site[data-look="clinic"] .reviews p {
   font-size: 1.15rem;
   line-height: 1.5;
+}
+
+/* Long names and long words never push a page wider than the screen. */
+.site h1,
+.site h2,
+.logo,
+.menuName,
+.heroCopy p {
+  overflow-wrap: anywhere;
+}
+.logo {
+  min-width: 0;
+}
+
+/* The request form shrinks with its column on the narrowest phones. */
+.book > *,
+.form,
+.form label {
+  min-width: 0;
+}
+.form input,
+.form textarea,
+.form select {
+  max-width: 100%;
+  min-width: 0;
 }
