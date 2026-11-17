@@ -2004,3 +2004,101 @@
   text-align: left;
   justify-items: start;
 }
+
+/* ---- Boutique: Boonma's flowing section edges. Sections alternate between cream and a deep band of the theme colour,
+   and each band rises into the one before it along a hand-drawn wave (the four shapes are Boonma's own). ---- */
+.site[data-look="boutique"] {
+  --deep: color-mix(in srgb, var(--accent) 85%, #000);
+  --blush: #fbecd0;
+  --wave-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 80V44C170 8 360 0 560 22s430 54 640 30c98-11 180-30 240-48V80z'/%3E%3C/svg%3E");
+  --wave-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 80V10c150 40 330 62 520 40S920-8 1150 12c120 10 210 28 290 46V80z'/%3E%3C/svg%3E");
+  --wave-c: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 80V30C220 66 420 4 700 28s520 56 740 22V80z'/%3E%3C/svg%3E");
+  --wave-d: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 80V52C140 22 300 14 480 36c170 22 330 14 470-16 140-29 300-8 490 6V80z'/%3E%3C/svg%3E");
+}
+.site[data-look="boutique"] section:has(> .gallery),
+.site[data-look="boutique"] .book,
+.site[data-look="boutique"] .info,
+.site[data-look="boutique"] .foot {
+  position: relative;
+  max-width: none;
+  margin: var(--wave-h) 0 0;
+  padding-inline: max(var(--pad), calc((100% - 68rem) / 2 + var(--pad)));
+}
+.site[data-look="boutique"] .info {
+  padding-inline: max(var(--pad), calc((100% - 68rem) / 2));
+}
+.site[data-look="boutique"] section:has(> .gallery)::before,
+.site[data-look="boutique"] .book::before,
+.site[data-look="boutique"] .info::before,
+.site[data-look="boutique"] .foot::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% - 1px);
+  height: var(--wave-h);
+  background: var(--flow-bg);
+  -webkit-mask: var(--wave) center bottom / 100% 100% no-repeat;
+  mask: var(--wave) center bottom / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.site[data-look="boutique"] section:has(> .gallery) {
+  --flow-bg: var(--deep);
+  --wave: var(--wave-a);
+  --wave-h: clamp(26px, 3.6vw, 52px);
+  background: var(--deep);
+  color: #fff;
+}
+.site[data-look="boutique"] .info {
+  --flow-bg: var(--blush);
+  --wave: var(--wave-c);
+  --wave-h: clamp(22px, 3vw, 44px);
+  background: var(--blush);
+}
+.site[data-look="boutique"] .book {
+  --flow-bg: var(--deep);
+  --wave: var(--wave-d);
+  --wave-h: clamp(34px, 4.4vw, 64px);
+  background: var(--deep);
+  color: #fff;
+}
+.site[data-look="boutique"] .foot {
+  --flow-bg: var(--blush);
+  --wave: var(--wave-b);
+  --wave-h: clamp(44px, 6vw, 92px);
+}
+.site[data-look="boutique"] section:has(> .gallery) h2,
+.site[data-look="boutique"] .book h2 {
+  color: #fff;
+}
+.site[data-look="boutique"] .book .bookIntro h2,
+.site[data-look="boutique"] .book .body {
+  color: rgb(255 255 255 / 0.86);
+}
+.site[data-look="boutique"] .book .contact a {
+  color: #fff;
+}
+.site[data-look="boutique"] .book .form {
+  color: var(--ink);
+}
+.site[data-look="boutique"] .book .form label {
+  color: var(--ink);
+}
+.site[data-look="boutique"] .closing {
+  background: transparent;
+  color: var(--ink);
+  border-radius: 0;
+}
+.site[data-look="boutique"] .closing .btn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.site[data-look="boutique"] .reviews blockquote {
+  border-left: 4px solid #e7c676;
+  padding-left: 1.25rem;
+}
+.site[data-look="boutique"] .reviews p {
+  font-family: var(--head);
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  line-height: 1.3;
+}
