@@ -3,11 +3,12 @@ import type { AiProvider } from "@/lib/ai/provider";
 import { ProviderError } from "@/lib/ai/provider";
 import type { WebsitePlan } from "@/lib/ai/website-plan";
 import { EMPTY_PROFILE, type WebsiteBrief } from "@/lib/website-brief";
+import { unknownNames } from "./claims";
 import { ALL_LOOKS, answersFromProfile, buildableSectors, buildChoicePrompt, parseChoice, pickTemplate, serviceLines } from "./choose";
 import { GENERAL_PRESET, SECTOR_PRESETS, presetFor } from "./presets";
 import { parseAnswers } from "./answers";
 import { checkSite } from "./checks";
-import { assembleSite, defaultCopy } from "./write";
+import { assembleSite, defaultCopy, tidyIntro } from "./write";
 
 const plan: WebsitePlan = {
   summary: "A friendly site that gets local homeowners to ask for a quote.",
@@ -85,8 +86,8 @@ describe("the general template", () => {
     expect(sectors).toContain("general");
   });
 
-  it("keeps a service's name and leaves its description for the writer", () => {
-    expect(serviceLines("Local taxi journeys – Reliable transport for everyday trips.\n\nAirport transfers – Pre-booked pickups")).toBe("Local taxi journeys\nAirport transfers");
+  it("keeps a service's name and the customer's own description of it", () => {
+    expect(serviceLines("Local taxi journeys – Reliable transport for everyday trips.\n\nAirport transfers – Pre-booked pickups")).toBe("Local taxi journeys – Reliable transport for everyday trips.\nAirport transfers – Pre-booked pickups");
     expect(serviceLines("Cut £20\nCut £20\nBeard - 10")).toBe("Cut £20\nBeard - 10");
     expect(serviceLines("x".repeat(40) + " " + "y".repeat(40)).length).toBeLessThanOrEqual(60);
   });
@@ -106,6 +107,45 @@ describe("the general template", () => {
     const site = assembleSite(input, defaultCopy(input));
     expect(checkSite(site, parsed.facts, GENERAL_PRESET).issues).toEqual([]);
     expect(site.sections.map((s) => s.kind)).toEqual(["hero", "services", "area", "enquiry", "cta"]);
+  });
+
+  it("shows the customer's own service descriptions as they wrote them", () => {
+    const a = answersFromProfile(taxi(), "Daz'd Cabs")!;
+    const parsed = parseAnswers(a, GENERAL_PRESET, { colour: "#1f3a34" });
+    if (!parsed.ok) throw new Error("fixture");
+    expect(parsed.facts.services[0]).toEqual({ name: "Local taxi journeys", description: "Reliable transport for everyday trips." });
+    const input = { preset: GENERAL_PRESET, facts: parsed.facts, look: "executive" as const, colour: parsed.colour };
+    const services = assembleSite(input, defaultCopy(input)).sections.find((x) => x.kind === "services");
+    expect(services && services.kind === "services" && services.items[0].description).toBe("Reliable transport for everyday trips.");
+  });
+
+  it("accepts the customer's curly apostrophe: Daz’s is Daz's", () => {
+    expect(unknownNames("Welcome to Daz’s Cabs and Fleetwood.", "Daz's Cabs Fleetwood")).toEqual([]);
+    expect(unknownNames("Welcome to Daz's Cabs.", "Daz’s Cabs")).toEqual([]);
+    expect(unknownNames("Ask for Marcus at the desk.", "Daz’s Cabs")).toEqual(["Marcus"]);
+  });
+
+  it("answers a chosen FAQs page from the customer's own facts when the writer left it empty, and passes every check", () => {
+    const a = answersFromProfile(taxi(), "Daz'd Cabs")!;
+    const parsed = parseAnswers(a, GENERAL_PRESET, { colour: "#1f3a34" });
+    if (!parsed.ok) throw new Error("fixture");
+    const pages = ["home", "services", "about", "contact", "faq"] as const;
+    const input = { preset: GENERAL_PRESET, facts: parsed.facts, look: "executive" as const, colour: parsed.colour, pages: [...pages], pageLimit: 7 };
+    const site = assembleSite(input, defaultCopy(input));
+    const faq = site.pages?.find((p) => p.slug === "faqs" || p.slug === "faq");
+    expect(faq).toBeDefined();
+    expect(faq!.sections.some((x) => x.kind === "faq")).toBe(true);
+    const result = checkSite(site, parsed.facts, GENERAL_PRESET, { pages: [...pages], pageLimit: 7 });
+    expect(result.issues.filter((i) => i.code === "page-missing" || i.code === "faq-not-from-facts")).toEqual([]);
+  });
+
+  it("ends an intro where a thought ends, never mid-phrase", () => {
+    const about = "Daz’s Cabs combines reliable, friendly local service with professional, comfortable transport, offering dependable journeys, convenient pre-bookings and a personal service customers can trust.";
+    const intro = tidyIntro(about, 18, 300);
+    expect(intro).toBe("Daz’s Cabs combines reliable, friendly local service with professional, comfortable transport, offering dependable journeys.");
+    expect(tidyIntro("A small gym where everyone knows your name. More words here.", 18, 300)).toBe("A small gym where everyone knows your name.");
+    expect(tidyIntro("", 18, 300)).toBe("");
+    expect(tidyIntro("One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen and", 18, 300)).not.toMatch(/\band\.$/);
   });
 
   it("refuses a licence or cover the customer never mentioned", () => {

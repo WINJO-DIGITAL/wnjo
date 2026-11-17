@@ -178,6 +178,33 @@ function isFilled(s: Section): boolean {
   }
 }
 
+/** The words the customer's own facts contain: the only ones an FAQ answer may be made of, apart from generic ones. */
+function knownWords(facts: CustomerFacts): Set<string> {
+  return new Set(
+    contentWords(
+      [
+        facts.businessName,
+        facts.about ?? "",
+        facts.address ?? "",
+        ...(facts.areas ?? []),
+        ...facts.services.flatMap((x) => [x.name, x.description ?? ""]),
+        ...(facts.highlights ?? []).map((h) => `${h.value} ${h.label}`),
+        ...(facts.details ?? []).map((d) => `${d.label} ${d.value}`),
+        ...(facts.hours ?? []).map((h) => `${h.day} ${h.open ?? ""} ${h.close ?? ""}`),
+      ].join(" "),
+    ),
+  );
+}
+
+/** Whether an FAQ answer is made of what the customer told us. The same test the checks apply. */
+export function faqAnswerGrounded(q: { question: string; answer: string }, facts: CustomerFacts): boolean {
+  const known = knownWords(facts);
+  const words = contentWords(q.answer);
+  const asked = new Set(contentWords(q.question));
+  const unknown = words.filter((w) => !known.has(w) && !asked.has(w) && !GENERIC_WORDS.has(w) && !/^\d+$/.test(w));
+  return !words.length || unknown.length / words.length <= 0.4;
+}
+
 /** `avoid` is wording from sites we shouldn't copy; it defaults to the list kept in avoid-wording.ts. */
 export function checkSite(
   content: SiteContent,
@@ -241,7 +268,7 @@ export function checkSite(
   const fields = textFields(content);
   const theirWords = [facts.about ?? "", ...(facts.details ?? []).map((d) => d.value)].join(" ");
   // Every line the wording makes: each claim and each number must be one the customer gave. Their own words are the facts.
-  const factText = [facts.businessName, facts.about ?? "", facts.address ?? "", ...(facts.areas ?? []), ...facts.services.flatMap((x) => [x.name, x.price ?? ""]), ...(facts.highlights ?? []).map((h) => `${h.value} ${h.label}`), ...(facts.details ?? []).map((d) => d.value), ...(facts.hours ?? []).map((h) => `${h.day} ${h.open ?? ""} ${h.close ?? ""}`), facts.phone ?? "", facts.email ?? ""].join(" ");
+  const factText = [facts.businessName, facts.about ?? "", facts.address ?? "", ...(facts.areas ?? []), ...facts.services.flatMap((x) => [x.name, x.price ?? "", x.description ?? ""]), ...(facts.highlights ?? []).map((h) => `${h.value} ${h.label}`), ...(facts.details ?? []).map((d) => d.value), ...(facts.hours ?? []).map((h) => `${h.day} ${h.open ?? ""} ${h.close ?? ""}`), facts.phone ?? "", facts.email ?? ""].join(" ");
   for (const f of fields) {
     // Picture descriptions are ours ("Business photo 2"), not claims, and the customer's own names and prices are theirs.
     if (f.where.includes(".facts.") || f.where === "business.name" || /\.items\[\d+\]\.(name|price)$/.test(f.where) || /\.alt$|\.images\[\d+\]/.test(f.where)) continue;
@@ -402,20 +429,7 @@ export function checkSite(
 
   // Facts only, and no repeating. An FAQ answer must be made of what the customer told us, and no two items, or an
   // item and the intro, may say the same thing.
-  const known = new Set(
-    contentWords(
-      [
-        facts.businessName,
-        facts.about ?? "",
-        facts.address ?? "",
-        ...(facts.areas ?? []),
-        ...facts.services.map((x) => x.name),
-        ...(facts.highlights ?? []).map((h) => `${h.value} ${h.label}`),
-        ...(facts.details ?? []).map((d) => `${d.label} ${d.value}`),
-        ...(facts.hours ?? []).map((h) => `${h.day} ${h.open ?? ""} ${h.close ?? ""}`),
-      ].join(" "),
-    ),
-  );
+  const known = knownWords(facts);
   const heroIntro = new Set(contentWords(hero && hero.kind === "hero" ? hero.intro : ""));
   const faqItems = all.flatMap((sec) => (sec.kind === "faq" ? sec.items : []));
   faqItems.forEach((q, j) => {

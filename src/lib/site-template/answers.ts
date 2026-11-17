@@ -49,14 +49,17 @@ const text = (v: unknown): string => (typeof v === "string" ? v.replace(/<[^>]*>
  * One service per line. A price counts only when it has a £ sign or a separator before it ("Cut £22", "Cut - 22"),
  * so "Grade 2 cut" stays a name. Prices are stored as "£22" or "£22.50".
  */
-export function parseServicesText(input: string): { services: { name: string; price?: string }[]; errors: string[] } {
-  const services: { name: string; price?: string }[] = [];
+export function parseServicesText(input: string): { services: { name: string; price?: string; description?: string }[]; errors: string[] } {
+  const services: { name: string; price?: string; description?: string }[] = [];
   const errors: string[] = [];
   const seen = new Set<string>();
   for (const line of input.split(/\r?\n/).map((l) => text(l)).filter(Boolean)) {
     // A price may have a comma (£2,900) and a unit after it ("£140 a night"); the unit is kept with the price.
     const m = line.match(/^(.+?)\s*(?:[-–—:]\s*£?\s*|£\s*)(\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d{1,4}(?:\.\d{1,2})?)(\s+(?:a|an|per)\s+[a-z]+(?:\s+[a-z]+)?)?$/i);
-    const name = (m ? m[1] : line).replace(/[-–—:\s]+$/, "").trim();
+    // "Airport transfers – Pre-booked pickups to UK airports" is a name and the customer's own description of it.
+    const d = !m ? line.match(/^(.{2,60}?)\s+[–—]\s+(.{3,})$/) : null;
+    const description = d ? d[2].replace(/\s+/g, " ").trim().slice(0, FIELD_LIMITS.itemText) : undefined;
+    const name = (m ? m[1] : d ? d[1] : line).replace(/[-–—:\s]+$/, "").trim();
     const amount = m ? Number(m[2].replace(/,/g, "")) : 0;
     const unit = m?.[3] ? ` ${m[3].trim().toLowerCase()}` : "";
     const price = m ? `£${amount.toFixed(amount % 1 === 0 ? 0 : 2)}${unit}` : undefined;
@@ -67,7 +70,7 @@ export function parseServicesText(input: string): { services: { name: string; pr
     }
     if (seen.has(name.toLowerCase())) continue;
     seen.add(name.toLowerCase());
-    services.push({ name, ...(price ? { price } : {}) });
+    services.push({ name, ...(price ? { price } : {}), ...(description ? { description } : {}) });
   }
   if (services.length > FIELD_LIMITS.items) errors.push(`Add up to ${FIELD_LIMITS.items} services.`);
   return { services: services.slice(0, FIELD_LIMITS.items), errors };

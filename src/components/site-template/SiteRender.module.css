@@ -2439,3 +2439,12 @@
   max-width: 100%;
   min-width: 0;
 }
+
+/* Executive without a photograph: a soft glow behind the headline and a fine frame, so the top of the page never reads as empty. */
+.site[data-look="executive"] .hero[data-variant="plain"] {
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 0%, color-mix(in srgb, var(--accent-text) 16%, transparent), transparent 70%),
+    linear-gradient(160deg, #1b1c21, #0e0f12 70%);
+  outline: 1px solid color-mix(in srgb, var(--accent-text) 28%, transparent);
+  outline-offset: -1.1rem;
+}

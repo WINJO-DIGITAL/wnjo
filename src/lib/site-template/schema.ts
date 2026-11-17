@@ -124,7 +124,7 @@ export type SiteContent = {
  */
 export type CustomerFacts = {
   businessName: string;
-  services: { name: string; price?: string }[];
+  services: { name: string; price?: string; /** The customer's own words about it, kept as they wrote them. */ description?: string }[];
   hours?: HoursItem[];
   /** Short facts the customer ticked or typed, such as "Walk-ins welcome". Shown as the facts strip. */
   highlights?: Fact[];

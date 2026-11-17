@@ -7,14 +7,14 @@
 import { MAX_ROUNDS } from "@/lib/ai/limits";
 import { ProviderError, type AiProvider } from "@/lib/ai/provider";
 import { extractJson } from "@/lib/ai/website-plan";
-import { checkSite, describeIssues, FILLER_PHRASES, type CheckIssue } from "./checks";
+import { checkSite, describeIssues, faqAnswerGrounded, FILLER_PHRASES, type CheckIssue } from "./checks";
 import { variantFor } from "./copy-variants";
 import { aboutSection, layoutPages, PAGE_KINDS, pageTitle, type PageHeads, type PageKind } from "./pages";
 import type { SectorPreset } from "./presets";
 import { STYLES, STYLE_INFO } from "./styles";
 import type { CustomerFacts, GalleryImage, Layout, Look, Section, SiteContent } from "./schema";
 import { defaultLayout, FIELD_LIMITS, WORD_LIMITS } from "./schema";
-import { cutWords, wordCount } from "./text";
+import { cutWords, sentencesOf, wordCount } from "./text";
 
 export type SiteCopy = {
   tagline: string;
@@ -186,6 +186,25 @@ export function parseCopy(text: string): ParsedCopy {
   };
 }
 
+/**
+ * The customer's own words as an intro, ending where a thought ends. The first sentence if it fits; otherwise as many of its
+ * comma-separated parts as fit, so it never stops mid-phrase ("…convenient pre-bookings and"). Only the customer's words.
+ */
+export function tidyIntro(text: string, maxWords: number, maxChars: number): string {
+  const first = (sentencesOf(text.replace(/\s+/g, " ").trim())[0] ?? "").replace(/[.!?]+$/, "");
+  if (!first) return "";
+  if (wordCount(first) <= maxWords && first.length <= maxChars) return `${first}.`;
+  let out = "";
+  for (const part of first.split(/,\s*/)) {
+    const next = out ? `${out}, ${part}` : part;
+    if (wordCount(next) > maxWords || next.length > maxChars) break;
+    out = next;
+  }
+  // A first part that is itself too long is cut at a word, with no loose "and" or "with" left hanging.
+  if (!out) out = cutWords(cut(first, maxChars), maxWords).replace(/\s+(?:and|or|with|to|for|of|the|a|an|in|on|at)$/i, "");
+  return `${out.replace(/[,;:\s]+$/, "")}.`;
+}
+
 const joinList = (items: string[]) => (items.length <= 1 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`);
 
 /** Adds the places the customer named, when the wording doesn't already say them. */
@@ -227,10 +246,10 @@ export function defaultCopy(input: WriteInput): SiteCopy {
   const fits = headline.length <= FIELD_LIMITS.headline && wordCount(headline) <= WORD_LIMITS.headline;
   return {
     tagline: "",
-    hero: { headline: fits ? headline : facts.businessName, intro: cutWords(cut(facts.about ?? "", FIELD_LIMITS.intro), WORD_LIMITS.intro), cta: c.heroCta },
+    hero: { headline: fits ? headline : facts.businessName, intro: tidyIntro(facts.about ?? "", WORD_LIMITS.intro, FIELD_LIMITS.intro), cta: c.heroCta },
     headings: c.headings,
     descriptions: {},
-    area: preset.areaSource === "areas" && places.length ? `${c.areaLead} ${joinList(places)}.` : facts.address ? `We are at ${facts.address}.` : places.length ? `Areas covered: ${joinList(places)}.` : "",
+    area: preset.areaSource === "areas" && places.length ? `${c.areaLead} ${joinList(places)}.` : facts.address ? `We are at ${facts.address}.` : places.length ? `${c.areaLead} ${joinList(places)}.` : "",
     enquiry: { intro: c.enquiryIntro, cta: c.enquiryCta },
     faq: [],
     closing: { headline: c.closingHeadline, cta: c.closingCta },
@@ -262,6 +281,20 @@ export function withDefaults(input: WriteInput, copy: SiteCopy): SiteCopy {
   };
 }
 
+/**
+ * Questions a visitor asks that the customer's own facts answer, in the customer's words and nothing else: whether they
+ * offer something they listed, when they are available, where they work, how to reach them. Up to four.
+ */
+export function factFaq(facts: CustomerFacts): { question: string; answer: string }[] {
+  const out: { question: string; answer: string }[] = [];
+  const when = facts.details?.find((d) => /availab|open/i.test(d.label))?.value;
+  if (when) out.push({ question: "When are you available?", answer: when });
+  if (facts.areas?.length) out.push({ question: "Where do you work?", answer: `We work in ${joinList(facts.areas)}.` });
+  for (const s of facts.services.filter((x) => x.description).slice(0, 2)) out.push({ question: `Do you offer ${s.name.toLowerCase()}?`, answer: `Yes. ${s.description}` });
+  if (facts.phone) out.push({ question: "How do I get in touch?", answer: `Call ${facts.phone}${facts.email ? ` or email ${facts.email}` : ""}.` });
+  return out.filter((q) => q.question.length <= FIELD_LIMITS.question && q.answer.length <= FIELD_LIMITS.answer && faqAnswerGrounded(q, facts)).slice(0, 4);
+}
+
 const norm = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim();
 
 /** Builds the site: the customer's facts as given, the model's wording in the gaps. Sections without data are left out. */
@@ -279,7 +312,11 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
         sections.push({
           kind: "services",
           heading: copy.headings.services,
-          items: facts.services.map((s) => ({ name: s.name, ...(descriptions.get(norm(s.name)) ? { description: descriptions.get(norm(s.name)) } : {}), ...(s.price ? { price: s.price } : {}) })),
+          items: facts.services.map((s) => {
+            // The customer's own description wins over anything the model wrote.
+            const description = s.description ?? descriptions.get(norm(s.name));
+            return { name: s.name, ...(description ? { description } : {}), ...(s.price ? { price: s.price } : {}) };
+          }),
         });
         break;
       case "hours":
@@ -304,7 +341,11 @@ export function assembleSite(input: WriteInput, copy: SiteCopy): SiteContent {
         sections.push({ kind: "enquiry", heading: copy.headings.enquiry, ...copy.enquiry, prompt: preset.enquiryPrompt });
         break;
       case "faq":
-        if (copy.faq.length) sections.push({ kind: "faq", heading: copy.headings.faq, items: copy.faq });
+        {
+          // The customer chose an FAQs page and the model wrote no questions: answer the ones their own facts already answer.
+          const items = copy.faq.length ? copy.faq : input.pages?.includes("faq") ? factFaq(facts) : [];
+          if (items.length) sections.push({ kind: "faq", heading: copy.headings.faq, items });
+        }
         break;
       case "cta":
         sections.push({ kind: "cta", ...copy.closing });

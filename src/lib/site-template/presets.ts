@@ -749,7 +749,7 @@ export const GENERAL_PRESET: SectorPreset = {
     heroCta: "Get in touch",
     enquiryIntro: "Tell us what you need and we will reply.",
     enquiryCta: "Send message",
-    closingHeadline: "Get in touch.",
+    closingHeadline: "Ready when you are.",
     closingCta: "Get in touch",
     example: { headline: "[What the business does] in [area]", intro: "[One plain sentence from what makes them different]." },
   },

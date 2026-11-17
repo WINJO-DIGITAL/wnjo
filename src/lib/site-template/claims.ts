@@ -92,8 +92,11 @@ const WEEKDAYS_AND_MONTHS = new Set("monday tuesday wednesday thursday friday sa
  * brand, a qualification) that isn't in their facts. The first word of a sentence is skipped, because it is capitalised
  * anyway. Days and months are allowed.
  */
-export function unknownNames(line: string, facts: string): string[] {
-  const known = new Set(wordsOf(facts));
+export function unknownNames(rawLine: string, facts: string): string[] {
+  // A curly apostrophe is the same letter as a straight one: "Daz’s" is "Daz's".
+  const line = rawLine.replace(/[’‘]/g, "'");
+  // The facts' words with and without a possessive, so a name matches whether or not the line says "Daz's".
+  const known = new Set(wordsOf(facts.replace(/[’‘]/g, "'")).flatMap((w) => (w.endsWith("'s") ? [w, w.slice(0, -2)] : [w])));
   const out = new Set<string>();
   for (const sentence of sentencesOf(line)) {
     const tokens = sentence.split(/\s+/).slice(1);

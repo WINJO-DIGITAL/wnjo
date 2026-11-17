@@ -18,17 +18,18 @@ const cutWords = (text: string, max: number): string => (text.length <= max ? te
 
 /**
  * One service per line, as the template wants them. A line the customer wrote as "Airport transfers – pre-booked pickups
- * to UK airports" keeps its name, and the description is left for the writer; a line over the name limit is cut at a word.
- * A price already in the line stays with it.
+ * to UK airports" keeps both parts: the name, and their own description of it, which the site shows as they wrote it.
+ * A name over the limit is cut at a word. A price already in the line stays with it.
  */
 export function serviceLines(text: string): string {
   const seen = new Set<string>();
   const lines: string[] = [];
   for (const raw of text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)) {
-    const m = raw.match(/^(.{2,60}?)\s+[–—-]\s+(.+)$/);
-    const line = m && !/^[£\d]/.test(m[2]) ? m[1].trim() : cutWords(raw, 60);
-    if (!line || seen.has(line.toLowerCase())) continue;
-    seen.add(line.toLowerCase());
+    const m = raw.match(/^(.{2,60}?)\s+([–—])\s+(.+)$/);
+    const line = m && !/^[£\d]/.test(m[3]) ? `${m[1].trim()} – ${cutWords(m[3].trim(), 200)}` : cutWords(raw, 60);
+    const key = line.split(" – ")[0].toLowerCase();
+    if (!line || seen.has(key)) continue;
+    seen.add(key);
     lines.push(line);
   }
   return lines.slice(0, 12).join("\n");

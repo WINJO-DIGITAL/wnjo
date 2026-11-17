@@ -9,6 +9,9 @@ import { WEBSITE_PLANS, type WebsitePlanId } from "@/lib/pricing";
 
 /** Pages that already are the next step, so the bar would only get in the way. */
 const HIDDEN_ON = ["/contact", "/build", "/build/project", "/build/hosting", "/account", "/admin"];
+/** A customer's website, in a private preview or live, is theirs: none of our own bars belong on it. */
+const HIDDEN_UNDER = ["/site-preview", "/preview", "/sites"];
+const hiddenOn = (pathname: string) => HIDDEN_ON.includes(pathname) || HIDDEN_UNDER.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
 /**
  * Phones and tablets: once the visitor has scrolled past the opening screen, a slim bar
@@ -41,7 +44,7 @@ export function StickyCta() {
     };
   }, [pathname]);
   useEffect(() => {
-    if (HIDDEN_ON.includes(pathname) || pathname === "/pricing") return;
+    if (hiddenOn(pathname) || pathname === "/pricing") return;
     if (pathname === "/") {
       // Homepage: the bar takes over once the hero (which ends with the top "Get started" button) has scrolled away,
       // on every screen size, and steps aside only over the footer.
@@ -120,7 +123,7 @@ export function StickyCta() {
     };
   }, [pathname]);
 
-  if (HIDDEN_ON.includes(pathname)) return null;
+  if (hiddenOn(pathname)) return null;
 
   const visible = pathname === "/pricing" ? Boolean(plan) && !footerInView : show;
   const chosen = plan && plan in WEBSITE_PLANS ? WEBSITE_PLANS[plan as WebsitePlanId] : null;
