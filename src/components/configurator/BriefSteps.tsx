@@ -11,6 +11,7 @@ import {
   STYLES,
   SUGGESTED_PAGES,
   cleanReference,
+  withLogo,
   type GoalId,
   type StyleId,
   type WebsiteBrief,
@@ -295,6 +296,7 @@ export function FilesField({
   view?: (file: BriefFile) => Promise<string | null>;
 }) {
   const input = useRef<HTMLInputElement>(null);
+  const logoInput = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
   // Local copies of the files picked in this session, keyed by storage path.
@@ -307,9 +309,10 @@ export function FilesField({
   // Release the browser's copies when the form goes away.
   useEffect(() => () => Object.values(localRef.current).forEach((u) => URL.revokeObjectURL(u)), []);
 
-  const pick = async (list: FileList | null) => {
+  const pick = async (list: FileList | null, as?: "logo") => {
     if (!list || !draftId) return;
-    const room = BRIEF_LIMITS.files - brief.files.length;
+    // A logo replaces the last one, so it needs no spare room; it is the only file picked here.
+    const room = as === "logo" ? 1 : BRIEF_LIMITS.files - brief.files.length;
     const files = Array.from(list).slice(0, Math.max(0, room));
     const problems: string[] = list.length > room ? [`You can attach up to ${BRIEF_LIMITS.files} files.`] : [];
     setBusy((b) => b + files.length);
@@ -319,12 +322,13 @@ export function FilesField({
       if (r.ok) {
         const added = r.file;
         setLocal((l) => ({ ...l, [added.path]: URL.createObjectURL(f) }));
-        onChange((current) => ({ files: [...current.files, added].slice(0, BRIEF_LIMITS.files) }));
+        onChange((current) => ({ files: as === "logo" ? withLogo(current.files, added) : [...current.files, added].slice(0, BRIEF_LIMITS.files) }));
       }
       else problems.push(`${f.name}: ${r.reason}`);
     }
     setErrors(problems);
     if (input.current) input.current.value = "";
+    if (logoInput.current) logoInput.current.value = "";
   };
 
   const open = async (f: BriefFile) => {
@@ -354,6 +358,18 @@ export function FilesField({
       </legend>
       <label className="brief-drop">
         <input
+          ref={logoInput}
+          type="file"
+          className="visually-hidden"
+          accept="image/png,image/jpeg,image/webp,image/svg+xml"
+          disabled={!draftId || busy > 0}
+          onChange={(e) => void pick(e.target.files, "logo")}
+        />
+        <span className="brief-drop__title">{busy > 0 ? `Uploading ${busy}…` : brief.files.some((f) => f.role === "logo") ? "Replace your logo" : "Add your logo"}</span>
+        <span className="brief-drop__hint">Shown at the top of your website · PNG, JPG or SVG</span>
+      </label>
+      <label className="brief-drop">
+        <input
           ref={input}
           type="file"
           multiple
@@ -362,7 +378,7 @@ export function FilesField({
           disabled={!draftId || busy > 0 || brief.files.length >= BRIEF_LIMITS.files}
           onChange={(e) => void pick(e.target.files)}
         />
-        <span className="brief-drop__title">{busy > 0 ? `Uploading ${busy}…` : "Add files"}</span>
+        <span className="brief-drop__title">{busy > 0 ? `Uploading ${busy}…` : "Add photos and documents"}</span>
         <span className="brief-drop__hint">Images, PDF or Word · up to 20 MB each · {BRIEF_LIMITS.files} files</span>
       </label>
       {brief.files.length > 0 && (

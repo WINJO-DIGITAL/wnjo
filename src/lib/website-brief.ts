@@ -83,6 +83,11 @@ export const BRIEF_UPLOAD = {
 
 export type BriefFile = { path: string; name: string; size: number; type: string; /** What the customer says this picture is for. Left out for an ordinary photo. */ role?: "logo" | "hero"; /** A few words describing the picture, for screen readers and search. Left out when not given. */ alt?: string };
 
+/** Adds a logo to a brief's files. A brief has one logo, so any earlier one goes back to being an ordinary photo. */
+export function withLogo(files: BriefFile[], added: BriefFile, max = BRIEF_LIMITS.files): BriefFile[] {
+  return [...files.map((f) => (f.role === "logo" ? { ...f, role: undefined } : f)), { ...added, role: "logo" as const }].slice(0, max);
+}
+
 export type WebsiteBrief = {
   goals: GoalId[];
   goalNote: string;

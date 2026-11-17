@@ -9,7 +9,10 @@ import {
   safeFileName,
   validateBrief,
   validateBriefUpload,
+  withLogo,
+  type BriefFile,
 } from "./website-brief";
+import { pickPhotos } from "./site-template/photos";
 
 const DRAFT = "3f1c2a4e-9b7d-4c2a-8e1f-0a1b2c3d4e5f";
 
@@ -157,5 +160,22 @@ describe("a description on an uploaded file", () => {
     expect(brief.files[0].alt).toBe("Two barbers at work");
     expect(brief.files[1].alt?.length).toBe(BRIEF_LIMITS.fileAlt);
     expect(brief.files[2]).not.toHaveProperty("alt");
+  });
+});
+
+describe("the logo", () => {
+  const file = (name: string, role?: "logo" | "hero"): BriefFile => ({ name, path: `drafts/x/${name}`, size: 1000, type: "image/png", ...(role ? { role } : {}) });
+
+  it("is marked as the logo when it is added through the logo slot", () => {
+    expect(withLogo([file("a.png")], file("mark.png"))).toEqual([file("a.png"), file("mark.png", "logo")]);
+  });
+
+  it("replaces an earlier logo, which goes back to being an ordinary photo", () => {
+    const next = withLogo([file("old.png", "logo"), file("a.png")], file("new.png"));
+    expect(next.map((f) => [f.name, f.role])).toEqual([["old.png", undefined], ["a.png", undefined], ["new.png", "logo"]]);
+  });
+
+  it("is shown as the logo on a built site, and never as the hero picture", () => {
+    expect(pickPhotos([file("mark.png", "logo")])).toEqual({ gallery: [], logo: "brief-file:drafts/x/mark.png" });
   });
 });
