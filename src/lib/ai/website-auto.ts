@@ -103,7 +103,7 @@ async function claim(db: SupabaseClient, brief: BriefRow): Promise<boolean> {
 }
 
 /** `fresh` makes a new plan instead of reusing the last. `by` is the person regenerating, who sees the result and needs no email. */
-export type DraftOptions = { fresh?: boolean; by?: Actor; /** Told why, when no template could be built and a words-only draft was made instead. */ onFallback?: (reason: string) => void };
+export type DraftOptions = { fresh?: boolean; by?: Actor; /** A style the owner chose for this build. Overrides the AI's choice of style, never the sector. */ look?: Look; /** Told why, when no template could be built and a words-only draft was made instead. */ onFallback?: (reason: string) => void };
 
 export async function draftWebsite(db: SupabaseClient, provider: AiProvider, brief: BriefRow, options: DraftOptions = {}): Promise<"drafted" | "text" | "waiting" | "failed"> {
   const actor: Actor = options.by ?? { userId: null, email: null, tenantId: brief.tenant_id, kind: "system" };
@@ -153,7 +153,8 @@ export async function draftWebsite(db: SupabaseClient, provider: AiProvider, bri
   if (!answers || sectors.length === 0) return await textDraft();
 
   // Step 2: the template. The customer's own look is kept; anything they left open, the AI chooses from the plan.
-  const asked = ALL_LOOKS.includes(answers.look as Look) ? (answers.look as Look) : null;
+  // The owner's choice when regenerating, then the customer's own, else the AI chooses.
+  const asked = options.look ?? (ALL_LOOKS.includes(answers.look as Look) ? (answers.look as Look) : null);
   const picked = await pickTemplate(provider, {
     businessName,
     businessType: site ? (presetFor(site.sector)?.label ?? site.sector) : (brief.brief?.otherBusinessType ?? ""),
@@ -185,7 +186,7 @@ async function failed(db: SupabaseClient, brief: BriefRow, who: { reference: str
 }
 
 /** Staff regenerate a website from scratch: a new plan, a new template choice and a new build. It makes a draft only. */
-export async function regenerateWebsite(db: SupabaseClient, provider: AiProvider, by: Actor, briefId: string): Promise<{ ok: true; outcome: "drafted" | "text"; note?: string } | { ok: false; status: number; error: string }> {
+export async function regenerateWebsite(db: SupabaseClient, provider: AiProvider, by: Actor, briefId: string, look?: Look): Promise<{ ok: true; outcome: "drafted" | "text"; note?: string } | { ok: false; status: number; error: string }> {
   const { data } = await db
     .from("website_briefs")
     .select("id, tenant_id, reference, email, name, business_name, brief")
@@ -196,7 +197,7 @@ export async function regenerateWebsite(db: SupabaseClient, provider: AiProvider
   if (!brief) return { ok: false, status: 404, error: "not_found" };
   if (!brief.brief?.site && !brief.brief?.goals?.length) return { ok: false, status: 409, error: "The customer hasn't sent their goals yet." };
   let note: string | undefined;
-  const outcome = await draftWebsite(db, provider, brief, { fresh: true, by, onFallback: (reason) => (note = `No template could be built, so this is a words-only draft. ${reason}`) });
+  const outcome = await draftWebsite(db, provider, brief, { fresh: true, by, look, onFallback: (reason) => (note = `No template could be built, so this is a words-only draft. ${reason}`) });
   if (outcome === "waiting") return { ok: false, status: 409, error: "The customer's answers aren't complete enough to build a template site yet." };
   if (outcome === "failed") return { ok: false, status: 502, error: "The AI couldn't finish the website. The reason is in the website's history." };
   return { ok: true, outcome, ...(note ? { note } : {}) };

@@ -2463,3 +2463,120 @@
 .site[data-look="heritage"] .heroLogo {
   margin-inline: auto;
 }
+
+/* ---- Structure: a feature card beside the headline, a two-tone headline and a link-rich footer ---- */
+
+/* The footer lists what they do and where, in columns, as a portfolio site's does. */
+.foot {
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 2rem 2.5rem;
+}
+.footHead {
+  color: var(--ink);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+.foot > div:first-child {
+  grid-column: span 1;
+}
+
+/* The feature card is a part of the Executive style's top of the page. */
+.heroCard {
+  display: none;
+}
+.areaLine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.9rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  font-weight: 500;
+}
+.areaLine span:not(:last-child)::after {
+  content: "·";
+  margin-left: 0.9rem;
+}
+.tone {
+  color: var(--accent-text);
+}
+.site[data-look="executive"] .hero[data-variant="plain"] {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: center;
+  text-align: left;
+  padding-block: clamp(3rem, 8vw, 6rem);
+}
+.site[data-look="executive"] .hero[data-variant="plain"] .heroCopy {
+  margin: 0;
+  justify-items: start;
+  max-width: 40rem;
+}
+.site[data-look="executive"] .hero[data-variant="plain"] .heroActions {
+  justify-content: flex-start;
+}
+.site[data-look="executive"] .hero[data-variant="plain"] .heroCopy .heroLogo {
+  display: none;
+}
+.site[data-look="executive"] .hero[data-variant="plain"] .heroCard {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+  padding: 1.25rem;
+  background: #15161a;
+  border: 1px solid color-mix(in srgb, var(--accent-text) 35%, transparent);
+  border-radius: 4px;
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.8);
+}
+.site[data-look="executive"] .hero[data-variant="plain"] .heroCard img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 16rem;
+  object-fit: contain;
+  border-radius: 2px;
+}
+.site[data-look="executive"] .hero[data-variant="plain"] .heroCard b {
+  font-family: var(--head);
+  font-size: 1.6rem;
+  font-weight: 300;
+}
+.site[data-look="executive"] .hero[data-variant="plain"] .heroCard p {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.site[data-look="executive"] .heroCard ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.site[data-look="executive"] .heroCard li {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.site[data-look="executive"] .heroCard a {
+  color: var(--accent-text);
+  font-size: 1.35rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+@media (min-width: 56rem) {
+  .site[data-look="executive"] .hero[data-variant="plain"] {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+  }
+}

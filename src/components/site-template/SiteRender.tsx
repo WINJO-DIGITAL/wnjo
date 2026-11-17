@@ -26,6 +26,18 @@ export function safeImage(src: string | undefined): string | null {
   return null;
 }
 
+/** A headline in two tones: the last words in the accent, as on a portfolio site. Short headlines stay one tone. */
+function twoTone(headline: string) {
+  const words = headline.trim().split(/\s+/);
+  if (words.length < 4) return headline;
+  const at = Math.ceil(words.length / 2);
+  return (
+    <>
+      {words.slice(0, at).join(" ")} <span className={css.tone}>{words.slice(at).join(" ")}</span>
+    </>
+  );
+}
+
 const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
 
 /** A wa.me link. A leading 0 is treated as a UK number; a number that already has a country code is left as it is. */
@@ -113,6 +125,8 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
   const style = { "--accent": colour, "--on-accent": onColour(colour) } as CSSProperties;
   const bookable = bookOn === null ? undefined : [...content.sections, ...(content.pages ?? []).flatMap((p) => p.sections)].find((s): s is Extract<Section, { kind: "enquiry" }> => s.kind === "enquiry");
   const services = serviceChoices(content);
+  // The footer lists what they do, from the customer's own service names, and where.
+  const serviceNames = [...content.sections, ...(content.pages ?? []).flatMap((p) => p.sections)].flatMap((x) => (x.kind === "services" ? x.items.map((i) => i.name) : [])).filter((n, i, all) => all.indexOf(n) === i).slice(0, 6);
   const reviews = (content.reviews ?? []).filter((review) => review.quote.trim() && review.name.trim());
   const profile = safeHttpsUrl(business.googleProfile);
   const photo = safeImage(heroImage);
@@ -136,7 +150,14 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                 // eslint-disable-next-line @next/next/no-img-element -- customer logos come from private storage, not the image optimiser
                 <img className={css.heroLogo} src={logo} alt={business.name} />
               )}
-              <h1>{s.headline}</h1>
+              {theme.look === "executive" && business.areas && business.areas.length > 0 && (
+                <p className={css.areaLine}>
+                  {business.areas.slice(0, 3).map((a) => (
+                    <span key={a}>{a}</span>
+                  ))}
+                </p>
+              )}
+              <h1>{theme.look === "executive" ? twoTone(s.headline) : s.headline}</h1>
               <p>{s.intro}</p>
               <span className={css.heroActions}>
                 <a className={css.btn} href={bookHref}>
@@ -149,6 +170,24 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                 )}
               </span>
             </div>
+            {/* A feature card beside the headline, as on a portfolio site: the logo or name, what they do, where, and the number. */}
+            <aside className={css.heroCard} aria-label={business.name}>
+              {logo ? (
+                // eslint-disable-next-line @next/next/no-img-element -- customer logos come from private storage, not the image optimiser
+                <img src={logo} alt={business.name} />
+              ) : (
+                <b>{business.name}</b>
+              )}
+              {business.tagline && <p>{business.tagline}</p>}
+              {business.areas && business.areas.length > 0 && (
+                <ul>
+                  {business.areas.slice(0, 6).map((a) => (
+                    <li key={a}>{a}</li>
+                  ))}
+                </ul>
+              )}
+              {business.phone && <a href={telHref(business.phone)}>{business.phone}</a>}
+            </aside>
           </section>
         );
       case "services":
@@ -467,8 +506,25 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
           <b className={css.logo}>{business.name}</b>
           {business.tagline && <span>{business.tagline}</span>}
         </div>
+        {serviceNames.length > 0 && (
+          <div>
+            <b className={css.footHead}>Services</b>
+            {serviceNames.map((n) => (
+              <span key={n}>{n}</span>
+            ))}
+          </div>
+        )}
+        {business.areas && business.areas.length > 0 && (
+          <div>
+            <b className={css.footHead}>Areas</b>
+            {business.areas.slice(0, 8).map((a) => (
+              <span key={a}>{a}</span>
+            ))}
+          </div>
+        )}
         {(business.address || business.phone || business.email || profile) && (
           <div>
+            <b className={css.footHead}>Contact</b>
             {business.address && <span>{business.address}</span>}
             {business.phone && <a href={telHref(business.phone)}>{business.phone}</a>}
             {business.email && <a href={`mailto:${business.email}`}>{business.email}</a>}

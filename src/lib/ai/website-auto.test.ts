@@ -191,6 +191,12 @@ describe("regenerating a website", () => {
     expect(steps).toContain("preview");
   });
 
+  it("uses the style the owner picked", async () => {
+    const r = await regenerateWebsite(single(ownWords), provider("cleaning", "executive"), staff, "b1", "executive");
+    expect(r).toEqual({ ok: true, outcome: "drafted" });
+    expect(steps.filter((x) => x.startsWith("site:"))).toEqual(["site:staff:cleaning:executive"]);
+  });
+
   it("refuses a website whose customer hasn't sent their goals", async () => {
     expect(await regenerateWebsite(single({ goals: [] }), provider(), staff, "b1")).toMatchObject({ ok: false, status: 409 });
   });

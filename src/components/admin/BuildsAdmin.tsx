@@ -21,6 +21,7 @@ import {
 import { REVISION_STATUSES, isUnfinished, type RevisionRow } from "@/lib/build-revisions";
 import { CUSTOMERS, FIRST_ACTIONS, GOALS, STYLES, TONES, type WebsiteBrief } from "@/lib/website-brief";
 import { SECTOR_PRESETS } from "@/lib/site-template/presets";
+import { STYLES as SITE_STYLES, STYLE_INFO } from "@/lib/site-template/styles";
 import { extrasRows } from "@/lib/brief-extras";
 
 type BriefRow = {
@@ -784,6 +785,7 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
   const [previews, setPreviews] = useState<AiPreviewRow[]>([]);
   const [siteBuilds, setSiteBuilds] = useState<AiSiteBuildRow[]>([]);
   const [siteChange, setSiteChange] = useState("");
+  const [regenLook, setRegenLook] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [change, setChange] = useState("");
@@ -883,12 +885,21 @@ function AiPanel({ client, row, revisions, call, onChanged }: { client: Supabase
             <button type="button" className="btn btn--secondary" disabled={busy !== null || !latestPlan} onClick={() => void run("preview", { action: "preview", briefId: row.id, change: change || undefined }, "Preview drafted.")}>
               {busy === "preview" ? "Writing pages…" : "Write the preview"}
             </button>
+            <label className="acct-label">
+              Style
+              <select className="acct-input" value={regenLook} onChange={(e) => setRegenLook(e.target.value)} aria-label="Style for the regenerated website">
+                <option value="">Chosen for me</option>
+                {SITE_STYLES.map((id) => (
+                  <option key={id} value={id}>{`${STYLE_INFO[id].label} (${STYLE_INFO[id].from})`}</option>
+                ))}
+              </select>
+            </label>
             <button
               type="button"
               className="btn btn--primary"
               disabled={busy !== null}
               onClick={() => {
-                if (window.confirm("Start this website again from the customer's answers? It makes a new plan, picks the template again and builds a new draft. The customer sees nothing until you release it.")) void run("regenerate", { action: "regenerate", briefId: row.id }, "Website regenerated. Review the new draft below.");
+                if (window.confirm("Start this website again from the customer's answers? It makes a new plan, picks the template again and builds a new draft. The customer sees nothing until you release it.")) void run("regenerate", { action: "regenerate", briefId: row.id, ...(regenLook ? { look: regenLook } : {}) }, "Website regenerated. Review the new draft below.");
               }}
             >
               {busy === "regenerate" ? "Regenerating…" : "Regenerate the website"}
