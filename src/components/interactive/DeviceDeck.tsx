@@ -309,40 +309,19 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         ))}
       </div>
 
-      <HeroCta />
-    </div>
-  );
-}
-
-/**
- * The hero button, with a short journey line under it: today, the preview, then live within 14 days. The first step is
- * already marked, so the visitor starts the journey the moment they arrive. Holding the button fills the line, and a
- * plain tap still goes straight to pricing. The styles keep the line still for anyone who has asked for less motion.
- */
-function HeroCta() {
-  const [held, setHeld] = useState(false);
-  const release = () => setHeld(false);
-  return (
-    <div className={`deck__cta${held ? " is-held" : ""}`}>
-      <Link href="/pricing" className="deck__btn" onPointerDown={() => setHeld(true)} onPointerUp={release} onPointerCancel={release} onPointerLeave={release}>
-        <span className="deck__btn-main">GET YOUR WEBSITE</span>
-        <span className="deck__btn-price">
-          From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/Month</span>
-        </span>
-      </Link>
-      <div className="deck__journey">
-        <span className="deck__journey-fill" aria-hidden="true" />
-        <ol className="deck__steps" role="list" aria-label="Your journey">
-          <li>Today</li>
-          <li>Preview</li>
-          <li>Live within 14 days</li>
-        </ol>
+      <div className="deck__cta">
+        <Link href="/pricing" className="deck__btn">
+          <span className="deck__btn-main">GET YOUR WEBSITE</span>
+          <span className="deck__btn-price">
+            From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/Month</span>
+          </span>
+        </Link>
+        <ul className="deck__bullets" role="list">
+          <li>Cancel any time, with no notice</li>
+          <li>No Minimum Term</li>
+          <li>Ongoing Support</li>
+        </ul>
       </div>
-      <ul className="deck__bullets" role="list">
-        <li>Cancel any time, with no notice</li>
-        <li>No Minimum Term</li>
-        <li>Ongoing Support</li>
-      </ul>
     </div>
   );
 }
