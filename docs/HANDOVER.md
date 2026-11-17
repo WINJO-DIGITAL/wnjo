@@ -5,6 +5,7 @@ Read this first in any new session. It holds the working rules and open items th
 ## Working rules (from the owner)
 
 - Commit locally. Push or merge to main only when the owner says "push" or "merge to main". If a stop hook asks for a push, decline and give the commit hashes.
+- Vercel builds only `main`, by the owner's choice (17 November 2026): branch previews are off, and the project's ignored-build-step rule skips every other branch. Do not turn previews on or create preview deployments. To see a change before it is live, run it locally, or merge to `main` when the owner says so.
 - Merge is fast-forward only: push the feature branch to `main` with `git push origin claude/hopeful-rubin-b40vgv:refs/heads/main`, then push the branch itself.
 - Before asking the owner to spend money (live model runs, paid tests), finish and check the change yourself with free tests. Never ask the owner to run something to find out whether a change works. Say what has been verified and what hasn't.
 - Keep replies short and plain. Sentence-case labels. Tick checklist items only when confirmed.
