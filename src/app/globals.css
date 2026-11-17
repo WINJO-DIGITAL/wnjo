@@ -14428,6 +14428,13 @@ body:has(.pv, .sitepv) .site-footer {
   color: var(--color-accent);
 }
 
+/* Phones: the ticks sit a little closer to the button, so the second line clears the bottom of the screen. */
+@media (max-width: 39.99rem) {
+  .deck .deck__bullets {
+    margin-top: 8px;
+  }
+}
+
 /* Phones: the client logos sit in one soft capsule, all the same size. The chosen one is lifted, not outlined. */
 @media (max-width: 39.99rem) {
   .deck .deck__rail {
