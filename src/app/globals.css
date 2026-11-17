@@ -8711,17 +8711,24 @@ ol.bs {
   border-radius: inherit;
   background: var(--color-accent);
   opacity: 0;
-  transition: opacity 0.12s ease;
+  transition: opacity 0.26s ease-out;
 }
-.deck__btn:active::before {
+.deck__btn:active::before,
+.deck__btn.is-launching::before {
   opacity: 1;
 }
 .deck__btn .deck__btn-price {
-  transition: color 0.12s ease;
+  transition: color 0.26s ease-out;
 }
 .deck__btn:active .deck__btn-price,
-.deck__btn:active .deck__btn-price .deck__unit {
+.deck__btn:active .deck__btn-price .deck__unit,
+.deck__btn.is-launching .deck__btn-price,
+.deck__btn.is-launching .deck__btn-price .deck__unit {
   color: #f6f0e6;
+}
+/* It stays pressed in while it holds, even after the finger lifts. */
+.deck__btn.is-launching {
+  transform: translate(var(--mx, 0px), var(--my, 0px)) scale(0.965);
 }
 @media (prefers-reduced-motion: reduce) {
   .deck__btn::before,

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import type { Project } from "@/lib/projects";
@@ -319,8 +320,35 @@ export function DeviceDeck({ items }: { items: Item[] }) {
  * then settles back with a small spring when let go. Nothing changes where a tap goes, and it stays still for anyone
  * who has asked for less motion. The lean is set as two CSS variables, so the page does not re-render as it moves.
  */
+/** How long the button holds its warm colour before the next page opens, in milliseconds. */
+const LAUNCH_MS = 380;
+
 function HeroCta() {
   const link = useRef<HTMLAnchorElement>(null);
+  const router = useRouter();
+  const [launching, setLaunching] = useState(false);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => {
+    const pending = timers.current;
+    return () => pending.forEach(clearTimeout);
+  }, []);
+  /**
+   * A tap lets the button warm to terracotta and hold for a beat before the pricing page opens, so the press is seen. It
+   * only does this for a plain tap or click: a modified click (new tab), or anyone who prefers reduced motion, goes
+   * straight through, and so does everything if the script has not loaded, because the link itself still works.
+   */
+  const open = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    e.preventDefault();
+    if (launching) return;
+    setLaunching(true);
+    timers.current.push(
+      setTimeout(() => router.push("/pricing"), LAUNCH_MS),
+      // If the visitor comes back to this page, the button must not be left warm.
+      setTimeout(() => setLaunching(false), LAUNCH_MS + 1200),
+    );
+  };
   const lean = (e: React.PointerEvent<HTMLAnchorElement>) => {
     const el = link.current;
     if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -340,7 +368,7 @@ function HeroCta() {
   };
   return (
     <div className="deck__cta">
-      <Link ref={link} href="/pricing" className="deck__btn" onPointerDown={lean} onPointerMove={lean} onPointerUp={settle} onPointerCancel={settle} onPointerLeave={settle}>
+      <Link ref={link} href="/pricing" className={`deck__btn${launching ? " is-launching" : ""}`} onClick={open} onPointerDown={lean} onPointerMove={lean} onPointerUp={settle} onPointerCancel={settle} onPointerLeave={settle}>
         <span className="deck__btn-main">GET YOUR WEBSITE</span>
         <span className="deck__btn-price">
           From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/Month</span>
