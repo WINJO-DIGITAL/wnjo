@@ -87,7 +87,7 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         el.style.setProperty("--x", (o * sp).toFixed(1));
         // On phones the neighbours sit back: smaller and fainter, so the centre phone leads.
         const side = mode === "phone" ? 0.26 : 0.17;
-        const fade = mode === "phone" ? 0.56 : 0.42;
+        const fade = mode === "phone" ? 0.32 : 0.3;
         el.style.setProperty("--s", (1 - Math.min(a, 1) * side).toFixed(3));
         el.style.setProperty("--o", a > 1.6 ? "0" : (1 - Math.min(a, 1) * fade).toFixed(2));
         el.style.zIndex = String(10 - Math.round(a * 2));
@@ -369,15 +369,15 @@ function HeroCta() {
   return (
     <div className="deck__cta">
       <Link ref={link} href="/pricing" className={`deck__btn${launching ? " is-launching" : ""}`} onClick={open} onPointerDown={lean} onPointerMove={lean} onPointerUp={settle} onPointerCancel={settle} onPointerLeave={settle}>
-        <span className="deck__btn-main">GET YOUR WEBSITE</span>
+        <span className="deck__btn-main">Get started</span>
         <span className="deck__btn-price">
-          From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/Month</span>
+          From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/month</span>
         </span>
       </Link>
       <ul className="deck__bullets" role="list">
         <li>Cancel any time, with no notice</li>
-        <li>No Minimum Term</li>
-        <li>Ongoing Support</li>
+        <li>No minimum term</li>
+        <li>Ongoing support</li>
       </ul>
     </div>
   );
