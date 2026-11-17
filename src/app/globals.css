@@ -16008,9 +16008,9 @@ a.timeline__what:hover {
   /* Phones: the supporting line sits centred under the headline, and the deck gives up its height so the price button stays in view. */
   .hero-ed--work .lede {
     max-width: 21rem;
-    margin: 0.6rem auto 0;
-    font-size: 1rem;
-    line-height: 1.45;
+    margin: 0.25rem auto 0;
+    font-size: 0.875rem;
+    line-height: 1.35;
     text-align: center;
     text-wrap: balance;
   }
