@@ -6488,14 +6488,6 @@ main #process ol.steps li::after {
   color: var(--color-ink);
 }
 
-.oq__full {
-  margin-top: var(--space-4);
-  max-width: 40rem;
-  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  line-height: 1.6;
-  color: var(--color-ink-2);
-}
-
 .oq__by {
   margin-top: var(--space-4);
   font-family: var(--font-mono);

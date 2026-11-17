@@ -88,7 +88,7 @@ export default function HomePage() {
       <section className="owner-quotes" aria-label="From the owners">
         <div className="container container--wide">
           <OwnerQuotes
-            items={OWNER_QUOTES.map(({ project, quote, pull }) => ({
+            items={OWNER_QUOTES.map(({ project, pull }) => ({
               slug: project.slug,
               name: project.name,
               logo: project.logo,
@@ -96,7 +96,6 @@ export default function HomePage() {
               url: project.url,
               host: project.host,
               showAddress: project.showAddress,
-              quote,
               pull,
             }))}
           />

@@ -11,10 +11,8 @@ export type OwnerQuoteItem = {
   url: string;
   host: string;
   showAddress?: boolean;
-  /** A sentence taken word for word from the quote, shown large. */
+  /** A sentence taken word for word from the owner's approved quote, shown large. It is the only wording shown. */
   pull: string;
-  /** The owner's full approved words. */
-  quote: string;
 };
 
 /**
@@ -44,7 +42,6 @@ export function OwnerQuotes({ items }: { items: OwnerQuoteItem[] }) {
           <figure key={item.slug} className="oq__item" data-active={i === active} aria-hidden={i !== active} id={`oq-${item.slug}`}>
             <blockquote>
               <p className="oq__pull">{`“${item.pull}”`}</p>
-              {item.quote !== item.pull && <p className="oq__full">{item.quote}</p>}
             </blockquote>
             <figcaption className="oq__by">
               Owner, {item.name} · {item.location} ·{" "}
