@@ -116,6 +116,11 @@ describe("POST /api/enquiry", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("gives a silently dropped submission a reference, so no one sees a blank one", async () => {
+    const res = await post({ ...contact, startedAt: Date.now() });
+    expect((await res.json()).reference).toMatch(/^WNJO-[0-9A-F]{6}$/);
+  });
+
   it("surfaces delivery failures instead of claiming success", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     fetchMock.mockResolvedValue(new Response("{}", { status: 500 }));

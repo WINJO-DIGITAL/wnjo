@@ -135,7 +135,7 @@ export function StickyCta() {
           Continue with {chosen.name}
         </Link>
       ) : (
-        <Link href="#packages" className="btn btn--primary">
+        <Link href={pathname === "/" || pathname === "/website-projects" ? "#packages" : "/#packages"} className="btn btn--primary">
           Choose a package
         </Link>
       )}
