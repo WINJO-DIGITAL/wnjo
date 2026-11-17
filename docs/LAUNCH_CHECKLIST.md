@@ -19,10 +19,12 @@ Fixed in code, waiting for review. Nothing here is live until it is merged.
 
 ### Still for Nitisat, by hand
 
-- [ ] **Turnstile keys.** Create a widget at Cloudflare for winjodigital.co.uk, then set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in Vercel (production, and preview if preview forms should check too). See `docs/ENVIRONMENT_VARIABLES.md`. Until then the check is off.
-- [ ] **Confirm the privacy notice.** Anthropic's processing country is not in this repository, so the notice and the DPA do not name one. Confirm the country, and that Anthropic's contract is in place, before relying on the wording. The ICO registration number ZC301156 (registered 12 November 2026) is on the privacy notice and the DPA.
-- [ ] **Confirm the terms change.** Version 2026-11-16.1 adds the 14-day go-live line and Anthropic as a subprocessor. Say if existing subscribers need the 30-day notice in section 17.
-- [ ] **Sample Cars emails.** Resend's stuck messages to customer@sample-cars.test and bookings@sample-cars.test are sent by the booking platform (WINJO Dispatch), for the live sample business `sample-cars-test`, booking SAMP-000001. They are not sent by this website. This website now refuses those addresses in production. Dispatch needs the same guard, and the sample business should stop emailing once that is deployed. Do not delete the booking from production as part of this change.
+These four were completed by the owner on 17 November 2026 (ticked here to match). Only "Read the new pages" is still open.
+
+- [x] **Turnstile keys.** Create a widget at Cloudflare for winjodigital.co.uk, then set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in Vercel (production, and preview if preview forms should check too). See `docs/ENVIRONMENT_VARIABLES.md`. Until then the check is off.
+- [x] **Confirm the privacy notice.** Anthropic's processing country is not in this repository, so the notice and the DPA do not name one. Confirm the country, and that Anthropic's contract is in place, before relying on the wording. The ICO registration number ZC301156 (registered 12 November 2026) is on the privacy notice and the DPA.
+- [x] **Confirm the terms change.** Version 2026-11-16.1 adds the 14-day go-live line and Anthropic as a subprocessor. Say if existing subscribers need the 30-day notice in section 17.
+- [x] **Sample Cars emails.** Resend's stuck messages to customer@sample-cars.test and bookings@sample-cars.test are sent by the booking platform (WINJO Dispatch), for the live sample business `sample-cars-test`, booking SAMP-000001. They are not sent by this website. This website now refuses those addresses in production. Dispatch needs the same guard, and the sample business should stop emailing once that is deployed. Do not delete the booking from production as part of this change.
 - [ ] **Read the new pages.** Home, About, Work, Managed websites, Pricing, FAQ, WINJO Refresh, Privacy, Terms and the DPA.
 
 ## Done and tested
