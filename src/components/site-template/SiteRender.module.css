@@ -4097,3 +4097,32 @@
   -webkit-mask: linear-gradient(to left, #000 15%, transparent 75%);
   mask: linear-gradient(to left, #000 15%, transparent 75%);
 }
+
+/* ---- Motion: each style's opening has its own movement. Transform only, never opacity, so the words are on screen from the first frame. Reduced motion switches all of it off. ---- */
+@keyframes openFromLeft { from { transform: translateX(-2.5rem); } }
+@keyframes openRise { from { transform: translateY(1.25rem); } }
+@keyframes openSettle { from { transform: translateY(0.6rem); } }
+@keyframes openDrop { from { transform: translateY(-0.9rem); } }
+@keyframes openGrow { from { transform: scale(0.965); } }
+.site[data-look="athletic"] .hero .heroCopy { animation: openFromLeft 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.site[data-look="precision"] .hero .heroCopy { animation: openSettle 1s ease-out both; }
+.site[data-look="boutique"] .hero .heroCopy { animation: openRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.site[data-look="executive"] .hero .heroCopy { animation: openSettle 1.2s ease-out both; }
+.site[data-look="hearth"] .hero .heroCopy { animation: openGrow 0.7s ease-out both; }
+.site[data-look="heritage"] .hero .heroCopy { animation: openDrop 0.9s ease-out both; }
+.site[data-look="tradesman"] .hero .heroCopy { animation: openRise 0.45s steps(6, end) both; }
+.site[data-look="clinic"] .hero .heroCopy { animation: openRise 0.9s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .site .hero .heroCopy { animation: none; }
+}
+
+/* A long figure word ("Emergency") must stay inside its column on a phone, never push the page sideways. */
+.facts p,
+.facts b,
+.facts span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.site[data-look="tradesman"] .facts b {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+}
