@@ -22,9 +22,9 @@ export const SAMPLE_BARBER_FACTS: CustomerFacts = {
   address: "12 High Street, Leeds",
   about: "A family barber shop on the high street.",
   details: [
-    { label: "What are you best known for?", value: "Skin fades and hot towel shaves" },
-    { label: "How should customers book?", value: "Walk-ins welcome, or call to book" },
-    { label: "How long have you been trading?", value: "Since 2012" },
+    { label: "What are you best known for?", heading: "Best known for", value: "Skin fades and hot towel shaves" },
+    { label: "How should customers book?", heading: "How to book", value: "Walk-ins welcome, or call to book" },
+    { label: "How long have you been trading?", heading: "How long we’ve been trading", value: "Since 2012" },
   ],
 };
 
@@ -71,9 +71,9 @@ export const SAMPLE_CAFE_FACTS: CustomerFacts = {
   address: "4 Quay Street, Whitby",
   about: "A harbourside bakery that bakes everything each morning.",
   details: [
-    { label: "What are you known for?", value: "Sourdough and cakes" },
-    { label: "What is the place like?", value: "Bright, with seating by the window" },
-    { label: "Do you take bookings?", value: "Walk-ins only, or book for groups" },
+    { label: "What are you known for?", heading: "Best known for", value: "Sourdough and cakes" },
+    { label: "What is the place like?", heading: "The place", value: "Bright, with seating by the window" },
+    { label: "Do you take bookings?", heading: "Bookings", value: "Walk-ins only, or book for groups" },
   ],
 };
 
@@ -109,10 +109,10 @@ export const SAMPLE_ELECTRICIAN_FACTS: CustomerFacts = {
   email: "jobs@sparkandco.example",
   about: "A one-man electrician who answers his own phone.",
   details: [
-    { label: "What jobs do you do most?", value: "Rewires, fuse boards and alarms" },
-    { label: "Who do you work for?", value: "Homeowners and landlords" },
-    { label: "Do you charge a call-out fee, or give free quotes?", value: "Free quotes, no call-out fee" },
-    { label: "How long have you been trading?", value: "Since 2015" },
+    { label: "What jobs do you do most?", heading: "Jobs we do most", value: "Rewires, fuse boards and alarms" },
+    { label: "Who do you work for?", heading: "Who we work for", value: "Homeowners and landlords" },
+    { label: "Do you charge a call-out fee, or give free quotes?", heading: "Call-out fees and quotes", value: "Free quotes, no call-out fee" },
+    { label: "How long have you been trading?", heading: "How long we’ve been trading", value: "Since 2015" },
   ],
 };
 
@@ -155,9 +155,9 @@ export const SAMPLE_PHYSIO_FACTS: CustomerFacts = {
   address: "8 Park Row, Bristol",
   about: "A small clinic run by one physiotherapist.",
   details: [
-    { label: "What do you help with most?", value: "Back pain and sports injuries" },
-    { label: "What happens at a first appointment?", value: "An assessment, then a plan agreed with you" },
-    { label: "How should patients book?", value: "Book by phone or email" },
+    { label: "What do you help with most?", heading: "What we help with", value: "Back pain and sports injuries" },
+    { label: "What happens at a first appointment?", heading: "Your first appointment", value: "An assessment, then a plan agreed with you" },
+    { label: "How should patients book?", heading: "How to book", value: "Book by phone or email" },
   ],
 };
 
@@ -204,9 +204,9 @@ export const SAMPLE_MASSAGE_FACTS: CustomerFacts = {
   address: "9 Harbour Street, Fleetwood",
   about: "A quiet treatment room by the harbour.",
   details: [
-    { label: "What is a visit like?", value: "An hour in a warm, quiet room" },
-    { label: "What are you best known for?", value: "Deep tissue and hot stone" },
-    { label: "How should clients book?", value: "Book by phone or message" },
+    { label: "What is a visit like?", heading: "What a visit is like", value: "An hour in a warm, quiet room" },
+    { label: "What are you best known for?", heading: "Best known for", value: "Deep tissue and hot stone" },
+    { label: "How should clients book?", heading: "How to book", value: "Book by phone or message" },
   ],
 };
 
@@ -252,9 +252,9 @@ export const SAMPLE_FITNESS_FACTS: CustomerFacts = {
   address: "4 Mill Lane, Bolton",
   about: "A small gym where everyone knows your name.",
   details: [
-    { label: "Who is it for?", value: "Beginners and returning exercisers" },
-    { label: "What can a new member expect?", value: "A short chat, then a trial class" },
-    { label: "How do people join or book?", value: "Book a class or join monthly" },
+    { label: "Who is it for?", heading: "Who it’s for", value: "Beginners and returning exercisers" },
+    { label: "What can a new member expect?", heading: "Your first session", value: "A short chat, then a trial class" },
+    { label: "How do people join or book?", heading: "How to join or book", value: "Book a class or join monthly" },
   ],
 };
 
@@ -292,9 +292,9 @@ export const SAMPLE_HOLIDAY_LET_FACTS: CustomerFacts = {
   email: "stay@theoldbyre.example",
   about: "A converted barn with a garden and sea views.",
   details: [
-    { label: "What is the place like?", value: "A quiet barn with views of the coast" },
-    { label: "Who is it good for?", value: "Couples and families" },
-    { label: "When can guests arrive and leave, and how do they book?", value: "Check-in from 4pm, check-out by 10am, book by message" },
+    { label: "What is the place like?", heading: "The setting", value: "A quiet barn with views of the coast" },
+    { label: "Who is it good for?", heading: "Who it suits", value: "Couples and families" },
+    { label: "When can guests arrive and leave, and how do they book?", heading: "Arriving and leaving", value: "Check-in from 4pm, check-out by 10am, book by message" },
   ],
 };
 
@@ -339,9 +339,9 @@ export const SAMPLE_BEAUTY_FACTS: CustomerFacts = {
   highlights: [{ value: "Bridal", label: "Bridal and event bookings" }, { value: "Vouchers", label: "Gift vouchers available" }],
   about: "A friendly two-chair salon run by one stylist.",
   details: [
-    { label: "What are you best known for?", value: "Colour and bridal hair" },
-    { label: "Is there a patch test or consultation first?", value: "A patch test before any colour" },
-    { label: "How should clients book?", value: "Book by phone or message" },
+    { label: "What are you best known for?", heading: "Best known for", value: "Colour and bridal hair" },
+    { label: "Is there a patch test or consultation first?", heading: "Before your first treatment", value: "A patch test before any colour" },
+    { label: "How should clients book?", heading: "How to book", value: "Book by phone or message" },
   ],
   phone: "01524 720319",
   email: "hello@rosewoodbeauty.example",
@@ -378,10 +378,10 @@ export const SAMPLE_PLUMBING_FACTS: CustomerFacts = {
   highlights: [{ value: "Free", label: "Quotes" }, { value: "Emergency", label: "Call-outs available" }],
   about: "A local plumber who answers his own phone.",
   details: [
-    { label: "What jobs do you do most?", value: "Boiler servicing, leaks and bathrooms" },
-    { label: "Who do you work for?", value: "Homeowners and landlords" },
-    { label: "Do you charge a call-out fee, or give free quotes?", value: "Free quotes, no call-out fee" },
-    { label: "How long have you been trading?", value: "Since 2014" },
+    { label: "What jobs do you do most?", heading: "Jobs we do most", value: "Boiler servicing, leaks and bathrooms" },
+    { label: "Who do you work for?", heading: "Who we work for", value: "Homeowners and landlords" },
+    { label: "Do you charge a call-out fee, or give free quotes?", heading: "Call-out fees and quotes", value: "Free quotes, no call-out fee" },
+    { label: "How long have you been trading?", heading: "How long we’ve been trading", value: "Since 2014" },
   ],
   phone: "01772 960234",
   email: "jobs@tidewater.example",
@@ -411,10 +411,10 @@ export const SAMPLE_BUILDING_FACTS: CustomerFacts = {
   highlights: [{ value: "Free", label: "Quotes" }, { value: "Insured", label: "Public liability cover" }],
   about: "A small family firm that does the work itself.",
   details: [
-    { label: "What kinds of job do you take on?", value: "Extensions, lofts and kitchens" },
-    { label: "Who do you work for?", value: "Homeowners" },
-    { label: "How do customers get a quote?", value: "A free visit to talk it through" },
-    { label: "How long have you been trading?", value: "A family firm for fifteen years" },
+    { label: "What kinds of job do you take on?", heading: "Jobs we take on", value: "Extensions, lofts and kitchens" },
+    { label: "Who do you work for?", heading: "Who we work for", value: "Homeowners" },
+    { label: "How do customers get a quote?", heading: "Getting a quote", value: "A free visit to talk it through" },
+    { label: "How long have you been trading?", heading: "How long we’ve been trading", value: "A family firm for fifteen years" },
   ],
   phone: "01539 720411",
   email: "enquiries@graniteandoak.example",
@@ -444,10 +444,10 @@ export const SAMPLE_CLEANING_FACTS: CustomerFacts = {
   highlights: [{ value: "Insured", label: "Public liability cover" }, { value: "Supplies", label: "Products and equipment brought" }],
   about: "A small team who clean your home as carefully as their own.",
   details: [
-    { label: "Who do you clean for?", value: "Homes and small offices" },
-    { label: "Do you do regular cleans, one-off cleans, or both?", value: "Weekly, fortnightly and one-off cleans" },
-    { label: "Who brings the products and equipment?", value: "We bring everything" },
-    { label: "How long have you been trading?", value: "Since 2018" },
+    { label: "Who do you clean for?", heading: "Who we clean for", value: "Homes and small offices" },
+    { label: "Do you do regular cleans, one-off cleans, or both?", heading: "Regular and one-off cleans", value: "Weekly, fortnightly and one-off cleans" },
+    { label: "Who brings the products and equipment?", heading: "Products and equipment", value: "We bring everything" },
+    { label: "How long have you been trading?", heading: "How long we’ve been trading", value: "Since 2018" },
   ],
   phone: "01204 960777",
   email: "hello@freshstart.example",

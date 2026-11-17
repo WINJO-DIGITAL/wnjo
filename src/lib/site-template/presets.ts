@@ -20,7 +20,16 @@ export type HighlightOption = { id: string; value: string; label: string };
  * A question about the business that the writer needs answered to write well. The answer is kept in the customer's own
  * words and given to the writer as a fact. Optional unless `required`.
  */
-export type SectorQuestion = { id: string; label: string; hint: string; placeholder?: string; required?: boolean };
+export type SectorQuestion = {
+  id: string;
+  /** The question as the business owner is asked it on the form. */
+  label: string;
+  /** What the answer is called on the finished site, to a visitor: "Why people trust us", never the question. */
+  heading: string;
+  hint: string;
+  placeholder?: string;
+  required?: boolean;
+};
 
 /** Asked of every template: the one thing a services list can't say. Required, so a site never rests on a list alone. */
 export const ABOUT_QUESTION = {
@@ -105,12 +114,14 @@ const ticked =
 const bookingQuestion = (who: string): SectorQuestion => ({
   id: "booking",
   label: `How should ${who} book?`,
+  heading: "How to book",
   hint: "For example: walk-ins welcome, call to book, or message us. We show only what you say.",
 });
 
 const historyQuestion: SectorQuestion = {
   id: "history",
   label: "How long have you been trading?",
+  heading: "How long we’ve been trading",
   hint: "For example: since 2012, or a family business.",
 };
 
@@ -138,7 +149,7 @@ export const BARBER_PRESET: SectorPreset = {
   },
   voice: "Confident, friendly and plain. Short sentences. No hype and no slang.",
   questions: [
-    { id: "speciality", label: "What are you best known for?", hint: "For example: skin fades, traditional shaves, kids' cuts." },
+    { id: "speciality", label: "What are you best known for?", heading: "Best known for", hint: "For example: skin fades, traditional shaves, kids' cuts." },
     bookingQuestion("customers"),
     historyQuestion,
   ],
@@ -185,9 +196,9 @@ export const CAFE_PRESET: SectorPreset = {
   },
   voice: "Warm, welcoming and simple. Short sentences. Talk about the food and the room, never about hype.",
   questions: [
-    { id: "speciality", label: "What are you known for?", hint: "For example: breakfasts, homemade cakes, coffee roasted nearby." },
-    { id: "place", label: "What is the place like?", hint: "For example: garden seating, dog-friendly, space for pushchairs." },
-    { id: "booking", label: "Do you take bookings?", hint: "For example: walk-ins only, or book a table for groups." },
+    { id: "speciality", label: "What are you known for?", heading: "Best known for", hint: "For example: breakfasts, homemade cakes, coffee roasted nearby." },
+    { id: "place", label: "What is the place like?", heading: "The place", hint: "For example: garden seating, dog-friendly, space for pushchairs." },
+    { id: "booking", label: "Do you take bookings?", heading: "Bookings", hint: "For example: walk-ins only, or book a table for groups." },
   ],
   restrictedClaims: [
     {
@@ -240,9 +251,9 @@ export const ELECTRICIAN_PRESET: SectorPreset = {
   },
   voice: "Direct, calm and reassuring. Short sentences. Say what is done and where, with no jargon and no big promises.",
   questions: [
-    { id: "jobs", label: "What jobs do you do most?", hint: "For example: rewires, fuse boards, lighting, EV chargers." },
-    { id: "workFor", label: "Who do you work for?", hint: "For example: homeowners, landlords, businesses." },
-    { id: "callout", label: "Do you charge a call-out fee, or give free quotes?", hint: "We only mention a fee or a free quote if you say so." },
+    { id: "jobs", label: "What jobs do you do most?", heading: "Jobs we do most", hint: "For example: rewires, fuse boards, lighting, EV chargers." },
+    { id: "workFor", label: "Who do you work for?", heading: "Who we work for", hint: "For example: homeowners, landlords, businesses." },
+    { id: "callout", label: "Do you charge a call-out fee, or give free quotes?", heading: "Call-out fees and quotes", hint: "We only mention a fee or a free quote if you say so." },
     historyQuestion,
   ],
   restrictedClaims: [
@@ -302,8 +313,8 @@ export const PHYSIO_PRESET: SectorPreset = {
   },
   voice: "Calm, clear and reassuring. Short sentences. Say what a treatment involves, and never promise a result or a cure.",
   questions: [
-    { id: "helpWith", label: "What do you help with most?", hint: "Describe what you help with, for example back pain or sports injuries. Not what you cure." },
-    { id: "firstVisit", label: "What happens at a first appointment?", hint: "For example: an assessment, then a plan agreed with you." },
+    { id: "helpWith", label: "What do you help with most?", heading: "What we help with", hint: "Describe what you help with, for example back pain or sports injuries. Not what you cure." },
+    { id: "firstVisit", label: "What happens at a first appointment?", heading: "Your first appointment", hint: "For example: an assessment, then a plan agreed with you." },
     bookingQuestion("patients"),
   ],
   restrictedClaims: [
@@ -357,8 +368,8 @@ export const MASSAGE_PRESET: SectorPreset = {
   },
   voice: "Calm, warm and unhurried. Short sentences. Describe the treatment and the room, and never promise a result.",
   questions: [
-    { id: "visit", label: "What is a visit like?", hint: "The room, how long it lasts, what to wear." },
-    { id: "speciality", label: "What are you best known for?", hint: "For example: deep tissue, pregnancy massage, treatments for two." },
+    { id: "visit", label: "What is a visit like?", heading: "What a visit is like", hint: "The room, how long it lasts, what to wear." },
+    { id: "speciality", label: "What are you best known for?", heading: "Best known for", hint: "For example: deep tissue, pregnancy massage, treatments for two." },
     bookingQuestion("clients"),
   ],
   restrictedClaims: [
@@ -412,8 +423,8 @@ export const BEAUTY_PRESET: SectorPreset = {
   },
   voice: "Friendly, polished and reassuring. Short sentences. Describe the treatment and the experience, and never promise a result.",
   questions: [
-    { id: "speciality", label: "What are you best known for?", hint: "For example: colour, bridal hair, nails, lashes." },
-    { id: "firstVisit", label: "Is there a patch test or consultation first?", hint: "For example: a patch test before colour. We show only what you say." },
+    { id: "speciality", label: "What are you best known for?", heading: "Best known for", hint: "For example: colour, bridal hair, nails, lashes." },
+    { id: "firstVisit", label: "Is there a patch test or consultation first?", heading: "Before your first treatment", hint: "For example: a patch test before colour. We show only what you say." },
     bookingQuestion("clients"),
   ],
   restrictedClaims: [
@@ -467,9 +478,9 @@ export const FITNESS_PRESET: SectorPreset = {
   },
   voice: "Energetic but plain. Short sentences. Say what a session involves and who it suits. No hype and no promised results.",
   questions: [
-    { id: "audience", label: "Who is it for?", hint: "For example: beginners, women only, over-50s, runners." },
-    { id: "firstSession", label: "What can a new member expect?", hint: "For example: a short chat, a trial class, kit provided." },
-    { id: "joining", label: "How do people join or book?", hint: "For example: drop in, book a class, or a monthly membership." },
+    { id: "audience", label: "Who is it for?", heading: "Who it’s for", hint: "For example: beginners, women only, over-50s, runners." },
+    { id: "firstSession", label: "What can a new member expect?", heading: "Your first session", hint: "For example: a short chat, a trial class, kit provided." },
+    { id: "joining", label: "How do people join or book?", heading: "How to join or book", hint: "For example: drop in, book a class, or a monthly membership." },
   ],
   restrictedClaims: [
     { pattern: /\b(guarantee[sd]?|transform(?:s|ed|ation)?|miracle|lose \d+|burn \d+|results? (?:in|within) \d+)\b/i, reason: "A fitness site must not promise a result, such as weight lost or how soon it will show." },
@@ -523,9 +534,9 @@ export const HOLIDAY_LET_PRESET: SectorPreset = {
   },
   voice: "Warm and practical. Short sentences. Describe the place, the rooms and what is nearby. Never invent a rating or an award.",
   questions: [
-    { id: "setting", label: "What is the place like?", hint: "The setting, the views, what you can walk to." },
-    { id: "guests", label: "Who is it good for?", hint: "For example: couples, families, walkers, groups." },
-    { id: "arrival", label: "When can guests arrive and leave, and how do they book?", hint: "For example: check-in from 4pm, check-out by 10am, book by message." },
+    { id: "setting", label: "What is the place like?", heading: "The setting", hint: "The setting, the views, what you can walk to." },
+    { id: "guests", label: "Who is it good for?", heading: "Who it suits", hint: "For example: couples, families, walkers, groups." },
+    { id: "arrival", label: "When can guests arrive and leave, and how do they book?", heading: "Arriving and leaving", hint: "For example: check-in from 4pm, check-out by 10am, book by message." },
   ],
   restrictedClaims: [
     { pattern: /\b(award[- ]winning|5[- ]star|five[- ]star|top[- ]rated|best[- ]rated|guarantee[sd]?)\b/i, reason: "A holiday let must not claim a rating, an award or a guarantee the customer hasn't given." },
@@ -572,9 +583,9 @@ export const PLUMBING_PRESET: SectorPreset = {
   },
   voice: "Direct, calm and reassuring. Short sentences. Say what is done and where, with no jargon and no big promises.",
   questions: [
-    { id: "jobs", label: "What jobs do you do most?", hint: "For example: boiler servicing, leaks, bathrooms, central heating." },
-    { id: "workFor", label: "Who do you work for?", hint: "For example: homeowners, landlords, businesses." },
-    { id: "callout", label: "Do you charge a call-out fee, or give free quotes?", hint: "We only mention a fee or a free quote if you say so." },
+    { id: "jobs", label: "What jobs do you do most?", heading: "Jobs we do most", hint: "For example: boiler servicing, leaks, bathrooms, central heating." },
+    { id: "workFor", label: "Who do you work for?", heading: "Who we work for", hint: "For example: homeowners, landlords, businesses." },
+    { id: "callout", label: "Do you charge a call-out fee, or give free quotes?", heading: "Call-out fees and quotes", hint: "We only mention a fee or a free quote if you say so." },
     historyQuestion,
   ],
   restrictedClaims: [
@@ -633,9 +644,9 @@ export const BUILDING_PRESET: SectorPreset = {
   },
   voice: "Practical, steady and plain. Short sentences. Say what is built and where, with no jargon and no big promises.",
   questions: [
-    { id: "jobs", label: "What kinds of job do you take on?", hint: "For example: small repairs, extensions, full renovations." },
-    { id: "workFor", label: "Who do you work for?", hint: "For example: homeowners, landlords, developers." },
-    { id: "quote", label: "How do customers get a quote?", hint: "For example: a free visit, or send photos. We show only what you say." },
+    { id: "jobs", label: "What kinds of job do you take on?", heading: "Jobs we take on", hint: "For example: small repairs, extensions, full renovations." },
+    { id: "workFor", label: "Who do you work for?", heading: "Who we work for", hint: "For example: homeowners, landlords, developers." },
+    { id: "quote", label: "How do customers get a quote?", heading: "Getting a quote", hint: "For example: a free visit, or send photos. We show only what you say." },
     historyQuestion,
   ],
   restrictedClaims: [
@@ -693,9 +704,9 @@ export const CLEANING_PRESET: SectorPreset = {
   },
   voice: "Friendly, reliable and plain. Short sentences. Say what is cleaned and where, with no hype and no promised results.",
   questions: [
-    { id: "workFor", label: "Who do you clean for?", hint: "For example: homes, offices, rental properties." },
-    { id: "frequency", label: "Do you do regular cleans, one-off cleans, or both?", hint: "For example: weekly, fortnightly, or one-off deep cleans." },
-    { id: "supplies", label: "Who brings the products and equipment?", hint: "For example: we bring everything, or you provide the products." },
+    { id: "workFor", label: "Who do you clean for?", heading: "Who we clean for", hint: "For example: homes, offices, rental properties." },
+    { id: "frequency", label: "Do you do regular cleans, one-off cleans, or both?", heading: "Regular and one-off cleans", hint: "For example: weekly, fortnightly, or one-off deep cleans." },
+    { id: "supplies", label: "Who brings the products and equipment?", heading: "Products and equipment", hint: "For example: we bring everything, or you provide the products." },
     historyQuestion,
   ],
   restrictedClaims: [
@@ -755,9 +766,9 @@ export const GENERAL_PRESET: SectorPreset = {
   },
   voice: "Plain, specific and in the customer's own words. Say what the business does and where. No hype, no superlatives, no promised results.",
   questions: [
-    { id: "customers", label: "Who are your customers?", hint: "For example: local people, businesses, visitors." },
-    { id: "proof", label: "What can you show to earn trust?", hint: "For example: years trading, licences, insurance. We only say what you tell us." },
-    { id: "hours-note", label: "When are you available?", hint: "For example: 24 hours, or weekdays by arrangement." },
+    { id: "customers", label: "Who are your customers?", heading: "Who we work with", hint: "For example: local people, businesses, visitors." },
+    { id: "proof", label: "What can you show to earn trust?", heading: "Why people trust us", hint: "For example: years trading, licences, insurance. We only say what you tell us." },
+    { id: "hours-note", label: "When are you available?", heading: "When we’re available", hint: "For example: 24 hours, or weekdays by arrangement." },
   ],
   restrictedClaims: [
     { pattern: /\b(best|number one|no\.? ?1|#1|leading|award[- ]winning|cheapest|guarantee[sd]?|100%)\b/i, reason: "A site must not claim to be the best or promise a guarantee." },

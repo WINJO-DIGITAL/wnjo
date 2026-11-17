@@ -241,12 +241,12 @@ export function parseAnswers(raw: RawAnswers, preset: SectorPreset, defaults: { 
   if (!about) errors.about = `Answer "${ABOUT_QUESTION.label}" in a sentence or two.`;
   else if (about.length > ANSWER_LIMITS.aboutText) errors.about = `Keep it under ${ANSWER_LIMITS.aboutText} characters.`;
   const rawDetails = raw.details && typeof raw.details === "object" ? raw.details : {};
-  const details: { label: string; value: string }[] = [];
+  const details: NonNullable<CustomerFacts["details"]> = [];
   for (const q of preset.questions) {
     const value = text(rawDetails[q.id]);
     if (value.length > ANSWER_LIMITS.detailText) errors[`detail-${q.id}`] = `Keep it under ${ANSWER_LIMITS.detailText} characters.`;
     else if (!value && q.required) errors[`detail-${q.id}`] = "Answer this question.";
-    else if (value) details.push({ label: q.label, value });
+    else if (value) details.push({ label: q.label, heading: q.heading, value });
   }
 
   const profile = text(raw.googleProfile);

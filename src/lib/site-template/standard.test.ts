@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { AiProvider } from "@/lib/ai/provider";
 import { ANSWER_LIMITS, cleanSiteAnswers, parseAnswers, parseServicesText } from "./answers";
 import { checkSite } from "./checks";
+import { aboutSection } from "./pages";
 import { ABOUT_QUESTION, SECTOR_PRESETS, type SectorPreset } from "./presets";
 import { SAMPLE_ANSWERS, SAMPLES } from "./sample";
 import { assembleSite, buildCopyPrompt, defaultCopy, writeSite } from "./write";
@@ -70,6 +71,23 @@ describe.each(presets.map((p) => [p.label, p] as [string, SectorPreset]))("%s: t
       expect(q.label.endsWith("?"), q.label).toBe(true);
       expect(q.hint.length).toBeGreaterThan(10);
     }
+  });
+
+  it("shows each answer on the finished site under a heading for the visitor, never the question put to the owner", () => {
+    for (const q of preset.questions) {
+      expect(q.heading.trim(), q.id).not.toBe("");
+      expect(q.heading.endsWith("?"), q.heading).toBe(false);
+      expect(q.heading, q.id).not.toBe(q.label);
+      expect(q.heading.length, q.heading).toBeLessThanOrEqual(32);
+    }
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const about = aboutSection(parsed.facts);
+    expect(about?.kind).toBe("about");
+    if (about?.kind !== "about") return;
+    expect(about.points.map((pt) => pt.label)).toEqual(preset.questions.map((q) => q.heading));
+    // The writer still reads the question each answer responds to.
+    expect(parsed.facts.details?.map((d) => d.label)).toEqual(preset.questions.map((q) => q.label));
   });
 
   it("lets a customer lift every claim the sector restricts, by ticking a fact that is true of them", () => {

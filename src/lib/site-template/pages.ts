@@ -87,7 +87,7 @@ export function defaultPageHead(preset: SectorPreset, kind: PageKind): { headlin
 /** The About page's content: the customer's own words, and their answers to the sector's questions as points. */
 export function aboutSection(facts: CustomerFacts, heading = "About us", image?: { src: string; alt: string }): Section | null {
   if (!facts.about?.trim()) return null;
-  return { kind: "about", heading, text: facts.about.trim(), points: (facts.details ?? []).map((d) => ({ label: d.label, text: d.value })), ...(image ? { image } : {}) };
+  return { kind: "about", heading, text: facts.about.trim(), points: (facts.details ?? []).map((d) => ({ label: d.heading ?? d.label, text: d.value })), ...(image ? { image } : {}) };
 }
 
 /** The first sentences of the customer's own words, whole, up to a length: what the home page shows of the About page. */
