@@ -232,23 +232,41 @@ const DETAIL_TABS: { id: DetailTab; label: string }[] = [
  */
 function HandoffBrief({ row, call }: { row: BriefRow; call: Call }) {
   const [markdown, setMarkdown] = useState<string | null>(null);
-  const [state, setState] = useState<"idle" | "busy" | "copied" | "failed">("idle");
-  const make = async () => {
+  const [state, setState] = useState<"idle" | "busy" | "copied" | "failed" | "manual">("idle");
+  const boxRef = useRef<HTMLTextAreaElement | null>(null);
+  const make = () => {
     setState("busy");
-    const r = await call({ action: "handoff", briefId: row.id });
-    const text = typeof r.json.markdown === "string" ? r.json.markdown : null;
-    if (!r.ok || !text) {
-      setState("failed");
-      return;
-    }
-    setMarkdown(text);
-    try {
-      await navigator.clipboard.writeText(text);
-      setState("copied");
-    } catch {
-      // Some browsers refuse without a tap on the text itself: it is shown below to copy by hand.
-      setState("idle");
-    }
+    setMarkdown(null);
+    const fetched = call({ action: "handoff", briefId: row.id }).then((r) => {
+      const text = typeof r.json.markdown === "string" ? r.json.markdown : null;
+      if (!r.ok || !text) throw new Error("no brief");
+      setMarkdown(text);
+      return text;
+    });
+    fetched.catch(() => setState("failed"));
+    // Safari (iPhone and iPad) only lets the page copy during the tap itself, so the copy starts now, with the brief
+    // promised as a blob, and not after the brief has been fetched (which would be too late and fail silently).
+    const copied =
+      typeof ClipboardItem !== "undefined" && typeof navigator.clipboard?.write === "function"
+        ? navigator.clipboard.write([new ClipboardItem({ "text/plain": fetched.then((t) => new Blob([t], { type: "text/plain" })) })])
+        : fetched.then((t) => navigator.clipboard.writeText(t));
+    copied.then(
+      () => setState("copied"),
+      () => {
+        // Refused by the browser: the brief is shown below, and a button selects it so it can be copied by hand.
+        void fetched.then(
+          () => setState("manual"),
+          () => undefined,
+        );
+      },
+    );
+  };
+  const selectBrief = () => {
+    const box = boxRef.current;
+    if (!box) return;
+    box.focus();
+    box.select();
+    box.setSelectionRange(0, box.value.length);
   };
   return (
     <div className="stack" style={{ "--stack": "var(--space-2)", marginBottom: "var(--space-4)" } as React.CSSProperties}>
@@ -259,7 +277,17 @@ function HandoffBrief({ row, call }: { row: BriefRow; call: Call }) {
       </div>
       <p className="acct-meta">Everything this customer told us, with the rules for a hand-built website, as one block to paste into a CLAUDE.md.</p>
       {state === "failed" && <p role="alert" className="acct-meta">The brief couldn&apos;t be made. Please try again.</p>}
-      {markdown && <textarea className="acct-input" readOnly rows={12} value={markdown} aria-label="The brief, ready to copy" onFocus={(e) => e.currentTarget.select()} />}
+      {state === "manual" && <p className="acct-meta">This browser wouldn&apos;t copy it for you. Tap Select brief below, then copy the highlighted text.</p>}
+      {markdown && (
+        <>
+          <textarea ref={boxRef} className="acct-input" readOnly rows={12} value={markdown} aria-label="The brief, ready to copy" onFocus={(e) => e.currentTarget.select()} />
+          <div className="admin-actions">
+            <button type="button" className="btn btn--secondary" onClick={selectBrief}>
+              Select brief
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
