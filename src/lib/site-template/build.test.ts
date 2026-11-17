@@ -54,6 +54,13 @@ describe("buildSite", () => {
     expect(store.saved[0].content.business.name).toBe("Hartley & Sons");
   });
 
+  it("gives a chosen FAQs page its content even at Essential, which leaves FAQs out", async () => {
+    const store = memoryStore();
+    const r = await run(provider([final(copy)]), store, { sector: "barber", answers, plan: "essential", pages: ["Home", "Services", "FAQs"], pageLimit: 5 });
+    expect(r).toMatchObject({ ok: true, checksOk: true, issues: [] });
+    expect(store.saved[0].content.pages?.map((p) => p.slug)).toContain("faq");
+  });
+
   it("builds a smaller site at Essential: the writer is not asked for the facts strip or the FAQ", async () => {
     const p = provider([final(copy)]);
     const store = memoryStore();

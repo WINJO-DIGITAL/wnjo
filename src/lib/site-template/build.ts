@@ -68,14 +68,16 @@ export async function buildSite(ctx: { provider: AiProvider; store: SiteBuildSto
 
   const base = presetFor(sector);
   if (!base) return { ok: false, reason: `There is no template for "${sector}" yet.`, costPence: 0 };
-  const preset = applyPlan(base, input.plan);
+  // A page the customer chose by name keeps its content, whatever their plan level leaves out.
+  const pages = input.pages ? choosePages(input.pages, input.pageLimit ?? null) : undefined;
+  const chosen = pages?.includes("faq") ? (["faq"] as const) : [];
+  const preset = applyPlan(base, input.plan, chosen);
 
   const parsed = parseAnswers(answers, preset, { colour: input.defaultColour ?? FALLBACK_COLOUR });
   if (!parsed.ok) return { ok: false, reason: Object.values(parsed.errors)[0], errors: parsed.errors, costPence: 0 };
   const facts: CustomerFacts = parsed.facts;
 
   const photos = pickPhotos(input.files ?? []);
-  const pages = input.pages ? choosePages(input.pages, input.pageLimit ?? null) : undefined;
   const written = await writeSite(
     { provider: ctx.provider, spentPence: await ctx.store.spentPence(ctx.briefId), maxPence: ctx.maxPence },
     { preset, facts, look: parsed.look, layout: parsed.layout, colour: parsed.colour, heroPhoto: photos.hero, logo: photos.logo, images: photos.gallery, change: input.change?.trim() || undefined, pages, pageLimit: input.pageLimit ?? null },

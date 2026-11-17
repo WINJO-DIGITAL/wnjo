@@ -22,9 +22,13 @@ export function planForPages(pages: number): PlanLevel {
   return PLAN_LEVELS.find((id) => ONE_OFF_TIERS[id].pageLimit >= pages) ?? "premium";
 }
 
-/** A sector's preset as it applies at a plan level. With no plan the preset is returned as it is. */
-export function applyPlan(preset: SectorPreset, plan?: PlanLevel): SectorPreset {
+/**
+ * A sector's preset as it applies at a plan level. With no plan the preset is returned as it is. `chosen` is the sections
+ * the customer asked for by name (an FAQs page, say): a page they chose within their plan's page count always gets its
+ * content, even where the plan's own list would leave that section out.
+ */
+export function applyPlan(preset: SectorPreset, plan?: PlanLevel, chosen: readonly SectionKind[] = []): SectorPreset {
   if (!plan) return preset;
-  const kinds = PLAN_SECTIONS[plan];
+  const kinds = [...PLAN_SECTIONS[plan], ...chosen];
   return { ...preset, sections: preset.sections.filter((s) => kinds.includes(s.kind)) };
 }
