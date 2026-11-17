@@ -31,7 +31,7 @@ const WORK_SECTIONS: Record<string, [number, number]> = {
   "ev-exec": [25, 52],
   boonma: [40, 88],
   "raeng-fitness": [25, 40],
-  duratek: [55, 72],
+  duratek: [55, 14],
 };
 
 export default function HomePage() {
