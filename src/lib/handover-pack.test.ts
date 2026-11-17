@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildE2ESample } from "@/lib/site-template/e2e-sample";
-import { HANDOVER_CHECKLIST, designNotes, missingChecklist, packEntries, previewWording, safeFileName, siteWording } from "./handover-pack";
+import type { WebsiteBrief } from "@/lib/website-brief";
+import { HANDOVER_CHECKLIST, briefNotes, designNotes, missingChecklist, packEntries, previewWording, readme, safeFileName, siteWording } from "./handover-pack";
 
 const site = buildE2ESample({ sector: "barber", pages: 4, photos: false })!.content;
 const all = HANDOVER_CHECKLIST.map((i) => i.id);
@@ -93,5 +94,44 @@ describe("the pack", () => {
     const withAddress = packEntries({ ...base, address: "hartley.co.uk" })[0].data as string;
     expect(withAddress).toContain("https://hartley.co.uk");
     expect(packEntries(base)[0].data as string).not.toContain("https://");
+  });
+});
+
+describe("the pack for a website built by hand", () => {
+  // A hand-built site has no saved pages: the pack holds what the customer told us, and says so.
+  const brief: Partial<WebsiteBrief> = {
+    goals: [],
+    goalNote: "More local bookings",
+    pages: ["Home", "Contact"],
+    colours: "Black and yellow",
+    profile: { services: "Local journeys\nAirport transfers", phone: "07474144600", email: "daz@example.test", differentiator: "Family run", areas: "Blackpool, Fleetwood", hours: "24 hours", proof: "Licensed", about: "", customers: "", firstActions: [], tone: "friendly" },
+  };
+  const input = { reference: "WNJO-1", businessName: "Daz's Cabs", brief, files: [{ name: "logo.png", data: new Uint8Array([1]) }] };
+
+  it("holds the customer's own words, their files and a readme, with no pages it doesn't have", () => {
+    const names = packEntries(input).map((e) => e.name);
+    expect(names).toEqual(["README.txt", "your-brief.txt", "files/logo.png"]);
+  });
+
+  it("writes what the customer said into the brief", () => {
+    const text = briefNotes(brief);
+    for (const part of ["More local bookings", "Home, Contact", "Black and yellow", "Airport transfers", "07474144600", "Blackpool, Fleetwood", "Family run"]) expect(text).toContain(part);
+  });
+
+  it("only lists in the readme what the pack holds", () => {
+    const text = readme(input);
+    expect(text).toContain("your-brief.txt");
+    expect(text).toContain("built for you by hand");
+    expect(text).not.toContain("wording/");
+    expect(text).not.toContain("design.txt");
+    expect(text).not.toContain("site-content.json");
+  });
+
+  it("keeps the template pack as it was", () => {
+    const names = packEntries({ reference: "WNJO-2", businessName: "Hartley", site, brief, files: [] }).map((e) => e.name);
+    expect(names).toContain("design.txt");
+    expect(names).toContain("site-content.json");
+    expect(names).not.toContain("your-brief.txt");
+    expect(readme({ reference: "WNJO-2", businessName: "Hartley", site, files: [] })).toContain("wording/");
   });
 });

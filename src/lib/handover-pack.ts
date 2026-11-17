@@ -4,7 +4,9 @@
  * wording, the photos and logo, the colours and fonts, and the page structure. Pure, so it is tested without storage.
  */
 import type { ContentSection, PageContent } from "@/lib/ai/website-content";
+import { SECTOR_PRESETS } from "@/lib/site-template/presets";
 import type { Look, Section, SiteContent } from "@/lib/site-template/schema";
+import { GOALS, STYLES, type WebsiteBrief } from "@/lib/website-brief";
 import type { ZipEntry } from "@/lib/zip";
 
 /** What staff confirm before a website is handed over. The server refuses a handover until every one is ticked. */
@@ -119,6 +121,43 @@ export function designNotes(content: SiteContent): string {
   ].join("\n");
 }
 
+const oneLine = (label: string, value: string | undefined | null) => (value && value.trim() ? `${label}: ${value.trim().replace(/\n+/g, "; ")}` : "");
+
+/**
+ * What the customer told us, in their own words, as plain text. It is the pack's wording for a website we built by
+ * hand, where no template saved its pages: the customer's own description, services and answers are theirs to keep.
+ */
+export function briefNotes(brief: Partial<WebsiteBrief>): string {
+  const p = brief.profile;
+  const answers = brief.site?.answers;
+  const preset = brief.site ? SECTOR_PRESETS[brief.site.sector] : undefined;
+  const asked = new Map((preset?.questions ?? []).map((q) => [q.id, q.heading]));
+  const lines = [
+    oneLine("What the website is for", (brief.goals ?? []).map((g) => GOALS[g]?.label ?? g).join(", ")),
+    oneLine("In your words", brief.goalNote),
+    oneLine("Pages you asked for", (brief.pages ?? []).join(", ")),
+    oneLine("Style", brief.style ? STYLES[brief.style]?.label : ""),
+    oneLine("Colours", brief.colours || answers?.colour),
+    oneLine("Sites you like", (brief.references ?? []).join(", ")),
+    oneLine("To avoid", brief.avoid),
+    oneLine("Features", brief.functionality),
+    "",
+    oneLine("Type of business", preset?.label ?? brief.otherBusinessType),
+    oneLine("What makes you different", p?.differentiator || answers?.about),
+    oneLine("About you", p?.about),
+    oneLine("Services", (answers?.servicesText || p?.services || "").trim()),
+    oneLine("Areas covered", p?.areas || answers?.areas),
+    oneLine("Opening hours", p?.hours),
+    oneLine("What shows you can be trusted", p?.proof),
+    oneLine("Phone", p?.phone || answers?.phone),
+    oneLine("Email", p?.email || answers?.email),
+    oneLine("Address", answers?.address),
+    ...Object.entries(answers?.details ?? {}).map(([id, v]) => oneLine(asked.get(id) ?? id, v)),
+    oneLine("Reviews you gave us", answers?.reviews),
+  ];
+  return block("What you told us", lines);
+}
+
 export type PackInput = {
   reference: string;
   businessName: string;
@@ -127,6 +166,8 @@ export type PackInput = {
   site?: SiteContent | null;
   previewPages?: readonly PageContent[] | null;
   previewTitles?: ReadonlyMap<string, string>;
+  /** What the customer told us. It is the pack's wording for a website we built by hand, which has no saved pages. */
+  brief?: Partial<WebsiteBrief> | null;
   /** Everything the customer uploaded: photos, logo and documents. */
   files: { name: string; data: Uint8Array }[];
   /** When the website was handed over, as text for the note. */
@@ -134,6 +175,7 @@ export type PackInput = {
 };
 
 export function readme(input: PackInput): string {
+  const hasWording = Boolean(input.site || input.previewPages?.length);
   return [
     `${input.businessName}: your website pack`,
     "",
@@ -142,10 +184,12 @@ export function readme(input: PackInput): string {
     input.address ? `Your website: https://${input.address}` : "",
     "",
     "What is in this pack",
-    "- wording/: every page's text, one file per page.",
+    hasWording ? "- wording/: every page's text, one file per page." : "",
+    !hasWording && input.brief ? "- your-brief.txt: everything you told us about your business, in your own words." : "",
     "- files/: the photos, logo and documents you gave us.",
-    "- design.txt: your colours, fonts and the page list.",
+    input.site ? "- design.txt: your colours, fonts and the page list." : "",
     input.site ? "- site-content.json: the structure of your website, in a plain format other tools can read." : "",
+    !hasWording ? "Your website was built for you by hand, so its pages are the live website itself and are not saved as separate files here." : "",
     "",
     "What stays with us",
     "The framework your website runs on stays ours (terms, section 9.4). Your website carries on running there, and your",
@@ -163,6 +207,7 @@ export function packEntries(input: PackInput): ZipEntry[] {
   const entries: ZipEntry[] = [{ name: "README.txt", data: readme(input) }];
   const wording = input.site ? siteWording(input.site) : input.previewPages?.length ? previewWording(input.previewPages, input.previewTitles) : [];
   for (const w of wording) entries.push({ name: w.file, data: w.text });
+  if (!wording.length && input.brief) entries.push({ name: "your-brief.txt", data: briefNotes(input.brief) });
   if (input.site) {
     entries.push({ name: "design.txt", data: designNotes(input.site) });
     entries.push({ name: "site-content.json", data: JSON.stringify(input.site, null, 2) });

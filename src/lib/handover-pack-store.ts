@@ -4,7 +4,7 @@ import type { WebsitePlan } from "@/lib/ai/website-plan";
 import { BRIEF_BUCKET } from "@/lib/brief-store";
 import { packEntries, safeFileName } from "@/lib/handover-pack";
 import type { SiteContent } from "@/lib/site-template/schema";
-import type { BriefFile } from "@/lib/website-brief";
+import type { BriefFile, WebsiteBrief } from "@/lib/website-brief";
 import { zip } from "@/lib/zip";
 
 /** A private bucket for the finished packs. It allows zip files only (the brief bucket does not). */
@@ -18,7 +18,7 @@ export type PackBrief = {
   reference: string;
   name: string;
   business_name: string | null;
-  brief: { files?: BriefFile[] } | null;
+  brief: (Partial<WebsiteBrief> & { files?: BriefFile[] }) | null;
   handed_over_at?: string | null;
 };
 
@@ -32,14 +32,17 @@ const day = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "n
  * signed-in owner of a handed-over website.
  */
 export async function createHandoverPack(db: SupabaseClient, brief: PackBrief): Promise<PackResult> {
-  const [{ data: build }, { data: preview }, { data: domain }] = await Promise.all([
+  const [{ data: build }, { data: preview }, { data: domain }, { data: manual }] = await Promise.all([
     db.from("website_site_builds").select("content").eq("brief_id", brief.id).neq("status", "withdrawn").order("version", { ascending: false }).limit(1).maybeSingle(),
     db.from("website_previews").select("pages, website_plans(plan)").eq("brief_id", brief.id).neq("status", "withdrawn").order("created_at", { ascending: false }).limit(1).maybeSingle(),
     db.from("site_domains").select("hostname").eq("brief_id", brief.id).limit(1).maybeSingle(),
+    db.from("website_briefs").select("manual_preview_url").eq("id", brief.id).maybeSingle(),
   ]);
   const site = (build as { content: SiteContent } | null)?.content ?? null;
   const prev = preview as unknown as { pages: PageContent[]; website_plans: { plan: WebsitePlan } | null } | null;
-  if (!site && !prev?.pages?.length) return { ok: false, error: "There is no finished website to put in a pack yet." };
+  // A website built by hand has no saved pages. It has the address it was shown on, and the pack holds what the customer told us.
+  const handBuilt = Boolean((manual as { manual_preview_url: string | null } | null)?.manual_preview_url);
+  if (!site && !prev?.pages?.length && !handBuilt) return { ok: false, error: "There is no finished website to put in a pack yet." };
 
   const files: { name: string; data: Uint8Array }[] = [];
   for (const f of (brief.brief?.files ?? []).slice(0, MAX_FILES)) {
@@ -58,6 +61,7 @@ export async function createHandoverPack(db: SupabaseClient, brief: PackBrief): 
       site,
       previewPages: site ? null : prev?.pages,
       previewTitles: titles,
+      brief: site || prev?.pages?.length ? null : brief.brief,
       files,
       handedOver: brief.handed_over_at ? day(brief.handed_over_at) : null,
     }),
