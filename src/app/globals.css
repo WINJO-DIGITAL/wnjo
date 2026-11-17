@@ -16399,22 +16399,20 @@ body:has(.dash-header) {
   background: var(--color-inverse-ink);
   color: var(--color-inverse-bg);
 
-/* ---------- Owners' quotes on phones: every owner's logo in one row, the chosen one named ---------- */
+/* ---------- Owners' quotes on phones: all four owners in an even 2 x 2 grid, each with its name shown ---------- */
 @media (max-width: 39.99rem) {
   .oq__switch {
-    flex-wrap: nowrap;
-    gap: 0.25rem 1.1rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem 1rem;
   }
   .oq__switch button {
-    flex: none;
+    min-width: 0;
+    gap: 0.6rem;
   }
-  /* Names of the others stay available to screen readers; sighted visitors get the logos. */
-  .oq__switch button[aria-pressed="false"] span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+  .oq__switch button span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    line-height: 1.2;
   }
 }
