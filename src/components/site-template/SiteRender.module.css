@@ -3262,3 +3262,157 @@
 .proofLine {
   display: block;
 }
+
+/* ---- Hearth on its own structure: a framed plate for the top of the page, services on a menu board with the heading
+   inside the board, hours on a chalkboard band, the request on a warm card, and a closing line in italic with one button ---- */
+.site[data-look="hearth"] {
+  --chalk: #2b2622;
+  --plate: #3a2a22;
+  --cream: #f6ead8;
+}
+
+/* The top of the page: a framed plate, the headline centred in italic, one warm button and a plain link. */
+.site[data-look="hearth"] .hero {
+  margin: clamp(0.75rem, 2vw, 1.5rem) var(--pad) 0;
+  padding: clamp(3rem, 8vw, 6.5rem) clamp(1.25rem, 5vw, 4rem);
+  border-radius: 22px;
+  border: 1px solid rgb(246 234 216 / 0.22);
+  background: radial-gradient(ellipse 70% 90% at 50% 0%, rgb(255 255 255 / 0.06), transparent 70%), var(--plate);
+  text-align: center;
+  align-items: center;
+  overflow: hidden;
+  min-height: 0;
+}
+.site[data-look="hearth"] .hero[data-variant="photo"] {
+  padding: 0;
+  border: 0;
+  background: none;
+  min-height: min(70vh, 34rem);
+}
+.site[data-look="hearth"] .hero[data-variant="photo"] .heroCopy {
+  position: relative;
+  z-index: 1;
+  margin: auto;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  border-radius: 18px;
+  background: rgb(42 29 23 / 0.72);
+  backdrop-filter: blur(4px);
+}
+.site[data-look="hearth"] .hero .heroCopy {
+  justify-items: center;
+  margin: 0 auto;
+  max-width: 46rem;
+}
+.site[data-look="hearth"] .hero h1 {
+  font-style: italic;
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  line-height: 1.02;
+}
+.site[data-look="hearth"] .hero .heroActions {
+  justify-content: center;
+}
+.site[data-look="hearth"] .hero .btn {
+  background: var(--cream);
+  color: #2a1d17;
+}
+.site[data-look="hearth"] .hero .btnGhost {
+  border-color: rgb(246 234 216 / 0.45);
+}
+
+/* Services as a menu board: a framed board with the heading set inside it, and the items in two columns with leaders. */
+.site[data-look="hearth"] section:has(> .menu) {
+  width: calc(100% - 2 * var(--pad));
+  max-width: 62rem;
+  margin: clamp(2.5rem, 6vw, 4rem) auto;
+  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 3.5rem);
+  border: 1px solid rgb(246 234 216 / 0.28);
+  border-radius: 6px;
+  background: var(--chalk);
+  outline: 1px solid rgb(246 234 216 / 0.12);
+  outline-offset: 6px;
+  text-align: center;
+}
+.site[data-look="hearth"] section:has(> .menu) > h2 {
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+.site[data-look="hearth"] section:has(> .menu) > h2::after {
+  margin-inline: auto;
+}
+.site[data-look="hearth"] .menu {
+  grid-template-columns: 1fr;
+  text-align: left;
+  gap: 0;
+}
+@media (min-width: 40rem) {
+  .site[data-look="hearth"] .menu {
+    grid-template-columns: 1fr 1fr;
+    gap: 0 3rem;
+  }
+}
+.site[data-look="hearth"] .menu li {
+  border-bottom: 1px dashed rgb(246 234 216 / 0.22);
+  padding: 1rem 0;
+}
+
+/* Hours on a chalkboard band: the day on the left, the time on the right, in a warm chalk colour. */
+.site[data-look="hearth"] .hours {
+  max-width: none;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background: #1f1914;
+  border: 1px solid rgb(246 234 216 / 0.18);
+  border-radius: 6px;
+  outline: 1px dashed rgb(246 234 216 / 0.14);
+  outline-offset: -10px;
+}
+.site[data-look="hearth"] .hours dt,
+.site[data-look="hearth"] .hours dd {
+  color: #ffd8b0;
+  font-family: var(--head);
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+/* The request: a warm card, the form inside it. */
+.site[data-look="hearth"] .book {
+  border-radius: 22px;
+  background: #3b2a21;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  margin: clamp(2.5rem, 6vw, 4rem) var(--pad);
+  max-width: none;
+}
+.site[data-look="hearth"] .book .form {
+  background: var(--chalk);
+  border-color: rgb(246 234 216 / 0.2);
+  border-radius: 14px;
+}
+
+/* The close: an italic line with one warm button, on a band of its own. */
+.site[data-look="hearth"] .closing {
+  margin: clamp(2rem, 5vw, 3.5rem) var(--pad);
+  padding: clamp(3rem, 7vw, 5rem) var(--pad);
+  border-radius: 22px;
+  background: #3a2a22;
+  border: 1px solid rgb(246 234 216 / 0.2);
+}
+.site[data-look="hearth"] .closing h2 {
+  font-style: italic;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+}
+
+/* Reviews: quoted in italic, each on its own plate. */
+.site[data-look="hearth"] .reviews blockquote {
+  border: 1px solid rgb(246 234 216 / 0.2);
+  border-radius: 12px;
+  background: var(--chalk);
+}
+
+/* The footer: three columns over a rule, the name in italic. */
+.site[data-look="hearth"] .foot {
+  border-top: 1px solid rgb(246 234 216 / 0.2);
+  background: #20150f;
+}
+.site[data-look="hearth"] .foot .logo {
+  font-style: italic;
+  font-size: 1.5rem;
+}
