@@ -1313,67 +1313,177 @@
 }
 
 
-/* ---- Precision (from Duratek): deep navy and green, light large type, cool hairlines, plenty of air ---- */
+/* ---- Precision (from Duratek's live site): a frosted navy header over a full-bleed top of the page, light-weight type
+   with a short accent line under each heading, inset rounded panels in cream, sand and deep navy, a closing band with the
+   question on the left and the action on the right, and a navy rounded footer with a large wordmark ---- */
 .site[data-look="precision"] {
-  --paper: #f7f6f2;
+  --paper: #f9f6ef;
   --ink: #18364c;
   --muted: #5a6b78;
   --line: #e1e6ea;
-  --radius: 4px;
+  --radius: 10px;
+  --card: #ffffff;
   --head: var(--tpl-font-manrope, var(--system));
   --body: var(--tpl-font-dmsans, var(--system));
   --head-weight: 300;
   --head-case: none;
   --head-track: -0.035em;
+  --navy: #18364c;
+  --navy-deep: #112839;
+  --sand: #f1ebe0;
+  --accent-text: color-mix(in srgb, var(--accent) 35%, #ffffff);
 }
 .site[data-look="precision"] h1 {
-  font-size: clamp(2.6rem, 6.4vw, 5.2rem);
+  font-size: clamp(2.6rem, 6.4vw, 5rem);
   line-height: 1.04;
 }
 .site[data-look="precision"] h2 {
-  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-size: clamp(1.9rem, 3.8vw, 3rem);
+  line-height: 1.1;
 }
+/* A short accent line under each heading, as on the Duratek site. */
+.site[data-look="precision"] .section h2::after {
+  content: "";
+  display: block;
+  width: 2rem;
+  height: 2px;
+  margin-top: 0.9rem;
+  background: var(--accent);
+}
+
+/* The header: frosted navy glass, white type, floating over the top of the page. */
 .site[data-look="precision"] .nav {
-  background: #fff;
-  backdrop-filter: none;
+  background: rgb(17 40 57 / 0.78);
+  color: #ffffff;
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+.site[data-look="precision"] {
+  --nav-h: 6.2rem;
+}
+@media (min-width: 48rem) {
+  .site[data-look="precision"] {
+    --nav-h: 4.4rem;
+  }
+}
+.site[data-look="precision"] .nav:has(+ .hero) {
+  margin-bottom: calc(-1 * var(--nav-h));
 }
 .site[data-look="precision"] .logo {
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  color: #ffffff;
+  font-size: 1.4rem;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+.site[data-look="precision"] .links a {
+  color: rgb(255 255 255 / 0.82);
+}
+.site[data-look="precision"] .links a:hover,
+.site[data-look="precision"] .links a[aria-current="page"] {
+  color: #ffffff;
+}
+.site[data-look="precision"] .links a[aria-current="page"] {
+  box-shadow: 0 2px 0 var(--accent-text);
+}
+.site[data-look="precision"] .nav .btnGhost {
+  color: #ffffff;
+  border-color: rgb(255 255 255 / 0.45);
+}
+.site[data-look="precision"] .nav .btn {
+  background: #ffffff;
+  color: var(--navy);
 }
 .site[data-look="precision"] .btn,
 .site[data-look="precision"] .btnGhost {
   padding: 0.95rem 1.5rem;
   font-weight: 500;
 }
+.site[data-look="precision"] .btn::after {
+  content: "→";
+  margin-left: 0.6rem;
+  font-weight: 400;
+}
+
+/* The top of the page: full width, the headline light and large, one white button and a plain link. */
+.site[data-look="precision"] .hero,
+.site[data-look="precision"][data-layout] .hero[data-variant] {
+  min-height: min(84vh, 46rem);
+  padding-top: calc(var(--pad) + var(--nav-h));
+  align-items: center;
+}
 .site[data-look="precision"] .hero[data-variant="photo"]::after {
-  background: linear-gradient(95deg, rgb(24 54 76 / 0.92), rgb(24 54 76 / 0.45) 60%, rgb(24 54 76 / 0.1));
+  background: linear-gradient(95deg, rgb(17 40 57 / 0.9), rgb(17 40 57 / 0.5) 55%, rgb(17 40 57 / 0.12));
 }
 .site[data-look="precision"] .hero[data-variant="plain"] {
-  background: #18364c;
-  color: #fff;
+  background:
+    radial-gradient(ellipse 55% 80% at 90% 10%, color-mix(in srgb, var(--accent-text) 22%, transparent), transparent 70%),
+    linear-gradient(160deg, var(--navy), var(--navy-deep));
+  color: #ffffff;
 }
+.site[data-look="precision"] .hero .btn,
 .site[data-look="precision"] .hero[data-variant="plain"] .btn {
-  background: #fff;
-  color: #18364c;
+  background: #ffffff;
+  color: var(--navy);
+}
+.site[data-look="precision"] .hero .btnGhost {
+  border: 0;
+  padding-inline: 0.25rem;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  text-decoration-color: rgb(255 255 255 / 0.5);
+}
+.site[data-look="precision"] .hero .btnGhost:hover {
+  background: transparent;
+  text-decoration-color: #ffffff;
+}
+
+/* Services: an inset deep-navy panel, rows divided by hairlines, as the technology panel on the Duratek site. */
+.site[data-look="precision"] section:has(> .menu),
+.site[data-look="precision"] .book {
+  width: calc(100% - 2 * var(--pad));
+  max-width: 76rem;
+  margin: clamp(1rem, 3vw, 2rem) auto;
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.1rem, 5vw, 4rem);
+  border-radius: 28px;
+}
+.site[data-look="precision"] section:has(> .menu) {
+  background: var(--navy);
+  color: #ffffff;
+}
+.site[data-look="precision"] section:has(> .menu) h2 {
+  color: #ffffff;
+}
+.site[data-look="precision"] section:has(> .menu) h2::after {
+  background: var(--accent-text);
 }
 .site[data-look="precision"] .menu {
   gap: 0 4rem;
 }
-.site[data-look="precision"] .menu li {
-  padding: 1.35rem 0;
+.site[data-look="precision"] section:has(> .menu) .menu li {
+  padding: 1.3rem 0;
+  border-bottom-color: rgb(255 255 255 / 0.16);
 }
 .site[data-look="precision"] .menu li::before {
   display: none;
 }
 .site[data-look="precision"] .menuName {
   font-weight: 500;
+  font-size: 1.1rem;
 }
 .site[data-look="precision"] .price {
   font-weight: 400;
-  color: #18364c;
+  color: var(--accent-text);
   font-feature-settings: "tnum";
 }
+.site[data-look="precision"] section:has(> .menu) .menuText {
+  color: #b9c6d0;
+}
+.site[data-look="precision"] section:has(> .menu) .more {
+  color: #ffffff;
+  border-color: rgb(255 255 255 / 0.4);
+}
+
+/* The facts: large light figures divided by hairlines. */
 .site[data-look="precision"] .facts {
   max-width: 68rem;
   gap: 0;
@@ -1389,37 +1499,151 @@
   font-weight: 300;
   font-size: clamp(2.2rem, 5vw, 3.6rem);
   letter-spacing: -0.04em;
-  color: #18364c;
+  color: var(--navy);
+}
+
+/* Hours and where to find them: an inset sand panel. */
+.site[data-look="precision"] .info {
+  width: calc(100% - 2 * var(--pad));
+  max-width: 76rem;
+  margin: clamp(1rem, 3vw, 2rem) auto;
+  padding: clamp(1.75rem, 4vw, 3rem);
+  background: var(--sand);
+  border-radius: 28px;
 }
 .site[data-look="precision"] .info > .section {
-  background: #fff;
-  border: 1px solid var(--line);
+  background: transparent;
+  border: 0;
+  padding: 0;
 }
+.site[data-look="precision"] .hours {
+  max-width: none;
+}
+
+/* The request: an inset sand panel with the form on a white card. */
+.site[data-look="precision"] .book {
+  background: var(--sand);
+}
+
 .site[data-look="precision"] .gallery img {
-  border-radius: 2px;
+  border-radius: 20px;
 }
+@media (min-width: 40rem) {
+  /* The gallery as a strip of tall slices that open on hover. */
+  .site[data-look="precision"] .gallery {
+    display: flex;
+    gap: 3px;
+    height: clamp(20rem, 38vw, 30rem);
+    overflow: hidden;
+    border-radius: 24px;
+  }
+  .site[data-look="precision"] .gallery img {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0;
+    transition: flex-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .site[data-look="precision"] .gallery img:first-child {
+    flex-grow: 2.4;
+  }
+  .site[data-look="precision"] .gallery:hover img {
+    flex-grow: 1;
+  }
+  .site[data-look="precision"] .gallery img:hover {
+    flex-grow: 3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site[data-look="precision"] .gallery img {
+    transition: none;
+  }
+}
+
+.site[data-look="precision"] .link,
+.site[data-look="precision"] .more {
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  border-bottom: 2px solid var(--accent);
+  color: var(--navy);
+}
+.site[data-look="precision"] .faq details {
+  border-bottom-color: var(--line);
+}
+
+/* The close: the question on the left, one action on the right. */
 .site[data-look="precision"] .closing {
-  margin: 0;
-  background: #18364c;
-  color: #fff;
+  display: grid;
+  justify-items: start;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: left;
+  margin: 0 auto;
+  max-width: 76rem;
+  padding: clamp(3rem, 7vw, 5rem) var(--pad);
+  background: transparent;
+  color: var(--navy);
+  border-radius: 0;
+  border-top: 1px solid var(--line);
+}
+.site[data-look="precision"] .closing h2 {
+  font-size: clamp(2rem, 4.6vw, 3.4rem);
+  max-width: none;
 }
 .site[data-look="precision"] .closing .btn {
-  background: #54ae51;
-  color: #0f2230;
+  background: var(--accent);
+  color: var(--on-accent);
 }
+@media (min-width: 48rem) {
+  .site[data-look="precision"] .closing {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+/* The footer: an inset navy panel with a large wordmark and columns headed in small capitals. */
 .site[data-look="precision"] .foot {
-  background: #112839;
+  margin: clamp(1rem, 3vw, 2rem) var(--pad) var(--pad);
+  padding: clamp(2rem, 5vw, 3.5rem);
+  background: var(--navy);
   color: #b9c6d0;
   border: 0;
+  border-radius: 28px;
 }
-.site[data-look="precision"] .foot .logo,
+.site[data-look="precision"] .foot > div:first-child {
+  order: 99;
+  grid-column: 1 / -1;
+  padding-top: clamp(1.5rem, 4vw, 2.5rem);
+  border-top: 1px solid rgb(255 255 255 / 0.14);
+}
+.site[data-look="precision"] .foot .logo {
+  font-size: clamp(2.2rem, 8vw, 5.5rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--accent-text);
+  overflow-wrap: normal;
+  word-break: normal;
+  text-wrap: balance;
+}
+.site[data-look="precision"] .footHead {
+  color: var(--accent-text);
+  font-weight: 500;
+}
 .site[data-look="precision"] .foot a:hover {
-  color: #fff;
+  color: #ffffff;
 }
 .site[data-look="precision"] .pagehead {
-  background: #fff;
+  background: #ffffff;
   border-bottom: 1px solid var(--line);
 }
+.site[data-look="precision"] .reviews blockquote {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
 
 /* ---- Boutique (from Boonma): cream and plum, a friendly serif, soft rounded shapes, a gentle wave ---- */
 .site[data-look="boutique"] {
@@ -2298,70 +2522,6 @@
 
 /* ---- Signature details from the portfolio sites ---- */
 
-/* Precision (Duratek): a frosted nav, the gallery as a strip of tall slices that open on hover, a large wordmark in the footer. */
-.site[data-look="precision"] .nav {
-  background: rgb(255 255 255 / 0.78);
-  backdrop-filter: blur(14px);
-}
-.site[data-look="precision"] .logo {
-  font-size: 1.4rem;
-  font-weight: 500;
-  letter-spacing: -0.04em;
-}
-.site[data-look="precision"] .foot .logo {
-  font-size: clamp(2.4rem, 8vw, 5rem);
-  font-weight: 300;
-  letter-spacing: -0.05em;
-  color: #fff;
-}
-.site[data-look="precision"] .btn {
-  position: relative;
-}
-.site[data-look="precision"] .btn::after {
-  content: "→";
-  margin-left: 0.6rem;
-  font-weight: 400;
-}
-.site[data-look="precision"] .link,
-.site[data-look="precision"] .more {
-  border: 0;
-  padding: 0;
-  border-radius: 0;
-  border-bottom: 2px solid #4b9b48;
-  color: #18364c;
-}
-@media (min-width: 40rem) {
-  .site[data-look="precision"] .gallery {
-    display: flex;
-    gap: 2px;
-    height: clamp(20rem, 38vw, 30rem);
-    overflow: hidden;
-    border-radius: 4px;
-  }
-  .site[data-look="precision"] .gallery img {
-    flex: 1 1 0;
-    min-width: 0;
-    height: 100%;
-    aspect-ratio: auto;
-    border-radius: 0;
-    transition: flex-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .site[data-look="precision"] .gallery img:first-child {
-    flex-grow: 2.4;
-  }
-  .site[data-look="precision"] .gallery:hover img {
-    flex-grow: 1;
-  }
-  .site[data-look="precision"] .gallery img:hover {
-    flex-grow: 3;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .site[data-look="precision"] .gallery img {
-    transition: none;
-  }
-}
-
 /* Executive (EV Exec): services as cards with a gold rule, a short gold rule under each heading, gold hairlines between facts. */
 .site[data-look="executive"] .section > h2::after {
   content: "";
@@ -2608,7 +2768,7 @@
   gap: 2rem 2.5rem;
 }
 .footHead {
-  color: var(--ink);
+  color: inherit;
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -2715,4 +2875,15 @@
     grid-template-columns: 1.15fr 0.85fr;
     gap: clamp(2rem, 5vw, 4.5rem);
   }
+}
+
+/* A long email address or word wraps instead of pushing a narrow panel wider than the screen. */
+.contact a,
+.bookIntro h2,
+.bookIntro .body {
+  overflow-wrap: anywhere;
+}
+
+.site[data-look="tradesman"] .footHead {
+  color: #ffffff;
 }
