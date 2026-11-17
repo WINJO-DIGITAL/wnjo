@@ -1,3 +1,4 @@
+import { flowFor } from "@/lib/site-template/flow";
 import type { CSSProperties } from "react";
 import { serviceChoices } from "@/lib/site-template/enquiry";
 import { mapsEmbedUrl, safeHttpsUrl } from "@/lib/site-template/seo";
@@ -113,7 +114,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
   const { business, theme } = content;
   const layout: Layout = (LAYOUTS as readonly string[]).includes(theme.layout ?? "") ? (theme.layout as Layout) : "showcase";
   const shown = pageSections(content, page);
-  const current = shown.slug === "" ? { ...shown, sections: arrange(shown.sections, layout) } : shown;
+  const current = shown.slug === "" ? { ...shown, sections: flowFor(theme.look, arrange(shown.sections, layout)) } : shown;
   const multi = (content.pages?.length ?? 0) > 0;
   // A page that is one main section under its own title (About, Services, Gallery, FAQs) doesn't repeat the title as a second heading.
   const solo = current.slug !== "" && current.sections.filter((x) => x.kind !== "pagehead" && x.kind !== "cta").length === 1;

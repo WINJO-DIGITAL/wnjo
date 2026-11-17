@@ -29,7 +29,7 @@ The eight styles live in `src/lib/site-template/styles.ts` and are drawn by `src
 
 Every style still renders the same sequence: hero, gallery or menu, hours, find us, request form, questions. Different skins, same skeleton. Two fixes are planned at system level rather than per style:
 
-1. Let each style reorder and merge sections (for example hours beside the form, areas inside the hero).
+1. DONE: each style has its own home-page section order (`src/lib/site-template/flow.ts`, tested). Hero stays first; the request, questions and closing band stay last; hours and find us stay paired. Still to do: merging sections (for example hours beside the form).
 2. Give the shared taxi-type content real structure: fares table (clearly marked sample prices on sample pages only), how-to-book strip, vehicle and capacity block, no duplicate logo, a different closing band per style.
 
 ## Known issues
