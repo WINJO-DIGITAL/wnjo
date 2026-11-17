@@ -32,7 +32,10 @@ The eight styles live in `src/lib/site-template/styles.ts` and are drawn by `src
 
 - Hours and find us share one band beside each other on wide screens (merged to main, `e045283`).
 - Header: logo left, menu beside it, buttons right. The centred logo used to clip the menu ("Find us" was cut off on every desktop render).
-- Checked: desktop and phone, the three hero layouts (showcase, split, essentials). Not measured: Lighthouse, axe. Score stays 74 until measured; the remaining gap is imagery and per-style motion, not layout.
+- Checked: desktop and phone, the three hero layouts (showcase, split, essentials).
+- Measured (17 Nov, local production build, barber sample, Athletic): Lighthouse desktop 100 / 100 / 100 / 100 (performance, accessibility, best practices, SEO); mobile performance 82-83, the other three 100. axe: no violations on all eight styles at 1280 and 390 px.
+- Mobile performance cause: largest paint 4.6 s in Lighthouse's throttled-mobile run, although the hero image itself loads in about 0.2 s. The wait is render-blocking CSS (about 70 KB, every style's rules ship to every site) and a 91 KB font. Real fix, not done: ship only the chosen style's CSS. Adding `fetchpriority="high"` to the hero image made no measurable difference; kept as harmless.
+- Score stays 74. Technical, responsive and accessibility are now measured and strong; the remaining gap is imagery and per-style motion.
 
 ## The systemic weakness (Part 10)
 
