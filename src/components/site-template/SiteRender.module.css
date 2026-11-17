@@ -4186,3 +4186,23 @@
   background: repeating-linear-gradient(135deg, var(--hazard) 0 18px, transparent 18px 36px);
   opacity: 0.9;
 }
+
+/* ---- Scroll reveal: parts of a section that start below the fold ease up into place as they arrive. Movement only, never opacity, so text is always fully opaque (nothing for a contrast audit to catch mid-fade). Marked by the script in reveal.ts, so
+   without JavaScript nothing is ever hidden. Each style has its own distance, speed and easing. ---- */
+.site { --rv-y: 2rem; --rv-t: 0.7s; --rv-e: ease-out; }
+.site[data-look="athletic"] { --rv-y: 3rem; --rv-t: 0.45s; --rv-e: cubic-bezier(0.2, 0.8, 0.2, 1); }
+.site[data-look="precision"] { --rv-y: 1.5rem; --rv-t: 0.95s; --rv-e: ease-out; }
+.site[data-look="boutique"] { --rv-y: 2rem; --rv-t: 0.85s; --rv-e: cubic-bezier(0.22, 1, 0.36, 1); }
+.site[data-look="executive"] { --rv-y: 1.25rem; --rv-t: 1.2s; --rv-e: ease-out; }
+.site[data-look="hearth"] { --rv-y: 2rem; --rv-t: 0.75s; --rv-e: ease-out; }
+.site[data-look="heritage"] { --rv-y: 1.5rem; --rv-t: 1s; --rv-e: ease-in-out; }
+.site[data-look="tradesman"] { --rv-y: 2rem; --rv-t: 0.35s; --rv-e: linear; }
+.site[data-look="clinic"] { --rv-y: 2rem; --rv-t: 0.9s; --rv-e: ease-out; }
+@media (prefers-reduced-motion: no-preference) {
+  .site [data-reveal] {
+    transition: transform var(--rv-t) var(--rv-e);
+  }
+  .site [data-reveal]:not([data-revealed]) {
+    transform: translateY(var(--rv-y));
+  }
+}

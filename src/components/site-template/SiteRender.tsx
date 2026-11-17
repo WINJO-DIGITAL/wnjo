@@ -4,6 +4,7 @@ import { serviceChoices } from "@/lib/site-template/enquiry";
 import { mapsEmbedUrl, safeHttpsUrl } from "@/lib/site-template/seo";
 import { LAYOUTS, type HoursItem, type Layout, type Section, type SiteContent } from "@/lib/site-template/schema";
 import css from "./SiteRender.module.css";
+import { REVEAL_SCRIPT } from "./reveal";
 
 /**
  * Lays a template build out as a page. It reads typed content only and never writes HTML from it: every string
@@ -446,6 +447,8 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
 
   return (
     <div className={css.site} data-look={theme.look} data-layout={layout} style={style}>
+      {/* A fixed script of ours, never built from the customer's words. */}
+      <script dangerouslySetInnerHTML={{ __html: REVEAL_SCRIPT }} />
       <header className={css.nav}>
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element -- customer logos come from private storage, not the image optimiser
