@@ -197,7 +197,7 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
     setMessage(null);
     const r = await call({ briefId: row.id, ...payload }, url);
     setBusy(false);
-    setMessage({ ok: r.ok, text: r.ok ? done : String(r.json.error ?? "That didn't work.") });
+    setMessage({ ok: r.ok && typeof r.json.note !== "string", text: r.ok ? (typeof r.json.note === "string" ? r.json.note : done) : String(r.json.error ?? "That didn't work.") });
     if (r.ok) {
       load();
       onChanged();

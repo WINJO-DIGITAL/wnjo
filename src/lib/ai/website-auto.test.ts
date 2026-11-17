@@ -183,6 +183,14 @@ describe("regenerating a website", () => {
     expect(alerts).toEqual([]);
   });
 
+  it("says so when no template could be built, instead of passing a words-only draft off as the site", async () => {
+    const noFit = { ...ownWords, profile: { ...ownWords.profile, services: "", email: "" } };
+    const r = await regenerateWebsite(single(noFit), provider(), staff, "b1");
+    expect(r).toMatchObject({ ok: true, outcome: "text" });
+    expect((r as { note?: string }).note).toMatch(/^No template could be built, so this is a words-only draft\./);
+    expect(steps).toContain("preview");
+  });
+
   it("refuses a website whose customer hasn't sent their goals", async () => {
     expect(await regenerateWebsite(single({ goals: [] }), provider(), staff, "b1")).toMatchObject({ ok: false, status: 409 });
   });

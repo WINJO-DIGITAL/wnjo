@@ -4,7 +4,7 @@ import type { AiProvider } from "./provider";
 import { parseAnswers } from "@/lib/site-template/answers";
 import { runSiteBuildStep } from "@/lib/site-template/build-service";
 import { ALL_LOOKS, answersFromProfile, buildableSectors, pickTemplate } from "@/lib/site-template/choose";
-import { presetFor } from "@/lib/site-template/presets";
+import { GENERAL_PRESET, presetFor } from "@/lib/site-template/presets";
 import type { RawAnswers, SiteAnswers } from "@/lib/site-template/answers";
 import type { Look } from "@/lib/site-template/schema";
 import type { WebsiteBrief } from "@/lib/website-brief";
@@ -55,7 +55,8 @@ export async function runAutoDrafts(db: SupabaseClient, provider: AiProvider | n
     if (!(await claim(db, brief))) continue;
     attempted += 1;
     try {
-      if ((await draftWebsite(db, provider, brief)) === "drafted") drafted += 1;
+      const outcome = await draftWebsite(db, provider, brief);
+      if (outcome === "drafted" || outcome === "text") drafted += 1;
     } catch (error) {
       console.error(`Automatic draft failed: ${error instanceof Error ? error.message : "unknown"}`);
     }
@@ -102,9 +103,9 @@ async function claim(db: SupabaseClient, brief: BriefRow): Promise<boolean> {
 }
 
 /** `fresh` makes a new plan instead of reusing the last. `by` is the person regenerating, who sees the result and needs no email. */
-export type DraftOptions = { fresh?: boolean; by?: Actor };
+export type DraftOptions = { fresh?: boolean; by?: Actor; /** Told why, when no template could be built and a words-only draft was made instead. */ onFallback?: (reason: string) => void };
 
-export async function draftWebsite(db: SupabaseClient, provider: AiProvider, brief: BriefRow, options: DraftOptions = {}): Promise<"drafted" | "waiting" | "failed"> {
+export async function draftWebsite(db: SupabaseClient, provider: AiProvider, brief: BriefRow, options: DraftOptions = {}): Promise<"drafted" | "text" | "waiting" | "failed"> {
   const actor: Actor = options.by ?? { userId: null, email: null, tenantId: brief.tenant_id, kind: "system" };
   const alert: typeof alertOwner = options.by ? async () => {} : alertOwner;
   const businessName = brief.business_name || brief.name;
@@ -135,11 +136,16 @@ export async function draftWebsite(db: SupabaseClient, provider: AiProvider, bri
   }
   if (!plan) return await failed(db, brief, who, "The plan could not be read back.");
 
-  const textDraft = async (): Promise<"drafted" | "failed"> => {
+  const textDraft = async (): Promise<"text" | "failed"> => {
+    // Say why, in the history and to whoever started it: a words-only draft is a fallback, never a quiet default.
+    const general = answers ? parseAnswers(answers, GENERAL_PRESET, { colour: FALLBACK_COLOUR }) : null;
+    const reason = !answers ? "They haven't described their business, so there was nothing to build a template from." : general && !general.ok ? (Object.values(general.errors)[0] ?? "Their answers don't fit a template yet.") : "Their answers don't fit a template yet.";
+    await logEvent(db, actor, brief.id, "ai", { step: "template", ok: false, sector: null, reason, costPence: 0 });
+    options.onFallback?.(reason);
     const preview = await runPreviewStep(db, actor, provider, brief.id);
     if (!preview.ok) return await failed(db, brief, who, preview.error);
     await alert(who, readyForReviewMessage({ ...who, checksOk: true, issues: 0, kind: "text" }));
-    return "drafted";
+    return "text";
   };
 
   // No template fits what they told us (for example, opening hours are needed and weren't given in a form we can use):
@@ -179,7 +185,7 @@ async function failed(db: SupabaseClient, brief: BriefRow, who: { reference: str
 }
 
 /** Staff regenerate a website from scratch: a new plan, a new template choice and a new build. It makes a draft only. */
-export async function regenerateWebsite(db: SupabaseClient, provider: AiProvider, by: Actor, briefId: string): Promise<{ ok: true; outcome: "drafted" | "waiting" | "failed" } | { ok: false; status: number; error: string }> {
+export async function regenerateWebsite(db: SupabaseClient, provider: AiProvider, by: Actor, briefId: string): Promise<{ ok: true; outcome: "drafted" | "text"; note?: string } | { ok: false; status: number; error: string }> {
   const { data } = await db
     .from("website_briefs")
     .select("id, tenant_id, reference, email, name, business_name, brief")
@@ -189,8 +195,9 @@ export async function regenerateWebsite(db: SupabaseClient, provider: AiProvider
   const brief = data as BriefRow | null;
   if (!brief) return { ok: false, status: 404, error: "not_found" };
   if (!brief.brief?.site && !brief.brief?.goals?.length) return { ok: false, status: 409, error: "The customer hasn't sent their goals yet." };
-  const outcome = await draftWebsite(db, provider, brief, { fresh: true, by });
+  let note: string | undefined;
+  const outcome = await draftWebsite(db, provider, brief, { fresh: true, by, onFallback: (reason) => (note = `No template could be built, so this is a words-only draft. ${reason}`) });
   if (outcome === "waiting") return { ok: false, status: 409, error: "The customer's answers aren't complete enough to build a template site yet." };
   if (outcome === "failed") return { ok: false, status: 502, error: "The AI couldn't finish the website. The reason is in the website's history." };
-  return { ok: true, outcome };
+  return { ok: true, outcome, ...(note ? { note } : {}) };
 }
