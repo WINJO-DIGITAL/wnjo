@@ -6,6 +6,7 @@ import { ArrowRight } from "@/components/Icons";
 import { VisitLogo } from "@/components/VisitLogo";
 import { HeroShowcase } from "@/components/interactive/HeroShowcase";
 import { OwnerQuotes } from "@/components/interactive/OwnerQuotes";
+import { WorkShots } from "@/components/interactive/WorkShots";
 import { RefreshTimeline } from "@/components/managed/RefreshTimeline";
 import { Responsibility } from "@/components/managed/Responsibility";
 import { SubscriptionTerms } from "@/components/managed/Sections";
@@ -26,6 +27,14 @@ const fystay = projectBySlug("fystay")!;
 const evexec = projectBySlug("ev-exec")!;
 /** The four client projects (the hero's), then our own platform. */
 const work = [...heroProjects, fystay];
+/** Where each site's second and third pictures start down its full-page capture, picked to show a real section each. */
+const WORK_SECTIONS: Record<string, [number, number]> = {
+  "ev-exec": [25, 52],
+  boonma: [40, 88],
+  "raeng-fitness": [25, 40],
+  duratek: [55, 72],
+  fystay: [25, 70],
+};
 
 export default function HomePage() {
   const schema = businessSchema(siteUrl() ?? "https://winjodigital.co.uk");
@@ -199,16 +208,17 @@ export default function HomePage() {
           <ul className="work-tiles" role="list">
             {work.map((p) => (
               <li key={p.slug} className="work-tile">
-                {/* The picture repeats the "View project" link beneath it, so it is skipped by keyboards and screen readers. */}
-                <Link href={`/work#${p.slug}`} className="work-tile__media" tabIndex={-1} aria-hidden="true">
-                  <Image
-                    src={p.desktop}
-                    alt=""
-                    sizes="(min-width: 64rem) 620px, 100vw"
-                    placeholder="blur"
-                    className="work-tile__shot"
-                  />
-                </Link>
+                {/* The opening screen, then two further sections of the same site, to swipe through. */}
+                <WorkShots
+                  name={p.name}
+                  href={`/work#${p.slug}`}
+                  sizes="(min-width: 64rem) 620px, 100vw"
+                  shots={[
+                    { src: p.desktop, top: 0 },
+                    { src: p.page, top: (WORK_SECTIONS[p.slug] ?? [30, 65])[0] },
+                    { src: p.page, top: (WORK_SECTIONS[p.slug] ?? [30, 65])[1] },
+                  ]}
+                />
                 <div className="work-tile__body">
                   <h3 className="work-tile__name">
                     <Image src={p.logo} alt="" width={32} height={32} sizes="32px" className="work-tile__logo" aria-hidden />

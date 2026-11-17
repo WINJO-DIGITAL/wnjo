@@ -16067,6 +16067,63 @@ a.timeline__what:hover {
   object-position: top;
   transition: transform var(--duration-slow) var(--ease);
 }
+/* A few pictures of the same website, swiped sideways. The tile's frame stays the same size. */
+.work-shots {
+  position: relative;
+}
+.work-shots__track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.work-shots__track::-webkit-scrollbar {
+  display: none;
+}
+.work-shots__slide {
+  flex: 0 0 100%;
+  display: block;
+  scroll-snap-align: start;
+}
+/* Short bars show where you are. Each button is a comfortable size to hit; the bar inside it is thin. */
+.work-shots__pager {
+  position: absolute;
+  left: 50%;
+  bottom: 0.6rem;
+  display: flex;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgb(32 24 20 / 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.work-shots__pager button {
+  position: relative;
+  width: 1.75rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.work-shots__pager button::after {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 1.5px) 5px auto;
+  height: 3px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.5);
+  transition: background var(--duration-fast) var(--ease);
+}
+.work-shots__pager button[aria-current="true"]::after {
+  background: #fff;
+}
+.work-shots__pager button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+  border-radius: 999px;
+}
 .work-tile__body {
   display: grid;
   gap: var(--space-2);
