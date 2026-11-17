@@ -3,6 +3,17 @@
 Working list for launching the AI-assisted website journey. Items marked **Decision** need the owner's answer before
 they can be done. Nothing here is pushed or deployed until the owner says so.
 
+## Only task remaining (17 November 2026)
+
+Everything else on this list is done and checked. These four are what is left before launch:
+
+- [ ] **1. Handover pack test.** Build one test outright website, pay in test mode, download the pack as staff, hand it over, then download it as the customer.
+- [ ] **2. Read the new pages (owner).** Home, About, Work, Managed websites, Pricing, FAQ, WINJO Refresh, Privacy, Terms and the DPA.
+- [ ] **3. Tune the template checks on a live run.** Read the first real customer's site before it goes live.
+- [ ] **4. Full audit before launch.** Signed-in account and admin screens; Supabase security advisor, including row-level security; live payments, including the webhook's retries; public site on phone and desktop; emails in a real inbox; the AI's live reply shape once the key is in.
+
+Checked 17 November 2026: the `handover-packs` storage bucket exists, is private and accepts only zip files, so the migration below is applied.
+
 ## Pre-launch tidy-up (November 2026)
 
 Fixed in code, waiting for review. Nothing here is live until it is merged.
@@ -81,7 +92,7 @@ These four were completed by the owner on 17 November 2026 (ticked here to match
 
 - [x] Handover checklist (six items) enforced on the server before a website bought outright can be handed over.
 - [x] Website pack built and downloadable by staff and, after handover, by the customer.
-- [ ] **Apply `supabase/migrations/20261117090000_handover_packs_bucket.sql`** in the Supabase SQL editor (creates the private `handover-packs` bucket). Without it the pack can't be saved.
+- [x] **Apply `supabase/migrations/20261117090000_handover_packs_bucket.sql`** in the Supabase SQL editor (creates the private `handover-packs` bucket). Checked live 17 November: bucket present, private, zip only.
 - [ ] **Try one pack on a test website:** build a test outright website, pay in test mode, download the pack as staff, hand over, and download it as the customer.
 - [ ] Terms 9.3 mention "exported website pages". The pack does not include rendered pages, so either produce them by hand on request or narrow the wording at the next terms update.
 
