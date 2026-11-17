@@ -13900,40 +13900,8 @@ body:has(.pv, .sitepv) .site-footer {
   color: var(--color-ink);
 }
 .deck__bullets li::before {
-  content: "\2713";
-  display: inline-block;
-  margin-right: 0.45em;
+  content: "\2713  ";
   color: var(--color-accent);
-}
-
-/* Ticks pop in: the button gives under a finger, then the three ticks light up one by one. */
-@media (prefers-reduced-motion: no-preference) {
-  @keyframes tick-pop {
-    0% { transform: scale(1); }
-    45% { transform: scale(1.7); }
-    100% { transform: scale(1); }
-  }
-  @keyframes tick-text {
-    0%, 100% { color: var(--color-ink); }
-    45% { color: var(--color-accent); }
-  }
-  .deck__btn {
-    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .deck__btn:active {
-    transition-duration: 0.1s;
-    transform: scale(0.965);
-  }
-  .deck__cta.is-pressed .deck__bullets li,
-  .deck__btn:hover ~ .deck__bullets li {
-    animation: tick-text 0.4s ease both;
-    animation-delay: calc(var(--i, 0) * 90ms);
-  }
-  .deck__cta.is-pressed .deck__bullets li::before,
-  .deck__btn:hover ~ .deck__bullets li::before {
-    animation: tick-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    animation-delay: calc(var(--i, 0) * 90ms);
-  }
 }
 
 /* Finish: a moment on arrival, a finer price card, a quieter month, a tighter end to the hero, and a hairline to the next part. */

@@ -309,40 +309,19 @@ export function DeviceDeck({ items }: { items: Item[] }) {
         ))}
       </div>
 
-      <HeroCta />
-    </div>
-  );
-}
-
-const CTA_POINTS = ["Cancel any time, with no notice", "No Minimum Term", "Ongoing Support"];
-
-/**
- * The hero button and the three points under it. Pressing the button makes it give a little, and the ticks light up
- * one after another. The press starts it, so it still plays while the next page loads. Nothing changes where a tap
- * goes, and the styles switch the motion off for anyone who has asked for less.
- */
-function HeroCta() {
-  const [pressed, setPressed] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
-  const press = () => {
-    setPressed(true);
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setPressed(false), 1200);
-  };
-  return (
-    <div className={`deck__cta${pressed ? " is-pressed" : ""}`}>
-      <Link href="/pricing" className="deck__btn" onPointerDown={press}>
-        <span className="deck__btn-main">GET YOUR WEBSITE</span>
-        <span className="deck__btn-price">
-          From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/Month</span>
-        </span>
-      </Link>
-      <ul className="deck__bullets" role="list">
-        {CTA_POINTS.map((text, i) => (
-          <li key={text} style={{ "--i": i } as React.CSSProperties}>{text}</li>
-        ))}
-      </ul>
+      <div className="deck__cta">
+        <Link href="/pricing" className="deck__btn">
+          <span className="deck__btn-main">GET YOUR WEBSITE</span>
+          <span className="deck__btn-price">
+            From {formatGBP(WEBSITE_PLANS.bronze.monthly)}<span className="deck__unit">/Month</span>
+          </span>
+        </Link>
+        <ul className="deck__bullets" role="list">
+          <li>Cancel any time, with no notice</li>
+          <li>No Minimum Term</li>
+          <li>Ongoing Support</li>
+        </ul>
+      </div>
     </div>
   );
 }
