@@ -724,6 +724,64 @@ export const CLEANING_PRESET: SectorPreset = {
   ],
 };
 
+
+/**
+ * The template for any business that isn't one of the eleven above: a taxi firm, a locksmith, a florist. It carries no
+ * sector's assumptions. Hours and areas are optional, the wording is neutral, and the site says only what the customer
+ * told us. The style (not the sector) is what gives it its look. It is never offered as a tile: it is what a business
+ * gets when it describes itself in its own words.
+ */
+export const GENERAL_PRESET: SectorPreset = {
+  id: "general",
+  label: "Any business",
+  group: "booking",
+  defaultLook: "executive",
+  itemsLabel: "Services",
+  servicesPrompt: "What you offer, and prices if you have them",
+  servicesExample: "Local journeys\nAirport transfers £35\nLong-distance, quoted on request",
+  hoursPrompt: "When are you open or available?",
+  areaSource: "address",
+  enquiryPrompt: "What can we help with?",
+  copy: {
+    trade: "",
+    areaLead: "We work in",
+    headings: { services: "What we do", hours: "Opening hours", gallery: "Our work", area: "Find us", enquiry: "Get in touch", faq: "Questions" },
+    heroCta: "Get in touch",
+    enquiryIntro: "Tell us what you need and we will reply.",
+    enquiryCta: "Send message",
+    closingHeadline: "Get in touch.",
+    closingCta: "Get in touch",
+    example: { headline: "[What the business does] in [area]", intro: "[One plain sentence from what makes them different]." },
+  },
+  voice: "Plain, specific and in the customer's own words. Say what the business does and where. No hype, no superlatives, no promised results.",
+  questions: [
+    { id: "customers", label: "Who are your customers?", hint: "For example: local people, businesses, visitors." },
+    { id: "proof", label: "What can you show to earn trust?", hint: "For example: years trading, licences, insurance. We only say what you tell us." },
+    { id: "hours-note", label: "When are you available?", hint: "For example: 24 hours, or weekdays by arrangement." },
+  ],
+  restrictedClaims: [
+    { pattern: /\b(best|number one|no\.? ?1|#1|leading|award[- ]winning|cheapest|guarantee[sd]?|100%)\b/i, reason: "A site must not claim to be the best or promise a guarantee." },
+    { pattern: /\b(fully )?(insured|licen[cs]ed|accredited|regulated|registered)\b/i, reason: "Cover, licences and registrations can only be mentioned if the customer said so.", unless: (facts) => /\b(insured|licen[cs]ed|accredited|regulated|registered)\b/i.test([facts.about ?? "", ...(facts.details ?? []).map((d) => d.value), ...(facts.highlights ?? []).map((h) => h.value)].join(" ")) },
+  ],
+  highlights: [
+    { id: "free-quotes", value: "Free", label: "Quotes" },
+    { id: "insured", value: "Insured", label: "Cover in place" },
+    { id: "licensed", value: "Licensed", label: "Fully licensed" },
+    { id: "pre-book", value: "Pre-booking", label: "Book in advance" },
+  ],
+  sections: [
+    { kind: "hero", required: true, guidance: "Say what the business does and where, in one headline. The intro draws on what makes them different, in the customer's own words. The call to action is getting in touch." },
+    { kind: "services", required: true, guidance: "The services the customer listed, each with their own price if they gave one." },
+    { kind: "facts", required: false, guidance: "Up to four short facts the customer told us. Never invent one, and never claim a licence, cover or accreditation they didn't give." },
+    { kind: "gallery", required: false, guidance: "Photos the customer uploaded, with short plain captions." },
+    { kind: "area", required: false, guidance: "The areas covered, or the address. Name each place exactly as the customer gave it and add no others." },
+    { kind: "hours", required: false, guidance: "When the business is open or available, exactly as the customer gave it." },
+    { kind: "enquiry", required: true, guidance: "A get-in-touch form: the customer says what they need and the business replies." },
+    { kind: "faq", required: false, guidance: "Up to four questions a new customer asks, answered only from facts the customer gave." },
+    { kind: "cta", required: true, guidance: "A closing line that points back to getting in touch." },
+  ],
+};
+
 export const SECTOR_PRESETS: Record<string, SectorPreset> = {
   [BARBER_PRESET.id]: BARBER_PRESET,
   [BEAUTY_PRESET.id]: BEAUTY_PRESET,
@@ -738,6 +796,7 @@ export const SECTOR_PRESETS: Record<string, SectorPreset> = {
   [CLEANING_PRESET.id]: CLEANING_PRESET,
 };
 
+/** A sector's template, or the general one. The general template is not a sector, so it isn't in SECTOR_PRESETS and is never a tile. */
 export function presetFor(sector: string): SectorPreset | null {
-  return SECTOR_PRESETS[sector] ?? null;
+  return sector === GENERAL_PRESET.id ? GENERAL_PRESET : (SECTOR_PRESETS[sector] ?? null);
 }

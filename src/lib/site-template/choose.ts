@@ -8,32 +8,64 @@ import { ProviderError, type AiProvider } from "@/lib/ai/provider";
 import { extractJson, type WebsitePlan } from "@/lib/ai/website-plan";
 import { GOALS, type WebsiteBrief } from "@/lib/website-brief";
 import { parseAnswers, type RawAnswers } from "./answers";
-import { SECTOR_PRESETS } from "./presets";
+import { GENERAL_PRESET, SECTOR_PRESETS, presetFor } from "./presets";
 import type { Look } from "./schema";
 import { STYLES, STYLE_INFO } from "./styles";
 
 const LOOK_NOTES = (look: Look): string => (look in STYLE_INFO ? `${STYLE_INFO[look as keyof typeof STYLE_INFO].blurb} Tone: ${STYLE_INFO[look as keyof typeof STYLE_INFO].tone}.` : look);
 
+const cutWords = (text: string, max: number): string => (text.length <= max ? text : text.slice(0, max).replace(/\s+\S*$/, "").trim());
+
 /**
- * The answers a template needs, taken from what a customer told us when they typed their own kind of business. Hours are
- * never guessed: a template that needs structured opening hours simply isn't a candidate for these answers.
+ * One service per line, as the template wants them. A line the customer wrote as "Airport transfers – pre-booked pickups
+ * to UK airports" keeps its name, and the description is left for the writer; a line over the name limit is cut at a word.
+ * A price already in the line stays with it.
+ */
+export function serviceLines(text: string): string {
+  const seen = new Set<string>();
+  const lines: string[] = [];
+  for (const raw of text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)) {
+    const m = raw.match(/^(.{2,60}?)\s+[–—-]\s+(.+)$/);
+    const line = m && !/^[£\d]/.test(m[2]) ? m[1].trim() : cutWords(raw, 60);
+    if (!line || seen.has(line.toLowerCase())) continue;
+    seen.add(line.toLowerCase());
+    lines.push(line);
+  }
+  return lines.slice(0, 12).join("\n");
+}
+
+/**
+ * The answers a template needs, taken from what a customer told us when they described their own kind of business. Opening
+ * hours are never guessed: a template that needs structured hours isn't a candidate for these answers, and the general
+ * template shows only the hours note, in the customer's words.
  */
 export function answersFromProfile(brief: WebsiteBrief, businessName: string): RawAnswers | null {
   if (!brief.otherBusinessType) return null;
   const p = brief.profile;
+  const customers = p.customers === "both" ? "Individuals and businesses" : p.customers === "individuals" ? "Individuals" : p.customers === "businesses" ? "Businesses" : "";
+  const details: Record<string, string> = {};
+  if (customers) details.customers = customers;
+  if (p.proof) details.proof = cutWords(p.proof, 200);
+  if (p.hours) details["hours-note"] = cutWords(p.hours, 200);
   return {
     businessName,
-    servicesText: p.services,
+    servicesText: serviceLines(p.services),
     phone: p.phone,
     email: p.email,
-    about: p.differentiator,
-    areas: p.areas,
+    about: cutWords([p.differentiator, p.about].filter(Boolean).join(" "), 400),
+    areas: p.areas
+      .split(/[,;\n]/)
+      .map((a) => a.trim())
+      .filter((a) => a && a.length <= 40)
+      .slice(0, 8)
+      .join(", "),
+    details,
   };
 }
 
-/** The sectors these answers can be built into without anything made up: each one must accept them as they are. */
+/** The templates these answers can be built into without anything made up: each one must accept them as they are. The general template is one of them, so a business with services and an email is always buildable. */
 export function buildableSectors(answers: RawAnswers): string[] {
-  return Object.values(SECTOR_PRESETS)
+  return [...Object.values(SECTOR_PRESETS), GENERAL_PRESET]
     .filter((preset) => parseAnswers(answers, preset, { colour: "#1f3a34" }).ok)
     .map((preset) => preset.id);
 }
@@ -48,11 +80,7 @@ export type ChoiceInput = {
   sectors: string[];
   /** The looks the model may pick from. */
   looks: readonly Look[];
-  /** The model may answer "none" when no sector suits the business, for example a taxi firm. A person's own sector never allows it. */
-  allowNone?: boolean;
 };
-
-export const NO_TEMPLATE = "none";
 
 export const CHOICE_SYSTEM =
   "You are a senior web designer at WINJO DIGITAL, a UK web design agency. You choose which of our website templates " +
@@ -71,9 +99,9 @@ export function buildChoicePrompt(input: ChoiceInput): string {
     `Tone: ${input.plan.tone}`,
     `Pages: ${input.plan.pages.map((p) => p.title).join(", ")}`,
     "",
-    input.allowNone ? `If none of these sectors suits the business, answer "${NO_TEMPLATE}" for the sector: a poor fit is worse than no template.` : "",
+    input.sectors.includes("general") ? 'Choose a specific sector only when it is plainly the same kind of business (a taxi firm is not a cleaner, and a florist is not a café). Otherwise answer "general": it suits any business, and the style gives it its look.' : "",
     "Sectors you may choose from:",
-    ...input.sectors.map((id) => `- ${id}: ${SECTOR_PRESETS[id]?.label ?? id}. ${SECTOR_PRESETS[id]?.voice ?? ""}`.trim()),
+    ...input.sectors.map((id) => `- ${id}: ${presetFor(id)?.label ?? id}. ${presetFor(id)?.voice ?? ""}`.trim()),
     "",
     "Looks you may choose from:",
     ...input.looks.map((look) => `- ${look}: ${LOOK_NOTES(look)}`),
@@ -87,12 +115,11 @@ export function buildChoicePrompt(input: ChoiceInput): string {
 export type Choice = { sector: string; look: Look };
 
 /** Checks a model reply. Strict: anything outside the lists is rejected, never repaired. */
-export function parseChoice(text: string, sectors: string[], looks: readonly Look[], allowNone = false): { ok: true; choice: Choice } | { ok: false; reason: string } {
+export function parseChoice(text: string, sectors: string[], looks: readonly Look[]): { ok: true; choice: Choice } | { ok: false; reason: string } {
   const raw = extractJson(text) as Record<string, unknown> | null;
   if (!raw || typeof raw !== "object") return { ok: false, reason: "The reply was not JSON." };
   const sector = typeof raw.sector === "string" ? raw.sector.trim().toLowerCase() : "";
   const look = typeof raw.look === "string" ? raw.look.trim().toLowerCase() : "";
-  if (allowNone && sector === NO_TEMPLATE) return { ok: true, choice: { sector: NO_TEMPLATE, look: looks[0] } };
   if (!sectors.includes(sector)) return { ok: false, reason: `"${sector}" is not one of the sectors offered.` };
   if (!(looks as readonly string[]).includes(look)) return { ok: false, reason: `"${look}" is not one of the looks offered.` };
   return { ok: true, choice: { sector, look: look as Look } };
@@ -106,7 +133,7 @@ export type ChoiceResult = { ok: true; choice: Choice; costPence: number } | { o
  */
 export async function pickTemplate(provider: AiProvider, input: ChoiceInput): Promise<ChoiceResult> {
   if (input.sectors.length === 0) return { ok: false, reason: "No template fits these answers.", costPence: 0 };
-  if (input.sectors.length === 1 && input.looks.length === 1 && !input.allowNone) return { ok: true, choice: { sector: input.sectors[0], look: input.looks[0] }, costPence: 0 };
+  if (input.sectors.length === 1 && input.looks.length === 1) return { ok: true, choice: { sector: input.sectors[0], look: input.looks[0] }, costPence: 0 };
   const prompt = buildChoicePrompt(input);
   let next = prompt;
   let costPence = 0;
@@ -120,7 +147,7 @@ export async function pickTemplate(provider: AiProvider, input: ChoiceInput): Pr
     }
     costPence += reply.usage.costPence;
     if (reply.kind !== "final") return { ok: false, reason: "The AI service asked for a tool, which this step does not use.", costPence };
-    const parsed = parseChoice(reply.text, input.sectors, input.looks, input.allowNone);
+    const parsed = parseChoice(reply.text, input.sectors, input.looks);
     if (parsed.ok) return { ok: true, choice: parsed.choice, costPence };
     next = `${prompt}\n\nYour last reply was rejected: ${parsed.reason} Reply again with only the JSON.`;
   }

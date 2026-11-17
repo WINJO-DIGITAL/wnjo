@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AiProvider } from "./provider";
 import { parseAnswers } from "@/lib/site-template/answers";
 import { runSiteBuildStep } from "@/lib/site-template/build-service";
-import { ALL_LOOKS, NO_TEMPLATE, answersFromProfile, buildableSectors, pickTemplate } from "@/lib/site-template/choose";
+import { ALL_LOOKS, answersFromProfile, buildableSectors, pickTemplate } from "@/lib/site-template/choose";
 import { presetFor } from "@/lib/site-template/presets";
 import type { RawAnswers, SiteAnswers } from "@/lib/site-template/answers";
 import type { Look } from "@/lib/site-template/schema";
@@ -121,6 +121,7 @@ export async function draftWebsite(db: SupabaseClient, provider: AiProvider, bri
     sectors = [site.sector];
   } else {
     answers = brief.brief ? answersFromProfile(brief.brief as WebsiteBrief, businessName) : null;
+    // Any business can be built: the specific sectors that fit what they told us, and the general template for the rest.
     sectors = answers ? buildableSectors(answers) : [];
   }
 
@@ -154,13 +155,7 @@ export async function draftWebsite(db: SupabaseClient, provider: AiProvider, bri
     plan: plan.plan,
     sectors,
     looks: asked ? [asked] : ALL_LOOKS,
-    allowNone: !site,
   });
-  // The AI says no template suits this kind of business: a text-only draft is better than a poor fit.
-  if (picked.ok && picked.choice.sector === NO_TEMPLATE) {
-    await logEvent(db, actor, brief.id, "ai", { step: "template", ok: true, sector: NO_TEMPLATE, costPence: picked.costPence, by: "ai" });
-    return await textDraft();
-  }
   if (!picked.ok) {
     // A customer's sector with the look left to the AI still builds: the sector's own look is used.
     if (!site) return await failed(db, brief, who, picked.reason);

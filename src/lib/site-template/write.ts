@@ -223,7 +223,7 @@ export function defaultCopy(input: WriteInput): SiteCopy {
   const c = v ? { ...preset.copy, enquiryIntro: v.enquiryIntro, closingHeadline: v.closingHeadline, headings: { ...preset.copy.headings, services: v.servicesHeading, gallery: v.galleryHeading } } : preset.copy;
   const places = facts.areas?.length ? facts.areas : [];
   const place = places.length ? joinList(places) : townOf(facts.address);
-  const headline = place ? `${c.trade} ${places.length ? (c.areasPreposition ?? "for") : "in"} ${place}` : facts.businessName;
+  const headline = place && c.trade ? `${c.trade} ${places.length ? (c.areasPreposition ?? "for") : "in"} ${place}` : facts.businessName;
   const fits = headline.length <= FIELD_LIMITS.headline && wordCount(headline) <= WORD_LIMITS.headline;
   return {
     tagline: "",

@@ -3,8 +3,11 @@ import type { AiProvider } from "@/lib/ai/provider";
 import { ProviderError } from "@/lib/ai/provider";
 import type { WebsitePlan } from "@/lib/ai/website-plan";
 import { EMPTY_PROFILE, type WebsiteBrief } from "@/lib/website-brief";
-import { ALL_LOOKS, answersFromProfile, buildableSectors, buildChoicePrompt, parseChoice, pickTemplate } from "./choose";
-import { SECTOR_PRESETS } from "./presets";
+import { ALL_LOOKS, answersFromProfile, buildableSectors, buildChoicePrompt, parseChoice, pickTemplate, serviceLines } from "./choose";
+import { GENERAL_PRESET, SECTOR_PRESETS, presetFor } from "./presets";
+import { parseAnswers } from "./answers";
+import { checkSite } from "./checks";
+import { assembleSite, defaultCopy } from "./write";
 
 const plan: WebsitePlan = {
   summary: "A friendly site that gets local homeowners to ask for a quote.",
@@ -44,7 +47,7 @@ describe("answers from a customer's own words", () => {
     const sectors = buildableSectors(answersFromProfile(own({ areas: "Preston, Chorley" }), "Paws")!);
     expect(sectors.length).toBeGreaterThan(0);
     for (const id of sectors) {
-      const hours = SECTOR_PRESETS[id].sections.find((s) => s.kind === "hours");
+      const hours = presetFor(id)!.sections.find((s) => s.kind === "hours");
       expect(!hours || !hours.required).toBe(true);
     }
   });
@@ -70,18 +73,53 @@ describe("the choice prompt and its checks", () => {
   });
 });
 
-describe("when no sector suits the business", () => {
-  it("lets the model say none, only when allowed, and tells it so", () => {
-    expect(parseChoice('{"sector":"none","look":"boutique"}', ["cleaning"], ALL_LOOKS, true)).toMatchObject({ ok: true, choice: { sector: "none" } });
-    expect(parseChoice('{"sector":"none","look":"boutique"}', ["cleaning"], ALL_LOOKS).ok).toBe(false);
-    expect(buildChoicePrompt(input({ allowNone: true }))).toContain('answer "none"');
-    expect(buildChoicePrompt(input())).not.toContain('answer "none"');
+describe("the general template", () => {
+  const taxi = (over: Partial<WebsiteBrief["profile"]> = {}): WebsiteBrief =>
+    ({
+      otherBusinessType: "Taxis",
+      profile: { ...EMPTY_PROFILE, services: "Local taxi journeys – Reliable transport for everyday trips.\n\nAirport transfers – Pre-booked pickups and drop-offs to UK airports.\n\nPrivate hire – Personal transport for groups", email: "d@x.co.uk", differentiator: "Reliable, friendly local service.", hours: "24 hours", proof: "Licensed private hire operator.", customers: "both", areas: "Thornton-Cleveleys, Blackpool, Fleetwood. UK-wide transfers by arrangement.", ...over },
+    }) as WebsiteBrief;
+
+  it("is always buildable for a business with services and an email, however long its service lines are", () => {
+    const sectors = buildableSectors(answersFromProfile(taxi(), "Daz'd Cabs")!);
+    expect(sectors).toContain("general");
   });
 
-  it("still asks the model when it is the only sector, so it can decline it", async () => {
-    const p = scripted('{"sector":"none","look":"bold"}');
-    expect(await pickTemplate(p, input({ sectors: ["cleaning"], looks: ["athletic"], allowNone: true }))).toMatchObject({ ok: true, choice: { sector: "none" } });
-    expect(p.calls).toBe(1);
+  it("keeps a service's name and leaves its description for the writer", () => {
+    expect(serviceLines("Local taxi journeys – Reliable transport for everyday trips.\n\nAirport transfers – Pre-booked pickups")).toBe("Local taxi journeys\nAirport transfers");
+    expect(serviceLines("Cut £20\nCut £20\nBeard - 10")).toBe("Cut £20\nBeard - 10");
+    expect(serviceLines("x".repeat(40) + " " + "y".repeat(40)).length).toBeLessThanOrEqual(60);
+  });
+
+  it("carries the customer's hours note, proof and customers as their own words, and invents no hours", () => {
+    const a = answersFromProfile(taxi(), "Daz'd Cabs")!;
+    expect(a.details).toEqual({ customers: "Individuals and businesses", proof: "Licensed private hire operator.", "hours-note": "24 hours" });
+    expect(a.hours).toBeUndefined();
+  });
+
+  it("builds a site that passes every check, saying only what the customer said", () => {
+    const a = answersFromProfile(taxi(), "Daz'd Cabs")!;
+    const parsed = parseAnswers(a, GENERAL_PRESET, { colour: "#1f3a34" });
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const input = { preset: GENERAL_PRESET, facts: parsed.facts, look: "executive" as const, colour: parsed.colour };
+    const site = assembleSite(input, defaultCopy(input));
+    expect(checkSite(site, parsed.facts, GENERAL_PRESET).issues).toEqual([]);
+    expect(site.sections.map((s) => s.kind)).toEqual(["hero", "services", "area", "enquiry", "cta"]);
+  });
+
+  it("refuses a licence or cover the customer never mentioned", () => {
+    const a = answersFromProfile(taxi({ proof: "", differentiator: "Friendly local service." }), "Daz'd Cabs")!;
+    const parsed = parseAnswers(a, GENERAL_PRESET, { colour: "#1f3a34" });
+    if (!parsed.ok) throw new Error("fixture");
+    const input = { preset: GENERAL_PRESET, facts: parsed.facts, look: "executive" as const, colour: parsed.colour };
+    const copy = { ...defaultCopy(input), hero: { headline: "Fully licensed taxis", intro: "Insured and trusted.", cta: "Get in touch" } };
+    expect(checkSite(assembleSite(input, copy), parsed.facts, GENERAL_PRESET).issues.length).toBeGreaterThan(0);
+  });
+
+  it("is never offered as a sector tile, but can be built", () => {
+    expect(Object.keys(SECTOR_PRESETS)).not.toContain("general");
+    expect(presetFor("general")).toBe(GENERAL_PRESET);
   });
 });
 

@@ -152,10 +152,10 @@ describe("automatic first drafts", () => {
     expect(steps.some((s) => s.startsWith("plan"))).toBe(false);
   });
 
-  it("makes a text draft instead of forcing a poor fit when the AI says no template suits the business", async () => {
-    const r = await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: ownWords }]), provider("none", "boutique"));
+  it("builds the general template for a business no sector fits, rather than forcing a poor fit", async () => {
+    const r = await runAutoDrafts(fakeDb([{ id: "b1", tenant_id: "t", brief: ownWords }]), provider("general", "executive"));
     expect(r.drafted).toBe(1);
-    expect(steps.filter((s) => !s.startsWith("event:"))).toEqual(["plan:system", "preview"]);
+    expect(steps).toContain("site:system:general:executive");
   });
 });
 
