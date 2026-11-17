@@ -68,7 +68,7 @@ export function handedOverEmail(args: { name: string; reference: string; account
       "Your final payment is in, and your website is now handed over to you, as set out in our terms.",
       ...(args.message ? ["", args.message] : []),
       "",
-      "You own your domain name and the content you gave us, and you can see everything we built in your account:",
+      "You own your domain name and the content you gave us. Your website pack has your wording, photos, colours and fonts, and you can download it from your account:",
       args.accountUrl,
       "",
       "If you'd like us to look after it for you, or you need anything else, just reply to this email.",

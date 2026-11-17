@@ -18,6 +18,8 @@ import {
 } from "@/lib/build-journey";
 import { notificationMailConfig, sendEmail } from "@/lib/mailer";
 import { handedOverEmail, previewReadyAgainEmail, proposalReadyEmail } from "@/lib/build-emails";
+import { HANDOVER_CHECKLIST, missingChecklist } from "@/lib/handover-pack";
+import { createHandoverPack, type PackBrief } from "@/lib/handover-pack-store";
 import { revisionTransition, stageAfterResolve, type RevisionStatus } from "@/lib/build-revisions";
 import { serviceClient } from "@/lib/quote-store";
 import { staffFromRequest, type Staff } from "@/lib/staff-auth";
@@ -64,6 +66,8 @@ async function logEvent(db: SupabaseClient, staff: Staff, briefId: string, kind:
  * - approve: record a quality, pricing, contract or publication decision.
  * - note: add an internal note to the history.
  * - file_link: a one-minute download link for a file attached to the brief.
+ * - handover_pack: build the website pack for a website bought outright and return a ten-minute download link.
+ * - handover: hand a paid website over. Needs the whole handover checklist ticked.
  * - proposal_save: create or edit a draft proposal.
  * - proposal: submit, approve, reject, send or withdraw a proposal.
  * - revision: start, finish or decline a change the customer asked for. A decline needs a reason the customer can
@@ -249,6 +253,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
+  if (body.action === "handover_pack") {
+    // Staff download the same pack the customer will get, to check it before handing the website over.
+    if (brief.route !== "proposal") return fail(422, "Only a website bought outright has a website pack.");
+    const { data: full } = await db
+      .from("website_briefs")
+      .select("id, tenant_id, reference, name, business_name, brief, handed_over_at")
+      .eq("id", brief.id)
+      .eq("tenant_id", staff.tenantId)
+      .maybeSingle();
+    if (!full) return fail(404, "not_found");
+    const pack = await createHandoverPack(db, full as PackBrief);
+    return pack.ok ? NextResponse.json({ url: pack.url, files: pack.files }) : fail(502, pack.error);
+  }
+
   if (body.action === "handover") {
     // Handing a website over gives it away, so it needs the same standing as publishing one.
     if (!canDecide(staff.role, "publication")) return fail(403, "Only an owner or admin can hand a website over.");
@@ -257,6 +275,9 @@ export async function POST(request: NextRequest) {
     const d = dates as { balance_paid_at: string | null; handed_over_at: string | null } | null;
     if (!d?.balance_paid_at) return fail(409, "The final payment hasn't been received yet.");
     if (d.handed_over_at) return fail(409, "This website has already been handed over.");
+    // The checklist is checked here, not only on the screen, so no request can skip it.
+    const missing = missingChecklist(body.checklist);
+    if (missing.length) return fail(422, `Tick every item on the handover checklist first. Still to do: ${missing.join("; ")}.`);
     const message = note(body.note);
     const { data: changed, error } = await db
       .from("website_briefs")
@@ -265,7 +286,7 @@ export async function POST(request: NextRequest) {
       .is("handed_over_at", null)
       .select("id");
     if (error || !changed?.length) return fail(409, "This website changed in the meantime. Refresh and try again.");
-    await logEvent(db, staff, brief.id, "note", { handover: "done", note: message });
+    await logEvent(db, staff, brief.id, "note", { handover: "done", note: message, checklist: HANDOVER_CHECKLIST.map((i) => i.id) });
     // A website we don't host is finished once it's handed over; one we host goes live through the approvals as usual.
     if (brief.stage !== "live") {
       const { error: moveError } = await db.from("website_briefs").update({ stage: "closed" }).eq("id", brief.id).eq("stage", brief.stage);

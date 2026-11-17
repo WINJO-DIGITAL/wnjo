@@ -58,6 +58,12 @@ Good to know:
 - Both run in GitHub Actions on every push (`.github/workflows/ci.yml`).
 - Browser tests include the live-site path, using made-up `*.e2e.test` addresses such as `barber-p6.e2e.test` (sector, pages, layout).
 
+## Handing over a website bought outright
+
+Staff open the website in Admin, Website builds, and use "Final payment and handover" once the customer has paid the balance. Download the website pack and check it, tick the six checklist items, add a message if needed, then press "Hand over website". The customer is emailed and can download the same pack from their account. Owner or admin only. See `docs/IMPLEMENTATION_STATUS.md` (handover pack section) for what the pack holds and the one database change it needs.
+
+Previews already show a faint "Preview · not licensed until final payment" mark and a banner (see `.preview-mark` in `globals.css`). Production payments run in live mode.
+
 ## Open items
 
 - Remove old `evexec_` helper functions from the `winjo digital` database. Owner needs to confirm the project and count first.

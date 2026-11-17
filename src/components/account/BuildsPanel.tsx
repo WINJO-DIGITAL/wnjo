@@ -271,7 +271,12 @@ function BuildCard({
             {outright && brief.balance_paid_at && !brief.handed_over_at && (
               <p className="build-card__meta">Your final payment is in. We&apos;re getting your website ready to hand over to you.</p>
             )}
-            {outright && brief.handed_over_at && <p className="build-card__meta">Your website has been handed over to you.</p>}
+            {outright && brief.handed_over_at && (
+              <>
+                <p className="build-card__meta">Your website has been handed over to you.</p>
+                <PackLink client={client} briefId={brief.id} />
+              </>
+            )}
             {!proposal && !showPay && brief.brief.goals.length > 0 && (
               <p className="build-card__meta">Built for {brief.brief.goals.map((g) => GOALS[g]?.label).filter(Boolean).join(", ")}</p>
             )}
@@ -413,6 +418,39 @@ function PreviewLink({ client, briefId }: { client: SupabaseClient; briefId: str
     <div className="btn-row">
       <button type="button" className="btn btn--primary" disabled={busy} onClick={() => void open()}>
         {busy ? "Opening…" : "View your preview"}
+      </button>
+      {error && <p className="field-error" role="alert">{error}</p>}
+    </div>
+  );
+}
+
+/** Downloads the customer's website pack. The link comes from the server, only for the owner of a handed-over website. */
+function PackLink({ client, briefId }: { client: SupabaseClient; briefId: string }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const open = async () => {
+    setBusy(true);
+    setError(null);
+    let reason: string | null = null;
+    const opened = await openFileTab(async () => {
+      const { data } = await client.auth.getSession();
+      const token = data.session?.access_token;
+      const res = token
+        ? await fetch("/api/briefs/handover-pack", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ briefId }) }).catch(() => null)
+        : null;
+      const json = (await res?.json().catch(() => null)) as { url?: string; error?: string } | null;
+      if (!res?.ok) reason = json?.error ?? null;
+      return res?.ok && json?.url ? json.url : null;
+    });
+    setBusy(false);
+    if (!opened) setError(reason && reason !== "not_found" ? reason : "Your website pack isn't ready to download yet. Please message us.");
+  };
+
+  return (
+    <div className="btn-row">
+      <button type="button" className="btn btn--primary" disabled={busy} onClick={() => void open()}>
+        {busy ? "Preparing…" : "Download your website pack"}
       </button>
       {error && <p className="field-error" role="alert">{error}</p>}
     </div>

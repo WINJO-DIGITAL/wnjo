@@ -1,5 +1,6 @@
 "use client";
 
+import { HANDOVER_CHECKLIST } from "@/lib/handover-pack";
 import { openFileTab } from "@/lib/open-tab";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -209,6 +210,15 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
     if (!opened) setMessage({ ok: false, text: "The file couldn't be opened." });
   };
 
+  const openPack = async () => {
+    const opened = await openFileTab(async () => {
+      const r = await call({ briefId: row.id, action: "handover_pack" });
+      if (!r.ok) setMessage({ ok: false, text: String(r.json.error ?? "The pack couldn't be made.") });
+      return r.ok && typeof r.json.url === "string" ? r.json.url : null;
+    });
+    if (!opened) setMessage((m) => m ?? { ok: false, text: "The pack couldn't be opened." });
+  };
+
   const state = approvalState(approvals);
   const pending = APPROVAL_ORDER.filter((k) => state[k] === "pending").length;
   const b = row.brief;
@@ -344,7 +354,7 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
           )}
 
           {row.route === "proposal" && row.figures.mode === "oneOff" && accepted && (
-            <HandoverPanel key={`${row.balance_paid_at ?? ""}:${row.handed_over_at ?? ""}`} row={row} busy={busy} act={act} />
+            <HandoverPanel key={`${row.balance_paid_at ?? ""}:${row.handed_over_at ?? ""}`} row={row} busy={busy} act={act} onPack={() => void openPack()} />
           )}
 
           {row.stage === "awaiting_payment" && (
@@ -379,22 +389,41 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
   );
 }
 
-function HandoverPanel({ row, busy, act }: { row: BriefRow; busy: boolean; act: (p: Record<string, unknown>, done: string) => Promise<boolean> }) {
+function HandoverPanel({ row, busy, act, onPack }: { row: BriefRow; busy: boolean; act: (p: Record<string, unknown>, done: string) => Promise<boolean>; onPack: () => void }) {
   const [message, setMessage] = useState("");
+  const [ticked, setTicked] = useState<string[]>([]);
   const day = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const complete = HANDOVER_CHECKLIST.every((item) => ticked.includes(item.id));
+  const toggle = (id: string) => setTicked((t) => (t.includes(id) ? t.filter((x) => x !== id) : [...t, id]));
   return (
     <div>
       <p className="admin-label">Final payment and handover</p>
       {row.handed_over_at ? (
-        <p className="acct-meta">Handed over on {day(row.handed_over_at)}.</p>
+        <>
+          <p className="acct-meta">Handed over on {day(row.handed_over_at)}. The customer can download their website pack from their account.</p>
+          <button type="button" className="btn btn--secondary" disabled={busy} onClick={onPack}>
+            Download the website pack
+          </button>
+        </>
       ) : row.balance_paid_at ? (
         <>
-          <p className="acct-meta">Final payment received on {day(row.balance_paid_at)}. Add where the files and domain details are, then hand the website over. It emails the customer. Owner or admin only.</p>
+          <p className="acct-meta">Final payment received on {day(row.balance_paid_at)}. Download the website pack and check it, tick each item below, then hand the website over. It emails the customer. Owner or admin only.</p>
+          <button type="button" className="btn btn--secondary" disabled={busy} onClick={onPack}>
+            Download the website pack
+          </button>
+          <fieldset>
+            <legend className="acct-label">Before handover</legend>
+            {HANDOVER_CHECKLIST.map((item) => (
+              <label key={item.id} className="acct-check">
+                <input type="checkbox" checked={ticked.includes(item.id)} onChange={() => toggle(item.id)} /> {item.label}
+              </label>
+            ))}
+          </fieldset>
           <label className="acct-label" htmlFor={`handover-${row.id}`}>
             Message to the customer <span className="optional">(optional)</span>
           </label>
           <textarea id={`handover-${row.id}`} className="acct-input" rows={3} maxLength={2000} value={message} onChange={(e) => setMessage(e.target.value)} />
-          <button type="button" className="btn btn--primary" disabled={busy} onClick={() => void act({ action: "handover", note: message }, "Website handed over. The customer has been emailed.")}>
+          <button type="button" className="btn btn--primary" disabled={busy || !complete} onClick={() => void act({ action: "handover", note: message, checklist: ticked }, "Website handed over. The customer has been emailed.")}>
             Hand over website
           </button>
         </>

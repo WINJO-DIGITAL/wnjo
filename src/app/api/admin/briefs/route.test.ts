@@ -30,8 +30,12 @@ const fakeDb = {
 };
 vi.mock("@/lib/quote-store", () => ({ serviceClient: () => fakeDb }));
 vi.mock("@/lib/mailer", () => ({ notificationMailConfig: () => null, sendEmail: vi.fn() }));
+let packResult: { ok: true; url: string; files: number } | { ok: false; error: string } = { ok: true, url: "https://pack", files: 3 };
+vi.mock("@/lib/handover-pack-store", () => ({ createHandoverPack: async () => packResult }));
 
 const { POST } = await import("./route");
+const { HANDOVER_CHECKLIST } = await import("@/lib/handover-pack");
+const ticked = HANDOVER_CHECKLIST.map((i) => i.id);
 const BRIEF = "3f1c2a4e-9b7d-4c2a-8e1f-0a1b2c3d4e5f";
 const post = (body: Record<string, unknown>) =>
   POST(new NextRequest("http://localhost/api/admin/briefs", { method: "POST", headers: { authorization: "Bearer t" }, body: JSON.stringify({ briefId: BRIEF, ...body }) }));
@@ -128,12 +132,31 @@ describe("handing over a website bought outright", () => {
   it("hands over once, records it, and closes a website we don't host", async () => {
     role = "owner";
     paid();
-    expect((await post({ action: "handover", note: "Your files are in the shared folder." })).status).toBe(200);
+    expect((await post({ action: "handover", note: "Your files are in the shared folder.", checklist: ticked })).status).toBe(200);
     const updates = writes.filter((w) => w.table === "website_briefs" && w.op === "update").map((w) => w.payload as Record<string, unknown>);
     expect(updates[0]).toHaveProperty("handed_over_at");
     expect(updates[1]).toEqual({ stage: "closed" });
     const events = writes.filter((w) => w.table === "website_brief_events").map((w) => w.payload as Record<string, unknown>);
     expect(events[0]).toMatchObject({ kind: "note", detail: { handover: "done", note: "Your files are in the shared folder." } });
+  });
+
+  it("won't hand over until the whole checklist is ticked", async () => {
+    role = "owner";
+    paid();
+    for (const checklist of [undefined, [], ticked.slice(0, 5), ["domain", "made-up"]]) {
+      const res = await post({ action: "handover", checklist });
+      expect(res.status).toBe(422);
+      expect((await res.json()).error).toMatch(/checklist/);
+    }
+    expect(writes).toEqual([]);
+  });
+
+  it("records the ticked checklist in the history", async () => {
+    role = "owner";
+    paid();
+    await post({ action: "handover", checklist: ticked });
+    const events = writes.filter((w) => w.table === "website_brief_events").map((w) => w.payload as { detail: { checklist: string[] } });
+    expect(events[0].detail.checklist).toEqual(ticked);
   });
 
   it("can't be done twice", async () => {
@@ -144,3 +167,24 @@ describe("handing over a website bought outright", () => {
   });
 });
 
+
+describe("the website pack", () => {
+  it("gives staff a download link", async () => {
+    packResult = { ok: true, url: "https://pack", files: 3 };
+    const res = await post({ action: "handover_pack" });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ url: "https://pack", files: 3 });
+  });
+
+  it("says plainly when the pack can't be made", async () => {
+    packResult = { ok: false, error: "There is no finished website to put in a pack yet." };
+    const res = await post({ action: "handover_pack" });
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toMatch(/no finished website/);
+  });
+
+  it("is only for a website bought outright", async () => {
+    tables.website_briefs = { ...(tables.website_briefs as object), route: "package" };
+    expect((await post({ action: "handover_pack" })).status).toBe(422);
+  });
+});

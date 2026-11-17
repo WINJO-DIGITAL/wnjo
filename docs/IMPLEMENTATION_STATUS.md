@@ -207,7 +207,7 @@ Built in sub-steps, each tested before the next.
 - Migration `20261107150000`: two notification trigger functions could be called directly through the API by anonymous visitors. They can no longer be; their triggers still fire (checked live). A helper's search path is now fixed.
 - Still open, by choice or outside the code: signed-in users can call the access-check helpers (accepted in the database notes); leaked-password protection is off in Supabase Auth settings, which the owner needs to switch on in the dashboard.
 
-### 3l. Balance payment — built, test mode only (terms to confirm)
+### 3l. Balance payment on the older quote and order system — superseded for websites
 - A quote's deposit and balance are now separate rows (migration `20261107160000`), checked live: both can exist on one quote, and a second balance is refused.
 - Staff request the balance once the deposit is paid (`POST /api/admin/balance`). It records the balance as due (the total minus the 50% deposit, no VAT) and tells the client, following their quote notice choices.
 - The client pays it from their quote (`POST /api/deposits/checkout` with `kind: "balance"`). Payment is refused until staff have requested it. Stripe return pages say so.
@@ -215,6 +215,7 @@ Built in sub-steps, each tested before the next.
 - The balance is requested automatically when the order moves to "Reviewing with you", the stage before launch, if the deposit is paid (migration `20261107170000`, checked live: created once, not again when the stage goes back and forth, not created before the deposit is paid). Staff keep the manual button as a fallback.
 - Chosen by default: request at the pre-launch review stage (industry standard for web agencies, so the final payment is settled before handover). Wording of the client notice is a draft for the owner to approve.
 - Not yet run through a real Stripe test payment end to end; the routes are type-checked and the database rules are checked live.
+- **Update, 17 November 2026:** this section describes the older quote and order system. A website bought outright uses a different path: the customer pays the balance from their account once they have approved the preview (`POST /api/briefs/balance`, open at the "Awaiting WINJO approval" and "Live" stages), so the "Reviewing with you" trigger above does not apply to websites. Production payments run in live mode (`STRIPE_MODE=live`); the buy-outright flow was tested end to end in test mode on 12 November (see the launch checklist).
 
 ### 4f. Budget gate wired into the runner — built, tested
 - The runner checks every model call against the task, agent, project and global limits. It adds the spend from the current run, because stored totals only change when a run finishes. A call that could exceed any limit is not started, and the task is suspended with the reason. 2 new runner tests, 42 AI tests in total, all passing.
@@ -299,3 +300,12 @@ A paid website gets a first AI draft, and a person decides what the customer see
 - **To switch on:** set `ANTHROPIC_API_KEY` (and optionally `AI_MAX_PENCE_PER_BRIEF`), and apply the migration. Then do one live run on a test website.
 - Tests: 40 new checks (prompts and checks, pipeline, service rules, routes, automatic drafts, the provider request shape). All use a fake provider. **Never run against the real Anthropic service**: it needs one live check once the key is set. The empty tools list is now left out of a request.
 - Not built: image generation, a visual design beyond the fixed text layout, and AI-applied edits beyond rewriting a page's copy. The older five-agent engine is separate and still switched off.
+
+## Handover pack and checklist for websites bought outright — built and tested (17 November 2026)
+
+- **Checklist:** before staff can hand a paid website over, six items must be ticked: domain in the customer's name, the finished site opens on its own address and works on a phone, the form was tested, the pack was downloaded and checked, hosting is agreed, and the customer has said they are happy. The server refuses a handover without all six (`HANDOVER_CHECKLIST` in `src/lib/handover-pack.ts`), and the ticked list is saved in the website's history.
+- **Website pack:** a zip with a readme, every page's wording (one file per page), the customer's photos, logo and documents, the colours and fonts, and the page structure as JSON. Built by `src/lib/handover-pack-store.ts`. Staff download it from the handover panel (`handover_pack` action) to check it; the customer downloads the same pack from their account after handover (`POST /api/briefs/handover-pack`, owner of a handed-over website only; link lasts ten minutes).
+- **What is not in it:** our framework and any code that depends on it (terms 9.4). The pack does not contain rendered page files, so section 9.3's "exported website pages" are still produced by hand on request, and the website itself keeps running on our hosting.
+- **Needs one database change before it works:** migration `20261117090000_handover_packs_bucket.sql` creates a private `handover-packs` storage bucket that allows zip files (the brief bucket does not). Until it is applied, the download shows "The pack couldn't be saved".
+- **Previews:** they already carry a faint diagonal "Preview · not licensed until final payment" mark on every page (`.preview-mark` in `globals.css`), plus a banner. Nothing new was added.
+- Tests: zip writer, pack contents, checklist, staff route and customer route (see `zip.test.ts`, `handover-pack.test.ts`, `api/admin/briefs/route.test.ts`, `api/briefs/handover-pack/route.test.ts`). Not run against the live database or storage.
