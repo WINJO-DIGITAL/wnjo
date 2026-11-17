@@ -35,12 +35,15 @@ export type TemplateTestResult = { model: string; rows: TemplateTestRow[]; passe
 /**
  * Stand-in photos for the test, so a site shows its pictures. Each template has photos of its own kind of business (stock photos under the Unsplash licence); a real customer's photos replace them. They only show the layout.
  */
+/** Stand-in footage for the sectors that have it (RAENG Fitness's own class footage). */
+export const STANDIN_VIDEOS: Record<string, string> = { fitness: "/styler/fitness-raeng-hero.mp4" };
+
 export const STANDIN_PHOTOS: Record<string, { hero: string; gallery: string[] }> = {
   barber: { hero: "/styler/barber-hero.webp", gallery: ["/styler/barber-cut.webp", "/styler/barber-fade.webp", "/styler/barber-shave.webp"] },
   beauty: { hero: "/styler/beauty-hero.webp", gallery: ["/styler/beauty-1.webp", "/styler/beauty-2.webp", "/styler/beauty-3.webp"] },
-  massage: { hero: "/styler/massage-hero.webp", gallery: ["/styler/massage-1.webp", "/styler/massage-2.webp", "/styler/massage-3.webp"] },
+  massage: { hero: "/styler/massage-boonma-hero.webp", gallery: ["/styler/massage-boonma-1.webp", "/styler/massage-boonma-2.webp", "/styler/massage-boonma-3.webp"] },
   physio: { hero: "/styler/clinic-hero.webp", gallery: ["/styler/clinic-knee.webp", "/styler/clinic-rehab.webp", "/styler/clinic-sports.webp"] },
-  fitness: { hero: "/styler/fitness-hero.webp", gallery: ["/styler/fitness-1.webp", "/styler/fitness-2.webp", "/styler/fitness-3.webp"] },
+  fitness: { hero: "/styler/fitness-raeng-hero.webp", gallery: ["/styler/fitness-raeng-1.webp", "/styler/fitness-raeng-2.webp", "/styler/fitness-raeng-3.webp"] },
   cafe: { hero: "/styler/cafe-hero.webp", gallery: ["/styler/cafe-plates.webp", "/styler/cafe-sourdough.webp", "/styler/cafe-wine.webp"] },
   "holiday-let": { hero: "/styler/holiday-hero.webp", gallery: ["/styler/holiday-1.webp", "/styler/holiday-2.webp", "/styler/holiday-3.webp"] },
   electrician: { hero: "/styler/trades-hero.webp", gallery: ["/styler/trades-fuse.webp", "/styler/trades-rewires.webp", "/styler/trades-testing.webp"] },

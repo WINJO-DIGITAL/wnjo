@@ -8,12 +8,12 @@ import { firstPages } from "./pages";
 import { SECTOR_PRESETS } from "./presets";
 import { SAMPLE_ANSWERS } from "./sample";
 import { LAYOUTS, LOOKS, type Layout, type Look, type SiteContent } from "./schema";
-import { STANDIN_PHOTOS } from "./template-test";
+import { STANDIN_PHOTOS, STANDIN_VIDEOS } from "./template-test";
 import { assembleSite, defaultCopy } from "./write";
 
-export type E2EParams = { sector: string; pages: number; layout?: string; look?: string; photos: boolean };
+export type E2EParams = { sector: string; pages: number; layout?: string; look?: string; photos: boolean; video?: boolean };
 
-export function buildE2ESample(p: E2EParams): { content: SiteContent; heroImage?: string } | null {
+export function buildE2ESample(p: E2EParams): { content: SiteContent; heroImage?: string; heroVideo?: string } | null {
   const preset = SECTOR_PRESETS[p.sector];
   if (!preset) return null;
   const parsed = parseAnswers({ ...SAMPLE_ANSWERS[preset.id], layout: p.layout }, preset, { colour: "#1f3a34" });
@@ -37,7 +37,7 @@ export function buildE2ESample(p: E2EParams): { content: SiteContent; heroImage?
       { question: "Where are you?", answer: "Our address is on the Contact page." },
     ],
   };
-  return { content: assembleSite(input, copy), heroImage: input.heroPhoto };
+  return { content: assembleSite(input, copy), heroImage: input.heroPhoto, heroVideo: p.video && photos ? STANDIN_VIDEOS[preset.id] : undefined };
 }
 
 /** The address a sample is served on: `<sector>-p<pages>[-<layout>][-<look>][-nophoto].e2e.test`, for example `barber-p6-split-warm.e2e.test`. */

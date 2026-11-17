@@ -94,9 +94,10 @@ test("the request form posts from the live address and stays there, on the page 
   await page.goto(at("barber-p7", "/contact"));
   const form = page.locator("#book form");
   await expect(form.locator('input[name="token"]')).toHaveCount(0);
+  await form.getByLabel("Service").selectOption("Cut & style");
+  await form.getByRole("button", { name: "Next" }).click();
   await form.getByLabel("Name").fill("Sam");
   await form.getByLabel("Phone or email").fill("07700 900123");
-  await form.getByLabel("Service").selectOption("Cut & style");
   await form.getByRole("button", { name: "Send request" }).click();
   // With no database to save to, the request can't be sent: the visitor is told so, on the same address and page.
   await expect(page).toHaveURL(at("barber-p7", "/contact?sent=0#book"));

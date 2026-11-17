@@ -7,9 +7,9 @@ import { assembleSite, defaultCopy } from "@/lib/site-template/write";
 import { BARBER_PRESET, SECTOR_PRESETS } from "@/lib/site-template/presets";
 import { SAMPLES, SAMPLE_BARBER, SAMPLE_BARBER_FACTS, SAMPLE_CAFE, SAMPLE_ELECTRICIAN } from "@/lib/site-template/sample";
 import { defaultLayout, LAYOUTS, type SiteContent } from "@/lib/site-template/schema";
-import { arrange, SiteRender, safeImage, type EnquiryProps } from "./SiteRender";
+import { arrange, SiteRender, safeImage, safeVideo, type EnquiryProps } from "./SiteRender";
 
-const render = (content: SiteContent, props: { heroImage?: string; enquiry?: EnquiryProps } = {}) =>
+const render = (content: SiteContent, props: { heroImage?: string; heroVideo?: string; enquiry?: EnquiryProps } = {}) =>
   renderToStaticMarkup(createElement(SiteRender, { content, ...props }));
 
 describe("sample barber", () => {
@@ -249,5 +249,35 @@ describe("inner pages", () => {
   });
   it("keeps the section headings on a page with several sections, such as Contact", () => {
     expect(page("contact").match(/<h2/g)?.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe("hero footage", () => {
+  it("accepts only an mp4 or webm on this site or at an https address", () => {
+    expect(safeVideo("/styler/fitness-raeng-hero.mp4")).toBe("/styler/fitness-raeng-hero.mp4");
+    expect(safeVideo("https://example.com/loop.webm?v=2")).toBe("https://example.com/loop.webm?v=2");
+    for (const bad of ["http://example.com/a.mp4", "//example.com/a.mp4", "javascript:alert(1)", "/styler/photo.webp", "/a.mp4.exe", "", undefined]) expect(safeVideo(bad), String(bad)).toBeNull();
+  });
+  it("shows footage only over a photo, with a pause control", () => {
+    const withBoth = render(SAMPLE_BARBER, { heroImage: "/styler/barber-hero.webp", heroVideo: "/styler/fitness-raeng-hero.mp4" });
+    expect(withBoth).toContain("<video");
+    expect(withBoth).toMatch(/background video/);
+    expect(render(SAMPLE_BARBER, { heroVideo: "/styler/fitness-raeng-hero.mp4" })).not.toContain("<video");
+    expect(render(SAMPLE_BARBER, { heroImage: "/styler/barber-hero.webp" })).not.toContain("<video");
+  });
+});
+
+describe("request form and reveal", () => {
+  it("groups the form into two steps that all show without a script", () => {
+    const html = render(SAMPLE_BARBER, { heroImage: "/styler/barber-hero.webp", enquiry: { action: "/api/site-enquiry", token: "t".repeat(24) } });
+    expect(html).toContain('data-step="1"');
+    expect(html).toContain('data-step="2"');
+    expect(html).not.toContain("data-enhanced");
+    expect(html).toContain('name="name"');
+  });
+  it("carries the one fixed reveal script, never anything built from the content", () => {
+    const html = render(SAMPLE_BARBER);
+    expect(html.match(/<script/g)?.length).toBe(1);
+    expect(html).toContain("IntersectionObserver");
   });
 });

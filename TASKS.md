@@ -62,6 +62,21 @@ Athletic now sets text in Inter under its Archivo headings, Executive in Hanken 
 
 Rescored: Athletic 79, Precision 78, Boutique 77, Executive 76, Hearth 76, Heritage 76, Tradesman 76, Clinic 75. Still judgement. The remaining gap to 90 is the owner's own photography per business and per-sector imagery; nothing left in this list can be closed with code alone.
 
+## Sixth round (17 Nov): lessons from the four portfolio sites
+
+From RAENG Fitness, Boonma and EV Exec (read-only; Duratek had nothing new). Done, all eight styles:
+
+- **Scroll reveal** (RAENG's pattern): parts of a section below the fold ease up into place as they arrive, with each style's own distance, speed and easing. Movement only, never opacity, so text is always fully opaque. An inline script marks the parts, so with no JavaScript or with reduced motion nothing is ever hidden.
+- **Request in steps** (Boonma's wizard, kept simple): two steps (what you need, your details) with a progress line, each step checked before the next, focus moved to the new step, Back, and a swipe on phones. The form is still one ordinary posting form: without JavaScript every field shows and it works as before.
+- **Hero footage** (RAENG `HeroVideo`): silent looping video over the hero photo, visible pause button, still photo for reduced motion or if it can't load. Photo-first layout only. The page and renderer support it, and the fitness sample uses RAENG's own class footage. **Customers cannot supply footage yet**: there is no video upload, storage or limits, so for real sites it stays unused until that is built.
+- **Real photos for two sample sectors:** Boonma's treatment-room photos for massage, RAENG's training photos for fitness (owner confirmed 17 Nov). Rooms without people were chosen for massage.
+
+Not used: EV Exec's car images (look AI-generated, one is a portrait of a named person; provenance unconfirmed). Boonma's one-data-file idea (prices, FAQ, SEO pages and structured data from one file) and its 19 generated local-SEO pages are the next reusability and technical lever; EV Exec's fares, fleet and quote pages are the taxi content still to build.
+
+Verified: 93 browser tests (three new), 1,514 unit tests, axe clean (photo and no photo, desktop and phone), Lighthouse accessibility, best practices and SEO at 100 on the new massage and fitness samples, mobile performance 82-85.
+
+Rescored: Athletic 80, Precision 79, Boutique 78, Executive 77, Hearth 77, Heritage 77, Tradesman 77, Clinic 76. Judgement, as before.
+
 ## The systemic weakness (Part 10)
 
 Every style still renders the same sequence: hero, gallery or menu, hours, find us, request form, questions. Different skins, same skeleton. Two fixes are planned at system level rather than per style:

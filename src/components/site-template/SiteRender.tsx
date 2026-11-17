@@ -5,6 +5,8 @@ import { mapsEmbedUrl, safeHttpsUrl } from "@/lib/site-template/seo";
 import { LAYOUTS, type HoursItem, type Layout, type Section, type SiteContent } from "@/lib/site-template/schema";
 import css from "./SiteRender.module.css";
 import { REVEAL_SCRIPT } from "./reveal";
+import { HeroVideo } from "./HeroVideo";
+import { RequestSteps } from "./RequestSteps";
 
 /**
  * Lays a template build out as a page. It reads typed content only and never writes HTML from it: every string
@@ -21,6 +23,11 @@ function onColour(hex: string): string {
 }
 
 /** Only https addresses and paths on this site are shown as images. */
+/** Footage for the top of the page: an mp4 or webm on this site or at an https address. */
+export function safeVideo(src: string | undefined): string | null {
+  return src && /\.(mp4|webm)(\?.*)?$/i.test(src) ? safeImage(src) : null;
+}
+
 export function safeImage(src: string | undefined): string | null {
   if (!src) return null;
   if (/^https:\/\//i.test(src)) return src;
@@ -104,6 +111,8 @@ export type EnquiryProps = { action: string; token?: string; state?: "sent" | "e
 export type SiteRenderProps = {
   content: SiteContent;
   heroImage?: string;
+  /** Silent looping footage over the hero photo. Needs the photo too: it is the still, and what shows if the footage can't play. */
+  heroVideo?: string;
   enquiry?: EnquiryProps;
   /** The page to show, by slug. Empty or unknown means the home page. */
   page?: string;
@@ -111,7 +120,7 @@ export type SiteRenderProps = {
   pageHref?: (slug: string) => string;
 };
 
-export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = defaultPageHref }: SiteRenderProps) {
+export function SiteRender({ content, heroImage, heroVideo, enquiry, page = "", pageHref = defaultPageHref }: SiteRenderProps) {
   const { business, theme } = content;
   const layout: Layout = (LAYOUTS as readonly string[]).includes(theme.layout ?? "") ? (theme.layout as Layout) : "showcase";
   const shown = pageSections(content, page);
@@ -132,6 +141,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
   const reviews = (content.reviews ?? []).filter((review) => review.quote.trim() && review.name.trim());
   const profile = safeHttpsUrl(business.googleProfile);
   const photo = safeImage(heroImage);
+  const video = photo ? safeVideo(heroVideo) : null;
   const logo = safeImage(business.logo);
   // A section that draws nothing (a gallery with no usable pictures) gets no nav link, so no link points at nothing.
   const nav = current.sections.flatMap((s) => (ANCHOR_IDS[s.kind] && !(s.kind === "gallery" && !s.images.some((im) => safeImage(im.src))) ? [{ id: ANCHOR_IDS[s.kind]!.id, label: navLabel(s)! }] : []));
@@ -146,6 +156,7 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
               // eslint-disable-next-line @next/next/no-img-element -- customer uploads come from private storage, not the image optimiser
               <img className={css.heroImg} src={photo} alt="" fetchPriority="high" decoding="async" />
             )}
+            {photo && video && s.variant !== "plain" && <HeroVideo src={video} />}
             <div className={css.heroCopy}>
               {/* With no photograph, the logo leads the page: it is the one picture the customer gave us. */}
               {logo && theme.look !== "executive" && !(photo && s.variant !== "plain") && (
@@ -314,40 +325,46 @@ export function SiteRender({ content, heroImage, enquiry, page = "", pageHref = 
                 {enquiry && <input type="hidden" name="page" value={current.slug} />}
                 {/* A field real visitors never see: bots fill it in, and the request is dropped. */}
                 <input className={css.trap} name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-                <label>
-                  Name
-                  <input name="name" autoComplete="name" maxLength={80} required />
-                </label>
-                <label>
-                  Phone or email
-                  <input name="contact" autoComplete="email" maxLength={120} required />
-                </label>
-                {services.length > 0 && (
-                  <label>
-                    Service
-                    <select name="service" required defaultValue="">
-                      <option value="" disabled>
-                        Choose a service
-                      </option>
-                      {services.map((name) => (
-                        <option key={name} value={name}>
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                )}
-                <label>
-                  Photo <span className={css.optional}>(optional)</span>
-                  <input name="photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
-                </label>
-                <label>
-                  {s.prompt || "Anything we should know?"}
-                  <textarea name="message" rows={3} maxLength={1000} />
-                </label>
-                <button className={css.btn} type={enquiry ? "submit" : "button"}>
-                  {s.cta}
-                </button>
+                <RequestSteps labels={[services.length > 0 ? "What you need" : "Your request", "Your details"]}>
+                  <div className={css.stepGroup} data-step="1">
+                    {services.length > 0 && (
+                      <label>
+                        Service
+                        <select name="service" required defaultValue="">
+                          <option value="" disabled>
+                            Choose a service
+                          </option>
+                          {services.map((name) => (
+                            <option key={name} value={name}>
+                              {name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
+                    <label>
+                      {s.prompt || "Anything we should know?"}
+                      <textarea name="message" rows={3} maxLength={1000} />
+                    </label>
+                  </div>
+                  <div className={css.stepGroup} data-step="2">
+                    <label>
+                      Name
+                      <input name="name" autoComplete="name" maxLength={80} required />
+                    </label>
+                    <label>
+                      Phone or email
+                      <input name="contact" autoComplete="email" maxLength={120} required />
+                    </label>
+                    <label>
+                      Photo <span className={css.optional}>(optional)</span>
+                      <input name="photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+                    </label>
+                    <button className={css.btn} type={enquiry ? "submit" : "button"}>
+                      {s.cta}
+                    </button>
+                  </div>
+                </RequestSteps>
               </form>
             )}
           </section>
