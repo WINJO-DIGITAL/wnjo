@@ -22,7 +22,8 @@ The eight styles live in `src/lib/site-template/styles.ts` and are drawn by `src
 | Hearth | 71 | Framed plate hero, menu board, chalkboard hours, warm request card |
 | Heritage | 71 | Brass plaques, framed price board, poster hero |
 | Tradesman | 70 | Job-sheet cards with yellow offsets, figures band, navy hours, yellow call slab |
-| Athletic, Precision, Boutique, Executive | as baseline | Earlier structural work only |
+| Athletic | 74 | Scaled-up type, services as full-width rows with hairlines, oversized figures band on ink |
+| Precision, Boutique, Executive | as baseline | Earlier structural work only |
 | Clinic | 63 | Arch photo beside the words, treatments as a heading-left list-right split with hairlines, figures without cards, sage closing band |
 
 ## The systemic weakness (Part 10)
@@ -44,4 +45,4 @@ Render on desktop and phone, contrast across six colour swatches, stress at five
 
 ## Next
 
-Athletic, Precision, Boutique, Executive, then the system-level changes above.
+Precision, Boutique, Executive, then the system-level changes above.

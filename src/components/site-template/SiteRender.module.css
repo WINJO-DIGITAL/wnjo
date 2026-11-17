@@ -3741,3 +3741,81 @@
   background: var(--sage);
   box-shadow: none;
 }
+
+/* ---- Athletic, scaled up: the type is bigger, services are real rows and the facts are an oversized figures band on ink. ---- */
+.site[data-look="athletic"] .section h2 {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+
+/* Services: full-width rows with hairlines, the name large and the price larger. */
+.site[data-look="athletic"] section:has(> .menu) .menu,
+.site[data-look="athletic"] section:has(> .menu) .menu[data-wide] {
+  gap: 0;
+}
+.site[data-look="athletic"] section:has(> .menu) .menu li {
+  background: transparent;
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid rgb(22 22 22 / 0.16);
+  padding: 1.35rem 0;
+  align-items: baseline;
+}
+.site[data-look="athletic"] section:has(> .menu) .menu li:first-child {
+  border-top: 2px solid #161616;
+}
+.site[data-look="athletic"] section:has(> .menu) .menuName {
+  font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.site[data-look="athletic"] section:has(> .menu) .price {
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+  font-weight: 800;
+}
+
+/* Facts: figures as big as headlines, on ink, between rules. */
+.site[data-look="athletic"] .facts {
+  max-width: none;
+  margin: 0;
+  gap: 0;
+  padding: clamp(2.25rem, 5vw, 3.5rem) max(var(--pad), calc((100% - 80rem) / 2 + var(--pad)));
+  background: #161616;
+  color: #ffffff;
+  border: 0;
+}
+.site[data-look="athletic"] .facts p {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0.5rem 1.5rem;
+  border-left: 1px solid rgb(255 255 255 / 0.22);
+  display: grid;
+  gap: 0.35rem;
+}
+.site[data-look="athletic"] .facts p:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+.site[data-look="athletic"] .facts b {
+  font-size: clamp(2.2rem, 6vw, 4.2rem);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+}
+.site[data-look="athletic"] .facts span {
+  color: rgb(255 255 255 / 0.74);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+/* Hours: larger, so the times read from across the room. */
+.site[data-look="athletic"] .hours,
+.site[data-look="athletic"] .hours li,
+.site[data-look="athletic"] .hours tr {
+  font-size: 1.1rem;
+}
