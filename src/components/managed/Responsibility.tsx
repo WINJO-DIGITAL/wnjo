@@ -41,7 +41,7 @@ export function Responsibility() {
       ([entry]) => {
         if (entry.isIntersecting) setSeen(true);
       },
-      { threshold: 0.35 },
+      { threshold: 0.1 },
     );
     io.observe(el);
     return () => io.disconnect();

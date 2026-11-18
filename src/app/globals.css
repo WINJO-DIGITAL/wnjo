@@ -13123,15 +13123,15 @@ body:has(.pv, .sitepv) .site-footer {
   overflow: hidden;
   /* Tall enough for a item that wraps onto two or three lines. */
   max-height: 6em;
-  /* Each point arrives on its own, one after the other. The list is hidden while it isn't the one showing, so the
-     whole sequence starts again every time the switch brings it back. */
+  /* Each point arrives on its own, one after the other. The points start almost visible, never blank, so a card is
+     never empty while it waits or while the switch brings it back. */
   animation: resp-in 460ms var(--ease) both;
-  animation-delay: calc(140ms + var(--i, 0) * 150ms);
+  animation-delay: calc(60ms + var(--i, 0) * 90ms);
 }
 @keyframes resp-in {
   from {
-    opacity: 0;
-    transform: translateY(10px);
+    opacity: 0.35;
+    transform: translateY(6px);
   }
 }
 /* The first run waits until the switch is on screen (the component sets data-seen). */
