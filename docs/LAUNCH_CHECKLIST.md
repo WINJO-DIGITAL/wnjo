@@ -17,7 +17,6 @@ emailed the brief and builds each website by hand. The AI key and the template c
   6. Tick the six items, hand over, then sign in as the customer and download the same pack.
 - [ ] **3. Audit before launch (without the AI).**
   - Signed-in account and admin screens: every page and action, including what a customer sees of someone else's data. Confirm each of the eleven functions the Supabase advisor lists as callable by signed-in users checks who is calling.
-  - Live payments: the plan checkout, the deposit and balance, the billing portal, and the webhook's handling of each event, including retries.
   - Public site on phone and desktop: visual polish, the buying path (tiers, hosting, six questions), wording.
   - Emails as sent in a real inbox.
 - [ ] **4. Read each hand-built website before it goes to the customer.** Check every claim (licences, insurance, hours, reviews) is something the customer told us.
