@@ -22,7 +22,6 @@ emailed the brief and builds each website by hand. The AI key and the template c
   - Public site on phone and desktop: visual polish, the buying path (tiers, hosting, six questions), wording.
   - Emails as sent in a real inbox.
 - [ ] **4. Read each hand-built website before it goes to the customer.** Check every claim (licences, insurance, hours, reviews) is something the customer told us.
-  - [x] Daz's Cabs: the test site and its brief were removed from the database on 19 November 2026, so there is nothing to check for it.
 
 ## After launch
 
