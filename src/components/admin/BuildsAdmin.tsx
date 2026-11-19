@@ -710,6 +710,7 @@ function GoLivePanel({
         <p className="acct-meta">This website is live.</p>
       ) : (
         <>
+          <p className="acct-meta">Before you go live: remove the password on the website&apos;s host, then open the address in a private window to check it loads without one.</p>
           {!qualityApproved && (
             <label className="acct-check">
               <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} /> I have checked the website
