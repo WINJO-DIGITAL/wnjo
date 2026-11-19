@@ -11,7 +11,7 @@ import { LAYOUTS, LOOKS, type Layout, type Look, type SiteContent } from "./sche
 import { STANDIN_PHOTOS, STANDIN_VIDEOS } from "./template-test";
 import { assembleSite, defaultCopy } from "./write";
 
-export type E2EParams = { sector: string; pages: number; layout?: string; look?: string; photos: boolean; video?: boolean };
+export type E2EParams = { sector: string; pages: number; layout?: string; look?: string; photos: boolean; video?: boolean; /** Two made-up reviews, so the reviews section can be seen. Test pages only. */ reviews?: boolean };
 
 export function buildE2ESample(p: E2EParams): { content: SiteContent; heroImage?: string; heroVideo?: string } | null {
   const preset = SECTOR_PRESETS[p.sector];
@@ -37,7 +37,14 @@ export function buildE2ESample(p: E2EParams): { content: SiteContent; heroImage?
       { question: "Where are you?", answer: "Our address is on the Contact page." },
     ],
   };
-  return { content: assembleSite(input, copy), heroImage: input.heroPhoto, heroVideo: p.video && photos ? STANDIN_VIDEOS[preset.id] : undefined };
+  const content = assembleSite(input, copy);
+  if (p.reviews) {
+    content.reviews = [
+      { quote: "Sample review for the test page. Friendly, on time and easy to book.", name: "Sample customer", source: "Google" },
+      { quote: "Second sample review for the test page, to show how two sit together.", name: "Another sample", source: "Google" },
+    ];
+  }
+  return { content, heroImage: input.heroPhoto, heroVideo: p.video && photos ? STANDIN_VIDEOS[preset.id] : undefined };
 }
 
 /** The address a sample is served on: `<sector>-p<pages>[-<layout>][-<look>][-nophoto].e2e.test`, for example `barber-p6-split-warm.e2e.test`. */

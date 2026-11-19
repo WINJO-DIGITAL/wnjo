@@ -7,7 +7,7 @@ import { assembleSite, defaultCopy } from "@/lib/site-template/write";
 import { BARBER_PRESET, SECTOR_PRESETS } from "@/lib/site-template/presets";
 import { SAMPLES, SAMPLE_BARBER, SAMPLE_BARBER_FACTS, SAMPLE_CAFE, SAMPLE_ELECTRICIAN } from "@/lib/site-template/sample";
 import { defaultLayout, LAYOUTS, type SiteContent } from "@/lib/site-template/schema";
-import { arrange, SiteRender, safeImage, safeVideo, type EnquiryProps } from "./SiteRender";
+import { arrange, heroFacts, SiteRender, safeImage, safeVideo, type EnquiryProps } from "./SiteRender";
 
 const render = (content: SiteContent, props: { heroImage?: string; heroVideo?: string; enquiry?: EnquiryProps } = {}) =>
   renderToStaticMarkup(createElement(SiteRender, { content, ...props }));
@@ -279,5 +279,31 @@ describe("request form and reveal", () => {
     const html = render(SAMPLE_BARBER);
     expect(html.match(/<script/g)?.length).toBe(1);
     expect(html).toContain("IntersectionObserver");
+  });
+});
+
+describe("the facts line under the headline", () => {
+  const withServices = (prices: (string | undefined)[], address?: string): SiteContent => ({
+    ...SAMPLE_BARBER,
+    business: { ...SAMPLE_BARBER.business, address },
+    sections: [
+      ...SAMPLE_BARBER.sections.filter((x) => x.kind === "hero"),
+      { kind: "services", heading: "What we offer", items: prices.map((price, n) => ({ name: `Service ${n}`, price })) },
+    ],
+    pages: [],
+  });
+
+  it("names the address and the lowest price the customer listed", () => {
+    expect(heroFacts(withServices(["£22", "£18", "£20.50"], "12 High Street, Leeds"))).toEqual(["12 High Street, Leeds", "Prices from £18"]);
+  });
+
+  it("says nothing about prices with fewer than two of them, and nothing about an address that wasn't given", () => {
+    expect(heroFacts(withServices(["£75", undefined]))).toEqual([]);
+    expect(heroFacts(withServices([undefined, "Quoted on request"]))).toEqual([]);
+  });
+
+  it("is shown on the page", () => {
+    const html = render(withServices(["£22", "£18"], "12 High Street, Leeds"));
+    expect(html).toContain("Prices from £18");
   });
 });

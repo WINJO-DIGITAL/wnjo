@@ -4352,11 +4352,13 @@
 }
 
 /* Panels read as boxes even without a border: the services list and the hours and find-us pair sit on the page. */
-.site[data-look] section:has(> .menu),
+.site[data-look="heritage"] section:has(> .menu),
+.site[data-look="hearth"] section:has(> .menu),
 .site[data-look] .info > .section {
   background: none !important;
 }
-.site[data-look] .section[id="services"],
+/* Precision paints its services as a full-width navy band with light type, as Duratek does: that band stays. */
+.site[data-look]:not([data-look="precision"]) .section[id="services"],
 .site[data-look] .section[id="faq"] {
   max-width: 76rem !important;
   width: 100%;
@@ -4382,4 +4384,87 @@
 .site[data-look="clinic"] .info {
   max-width: none;
   padding-inline: max(var(--pad), calc((100% - 76rem) / 2 + var(--pad)));
+}
+
+/* ==========================================================================
+   Portfolio standard, phase 2: practical facts under the headline.
+   ========================================================================== */
+.heroFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0;
+  margin-top: 0.9rem !important;
+  font-size: 0.92rem;
+  opacity: 0.88;
+}
+.heroFacts span + span::before {
+  content: "\00b7";
+  margin: 0 0.6em;
+  opacity: 0.7;
+}
+/* Centred heroes centre the facts too. */
+.site[data-look] .hero .heroCopy[style*="center"] .heroFacts,
+.site[data-look="heritage"] .heroFacts,
+.site[data-look="hearth"] .heroFacts {
+  justify-content: center;
+}
+/* Phones: one fact per line, so a separator never starts a line. */
+@media (max-width: 39.99rem) {
+  .heroFacts {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .heroFacts span + span::before {
+    content: none;
+  }
+  .site[data-look="heritage"] .heroFacts,
+  .site[data-look="hearth"] .heroFacts {
+    align-items: center;
+  }
+}
+
+/* The header stays on one line above phone size, as on the portfolio sites. The section links take the room that is
+   left and scroll sideways if there are more than fit, fading at the edge. Below 1280px the small Call button steps
+   back: the number is already in the hero and on the request section. */
+@media (min-width: 48rem) {
+  .site[data-look] .nav {
+    flex-wrap: nowrap;
+  }
+  .site[data-look] .nav .links {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 2rem), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 2rem), transparent);
+    padding-right: 1.5rem;
+  }
+  .site[data-look] .nav .links::-webkit-scrollbar {
+    display: none;
+  }
+  .site[data-look] .nav > .btn,
+  .site[data-look] .nav > .call,
+  .site[data-look] .nav > .logo,
+  .site[data-look] .nav > .logoImg {
+    flex: none;
+    white-space: nowrap;
+  }
+}
+@media (min-width: 48rem) and (max-width: 79.99rem) {
+  .site[data-look] .nav > .call {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Portfolio standard, phase 3: rhythm. The portfolio sites change colour between sections, so the page has a beat
+   instead of one flat background. Boutique and clinic already band the hours and find-us pair; every other look now
+   does too, with a tint mixed from its own paper and ink, so a dark look gets a lighter band and a light look a deeper one.
+   ========================================================================== */
+.site[data-look]:not([data-look="boutique"]):not([data-look="clinic"]) .info {
+  max-width: none;
+  padding-inline: max(var(--pad), calc((100% - 76rem) / 2 + var(--pad)));
+  padding-block: clamp(3rem, 7vw, 5rem);
+  background: color-mix(in srgb, var(--ink) 5%, var(--paper));
 }

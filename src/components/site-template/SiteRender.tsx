@@ -84,6 +84,24 @@ function pageSections(content: SiteContent, slug: string): { sections: Section[]
   return page ? { sections: page.sections, slug: page.slug } : { sections: content.sections, slug: "" };
 }
 
+/**
+ * A short line of practical facts under the headline, as the portfolio sites have: where the business is, and the
+ * lowest price the customer listed. Built only from the customer's own details, so it never says anything they didn't.
+ */
+export function heroFacts(content: SiteContent): string[] {
+  const facts: string[] = [];
+  const address = content.business.address?.trim();
+  if (address) facts.push(address);
+  const prices = [...content.sections, ...(content.pages ?? []).flatMap((p) => p.sections)]
+    .flatMap((x) => (x.kind === "services" ? x.items.map((i) => i.price ?? "") : []))
+    .flatMap((price) => {
+      const m = /£\s?(\d+(?:\.\d{1,2})?)/.exec(price);
+      return m ? [{ value: Number(m[1]), text: `£${m[1]}` }] : [];
+    });
+  if (prices.length > 1) facts.push(`Prices from ${prices.reduce((a, b) => (b.value < a.value ? b : a)).text}`);
+  return facts;
+}
+
 /** The page whose sections hold the request form, so every "book" button can point there. */
 function bookingSlug(content: SiteContent): string | null {
   if (content.sections.some((s) => s.kind === "enquiry")) return "";
@@ -139,6 +157,7 @@ export function SiteRender({ content, heroImage, heroVideo, enquiry, page = "", 
   // The footer lists what they do, from the customer's own service names, and where.
   const serviceNames = [...content.sections, ...(content.pages ?? []).flatMap((p) => p.sections)].flatMap((x) => (x.kind === "services" ? x.items.map((i) => i.name) : [])).filter((n, i, all) => all.indexOf(n) === i).slice(0, 6);
   const reviews = (content.reviews ?? []).filter((review) => review.quote.trim() && review.name.trim());
+  const facts = heroFacts(content);
   const profile = safeHttpsUrl(business.googleProfile);
   const photo = safeImage(heroImage);
   const video = photo ? safeVideo(heroVideo) : null;
@@ -172,6 +191,13 @@ export function SiteRender({ content, heroImage, heroVideo, enquiry, page = "", 
               )}
               <h1>{theme.look === "executive" ? twoTone(s.headline) : s.headline}</h1>
               <p>{s.intro}</p>
+              {facts.length > 0 && (
+                <p className={css.heroFacts}>
+                  {facts.map((f) => (
+                    <span key={f}>{f}</span>
+                  ))}
+                </p>
+              )}
               <span className={css.heroActions}>
                 <a className={css.btn} href={bookHref}>
                   {s.cta}

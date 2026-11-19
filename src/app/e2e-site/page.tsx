@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export default async function E2ESite({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   if (process.env.E2E !== "1") notFound();
   const q = await searchParams;
-  const sample = buildE2ESample({ sector: q.t ?? "barber", pages: Number(q.n ?? 1), layout: q.l, look: q.look, photos: q.nophoto !== "1", video: q.video === "1" });
+  const sample = buildE2ESample({ sector: q.t ?? "barber", pages: Number(q.n ?? 1), layout: q.l, look: q.look, photos: q.nophoto !== "1", video: q.video === "1", reviews: q.rv === "1" });
   if (!sample) notFound();
   // Page links keep the sample's own settings, so following one shows the same sample's other page.
   const keep = new URLSearchParams(Object.entries(q).filter((e): e is [string, string] => typeof e[1] === "string" && e[0] !== "page"));
