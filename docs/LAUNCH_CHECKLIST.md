@@ -20,8 +20,3 @@ emailed the brief and builds each website by hand. The AI key and the template c
   - Public site on phone and desktop: visual polish, the buying path (tiers, hosting, six questions), wording.
   - Emails as sent in a real inbox.
 - [ ] **4. Read each hand-built website before it goes to the customer.** Check every claim (licences, insurance, hours, reviews) is something the customer told us.
-
-## After launch
-
-- [ ] Template checks on a live run: read the first AI-built customer's site before it goes live, once automatic mode is switched on.
-- [ ] The AI's live reply shape for bespoke builds, once the key is in.
