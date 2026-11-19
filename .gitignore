@@ -11,3 +11,7 @@ npm-debug.log*
 .DS_Store
 test-results/
 playwright-report/
+
+# Environment files: never commit real keys. Only the blank template is tracked.
+.env*
+!.env.example
