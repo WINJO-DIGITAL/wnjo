@@ -4280,3 +4280,106 @@
 .stepNav .btnGhost {
   flex: 1 1 8rem;
 }
+
+/* ==========================================================================
+   Portfolio standard, phase 1 (November 2026): open sections, a wider page and two columns on desktop.
+   The portfolio sites (RAENG, Duratek, Boonma, EV Exec) never put a section in a box: sections sit full width on the
+   page and the content breathes. These rules come last, so they win over each look's own frames, cards and shadows.
+   The request form keeps its box: it is the one real component a visitor fills in.
+   ========================================================================== */
+
+/* No frame, outline or shadow around a whole section, in any look. The looks box sections through several routes
+   (.info > .section, section:has(> .menu)), so this one rule is marked important: it is meant to have the last word,
+   and it touches only the frame of a whole section, never a button, a field or the form. */
+.site[data-look] .hero,
+.site[data-look] .section,
+.site[data-look] .info > .section,
+.site[data-look] section:has(> .menu),
+.site[data-look] .closing,
+.site[data-look] .hours {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+/* Pictures sit on the page, not in a frame. */
+.site[data-look] .gallery img {
+  border: 0;
+}
+/* Tradesman: services are rows divided by a rule, not a stack of shadowed cards. */
+.site[data-look="tradesman"] .menu li {
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+}
+
+/* A wider page, as on the portfolio sites. The booking band keeps its own width: some looks paint it edge to edge. */
+.site[data-look] .section:not(.book) {
+  max-width: 76rem;
+}
+/* The hours and find-us pair lines up with every other section, edge to edge of the same column. */
+.site[data-look] .info {
+  max-width: 76rem;
+  padding-inline: var(--pad);
+}
+.site[data-look] .info > .section {
+  padding-inline: 0;
+}
+
+/* Desktop: the heading sits on the left and the content on the right, for the long sections. */
+@media (min-width: 64rem) {
+  .site[data-look] .section[id="services"],
+  .site[data-look] .section[id="faq"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: start;
+  }
+  .site[data-look] .section[id="services"] > h2,
+  .site[data-look] .section[id="faq"] > h2 {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    text-align: left;
+    margin-bottom: 0;
+  }
+  .site[data-look] .section[id="services"] > :not(h2),
+  .site[data-look] .section[id="faq"] > :not(h2) {
+    grid-column: 2;
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* Panels read as boxes even without a border: the services list and the hours and find-us pair sit on the page. */
+.site[data-look] section:has(> .menu),
+.site[data-look] .info > .section {
+  background: none !important;
+}
+.site[data-look] .section[id="services"],
+.site[data-look] .section[id="faq"] {
+  max-width: 76rem !important;
+  width: 100%;
+}
+@media (min-width: 64rem) {
+  /* A heading in the left column is plain: the centred rules some looks draw beside a heading don't belong there. */
+  .site[data-look] .section[id="services"] > h2::before,
+  .site[data-look] .section[id="services"] > h2::after,
+  .site[data-look] .section[id="faq"] > h2::before,
+  .site[data-look] .section[id="faq"] > h2::after {
+    content: none;
+  }
+  .site[data-look] .section[id="services"] > h2,
+  .site[data-look] .section[id="faq"] > h2 {
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+/* Boutique and clinic paint the hours and find-us pair as a band: the band runs edge to edge and its content sits in
+   the same column as the rest of the page. */
+.site[data-look="boutique"] .info,
+.site[data-look="clinic"] .info {
+  max-width: none;
+  padding-inline: max(var(--pad), calc((100% - 76rem) / 2 + var(--pad)));
+}
