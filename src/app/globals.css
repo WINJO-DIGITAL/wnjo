@@ -10632,9 +10632,11 @@ body:has(.dash-header) .site-footer {
   text-align: left;
   vertical-align: bottom;
 }
+/* The cells are mostly words: proportional figures, because this font's tabular setting also widens commas and full
+   stops, which made "Sector design, tailored" read as "Sector design , tailored". */
 .pkg-compare td,
 .pkg-compare th[scope="row"] {
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: normal;
 }
 .pkg-compare .pkg-compare__popular {
   background: var(--color-surface-sunken);
@@ -14260,6 +14262,14 @@ body:has(.pv, .sitepv) .site-footer {
   }
   #process .bs__screen {
     aspect-ratio: 4 / 3;
+  }
+  /* The quote has the most lines, so in the shorter frame its text scales down to fit, first payment included. */
+  #process .bs__stage[data-stage="scope"] .bs__inner {
+    font-size: calc(100cqw / 20);
+  }
+  /* The stamp repeats what the lines above already say; the shorter frame leaves it out rather than cut it in half. */
+  #process .bs__stage[data-stage="scope"] .bs-price {
+    display: none;
   }
   #process .bs__stage h3 {
     font-size: 1.25rem;
