@@ -60,7 +60,8 @@ export async function POST(request: NextRequest) {
 
   // Files were uploaded to this form's draft folder; only those really in it are kept.
   const draftId = typeof body.draftId === "string" && DRAFT_ID_RE.test(body.draftId) ? body.draftId : null;
-  let brief = cleanBrief(body.brief, draftId ?? undefined);
+  // The set-aside answers from switching business type are progress only: they are never part of what is sent.
+  let brief = cleanBrief({ ...(typeof body.brief === "object" && body.brief ? body.brief : {}), typeStash: null }, draftId ?? undefined);
   if (draftId) brief = await confirmBriefFiles(db, draftId, brief);
   const errors = validateBrief(brief);
   if (Object.keys(errors).length) return fail(422, "Please complete your brief.", { brief: errors });

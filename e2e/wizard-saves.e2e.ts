@@ -90,3 +90,44 @@ test("a failed load keeps the form closed and never saves over the stored answer
   await page.click('button:has-text("Try again")');
   await expect(services(page)).toHaveValue("Seeded services");
 });
+
+test("switching the kind of business keeps what was typed, both ways, even after a reload", async ({ page }) => {
+  await page.goto("/e2e-wizard");
+  await page.fill("#wiz-biz", "Autism Initiatives");
+  await page.locator('label:has-text("Grooming")').first().click();
+  await page.click('button:has-text("Next")');
+  await services(page).fill("Support sessions £40");
+  await page.locator('input[type="tel"]').first().fill("01700 900123");
+  await page.locator('input[type="email"]').first().fill("test@example.com");
+  await page.locator('input[id$="-address"]').fill("12 Test Street, Preston");
+  await page.click('button:has-text("Back")');
+
+  // To "Another type of business": what both ask for comes with them.
+  await page.locator('label:has-text("Another type of business")').click();
+  await page.locator('input[placeholder^="For example: dog grooming"]').fill("Autism charity");
+  await page.click('button:has-text("Next")');
+  await expect(page.locator(".wiz__step")).toContainText("What you offer");
+  await expect(services(page)).toHaveValue("Support sessions £40");
+  await expect(page.locator('input[type="tel"]').first()).toHaveValue("01700 900123");
+  await expect(page.locator('input[type="email"]').first()).toHaveValue("test@example.com");
+  await services(page).fill("Support sessions £40\nTraining for schools");
+  await expect(page.locator(".wiz__saved")).toHaveText("Saved");
+
+  // A reload in the middle changes nothing.
+  await page.reload();
+  await expect(services(page)).toHaveValue("Support sessions £40\nTraining for schools");
+
+  // And back to a type: the generic edits come across, and the address set aside comes back.
+  await page.click('button:has-text("Back")');
+  await expect(page.locator('input[placeholder^="For example: dog grooming"]')).toHaveValue("Autism charity");
+  await page.locator('label:has-text("Grooming")').first().click();
+  await page.click('button:has-text("Next")');
+  await expect(services(page)).toHaveValue("Support sessions £40\nTraining for schools");
+  await expect(page.locator('input[id$="-address"]')).toHaveValue("12 Test Street, Preston");
+  await expect(page.locator('input[type="email"]').first()).toHaveValue("test@example.com");
+
+  // Choosing "Another type" again offers the typed name straight back.
+  await page.click('button:has-text("Back")');
+  await page.locator('label:has-text("Another type of business")').click();
+  await expect(page.locator('input[placeholder^="For example: dog grooming"]')).toHaveValue("Autism charity");
+});

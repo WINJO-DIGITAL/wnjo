@@ -106,7 +106,14 @@ export type WebsiteBrief = {
   profile: BusinessProfile;
   /** Extra questions for every brief: role, offer, what must be easy to find, look, and what to show. All optional. */
   extras: BriefExtras;
+  /**
+   * What the customer typed for the kind of business they have switched away from, set aside so switching back
+   * restores it. Part of their saved progress only: it is never sent to the team.
+   */
+  typeStash?: TypeStash | null;
 };
+
+export type TypeStash = { site: SiteAnswers | null; other: string };
 
 export const CUSTOMERS = { individuals: "Individuals", businesses: "Businesses", both: "Both" } as const;
 export const FIRST_ACTIONS = { call: "Call", book: "Book online", quote: "Request a quote", email: "Email", visit: "Visit" } as const;
@@ -265,7 +272,17 @@ export function cleanBrief(input: unknown, draftId?: string): WebsiteBrief {
     otherBusinessType: text(o.otherBusinessType, 80).replace(/<[^>]*>/g, "").trim(),
     profile: cleanProfile(o.profile),
     extras: cleanExtras(o.extras),
+    ...cleanTypeStash(o.typeStash),
   };
+}
+
+/** The set-aside answers, or nothing at all when there are none, so the saved brief stays free of it. */
+function cleanTypeStash(input: unknown): { typeStash?: TypeStash } {
+  if (!input || typeof input !== "object") return {};
+  const o = input as Record<string, unknown>;
+  const site = cleanSiteAnswers(o.site, Object.keys(SECTOR_PRESETS));
+  const other = text(o.other, 80).replace(/<[^>]*>/g, "").trim();
+  return site || other ? { typeStash: { site, other } } : {};
 }
 
 /** Cleans the profile the form sends. Unknown choices are dropped; nothing is judged here. */

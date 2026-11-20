@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { carryToAnswers, carryToProfile } from "@/lib/brief-type-switch";
 import { DAYS, type DayAnswer, type RawAnswers } from "@/lib/site-template/answers";
 import { ABOUT_QUESTION, BUSINESS_GROUPS, SECTOR_PRESETS, type BusinessGroup } from "@/lib/site-template/presets";
 import { defaultLayout, LAYOUTS, type Layout, type Look } from "@/lib/site-template/schema";
@@ -54,9 +55,29 @@ export function BusinessTypeField({ brief, onChange }: { brief: WebsiteBrief; on
   const site = brief.site;
   // "Another type of business" is only selected when the customer picks it. Nothing is pre-selected for them.
   const [otherMode, setOtherMode] = useState(brief.otherBusinessType !== "");
-  const choose = (sector: string | null) => {
+  // Switching the kind of business never costs what was typed. What both kinds ask for is carried across, and what only
+  // one asks for (an address, ticked facts) is set aside and put back if the customer switches again.
+  const choose = (sector: string) => {
     setOtherMode(false);
-    onChange({ otherBusinessType: "", site: sector ? { sector, answers: { ...(site?.answers ?? {}), hours: site?.answers.hours?.length ? site.answers.hours : emptyWeek(), look: site?.answers.look ?? SECTOR_PRESETS[sector].defaultLook, colour: site?.answers.colour ?? SITE_COLOURS[0].hex } } : null });
+    const stash = brief.typeStash;
+    // Coming from "Another type": the generic details seed the answers, on top of anything set aside earlier.
+    const base: RawAnswers | undefined = site ? site.answers : carryToAnswers(brief.profile, stash?.site?.answers);
+    onChange({
+      otherBusinessType: "",
+      typeStash: { site: stash?.site ?? null, other: brief.otherBusinessType || stash?.other || "" },
+      site: { sector, answers: { ...(base ?? {}), hours: base?.hours?.length ? base.hours : emptyWeek(), look: base?.look ?? SECTOR_PRESETS[sector].defaultLook, colour: base?.colour ?? SITE_COLOURS[0].hex } },
+    });
+  };
+  const chooseOther = () => {
+    setOtherMode(true);
+    if (!site) return;
+    const stash = brief.typeStash;
+    onChange({
+      site: null,
+      otherBusinessType: brief.otherBusinessType || stash?.other || "",
+      profile: carryToProfile(site.answers, brief.profile),
+      typeStash: { site, other: stash?.other ?? "" },
+    });
   };
 
   return (
@@ -76,7 +97,7 @@ export function BusinessTypeField({ brief, onChange }: { brief: WebsiteBrief; on
             </label>
           ))}
           <label className={styles.choice}>
-            <input type="radio" name={`${id}-sector`} checked={!site && otherMode} onChange={() => (setOtherMode(true), onChange({ site: null }))} />
+            <input type="radio" name={`${id}-sector`} checked={!site && otherMode} onChange={chooseOther} />
             <span className={styles.choiceBody}>
               <span className="site-tile__group">Anything else</span>
               <span className={styles.choiceLabel}>Another type of business</span>
