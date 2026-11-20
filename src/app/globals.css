@@ -16984,3 +16984,15 @@ body:has(.dash-header) {
   gap: var(--space-2);
   margin-top: var(--space-2);
 }
+
+/* The business-type questions in the details form sit in their own block, apart from the questions above. */
+.site-profile__category {
+  display: grid;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+}
+.site-profile__category-title {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 550;
+}

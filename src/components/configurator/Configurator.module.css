@@ -167,6 +167,11 @@
   font-weight: 550;
 }
 
+/* Sections of a form step sit apart, so one question block never runs into the next. */
+.group + .group {
+  margin-top: var(--space-6);
+}
+
 .group > :global(.field-hint) {
   margin: calc(var(--space-2) * -1) 0 var(--space-3);
 }
