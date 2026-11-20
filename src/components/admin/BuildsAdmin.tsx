@@ -75,6 +75,9 @@ type Call = (payload: Record<string, unknown>, url?: string) => Promise<{ ok: bo
  * How new websites are made. Automatic: the AI plans, picks a style and builds a draft as soon as the customer sends
  * their goals. Manual: nothing is built; the owner is emailed the brief and builds it themselves. Owners and admins only.
  */
+/** Off while every website is built by hand. The switch is kept here so the AI option can come back later. */
+const BUILD_MODE_CHOICE_ON = false;
+
 function BuildModeSwitch({ client }: { client: SupabaseClient }) {
   const [mode, setMode] = useState<"auto" | "manual" | null>(null);
   const [busy, setBusy] = useState(false);
@@ -99,7 +102,7 @@ function BuildModeSwitch({ client }: { client: SupabaseClient }) {
     if (res?.ok) setMode(next);
     else setMessage(res?.status === 403 ? "Only an owner or admin can change this." : "That didn't save. Please try again.");
   };
-  if (mode === null) return null;
+  if (!BUILD_MODE_CHOICE_ON || mode === null) return null;
   return (
     <fieldset className="admin-mode" disabled={busy}>
       <legend className="admin-label">How new websites are made</legend>

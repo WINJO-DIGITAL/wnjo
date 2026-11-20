@@ -12,14 +12,14 @@ export type BuildMode = (typeof BUILD_MODES)[number];
 export const isBuildMode = (value: unknown): value is BuildMode => typeof value === "string" && (BUILD_MODES as readonly string[]).includes(value);
 
 /**
- * The agency's mode. No setting means auto, as before. If the setting can't be read, it is treated as manual: a
- * website that waits for a person is far better than one the owner asked not to have drafted being drafted anyway.
+ * Every website is built by hand until further notice. The AI is shelved, so the mode is always manual, whatever the
+ * stored setting says. The stored setting and the switch are kept so auto can come back later.
  */
+// The arguments are kept so the callers and the stored setting work unchanged if auto comes back.
 export async function getBuildMode(db: SupabaseClient, tenantId: string): Promise<BuildMode> {
-  const { data, error } = await db.from("tenant_settings").select("website_build_mode").eq("tenant_id", tenantId).maybeSingle();
-  if (error) return "manual";
-  const mode = (data as { website_build_mode?: unknown } | null)?.website_build_mode;
-  return isBuildMode(mode) ? mode : "auto";
+  void db;
+  void tenantId;
+  return "manual";
 }
 
 export async function setBuildMode(db: SupabaseClient, tenantId: string, mode: BuildMode): Promise<boolean> {
