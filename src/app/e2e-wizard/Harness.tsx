@@ -21,8 +21,9 @@ export function Harness() {
   const [sent, setSent] = useState(false);
   const [shown, setShown] = useState(true);
   const api = useMemo<WizardApi>(() => {
-    const w = window as unknown as Counters;
-    const param = (k: string, d: number) => Number(new URLSearchParams(window.location.search).get(k) ?? d);
+    // This runs while the page is prepared on the server too, where there is no window: read it only inside the calls.
+    const w = (typeof window === "undefined" ? {} : window) as unknown as Counters;
+    const param = (k: string, d: number) => (typeof window === "undefined" ? d : Number(new URLSearchParams(window.location.search).get(k) ?? d));
     return {
       loadAllowance: async () => 5,
       loadKnown: async () => ({ email: "known@example.com", phone: "01234 567890" }),
