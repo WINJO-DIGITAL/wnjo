@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCustomers, customerTimeline, viewCustomers, type BriefRow, type EnquiryRow, type SubRow } from "./customers";
+import { buildCustomers, customerTimeline, renewalOf, viewCustomers, type BriefRow, type EnquiryRow, type SubRow } from "./customers";
 import { planInfo, PLAN_RULES } from "./plan-info";
 import { CARE_PLANS, WEBSITE_PLANS } from "@/lib/pricing";
 
@@ -81,5 +81,44 @@ describe("plan information", () => {
     expect(text).toMatch(/no minimum term/);
     expect(text).toMatch(/Cancel any time/);
     expect(text).not.toMatch(/notice to end|12 months|contract/i);
+  });
+});
+
+describe("when a customer's plan renews", () => {
+  const renews = (subs: SubRow[]) => renewalOf(subs);
+
+  it("is the next payment date of a running plan", () => {
+    expect(renews([sub({ current_period_end: "2026-12-05T00:00:00Z" })])).toEqual({ at: "2026-12-05T00:00:00Z", kind: "renews" });
+  });
+
+  it("says a plan being cancelled ends on that date, and a failed payment is overdue", () => {
+    expect(renews([sub({ current_period_end: "2026-12-05T00:00:00Z", cancel_at_period_end: true })])?.kind).toBe("ends");
+    expect(renews([sub({ current_period_end: "2026-11-25T00:00:00Z", status: "past_due" })])?.kind).toBe("overdue");
+  });
+
+  it("takes the soonest date across plans, and an overdue plan always comes first", () => {
+    expect(renews([sub({ current_period_end: "2026-12-20T00:00:00Z" }), sub({ id: "s2", current_period_end: "2026-12-02T00:00:00Z" })])?.at).toBe("2026-12-02T00:00:00Z");
+    const mixed = renews([sub({ current_period_end: "2026-12-02T00:00:00Z" }), sub({ id: "s2", status: "past_due", current_period_end: "2026-12-30T00:00:00Z" })]);
+    expect(mixed).toEqual({ at: "2026-12-30T00:00:00Z", kind: "overdue" });
+  });
+
+  it("ignores test-mode plans, plans that aren't running and plans with no date", () => {
+    expect(renews([sub({ livemode: false, current_period_end: "2026-12-05T00:00:00Z" })])).toBeNull();
+    expect(renews([sub({ status: "offered", current_period_end: "2026-12-05T00:00:00Z" })])).toBeNull();
+    expect(renews([sub({})])).toBeNull();
+  });
+
+  it("can sort the directory by renewal: overdue first, then soonest, then customers with no date", () => {
+    const all = buildCustomers(
+      [
+        sub({ email: "late@x.test", name: "Late", business_name: "Late Co", current_period_end: "2026-12-28T00:00:00Z" }),
+        sub({ id: "s2", email: "soon@x.test", name: "Soon", business_name: "Soon Co", current_period_end: "2026-12-01T00:00:00Z" }),
+        sub({ id: "s3", email: "due@x.test", name: "Due", business_name: "Due Co", status: "past_due", current_period_end: "2026-12-30T00:00:00Z" }),
+        sub({ id: "s4", email: "none@x.test", name: "None", business_name: "None Co", status: "offered" }),
+      ],
+      [],
+      [],
+    );
+    expect(viewCustomers([...all], { filter: "all", search: "", sort: "renewal" }).map((c) => c.business)).toEqual(["Due Co", "Soon Co", "Late Co", "None Co"]);
   });
 });

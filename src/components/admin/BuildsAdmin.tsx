@@ -121,10 +121,25 @@ function BuildModeSwitch({ client }: { client: SupabaseClient }) {
   );
 }
 
+/** The website named in the address (#builds/<id>), so Today and other screens can open one directly. */
+function briefFromHash(): string | null {
+  if (typeof window === "undefined") return null;
+  const m = window.location.hash.match(/^#builds\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i);
+  return m ? m[1].toLowerCase() : null;
+}
+
 export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<BriefRow[] | null>(null);
   const [error, setError] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(briefFromHash);
+  useEffect(() => {
+    const onHash = () => {
+      const id = briefFromHash();
+      if (id) setSelected(id);
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
   // The detail is shown under the table, so bring it into view when a brief is opened (on a phone it is far below).
   const detailRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {

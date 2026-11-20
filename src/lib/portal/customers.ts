@@ -49,6 +49,8 @@ export type Customer = {
   since: string;
   /** The latest thing that happened on any of their records. */
   lastActivity: string;
+  /** When the plan next renews or ends, and which: null when there is no running plan with a date. */
+  renewal: Renewal | null;
   subscriptions: SubRow[];
   briefs: BriefRow[];
   enquiries: EnquiryRow[];
@@ -67,6 +69,24 @@ function stateOf(subs: SubRow[]): CustomerState {
   if (live.some((s) => s.status === "offered")) return "awaiting_payment";
   if (live.some((s) => s.status === "cancelled")) return "ended";
   return "lead";
+}
+
+export type Renewal = { at: string; kind: "renews" | "ends" | "overdue" };
+
+/**
+ * The date that matters most on a customer's plans: when the next payment is due, or when a plan that is being
+ * cancelled ends. A plan whose payment has failed counts as overdue from its renewal date. Test-mode plans are ignored.
+ * With several plans, the soonest date wins, and a plan that is overdue always comes first.
+ */
+export function renewalOf(subs: SubRow[]): Renewal | null {
+  const dated = subs
+    .filter(real)
+    .filter((s) => running(s) && s.current_period_end)
+    .map((s): Renewal => ({ at: s.current_period_end as string, kind: s.status === "past_due" ? "overdue" : s.cancel_at_period_end ? "ends" : "renews" }));
+  if (dated.length === 0) return null;
+  const overdue = dated.filter((d) => d.kind === "overdue");
+  const pool = overdue.length ? overdue : dated;
+  return [...pool].sort((a, b) => a.at.localeCompare(b.at))[0];
 }
 
 const key = (email: string) => email.trim().toLowerCase();
@@ -98,6 +118,7 @@ export function buildCustomers(subs: SubRow[], briefs: BriefRow[], enquiries: En
       state: stateOf(r.subs),
       monthlyPence: r.subs.filter(real).filter(running).reduce((sum, s) => sum + s.monthly_pence, 0),
       since: earliest([...r.subs.map((s) => s.created_at), ...r.briefs.map((b) => b.created_at), ...r.enquiries.map((e) => e.created_at)]),
+      renewal: renewalOf(r.subs),
       lastActivity: latest([
         ...r.subs.flatMap((s) => [s.created_at, s.last_payment_at]),
         ...r.briefs.flatMap((b) => [b.created_at, b.updated_at]),
@@ -112,7 +133,7 @@ export function buildCustomers(subs: SubRow[], briefs: BriefRow[], enquiries: En
 }
 
 export type CustomerFilter = "all" | CustomerState;
-export type CustomerSort = "recent" | "name" | "monthly";
+export type CustomerSort = "recent" | "name" | "monthly" | "renewal";
 
 /** The directory as shown: filtered by state, matched against a search, and sorted. */
 export function viewCustomers(all: Customer[], opts: { filter: CustomerFilter; search: string; sort: CustomerSort }): Customer[] {
@@ -127,8 +148,20 @@ export function viewCustomers(all: Customer[], opts: { filter: CustomerFilter; s
     c.enquiries.some((e) => e.reference.toLowerCase().includes(q));
   const rows = all.filter((c) => (opts.filter === "all" || c.state === opts.filter) && hit(c));
   const label = (c: Customer) => (c.business || c.name || c.email).toLowerCase();
+  // Soonest renewal first. Overdue ones lead, and customers with no date at all go last.
+  const byRenewal = (a: Customer, b: Customer) => {
+    if (!a.renewal || !b.renewal) return a.renewal ? -1 : b.renewal ? 1 : label(a).localeCompare(label(b));
+    const rank = (c: Customer) => (c.renewal?.kind === "overdue" ? 0 : 1);
+    return rank(a) - rank(b) || a.renewal.at.localeCompare(b.renewal.at);
+  };
   return rows.sort((a, b) =>
-    opts.sort === "name" ? label(a).localeCompare(label(b)) : opts.sort === "monthly" ? b.monthlyPence - a.monthlyPence || label(a).localeCompare(label(b)) : b.lastActivity.localeCompare(a.lastActivity),
+    opts.sort === "name"
+      ? label(a).localeCompare(label(b))
+      : opts.sort === "monthly"
+        ? b.monthlyPence - a.monthlyPence || label(a).localeCompare(label(b))
+        : opts.sort === "renewal"
+          ? byRenewal(a, b)
+          : b.lastActivity.localeCompare(a.lastActivity),
   );
 }
 

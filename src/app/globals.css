@@ -16654,3 +16654,64 @@ body:has(.dash-header) {
     line-height: 1.2;
   }
 }
+
+/* Customers list: the renewal date, with trouble in the accent colour and an ending plan quieter. */
+.renewal--overdue {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+.renewal--ends {
+  color: var(--color-ink-2);
+}
+
+/* Today: the business figures in one quiet line, the two day-to-day lists side by side, and a pointer to the full screen. */
+.today__summary {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.today__summary a {
+  color: inherit;
+}
+.today__cols--even {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+@media (max-width: 899px) {
+  .today__cols--even {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* A website or message row: the name with what it is underneath, and the date on the right. */
+.rows__link > span:first-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.rows__link > span:first-child .rows__sub {
+  margin-left: 0;
+}
+.rows__when {
+  flex: none;
+  color: var(--color-ink-2);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.panel__more {
+  margin: 10px 0 0;
+  font-size: 14px;
+}
+.panel__more a {
+  color: var(--color-ink-2);
+}
+/* Customers list: air between the monthly price and the renewal date. */
+.cust .admin-table th:nth-child(4),
+.cust .admin-table td:nth-child(4) {
+  padding-left: 28px;
+}
+@media (max-width: 719px) {
+  .cust .admin-table th:nth-child(4),
+  .cust .admin-table td:nth-child(4) {
+    padding-left: 0;
+  }
+}

@@ -42,16 +42,16 @@ type Tab = "overview" | "customers" | "enquiries" | "builds" | "quotes" | "subsc
 
 const TABS: Tab[] = ["overview", "customers", "enquiries", "builds", "quotes", "subscriptions", "orders", "approvals", "projects", "ai"];
 const TAB_INFO: Record<Tab, { group: string; title: string }> = {
-  overview: { group: "Overview", title: "Today" },
+  overview: { group: "Today", title: "Today" },
+  builds: { group: "Websites", title: "Websites" },
+  enquiries: { group: "Inbox", title: "Inbox" },
   customers: { group: "Customers", title: "Customers" },
-  enquiries: { group: "Sales", title: "Enquiries" },
-  builds: { group: "Sales", title: "Website builds" },
-  quotes: { group: "Sales", title: "Quotes" },
-  subscriptions: { group: "Sales", title: "Website subscriptions" },
-  orders: { group: "Delivery", title: "Orders" },
-  projects: { group: "Delivery", title: "Projects" },
-  approvals: { group: "Delivery", title: "Approvals" },
-  ai: { group: "Studio", title: "AI agents" },
+  subscriptions: { group: "More", title: "Subscriptions" },
+  quotes: { group: "More", title: "Quotes" },
+  orders: { group: "More", title: "Orders" },
+  projects: { group: "More", title: "Projects" },
+  approvals: { group: "More", title: "Approvals" },
+  ai: { group: "More", title: "AI agents" },
 };
 
 /** The section named in the address hash (set by the dashboard menu), or the overview. */

@@ -20,32 +20,25 @@ const CUSTOMER: DashGroup[] = [
   { label: "Help", href: "/account/help", items: [] },
 ];
 
-/** Staff dashboard sections. Items switch the admin view (it listens for the address hash). */
+/**
+ * Staff dashboard sections. Items switch the admin view (it listens for the address hash). The four places used every
+ * day are plain links; everything used less often sits under More.
+ */
 const STAFF: DashGroup[] = [
   { label: "Today", href: "/admin#overview", items: [] },
+  { label: "Websites", href: "/admin#builds", items: [] },
+  { label: "Inbox", href: "/admin#enquiries", items: [] },
   { label: "Customers", href: "/admin#customers", items: [] },
   {
-    label: "Sales",
+    label: "More",
     items: [
-      { label: "Enquiries", hint: "New leads from the site", href: "/admin#enquiries" },
-      { label: "Website builds", hint: "Briefs, previews and approvals", href: "/admin#builds" },
       { label: "Subscriptions", hint: "Plans, payment links and cancellations", href: "/admin#subscriptions" },
+      { label: "Quotes", hint: "Bespoke: sent, accepted and declined", href: "/admin#quotes" },
+      { label: "Orders", hint: "Bespoke: stages, updates and client invites", href: "/admin#orders" },
+      { label: "Projects", hint: "Bespoke: messages and files", href: "/admin#projects" },
+      { label: "Approvals", hint: "Bespoke: client sign-offs", href: "/admin#approvals" },
+      { label: "AI agents", hint: "Tasks, budget and briefing", href: "/admin#ai" },
     ],
-  },
-  // The quoted, bespoke-project route: quotes, staged orders, project messages and sign-offs. Kept together, apart
-  // from the monthly-website work that fills most days.
-  {
-    label: "Bespoke projects",
-    items: [
-      { label: "Quotes", hint: "Sent, accepted and declined", href: "/admin#quotes" },
-      { label: "Orders", hint: "Stages, updates and client invites", href: "/admin#orders" },
-      { label: "Projects", hint: "Messages and files", href: "/admin#projects" },
-      { label: "Approvals", hint: "Client sign-offs", href: "/admin#approvals" },
-    ],
-  },
-  {
-    label: "Studio",
-    items: [{ label: "AI agents", hint: "Tasks, budget and briefing", href: "/admin#ai" }],
   },
 ];
 

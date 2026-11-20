@@ -14,12 +14,19 @@ import {
   type CustomerFilter,
   type CustomerSort,
   type EnquiryRow,
+  type Renewal,
   type SubRow,
 } from "@/lib/portal/customers";
 
 const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
 const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 const date = (iso: string | null | undefined) => (iso ? day.format(new Date(iso)) : "");
+
+/** The renewal as a short phrase: the date, or what is wrong with it. */
+function renewalText(r: Renewal): string {
+  const d = day.format(new Date(r.at));
+  return r.kind === "overdue" ? `Overdue, due ${d}` : r.kind === "ends" ? `Ends ${d}` : d;
+}
 
 const SUB_STATUS: Record<string, string> = { offered: "Link sent", active: "Active", past_due: "Payment overdue", cancelled: "Ended", paid: "Paid", expired: "Expired" };
 const FILTERS: { id: CustomerFilter; label: string }[] = [
@@ -111,6 +118,7 @@ export function CustomersAdmin({ client, tenantId }: { client: SupabaseClient; t
           <option value="recent">Latest activity</option>
           <option value="name">Name</option>
           <option value="monthly">Monthly payment</option>
+          <option value="renewal">Renewal date</option>
         </select>
       </div>
       <div className="seg" role="group" aria-label="Show">
@@ -129,7 +137,7 @@ export function CustomersAdmin({ client, tenantId }: { client: SupabaseClient; t
         <table className="admin-table admin-table--stack admin-table--list">
           <thead>
             <tr>
-              <th scope="col">Customer</th><th scope="col">Status</th><th scope="col">Plan</th><th scope="col" className="admin-table__num">Monthly</th><th scope="col">Last activity</th>
+              <th scope="col">Customer</th><th scope="col">Plan</th><th scope="col" className="admin-table__num">Monthly</th><th scope="col">Renews</th><th scope="col">Status</th><th scope="col">Last activity</th>
             </tr>
           </thead>
           <tbody>
@@ -141,9 +149,10 @@ export function CustomersAdmin({ client, tenantId }: { client: SupabaseClient; t
                     <a className="cust-name" href={`#customers/${encodeURIComponent(c.email)}`}>{c.business || c.name || c.email}</a>
                     <span className="cust-sub">{c.business && c.name ? `${c.name} · ${c.email}` : c.business || c.name ? c.email : ""}</span>
                   </td>
-                  <td data-label="Status"><span className={`state state--${c.state}`}>{STATE_LABEL[c.state]}</span></td>
                   <td data-label="Plan">{plan ? plan.package_name : c.briefs[0] ? "Website in progress" : "None yet"}</td>
                   <td data-label="Monthly" className="admin-table__num">{c.monthlyPence > 0 ? money.format(c.monthlyPence / 100) : "–"}</td>
+                  <td data-label="Renews">{c.renewal ? <span className={`renewal renewal--${c.renewal.kind}`}>{renewalText(c.renewal)}</span> : "–"}</td>
+                  <td data-label="Status"><span className={`state state--${c.state}`}>{STATE_LABEL[c.state]}</span></td>
                   <td data-label="Last activity">{date(c.lastActivity)}</td>
                 </tr>
               );
