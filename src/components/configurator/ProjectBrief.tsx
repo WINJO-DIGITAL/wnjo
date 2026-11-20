@@ -6,7 +6,8 @@ import { BriefWizard, type WizardApi } from "@/components/account/BriefWizard";
 import { EMPTY_BRIEF } from "@/lib/website-brief";
 import styles from "./Configurator.module.css";
 
-const TEMPLATE_SITES_ON = process.env.NEXT_PUBLIC_TEMPLATE_SITES === "on";
+// The ten business categories are always asked (the AI template builder is shelved, see BuildsPanel).
+const TYPES_ON = true;
 
 /**
  * The six questions, straight after the short "Own your website" form, on the same screen. The customer holds a brief
@@ -87,7 +88,7 @@ export function ProjectBrief({ briefId, pass, reference, name, businessName, ema
           <h2 className="h2">Now tell us about your website</h2>
           <p className="muted">A few quick questions, and then we&apos;ll write your proposal. Nothing to pay yet, and you can stop and come back from the link in your email.</p>
         </div>
-        <BriefWizard initial={EMPTY_BRIEF} name={name} businessName={businessName} typesOn={TEMPLATE_SITES_ON} api={api} onSent={() => setSent(true)} bespoke />
+        <BriefWizard initial={EMPTY_BRIEF} name={name} businessName={businessName} typesOn={TYPES_ON} api={api} onSent={() => setSent(true)} bespoke />
       </div>
     </div>
   );

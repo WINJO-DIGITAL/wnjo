@@ -333,8 +333,11 @@ function DetailsThanks({ name, onContinue }: { name: string; onContinue: () => v
   );
 }
 
-/** The template-site questions stay hidden from customers until the owner sets NEXT_PUBLIC_TEMPLATE_SITES to "on". */
-const TEMPLATE_SITES_ON = process.env.NEXT_PUBLIC_TEMPLATE_SITES === "on";
+/**
+ * The customer form always asks for the kind of business using the ten broad categories (see business-categories.ts).
+ * The AI template builder is shelved: customers can't choose it, and its code stays in place for later.
+ */
+const TYPES_ON = true;
 
 /**
  * The details form for a website paid for through the short checkout, one short step at a time. Progress is saved on
@@ -411,7 +414,7 @@ function BriefDetailsCard({
     };
   }, [client, briefId]);
 
-  return <BriefWizard initial={initial} name={savedName === UNNAMED ? "" : savedName} businessName={savedBusiness} typesOn={TEMPLATE_SITES_ON} api={api} onSent={onSaved} bespoke={bespoke} />;
+  return <BriefWizard initial={initial} name={savedName === UNNAMED ? "" : savedName} businessName={savedBusiness} typesOn={TYPES_ON} api={api} onSent={onSaved} bespoke={bespoke} />;
 }
 
 /** Opens the customer's private preview in a new tab. The address comes from the server, only for the website's owner. */
