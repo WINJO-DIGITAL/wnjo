@@ -78,6 +78,8 @@ type Call = (payload: Record<string, unknown>, url?: string) => Promise<{ ok: bo
  */
 /** Off while every website is built by hand. The switch is kept here so the AI option can come back later. */
 const BUILD_MODE_CHOICE_ON = false;
+/** AI controls are shelved: every website is built by hand until further notice. */
+const AI_CONTROLS_ON = false;
 
 function BuildModeSwitch({ client }: { client: SupabaseClient }) {
   const [mode, setMode] = useState<"auto" | "manual" | null>(null);
@@ -126,6 +128,11 @@ function BuildModeSwitch({ client }: { client: SupabaseClient }) {
 }
 
 /** The website named in the address (#builds/<id>), so Today and other screens can open one directly. */
+/** Opens a website by its address (#builds/<id>), or closes it if it is already open. Called from a click, never during render. */
+function openBriefHash(id: string, selected: string | null): void {
+  window.location.hash = id === selected ? "builds" : `builds/${id}`;
+}
+
 function briefFromHash(): string | null {
   if (typeof window === "undefined") return null;
   const m = window.location.hash.match(/^#builds\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i);
@@ -149,7 +156,7 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   // The detail is shown under the table, so bring it into view when a brief is opened (on a phone it is far below).
   const detailRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (selected) detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (selected) window.scrollTo({ top: 0 });
   }, [selected]);
 
   const load = useCallback(() => {
@@ -187,9 +194,7 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   );
 
   const current = rows.find((r) => r.id === selected) ?? null;
-  const openBrief = (id: string) => {
-    window.location.hash = id === selected ? "builds" : `builds/${id}`;
-  };
+  const openBrief = (id: string) => openBriefHash(id, selected);
   const stages = (Object.keys(STAGES) as Stage[]).filter((stage) => rows.some((row) => row.stage === stage));
   const listed = stageFilter === "all" ? rows : rows.filter((row) => row.stage === stageFilter);
   return (
@@ -208,52 +213,32 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
           ))}
         </div>
       )}
-      <div className="table-wrap" role="region" aria-label="Website briefs" tabIndex={0}>
-      <table className="admin-table admin-table--list admin-table--stack admin-table--websites">
-        <thead>
-          <tr>
-            <th scope="col">Website</th>
-            <th scope="col">Plan</th>
-            <th scope="col">Stage</th>
-            <th scope="col" className="admin-table__end">Received</th>
-          </tr>
-        </thead>
-        <tbody>
-          {listed.map((r) => (
-            <tr key={r.id} aria-selected={r.id === selected} className="admin-table__row" onClick={() => openBrief(r.id)}>
-              <td data-label="Website">
-                <button
-                  type="button"
-                  className="admin-table__open"
-                  aria-expanded={r.id === selected}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openBrief(r.id);
-                  }}
-                >
-                  {r.business_name || r.name}
-                </button>
-                <span className="admin-table__sub">{r.reference} · {when.format(new Date(r.created_at))}</span>
-              </td>
-              <td data-label="Plan">
+      <ul className="website-cards" aria-label="Website briefs">
+        {listed.map((r) => (
+          <li key={r.id}>
+            <button type="button" className="website-card" aria-expanded={r.id === selected} onClick={() => openBrief(r.id)}>
+              <span className="website-card__top">
+                <span className="website-card__name">{r.business_name || r.name}</span>
+                <span className="website-card__stage">{staffStageLabel(r.stage)}</span>
+              </span>
+              <span className="website-card__meta">
                 {r.route === "proposal" ? "Bespoke" : r.figures.package}
-                <span className="admin-table__sub">
-                  {r.figures.mode === "monthly" ? `${pounds(r.figures.monthly)} a month` : pounds(r.figures.oneOffTotal)}
-                </span>
-              </td>
-              <td data-label="Stage">{staffStageLabel(r.stage)}</td>
-              <td data-label="Received" className="admin-table__end">{when.format(new Date(r.created_at))}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      </div>
+                {" · "}
+                {r.figures.mode === "monthly" ? `${pounds(r.figures.monthly)} a month` : pounds(r.figures.oneOffTotal)}
+                {" · "}
+                {when.format(new Date(r.created_at))}
+              </span>
+              <span className="website-card__ref">{r.reference}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
       {listed.length === 0 && <p className="lede">No websites at that stage.</p>}
       </div>
       {current && (
         <div id="brief-detail" ref={detailRef}>
-          <button type="button" className="builds__back" onClick={() => { window.location.hash = "builds"; }}>
-            All websites
+          <button type="button" className="arrow-link builds__back" onClick={() => { window.location.hash = "builds"; }}>
+            ← All websites
           </button>
           <BriefDetail key={current.id} client={client} row={current} call={call} onChanged={load} />
         </div>
@@ -490,7 +475,7 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
         {DETAIL_TABS.map((t) => (
           <button key={t.id} type="button" role="tab" id={`btab-${row.id}-${t.id}`} aria-selected={tab === t.id} aria-controls={`bpanel-${row.id}`} className="tabs__tab" onClick={() => setTab(t.id)}>
             {t.label}
-            {t.id === "approvals" && pending > 0 && <span className="tabs__count">{pending}</span>}
+            {t.id === "approvals" && pending > 0 && ["preview", "changes", "approval", "live"].includes(row.stage) && <span className="tabs__count">{pending}</span>}
           </button>
         ))}
       </div>
@@ -592,34 +577,6 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
         <div className="stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
           <StageControl row={row} path={path} busy={busy} onMove={(stage, note) => act({ action: "stage", stage, note }, `Moved to ${staffStageLabel(stage)}.`)} />
 
-          {GO_LIVE_STAGES.includes(row.stage) && (
-            <GoLivePanel
-              row={row}
-              busy={busy}
-              call={call}
-              qualityApproved={state.quality === "approved"}
-              buildReleased={releasedBuild}
-              proposalAccepted={Boolean(accepted)}
-              onGoLive={(qualityChecked) => act({ action: "go-live", qualityChecked }, "The website is live.")}
-            />
-          )}
-
-          <ExpectedDate key={`${row.id}:${row.expected_by ?? ""}`} row={row} busy={busy} act={act} />
-
-          <HandBuilt row={row} call={call} onChanged={onChanged} />
-
-          <AiPanel client={client} row={row} revisions={revisions} call={call} onChanged={onChanged} />
-
-          <RevisionsPanel revisions={revisions} busy={busy} act={act} />
-
-          {row.route === "proposal" && (
-            <ProposalPanel key={proposals.map((p) => `${p.id}:${p.status}`).join()} proposals={proposals} busy={busy} act={act} />
-          )}
-
-          {row.route === "proposal" && row.figures.mode === "oneOff" && accepted && (
-            <HandoverPanel key={`${row.balance_paid_at ?? ""}:${row.handed_over_at ?? ""}`} row={row} busy={busy} act={act} onPack={() => void openPack()} />
-          )}
-
           {row.stage === "awaiting_payment" && (
             <div>
               <p className="admin-label">Payment link</p>
@@ -642,6 +599,37 @@ function BriefDetail({ client, row, call, onChanged }: { client: SupabaseClient;
               </button>
             </div>
           )}
+
+          <HandBuilt row={row} call={call} onChanged={onChanged} />
+
+          {GO_LIVE_STAGES.includes(row.stage) && (
+            <GoLivePanel
+              row={row}
+              busy={busy}
+              call={call}
+              qualityApproved={state.quality === "approved"}
+              buildReleased={releasedBuild}
+              proposalAccepted={Boolean(accepted)}
+              onGoLive={(qualityChecked) => act({ action: "go-live", qualityChecked }, "The website is live.")}
+            />
+          )}
+
+          {AI_CONTROLS_ON && <AiPanel client={client} row={row} revisions={revisions} call={call} onChanged={onChanged} />}
+
+          <RevisionsPanel revisions={revisions} busy={busy} act={act} />
+
+          {row.route === "proposal" && (
+            <ProposalPanel key={proposals.map((p) => `${p.id}:${p.status}`).join()} proposals={proposals} busy={busy} act={act} />
+          )}
+
+          {row.route === "proposal" && row.figures.mode === "oneOff" && accepted && (
+            <HandoverPanel key={`${row.balance_paid_at ?? ""}:${row.handed_over_at ?? ""}`} row={row} busy={busy} act={act} onPack={() => void openPack()} />
+          )}
+
+          <details className="build-more">
+            <summary>Expected date</summary>
+            <ExpectedDate key={`${row.id}:${row.expected_by ?? ""}`} row={row} busy={busy} act={act} />
+          </details>
         </div>
         )}
 
