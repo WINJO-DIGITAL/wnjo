@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AccountMenu } from "@/components/account/AccountMenu";
 import { NotificationsBell } from "@/components/account/NotificationsBell";
 import { Logo } from "@/components/Logo";
@@ -176,14 +177,41 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
   );
 }
 
-/** Phone navigation for staff. The desktop bar stays; this sits on the bottom edge so a thumb can reach it. */
+/** Phone navigation for staff. Portalled to the page, because a fixed bar inside the header (which blurs the background) sticks to the header instead of the bottom of the screen. */
 function StaffTabs({ groups, isHere }: { groups: DashGroup[]; isHere: (href: string) => boolean }) {
   const [moreOpen, setMoreOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const more = groups.find((group) => !group.href);
   const moreCurrent = more?.items.some((item) => isHere(item.href)) ?? false;
 
-  return (
+  useEffect(() => setMounted(true), []);
+
+  // Sit just above Safari's toolbar. That bar covers the bottom of the page and is not the home-indicator inset.
+  useEffect(() => {
+    const apply = () => {
+      const vv = window.visualViewport;
+      const lift = vv ? Math.max(0, Math.round(window.innerHeight - vv.offsetTop - vv.height)) : 0;
+      document.documentElement.style.setProperty("--staff-tabs-lift", `${lift}px`);
+    };
+    apply();
+    window.visualViewport?.addEventListener("resize", apply);
+    window.visualViewport?.addEventListener("scroll", apply);
+    window.addEventListener("resize", apply);
+    return () => {
+      window.visualViewport?.removeEventListener("resize", apply);
+      window.visualViewport?.removeEventListener("scroll", apply);
+      window.removeEventListener("resize", apply);
+      document.documentElement.style.removeProperty("--staff-tabs-lift");
+    };
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <>
+      {moreOpen && more && (
+        <button type="button" className="dash-tabs-scrim" aria-label="Close menu" onClick={() => setMoreOpen(false)} />
+      )}
       {moreOpen && more && (
         <div className="dash-tabs-sheet" id="staff-more">
           {more.items.map((item) => (
@@ -215,6 +243,7 @@ function StaffTabs({ groups, isHere }: { groups: DashGroup[]; isHere: (href: str
           ),
         )}
       </nav>
-    </>
+    </>,
+    document.body,
   );
 }
