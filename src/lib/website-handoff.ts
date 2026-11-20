@@ -5,7 +5,7 @@
  */
 import { extrasRows } from "@/lib/brief-extras";
 import { SECTOR_PRESETS } from "@/lib/site-template/presets";
-import { GOALS, STYLES, type BriefFile, type WebsiteBrief } from "@/lib/website-brief";
+import { categoryLines, GOALS, STYLES, type BriefFile, type WebsiteBrief } from "@/lib/website-brief";
 
 export type HandoffFile = Pick<BriefFile, "name" | "type" | "size" | "role" | "alt"> & { /** A short-lived download link, when one was made. */ url?: string };
 
@@ -76,6 +76,7 @@ export function buildHandoffBrief(input: HandoffInput): string {
         line("WhatsApp", answers?.whatsapp),
         line("Areas covered", p.areas || answers?.areas),
         line("Hours or availability", p.hours),
+        ...categoryLines(brief),
         line("Package", input.plan),
       ]),
     ].join("\n"),

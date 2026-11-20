@@ -10,6 +10,7 @@
 import { cleanExtras, EMPTY_EXTRAS, extrasRows, type BriefExtras } from "./brief-extras";
 import { cleanSiteAnswers, type SiteAnswers } from "@/lib/site-template/answers";
 import { SECTOR_PRESETS } from "@/lib/site-template/presets";
+import { CATEGORIES, CATEGORY_IDS } from "./business-categories";
 
 export const BRIEF_VERSION = 1;
 
@@ -102,6 +103,10 @@ export type WebsiteBrief = {
   site: SiteAnswers | null;
   /** The customer's own words for their business, when none of our sectors fits. Plain text. */
   otherBusinessType: string;
+  /** The category the customer picked first (see business-categories.ts), or "" before they pick. "other" means their own words. */
+  category: string;
+  /** The answers to the category's own questions, by question id. Empty when there is no category. */
+  categoryAnswers: Record<string, string>;
   /** What a first website needs for a business with no template. Used only when otherBusinessType is set. */
   profile: BusinessProfile;
   /** Extra questions for every brief: role, offer, what must be easy to find, look, and what to show. All optional. */
@@ -165,6 +170,8 @@ export const EMPTY_BRIEF: WebsiteBrief = {
   files: [],
   site: null,
   otherBusinessType: "",
+  category: "",
+  categoryAnswers: {},
   profile: EMPTY_PROFILE,
   extras: EMPTY_EXTRAS,
 };
@@ -270,6 +277,8 @@ export function cleanBrief(input: unknown, draftId?: string): WebsiteBrief {
     files,
     site: cleanSiteAnswers(o.site, Object.keys(SECTOR_PRESETS)),
     otherBusinessType: text(o.otherBusinessType, 80).replace(/<[^>]*>/g, "").trim(),
+    category: CATEGORY_IDS.includes(o.category as string) ? (o.category as string) : "",
+    categoryAnswers: cleanCategoryAnswers(o.categoryAnswers),
     profile: cleanProfile(o.profile),
     extras: cleanExtras(o.extras),
     ...cleanTypeStash(o.typeStash),
@@ -283,6 +292,17 @@ function cleanTypeStash(input: unknown): { typeStash?: TypeStash } {
   const site = cleanSiteAnswers(o.site, Object.keys(SECTOR_PRESETS));
   const other = text(o.other, 80).replace(/<[^>]*>/g, "").trim();
   return site || other ? { typeStash: { site, other } } : {};
+}
+
+/** Keeps only answers to the questions of the category picked, at a sensible length. Anything else is dropped. */
+function cleanCategoryAnswers(input: unknown): Record<string, string> {
+  if (!input || typeof input !== "object") return {};
+  const known = new Set(CATEGORIES.flatMap((c) => c.questions.map((q) => q.id)));
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(input as Record<string, unknown>).slice(0, 12)) {
+    if (known.has(key) && typeof value === "string") out[key] = text(value, 200);
+  }
+  return out;
 }
 
 /** Cleans the profile the form sends. Unknown choices are dropped; nothing is judged here. */
@@ -340,6 +360,13 @@ export function pagesBeyondBand(brief: WebsiteBrief, bandMax: number | null): nu
 const kb = (n: number) => (n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
 
 /** The profile as plain lines, for the email and the admin view. Empty answers are left out. */
+/** The answers to the category's own questions, in the question's own words, for the team and the writer. */
+export function categoryLines(brief: Pick<WebsiteBrief, "category" | "categoryAnswers">): string[] {
+  const cat = CATEGORIES.find((c) => c.id === brief.category);
+  if (!cat) return [];
+  return cat.questions.flatMap((q) => (brief.categoryAnswers[q.id]?.trim() ? [`${q.label} ${brief.categoryAnswers[q.id].trim()}`] : []));
+}
+
 export function profileLines(p: BusinessProfile): string[] {
   const out: string[] = [];
   if (p.services) out.push(`Offers: ${p.services.replace(/\n/g, "; ")}`);
@@ -371,6 +398,7 @@ export function formatBrief(brief: WebsiteBrief): string {
     ...(brief.site ? [`Template site: ${SECTOR_PRESETS[brief.site.sector]?.label ?? brief.site.sector}, ${brief.site.answers.businessName || "no name yet"}`] : []),
     ...(brief.otherBusinessType ? [`Business type (their words): ${brief.otherBusinessType}`] : []),
     ...(brief.otherBusinessType ? profileLines(brief.profile) : []),
+    ...categoryLines(brief),
     ...extrasRows(brief.extras).map(([label, value]) => `${label} ${value}`),
     `Files: ${brief.files.length ? brief.files.map((f) => `${f.name} (${kb(f.size)})`).join(", ") : "none"}`,
   ];

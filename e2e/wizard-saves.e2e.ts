@@ -13,7 +13,7 @@ const services = (page: Page) => page.locator('textarea[id$="-services"]');
 async function toOfferStep(page: Page, query = "") {
   await page.goto(`/e2e-wizard${query}`);
   await page.fill("#wiz-biz", "Autism Initiatives");
-  await page.locator('label:has-text("Grooming")').first().click();
+  await page.locator('label:has-text("Health, beauty")').first().click();
   await page.click('button:has-text("Next")');
   await expect(page.locator(".wiz__step")).toContainText("What you offer");
   await expect(page.locator(".wiz__saved")).toHaveText("Saved");
@@ -27,7 +27,7 @@ test("backgrounding the page saves what was just typed", async ({ page }) => {
     document.dispatchEvent(new Event("visibilitychange"));
   });
   // At once: the old timer waited 800ms, which a hidden phone page never gets to run.
-  await expect.poll(async () => (await stored(page))?.brief?.site?.answers?.servicesText, { timeout: 250 }).toBe("Typed, then the app goes to the background");
+  await expect.poll(async () => (await stored(page))?.brief?.profile?.services, { timeout: 250 }).toBe("Typed, then the app goes to the background");
 });
 
 test("typing and then reloading straight away keeps the answer", async ({ page }) => {
@@ -40,7 +40,7 @@ test("typing and then reloading straight away keeps the answer", async ({ page }
 test("a step change is saved at once", async ({ page }) => {
   await page.goto("/e2e-wizard");
   await page.fill("#wiz-biz", "Autism Initiatives");
-  await page.locator('label:has-text("Grooming")').first().click();
+  await page.locator('label:has-text("Health, beauty")').first().click();
   await page.click('button:has-text("Next")');
   await expect.poll(async () => (await stored(page))?.step, { timeout: 400 }).toBe("offer");
 });
@@ -49,7 +49,7 @@ test("switching to another tab of the account page saves, and shows the answers 
   await toOfferStep(page);
   await services(page).fill("Typed, then the tab is switched");
   await page.click("#harness-toggle");
-  await expect.poll(async () => (await stored(page))?.brief?.site?.answers?.servicesText).toBe("Typed, then the tab is switched");
+  await expect.poll(async () => (await stored(page))?.brief?.profile?.services).toBe("Typed, then the tab is switched");
   await page.click("#harness-toggle");
   await expect(services(page)).toHaveValue("Typed, then the tab is switched");
 });
@@ -61,7 +61,7 @@ test("slow saves never overlap, and the newest answer is the one kept", async ({
     await services(page).fill(text);
     await page.waitForTimeout(1000);
   }
-  await expect.poll(async () => (await stored(page))?.brief?.site?.answers?.servicesText, { timeout: 15_000 }).toBe("one two three four");
+  await expect.poll(async () => (await stored(page))?.brief?.profile?.services, { timeout: 15_000 }).toBe("one two three four");
   await expect(page.locator(".wiz__saved")).toHaveText("Saved", { timeout: 15_000 });
   expect(await page.evaluate(() => (window as unknown as { __maxActive?: number }).__maxActive)).toBe(1);
 });
@@ -94,16 +94,16 @@ test("a failed load keeps the form closed and never saves over the stored answer
 test("switching the kind of business keeps what was typed, both ways, even after a reload", async ({ page }) => {
   await page.goto("/e2e-wizard");
   await page.fill("#wiz-biz", "Autism Initiatives");
-  await page.locator('label:has-text("Grooming")').first().click();
+  await page.locator('label:has-text("Health, beauty")').first().click();
   await page.click('button:has-text("Next")');
   await services(page).fill("Support sessions £40");
   await page.locator('input[type="tel"]').first().fill("01700 900123");
   await page.locator('input[type="email"]').first().fill("test@example.com");
-  await page.locator('input[id$="-address"]').fill("12 Test Street, Preston");
+  await page.locator('input[id$="-diff"]').fill("Run by people with lived experience");
   await page.click('button:has-text("Back")');
 
-  // To "Another type of business": what both ask for comes with them.
-  await page.locator('label:has-text("Another type of business")').click();
+  // To "Something else": what was typed comes with the customer.
+  await page.locator('label:has-text("Something else")').click();
   await page.locator('input[placeholder^="For example: dog grooming"]').fill("Autism charity");
   await page.click('button:has-text("Next")');
   await expect(page.locator(".wiz__step")).toContainText("What you offer");
@@ -117,17 +117,23 @@ test("switching the kind of business keeps what was typed, both ways, even after
   await page.reload();
   await expect(services(page)).toHaveValue("Support sessions £40\nTraining for schools");
 
-  // And back to a type: the generic edits come across, and the address set aside comes back.
+  // Back to a category: the same details are still there.
   await page.click('button:has-text("Back")');
   await expect(page.locator('input[placeholder^="For example: dog grooming"]')).toHaveValue("Autism charity");
-  await page.locator('label:has-text("Grooming")').first().click();
+  await page.locator('label:has-text("Trades and home services")').first().click();
   await page.click('button:has-text("Next")');
   await expect(services(page)).toHaveValue("Support sessions £40\nTraining for schools");
-  await expect(page.locator('input[id$="-address"]')).toHaveValue("12 Test Street, Preston");
   await expect(page.locator('input[type="email"]').first()).toHaveValue("test@example.com");
+});
 
-  // Choosing "Another type" again offers the typed name straight back.
-  await page.click('button:has-text("Back")');
-  await page.locator('label:has-text("Another type of business")').click();
-  await expect(page.locator('input[placeholder^="For example: dog grooming"]')).toHaveValue("Autism charity");
+test("the category's own questions are kept with the details", async ({ page }) => {
+  await page.goto("/e2e-wizard");
+  await page.fill("#wiz-biz", "Autism Initiatives");
+  await page.locator('label:has-text("Charities, community")').first().click();
+  await page.click('button:has-text("Next")');
+  await expect(page.locator(".site-profile__category-title")).toHaveText("About your kind of business");
+  await page.locator('input[id$="-cat-who"]').fill("Families of autistic children");
+  await expect(page.locator(".wiz__saved")).toHaveText("Saved", { timeout: 5000 });
+  await page.reload();
+  await expect(page.locator('input[id$="-cat-who"]')).toHaveValue("Families of autistic children");
 });

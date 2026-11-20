@@ -1,9 +1,10 @@
 "use client";
 
 import { useId, useState } from "react";
-import { carryToAnswers, carryToProfile } from "@/lib/brief-type-switch";
+import { carryToProfile } from "@/lib/brief-type-switch";
+import { CATEGORIES, categoryById, OTHER_CATEGORY } from "@/lib/business-categories";
 import { DAYS, type DayAnswer, type RawAnswers } from "@/lib/site-template/answers";
-import { ABOUT_QUESTION, BUSINESS_GROUPS, SECTOR_PRESETS, type BusinessGroup } from "@/lib/site-template/presets";
+import { ABOUT_QUESTION, SECTOR_PRESETS } from "@/lib/site-template/presets";
 import { defaultLayout, LAYOUTS, type Layout, type Look } from "@/lib/site-template/schema";
 import { STYLES, STYLE_INFO } from "@/lib/site-template/styles";
 import { CUSTOMERS, FIRST_ACTIONS, PROFILE_LIMITS, TONES, type BusinessProfile, type FirstAction, type WebsiteBrief } from "@/lib/website-brief";
@@ -29,83 +30,63 @@ export const SITE_COLOURS = [
   { hex: "#14213d", label: "Midnight" },
 ] as const;
 
-const SECTOR_HINT: Record<string, string> = {
-  barber: "Services and prices, opening hours, and booking requests",
-  cafe: "Menu, opening hours, and table requests",
-  electrician: "Services, areas you cover, and quote requests",
-  physio: "Treatments and prices, opening hours, and appointment requests",
-  massage: "Treatments and prices, opening hours, and booking requests",
-  fitness: "Classes and sessions, opening hours, and trial requests",
-  "holiday-let": "Stays and prices, the places nearby, and date requests",
-  beauty: "Treatments and prices, opening hours, and booking requests",
-  plumbing: "Services, areas you cover, and quote requests",
-  building: "Services, areas you cover, and quote requests",
-  cleaning: "Services, areas you cover, and quote requests",
-};
-const GROUP_ORDER = Object.keys(BUSINESS_GROUPS) as BusinessGroup[];
 
 const emptyWeek = (): DayAnswer[] => DAYS.map((day) => ({ day, open: "", close: "" }));
 
 /**
- * Choosing the kind of business: the templates we have, grouped, and "Another type of business" with a typed box.
- * Nothing is pre-selected. Choosing a template starts its questions with blank opening times and the sector's look.
+ * Choosing the kind of business: one of the ten broad categories, or "Something else" with a typed box. Nothing is
+ * pre-selected. Choosing a category keeps every answer already given: the general details come with the customer, and
+ * a template type's answers carry across. Nothing is built from the category alone; it sets the questions asked.
  */
 export function BusinessTypeField({ brief, onChange }: { brief: WebsiteBrief; onChange: BriefChange }) {
   const id = useId();
   const site = brief.site;
-  // "Another type of business" is only selected when the customer picks it. Nothing is pre-selected for them.
-  const [otherMode, setOtherMode] = useState(brief.otherBusinessType !== "");
-  // Switching the kind of business never costs what was typed. What both kinds ask for is carried across, and what only
-  // one asks for (an address, ticked facts) is set aside and put back if the customer switches again.
-  const choose = (sector: string) => {
+  const [otherMode, setOtherMode] = useState(brief.category === OTHER_CATEGORY);
+  const chooseCategory = (catId: string) => {
+    const cat = categoryById(catId);
     setOtherMode(false);
-    const stash = brief.typeStash;
-    // Coming from "Another type": the generic details seed the answers, on top of anything set aside earlier.
-    const base: RawAnswers | undefined = site ? site.answers : carryToAnswers(brief.profile, stash?.site?.answers);
     onChange({
-      otherBusinessType: "",
-      typeStash: { site: stash?.site ?? null, other: brief.otherBusinessType || stash?.other || "" },
-      site: { sector, answers: { ...(base ?? {}), hours: base?.hours?.length ? base.hours : emptyWeek(), look: base?.look ?? SECTOR_PRESETS[sector].defaultLook, colour: base?.colour ?? SITE_COLOURS[0].hex } },
+      category: catId,
+      otherBusinessType: cat ? cat.label : "",
+      site: null,
+      profile: site ? carryToProfile(site.answers, brief.profile) : brief.profile,
     });
   };
   const chooseOther = () => {
     setOtherMode(true);
-    if (!site) return;
-    const stash = brief.typeStash;
     onChange({
+      category: OTHER_CATEGORY,
+      otherBusinessType: brief.category === OTHER_CATEGORY ? brief.otherBusinessType : "",
       site: null,
-      otherBusinessType: brief.otherBusinessType || stash?.other || "",
-      profile: carryToProfile(site.answers, brief.profile),
-      typeStash: { site, other: stash?.other ?? "" },
+      profile: site ? carryToProfile(site.answers, brief.profile) : brief.profile,
     });
   };
+  const picked = site ? "" : brief.category;
 
   return (
     <>
       <fieldset className={styles.group}>
         <legend className={styles.legend}>What kind of business is it?</legend>
+        <p className="field-hint">Pick the one closest to yours. It sets the questions we ask next.</p>
         <div className={`${styles.choices} ${styles.cols2}`}>
-          {/* One grid, in group order. Each tile names its group, so the groups stay visible without a half-empty row each. */}
-          {GROUP_ORDER.flatMap((g) => Object.values(SECTOR_PRESETS).filter((p) => p.group === g)).map((p) => (
-            <label key={p.id} className={styles.choice}>
-              <input type="radio" name={`${id}-sector`} checked={site?.sector === p.id} onChange={() => choose(p.id)} />
+          {CATEGORIES.map((c) => (
+            <label key={c.id} className={styles.choice}>
+              <input type="radio" name={`${id}-category`} checked={picked === c.id} onChange={() => chooseCategory(c.id)} />
               <span className={styles.choiceBody}>
-                <span className="site-tile__group">{BUSINESS_GROUPS[p.group].label}</span>
-                <span className={styles.choiceLabel}>{p.label}</span>
-                <span className={styles.choiceHint}>{SECTOR_HINT[p.id] ?? ""}</span>
+                <span className={styles.choiceLabel}>{c.label}</span>
+                <span className={styles.choiceHint}>{c.examples}</span>
               </span>
             </label>
           ))}
           <label className={styles.choice}>
-            <input type="radio" name={`${id}-sector`} checked={!site && otherMode} onChange={chooseOther} />
+            <input type="radio" name={`${id}-category`} checked={picked === OTHER_CATEGORY || otherMode} onChange={chooseOther} />
             <span className={styles.choiceBody}>
-              <span className="site-tile__group">Anything else</span>
-              <span className={styles.choiceLabel}>Another type of business</span>
-              <span className={styles.choiceHint}>Tell us what it is</span>
+              <span className={styles.choiceLabel}>Something else</span>
+              <span className={styles.choiceHint}>Tell us what it is in your own words</span>
             </span>
           </label>
         </div>
-        {!site && otherMode && (
+        {(picked === OTHER_CATEGORY || (otherMode && !site)) && (
           <div className="field site-other">
             <label htmlFor={`${id}-other`}>Tell us the type of business</label>
             <input
@@ -120,7 +101,6 @@ export function BusinessTypeField({ brief, onChange }: { brief: WebsiteBrief; on
           </div>
         )}
       </fieldset>
-
     </>
   );
 }
@@ -446,6 +426,25 @@ export function ProfileFields({ brief, onChange, errors }: { brief: WebsiteBrief
         <p className="field-hint">We match the wording to this. Pick the one closest to how you talk to customers.</p>
         {chips(TONES, p.tone, (v) => set({ tone: v }), "Tone")}
       </fieldset>
+
+      {categoryById(brief.category) && (
+        <div className="site-profile__category">
+          <h4 className="site-profile__category-title">About your kind of business</h4>
+          {categoryById(brief.category)!.questions.map((q) => (
+            <div key={q.id} className="field">
+              <label htmlFor={`${id}-cat-${q.id}`}>{q.label} <span className="optional">(optional)</span></label>
+              <p className="field-hint">{q.hint}</p>
+              <input
+                id={`${id}-cat-${q.id}`}
+                className="input"
+                maxLength={200}
+                value={brief.categoryAnswers[q.id] ?? ""}
+                onChange={(e) => onChange({ categoryAnswers: { ...brief.categoryAnswers, [q.id]: e.target.value } })}
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
