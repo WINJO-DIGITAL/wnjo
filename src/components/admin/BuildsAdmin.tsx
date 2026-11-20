@@ -5,6 +5,7 @@ import { openFileTab } from "@/lib/open-tab";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  STAGES,
   staffStageLabel,
   APPROVALS,
   APPROVAL_ORDER,
@@ -135,13 +136,15 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<BriefRow[] | null>(null);
   const [error, setError] = useState(false);
   const [selected, setSelected] = useState<string | null>(briefFromHash);
+  const [stageFilter, setStageFilter] = useState<Stage | "all">("all");
   useEffect(() => {
-    const onHash = () => {
-      const id = briefFromHash();
-      if (id) setSelected(id);
+    const sync = () => setSelected(briefFromHash());
+    window.addEventListener("hashchange", sync);
+    window.addEventListener("popstate", sync);
+    return () => {
+      window.removeEventListener("hashchange", sync);
+      window.removeEventListener("popstate", sync);
     };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
   }, []);
   // The detail is shown under the table, so bring it into view when a brief is opened (on a phone it is far below).
   const detailRef = useRef<HTMLDivElement | null>(null);
@@ -184,11 +187,29 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
   );
 
   const current = rows.find((r) => r.id === selected) ?? null;
+  const openBrief = (id: string) => {
+    window.location.hash = id === selected ? "builds" : `builds/${id}`;
+  };
+  const stages = (Object.keys(STAGES) as Stage[]).filter((stage) => rows.some((row) => row.stage === stage));
+  const listed = stageFilter === "all" ? rows : rows.filter((row) => row.stage === stageFilter);
   return (
-    <div className="stack" style={{ "--stack": "var(--space-6)", minWidth: 0 } as React.CSSProperties}>
+    <div className={current ? "builds builds--open stack" : "builds stack"} style={{ "--stack": "var(--space-6)", minWidth: 0 } as React.CSSProperties}>
+      <div className="builds__browse stack" style={{ "--stack": "var(--space-6)" } as React.CSSProperties}>
       <BuildModeSwitch client={client} />
+      {stages.length > 1 && (
+        <div className="seg seg--scroll" role="group" aria-label="Stage">
+          <button type="button" className="seg__item" aria-pressed={stageFilter === "all"} onClick={() => setStageFilter("all")}>
+            All <span className="seg__count">{rows.length}</span>
+          </button>
+          {stages.map((stage) => (
+            <button key={stage} type="button" className="seg__item" aria-pressed={stageFilter === stage} onClick={() => setStageFilter(stage)}>
+              {staffStageLabel(stage)} <span className="seg__count">{rows.filter((row) => row.stage === stage).length}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className="table-wrap" role="region" aria-label="Website briefs" tabIndex={0}>
-      <table className="admin-table admin-table--list">
+      <table className="admin-table admin-table--list admin-table--stack admin-table--websites">
         <thead>
           <tr>
             <th scope="col">Website</th>
@@ -198,37 +219,42 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
-            <tr key={r.id} aria-selected={r.id === selected} className="admin-table__row" onClick={() => setSelected(r.id === selected ? null : r.id)}>
-              <td>
+          {listed.map((r) => (
+            <tr key={r.id} aria-selected={r.id === selected} className="admin-table__row" onClick={() => openBrief(r.id)}>
+              <td data-label="Website">
                 <button
                   type="button"
                   className="admin-table__open"
                   aria-expanded={r.id === selected}
                   onClick={(e) => {
                     e.stopPropagation();
-                    setSelected(r.id === selected ? null : r.id);
+                    openBrief(r.id);
                   }}
                 >
                   {r.business_name || r.name}
                 </button>
-                <span className="admin-table__sub">{r.reference}</span>
+                <span className="admin-table__sub">{r.reference} · {when.format(new Date(r.created_at))}</span>
               </td>
-              <td>
+              <td data-label="Plan">
                 {r.route === "proposal" ? "Bespoke" : r.figures.package}
                 <span className="admin-table__sub">
                   {r.figures.mode === "monthly" ? `${pounds(r.figures.monthly)} a month` : pounds(r.figures.oneOffTotal)}
                 </span>
               </td>
-              <td>{staffStageLabel(r.stage)}</td>
-              <td className="admin-table__end">{when.format(new Date(r.created_at))}</td>
+              <td data-label="Stage">{staffStageLabel(r.stage)}</td>
+              <td data-label="Received" className="admin-table__end">{when.format(new Date(r.created_at))}</td>
             </tr>
           ))}
         </tbody>
       </table>
       </div>
+      {listed.length === 0 && <p className="lede">No websites at that stage.</p>}
+      </div>
       {current && (
         <div id="brief-detail" ref={detailRef}>
+          <button type="button" className="builds__back" onClick={() => { window.location.hash = "builds"; }}>
+            All websites
+          </button>
           <BriefDetail key={current.id} client={client} row={current} call={call} onChanged={load} />
         </div>
       )}

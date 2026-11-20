@@ -11,8 +11,8 @@ const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP
 const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
 const DAY_MS = 24 * 3600 * 1000;
 /** How many of each list the home shows before it points to the full screen. */
-const JOBS_SHOWN = 8;
-const MESSAGES_SHOWN = 6;
+const JOBS_SHOWN = 4;
+const MESSAGES_SHOWN = 3;
 
 type Sub = { id: string; reference: string; kind: string; status: string; name: string; business_name: string | null; email: string; package_name: string; monthly_pence: number; cancel_at_period_end: boolean; livemode: boolean | null; current_period_end: string | null; first_payment_at: string | null; created_at: string };
 type Need = { label: string; count: number; href: string };

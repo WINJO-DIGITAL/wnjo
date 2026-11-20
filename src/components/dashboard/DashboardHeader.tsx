@@ -99,7 +99,7 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
   };
 
   return (
-    <header className="dash-header" ref={barRef}>
+    <header className={`dash-header${variant === "staff" ? " dash-header--staff" : ""}`} ref={barRef}>
       <div className="dash-header__inner">
         <Link href="/" className="dash-brand" aria-label="WINJO DIGITAL home">
           <Logo />
@@ -171,6 +171,50 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
           </button>
         </nav>
       )}
+      {variant === "staff" && <StaffTabs groups={groups} isHere={isHere} />}
     </header>
+  );
+}
+
+/** Phone navigation for staff. The desktop bar stays; this sits on the bottom edge so a thumb can reach it. */
+function StaffTabs({ groups, isHere }: { groups: DashGroup[]; isHere: (href: string) => boolean }) {
+  const [moreOpen, setMoreOpen] = useState(false);
+  const more = groups.find((group) => !group.href);
+  const moreCurrent = more?.items.some((item) => isHere(item.href)) ?? false;
+
+  return (
+    <>
+      {moreOpen && more && (
+        <div className="dash-tabs-sheet" id="staff-more">
+          {more.items.map((item) => (
+            <a key={item.label} href={item.href} className="dash-tabs-sheet__item" aria-current={isHere(item.href) ? "page" : undefined} onClick={() => setMoreOpen(false)}>
+              <span className="dash-menu__label">{item.label}</span>
+              <span className="dash-menu__hint">{item.hint}</span>
+            </a>
+          ))}
+        </div>
+      )}
+      <nav className="dash-tabs" aria-label="Staff dashboard">
+        {groups.map((group) =>
+          group.href ? (
+            <a key={group.label} href={group.href} className="dash-tabs__item" aria-current={isHere(group.href) ? "page" : undefined} onClick={() => setMoreOpen(false)}>
+              {group.label}
+            </a>
+          ) : (
+            <button
+              key={group.label}
+              type="button"
+              className="dash-tabs__item"
+              aria-expanded={moreOpen}
+              aria-controls="staff-more"
+              data-current={moreCurrent ? "" : undefined}
+              onClick={() => setMoreOpen((open) => !open)}
+            >
+              {group.label}
+            </button>
+          ),
+        )}
+      </nav>
+    </>
   );
 }
