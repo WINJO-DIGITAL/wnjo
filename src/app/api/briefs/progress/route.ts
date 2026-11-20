@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   // A pass can save progress, never read it back: reading stored details always needs a signed-in, verified email.
   if (caller.kind === "pass" && body.action !== "save") return fail(401, "Please sign in again.");
   const customer = caller.kind === "customer" ? caller : null;
-  const limit = LIMITS_PER_ROUTE.briefDraft;
+  const limit = LIMITS_PER_ROUTE.briefProgress;
   if (await sharedRateLimited(db, "brief-progress", customer ? customer.userId : `pass:${briefId}`, limit.max, limit.windowSeconds)) return fail(429, "rate_limited");
 
   const { data } = await db.from("website_briefs").select("email, tenant_id, stage, route").eq("id", briefId).maybeSingle();

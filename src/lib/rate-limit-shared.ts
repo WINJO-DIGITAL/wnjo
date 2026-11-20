@@ -44,6 +44,9 @@ export const LIMITS_PER_ROUTE = {
   uploadUrl: { max: 40, windowSeconds: 10 * 60 },
   briefUpload: { max: 20, windowSeconds: 10 * 60 },
   briefDraft: { max: 120, windowSeconds: 10 * 60 },
+  // A signed-in customer's autosave while they fill in their details: a save follows every pause in typing, so a long
+  // form makes many of them. Too low a limit would refuse saves and look like the answers weren't kept.
+  briefProgress: { max: 600, windowSeconds: 10 * 60 },
   briefFeedback: { max: 20, windowSeconds: 10 * 60 },
   notify: { max: 30, windowSeconds: 10 * 60 },
 } as const;

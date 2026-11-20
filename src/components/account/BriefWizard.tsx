@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type TouchEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type TouchEvent } from "react";
 import { ExtraFields } from "@/components/configurator/ExtraFields";
 import { PAGE_CHOICES } from "@/lib/site-template/pages";
 import { DesignFields, FilesField, FunctionalityField, GoalsField, PagesField, type BriefChange } from "@/components/configurator/BriefSteps";
@@ -13,6 +13,8 @@ import { GOALS, STYLES, type BriefFile, type WebsiteBrief } from "@/lib/website-
 /** What the wizard asks of the server. Passed in, so the form can be tried without one. */
 export type WizardApi = {
   loadAllowance(): Promise<number | null>;
+  /** The saved answers, or null when there are none. It must throw when it can't tell (offline, signed out): an
+   *  unknown result is never treated as "nothing saved", or the next save would overwrite what the server holds. */
   loadProgress(): Promise<Progress | null>;
   /** What the customer gave at sign-up, so the form doesn't ask again. */
   loadKnown(): Promise<KnownContact | null>;
@@ -31,7 +33,12 @@ const HEADINGS: Record<StepId, string> = {
 };
 
 type SaveState = "idle" | "saving" | "saved" | "error";
-const SAVE_DELAY_MS = 800;
+/** How long after the last keystroke the answers are saved. A step change, leaving the page and hiding the app save at once. */
+const SAVE_DELAY_MS = 500;
+/** A failed save is tried again after each of these, so a patchy mobile connection doesn't lose the answers. */
+const RETRY_MS = [2000, 6000, 15000];
+const LOAD_RETRY_MS = [700, 1800];
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 const SWIPE_MIN_PX = 80;
 
 /**
@@ -71,6 +78,9 @@ export function BriefWizard({
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("idle");
+  // Set when the saved answers couldn't be opened: the form stays closed, so nothing can overwrite them with a blank one.
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   // A folder for this form's uploads. Kept across a resume, so earlier uploads stay with the form.
   const [draftId, setDraftId] = useState<string | null>(() => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : null));
   const dirty = useRef(false);
@@ -82,11 +92,30 @@ export function BriefWizard({
   const current: StepId = steps.includes(step) ? step : steps[0];
   const index = steps.indexOf(current);
 
-  // Load the plan's page allowance and any saved progress once, then show the form.
+  // Load the plan's page allowance and any saved progress, then show the form. If the saved answers can't be opened
+  // (offline, a dropped connection) the form is NOT shown blank: it waits and asks to try again, because a blank form
+  // saves over the answers the server already holds.
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const [pages, saved, knownContact] = await Promise.all([api.loadAllowance().catch(() => null), api.loadProgress().catch(() => null), api.loadKnown().catch(() => null)]);
+      setLoadFailed(false);
+      let saved: Progress | null | undefined;
+      for (let attempt = 0; attempt <= LOAD_RETRY_MS.length; attempt++) {
+        try {
+          saved = await api.loadProgress();
+          break;
+        } catch {
+          saved = undefined;
+          if (attempt < LOAD_RETRY_MS.length) await sleep(LOAD_RETRY_MS[attempt]);
+        }
+        if (cancelled) return;
+      }
+      if (cancelled) return;
+      if (saved === undefined) {
+        setLoadFailed(true);
+        return;
+      }
+      const [pages, knownContact] = await Promise.all([api.loadAllowance().catch(() => null), api.loadKnown().catch(() => null)]);
       if (cancelled) return;
       setAllowed(pages);
       setKnown(knownContact);
@@ -104,9 +133,9 @@ export function BriefWizard({
     return () => {
       cancelled = true;
     };
-    // The inputs are read once, on first load.
+    // The inputs are read on first load, and again only when the customer asks to try again.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadAttempt]);
 
   // The latest answers, so a save always sends what is on screen now.
   const latest = useRef<Progress | null>(null);
@@ -114,20 +143,80 @@ export function BriefWizard({
     latest.current = { name, businessName, brief, step: current, draftId };
   });
 
-  // Save a moment after the customer stops typing, and after they change step.
+  // Saves go one at a time, in order, so a slow earlier save can never land after a newer one. If answers change while a
+  // save is in flight, one more save follows it with the newest answers. A failed save is tried again a few times.
+  const inFlight = useRef(false);
+  const queued = useRef(false);
+  const retries = useRef(0);
+  const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // The save calls itself again for a retry or a queued change, through this ref.
+  const persistRef = useRef<() => Promise<void>>(async () => {});
+  const persist = useCallback(async () => {
+    if (inFlight.current) {
+      queued.current = true;
+      return;
+    }
+    const progress = latest.current;
+    if (!progress) return;
+    if (retryTimer.current) clearTimeout(retryTimer.current);
+    inFlight.current = true;
+    setSaveState("saving");
+    let ok = false;
+    try {
+      ok = await api.saveProgress(progress);
+    } catch {
+      ok = false;
+    }
+    inFlight.current = false;
+    if (!ok) {
+      setSaveState("error");
+      const wait = RETRY_MS[retries.current++];
+      if (wait !== undefined) retryTimer.current = setTimeout(() => void persistRef.current(), wait);
+      return;
+    }
+    retries.current = 0;
+    if (queued.current) {
+      queued.current = false;
+      void persistRef.current();
+      return;
+    }
+    setSaveState("saved");
+  }, [api]);
+  useEffect(() => {
+    persistRef.current = persist;
+  }, [persist]);
+
+  // Save a moment after the customer stops typing, and straight away when they change step.
+  const lastStep = useRef<StepId | null>(null);
+  useEffect(() => {
+    if (loaded && lastStep.current === null) lastStep.current = current;
+  }, [loaded, current]);
   useEffect(() => {
     if (!loaded || !dirty.current) return;
-    const t = setTimeout(() => {
-      const progress = latest.current;
-      if (!progress) return;
-      setSaveState("saving");
-      void api
-        .saveProgress(progress)
-        .catch(() => false)
-        .then((ok) => setSaveState(ok ? "saved" : "error"));
-    }, SAVE_DELAY_MS);
+    const stepChanged = lastStep.current !== null && lastStep.current !== current;
+    lastStep.current = current;
+    const t = setTimeout(() => void persist(), stepChanged ? 0 : SAVE_DELAY_MS);
     return () => clearTimeout(t);
-  }, [loaded, brief, name, businessName, current, api]);
+  }, [loaded, brief, name, businessName, current, persist]);
+
+  // Leaving the page, switching to another app, or moving to another tab of the account page must not lose the last few
+  // seconds: a phone freezes a hidden page's timers, and may discard the page altogether. Save at once in each case.
+  useEffect(() => {
+    if (!loaded) return;
+    const flush = () => {
+      if (dirty.current) void persistRef.current();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", flush);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
+  }, [loaded]);
 
   // Each step starts at its heading, so a screen reader and a phone both land in the right place.
   useEffect(() => {
@@ -205,6 +294,20 @@ export function BriefWizard({
     else setMessage(result.error);
   };
 
+  if (loadFailed) {
+    return (
+      <div className="stack" style={{ "--stack": "var(--space-3)" } as CSSProperties}>
+        <p className="field-error" role="alert">
+          We couldn&apos;t open your saved answers just now, so we haven&apos;t changed anything. Check your connection and try again.
+        </p>
+        <div className="btn-row">
+          <button type="button" className="btn btn--primary" onClick={() => setLoadAttempt((n) => n + 1)}>
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
   if (!loaded) return <p className="acct-meta" role="status">Opening your form…</p>;
 
   const typeLabel = brief.site ? (SECTOR_PRESETS[brief.site.sector]?.label ?? "") : brief.otherBusinessType;

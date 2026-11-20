@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { openFileTab } from "@/lib/open-tab";
 import { PORTAL_STEPS, nextStepFor, portalStepIndex } from "@/lib/portal-steps";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -357,15 +357,22 @@ function BriefDetailsCard({
   bespoke: boolean;
   onSaved: () => void;
 }) {
+  // The last sign-in token seen, so a save can be sent at once when the page is being left, without waiting to read the
+  // session first. The server still checks it every time.
+  const tokenRef = useRef<string | null>(null);
   const api = useMemo<WizardApi>(() => {
     // One place for the signed-in call, so every request is made the same way.
-    const call = async (path: string, body: unknown): Promise<{ ok: boolean; json: Record<string, unknown> | null } | null> => {
+    const post = async (token: string, path: string, body: unknown, keepalive: boolean): Promise<{ ok: boolean; json: Record<string, unknown> | null } | null> => {
+      const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body), keepalive }).catch(() => null);
+      if (!res) return null;
+      return { ok: res.ok, json: (await res.json().catch(() => null)) as Record<string, unknown> | null };
+    };
+    const call = async (path: string, body: unknown, keepalive = false): Promise<{ ok: boolean; json: Record<string, unknown> | null } | null> => {
       const { data } = await client.auth.getSession();
       const token = data.session?.access_token;
       if (!token) return null;
-      const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }).catch(() => null);
-      if (!res) return null;
-      return { ok: res.ok, json: (await res.json().catch(() => null)) as Record<string, unknown> | null };
+      tokenRef.current = token;
+      return post(token, path, body, keepalive);
     };
     return {
       loadAllowance: async () => {
@@ -374,13 +381,24 @@ function BriefDetailsCard({
       },
       loadProgress: async () => {
         const r = await call("/api/briefs/progress", { briefId, action: "load" });
-        return r?.ok ? ((r.json?.progress as Progress | null) ?? null) : null;
+        // Not being able to ask (offline, signed out, a server error) is not the same as "nothing saved": the form
+        // waits and asks to try again rather than opening blank and saving over what is stored.
+        if (!r || !r.ok) throw new Error("progress_unavailable");
+        return (r.json?.progress as Progress | null) ?? null;
       },
       loadKnown: async () => {
         const r = await call("/api/briefs/known", { briefId });
         return r?.ok && typeof r.json?.email === "string" ? { email: r.json.email, phone: typeof r.json.phone === "string" ? r.json.phone : "" } : null;
       },
-      saveProgress: async (progress) => Boolean((await call("/api/briefs/progress", { briefId, action: "save", progress }))?.ok),
+      saveProgress: async (progress) => {
+        // keepalive lets the request finish even as the page closes or the app goes to the background.
+        const payload = { briefId, action: "save", progress };
+        const known = tokenRef.current;
+        const r = known ? await post(known, "/api/briefs/progress", payload, true) : await call("/api/briefs/progress", payload, true);
+        // A refused token (it expired) is read fresh and sent once more.
+        if (r && !r.ok && known) return Boolean((await call("/api/briefs/progress", payload, true))?.ok);
+        return Boolean(r?.ok);
+      },
       viewFile: async (file) => {
         const r = await call("/api/briefs/file", { briefId, path: file.path });
         return r?.ok && typeof r.json?.url === "string" ? r.json.url : null;

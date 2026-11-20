@@ -14,7 +14,7 @@ vi.mock("@/lib/quote-store", () => ({
     },
   }),
 }));
-vi.mock("@/lib/rate-limit-shared", () => ({ LIMITS_PER_ROUTE: { briefDraft: { max: 120, windowSeconds: 600 } }, sharedRateLimited: async () => state.limited }));
+vi.mock("@/lib/rate-limit-shared", () => ({ LIMITS_PER_ROUTE: { briefDraft: { max: 120, windowSeconds: 600 }, briefProgress: { max: 600, windowSeconds: 600 } }, sharedRateLimited: async () => state.limited }));
 vi.mock("@/lib/staff-auth", () => ({ customerFromRequest: async () => (state.signedIn ? { userId: "c1", email: "owner@shop.co.uk" } : null) }));
 
 import { briefPassKey, issueBriefPass } from "@/lib/brief-pass";
