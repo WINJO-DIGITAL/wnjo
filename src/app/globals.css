@@ -16945,3 +16945,42 @@ body:has(.dash-header) {
   padding: 8px 0;
   font-weight: 600;
 }
+
+/* Inbox: one light card per message instead of a seven-row table. */
+.inbox-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.inbox-card {
+  display: grid;
+  gap: 4px;
+  padding: var(--space-4);
+  border: 1px solid var(--color-line, rgba(0, 0, 0, 0.1));
+  border-radius: 14px;
+  background: #fff;
+}
+.inbox-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: baseline;
+}
+.inbox-card__date,
+.inbox-card__meta {
+  font-size: 0.8125rem;
+  opacity: 0.7;
+  margin: 0;
+}
+.inbox-card__email {
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.inbox-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}

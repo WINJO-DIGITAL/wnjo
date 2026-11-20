@@ -238,26 +238,24 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
       {shown.length === 0 ? (
         <p className="lede">{show === "open" && !q ? "Every enquiry has been dealt with." : "No enquiry matches that."}</p>
       ) : (
-        <table className="admin-table admin-table--stack">
-          <thead><tr><th scope="col">Name</th><th scope="col">Received</th><th scope="col">Reference</th><th scope="col">Type</th><th scope="col">Email</th><th scope="col">Next step</th><th scope="col"><span className="visually-hidden">Status</span></th></tr></thead>
-          <tbody>
-            {shown.map((r) => (
-              <tr key={r.id}>
-                <td data-label="Name"><a className="cust-name" href={`#customers/${encodeURIComponent(r.email.trim().toLowerCase())}`}>{r.name}</a></td>
-                <td data-label="Received">{when.format(new Date(r.created_at))}</td>
-                <td data-label="Reference">{r.reference}</td>
-                <td data-label="Type">{enquiryType(r)}</td>
-                <td data-label="Email"><a href={`mailto:${r.email}`}>{r.email}</a></td>
-                <td data-label="Next step">{(r.answers as { type?: string } | null)?.type === "website" ? <a href="#subscriptions" className="acct-meta">Create a payment link</a> : r.kind === "brief" && r.answers ? <QuoteFromBrief client={client} enquiryId={r.id} /> : <a href={`mailto:${r.email}`} className="acct-meta">Reply by email</a>}</td>
-                <td data-label="Status">
-                  <button type="button" className="btn btn--secondary btn--sm" disabled={busy === r.id} onClick={() => void setHandled(r, !r.handled_at)}>
-                    {r.handled_at ? "Reopen" : "Mark as dealt with"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul className="inbox-cards">
+          {shown.map((r) => (
+            <li key={r.id} className="inbox-card">
+              <div className="inbox-card__top">
+                <a className="cust-name" href={`#customers/${encodeURIComponent(r.email.trim().toLowerCase())}`}>{r.name}</a>
+                <span className="inbox-card__date">{when.format(new Date(r.created_at))}</span>
+              </div>
+              <p className="inbox-card__meta">{enquiryType(r)} · {r.reference}</p>
+              <a className="inbox-card__email" href={`mailto:${r.email}`}>{r.email}</a>
+              <div className="inbox-card__actions">
+                {(r.answers as { type?: string } | null)?.type === "website" ? <a href="#subscriptions" className="btn btn--secondary btn--sm">Create a payment link</a> : r.kind === "brief" && r.answers ? <QuoteFromBrief client={client} enquiryId={r.id} /> : <a href={`mailto:${r.email}`} className="btn btn--secondary btn--sm">Reply by email</a>}
+                <button type="button" className="btn btn--secondary btn--sm" disabled={busy === r.id} onClick={() => void setHandled(r, !r.handled_at)}>
+                  {r.handled_at ? "Reopen" : "Mark as dealt with"}
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
