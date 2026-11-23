@@ -17371,3 +17371,75 @@ body:has(.dash-header) {
     padding: 24px;
   }
 }
+
+/* Winjo Dispatch: the booking demo beside the headline, and the offer as one slim strip below the opener. */
+.dispatch-hero__visual {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  min-width: 0;
+}
+.dispatch-hero__caption {
+  margin: 0;
+  font-size: 13px;
+  color: rgb(255 255 255 / 0.6);
+}
+.dispatch-strip-wrap {
+  position: relative;
+  z-index: 1;
+  margin-top: -36px;
+}
+.dispatch-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 18px 40px -24px rgb(36 25 15 / 0.5);
+}
+.dispatch-strip > div {
+  display: grid;
+  gap: 4px;
+  padding: 22px 24px;
+}
+.dispatch-strip > div + div {
+  border-left: 1px solid var(--color-line);
+}
+.dispatch-strip dt {
+  font-size: 13px;
+  color: var(--color-ink-3);
+}
+.dispatch-strip dd {
+  margin: 0;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+@media (max-width: 719px) {
+  .dispatch-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dispatch-strip > div:nth-child(3) {
+    border-left: 0;
+  }
+  .dispatch-strip > div:nth-child(n + 3) {
+    border-top: 1px solid var(--color-line);
+  }
+  .dispatch-strip > div {
+    padding: 16px 18px;
+  }
+}
+.dispatch-hero__visual .bd__steps,
+.dispatch-hero__visual .bd__note {
+  display: none;
+}
+.dispatch-hero__visual {
+  justify-items: stretch;
+}
+.dispatch-hero__visual .bd {
+  width: 100%;
+}
+.dispatch-hero__caption {
+  text-align: center;
+}
