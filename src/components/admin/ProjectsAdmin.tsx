@@ -12,6 +12,12 @@ import { sendQueuedEmails } from "@/lib/notify-client";
  * Internal project status and priority are not shown here: they aren't readable through the API yet.
  */
 
+/** A stored status such as in_progress, read as plain words. The stored value is not changed. */
+const statusLabel = (status: string): string => {
+  const words = status.replace(/_/g, " ").trim();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+};
+
 type Project = { id: string; name: string; customer_status: string; target_date: string | null; organization_id: string | null };
 type Conversation = { id: string; project_id: string; tenant_id: string; subject: string };
 type Message = { id: string; body: string; sender_kind: string; is_internal: boolean; created_at: string };
@@ -55,7 +61,7 @@ export function ProjectsAdmin({ client, tenantId, userId }: { client: SupabaseCl
         <li key={p.id}>
           <button type="button" className="admin-row" onClick={() => setOpenId(p.id)}>
             <span>{p.name}</span>
-            <span className="acct-meta">{p.customer_status}</span>
+            <span className="acct-meta">{statusLabel(p.customer_status)}</span>
           </button>
         </li>
       ))}

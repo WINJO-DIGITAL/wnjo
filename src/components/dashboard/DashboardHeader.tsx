@@ -21,6 +21,9 @@ const CUSTOMER: DashGroup[] = [
   { label: "Help", href: "/account/help", items: [] },
 ];
 
+/** AI is shelved until further notice, so its screen is left out of the menu. Switch this on to bring it back. */
+const AI_MENU_ON = false;
+
 /**
  * Staff dashboard sections. Items switch the admin view (it listens for the address hash). The four places used every
  * day are plain links; everything used less often sits under More.
@@ -38,7 +41,7 @@ const STAFF: DashGroup[] = [
       { label: "Orders", hint: "Bespoke: stages, updates and client invites", href: "/admin#orders" },
       { label: "Projects", hint: "Bespoke: messages and files", href: "/admin#projects" },
       { label: "Approvals", hint: "Bespoke: client sign-offs", href: "/admin#approvals" },
-      { label: "AI agents", hint: "Tasks, budget and briefing", href: "/admin#ai" },
+      ...(AI_MENU_ON ? [{ label: "AI agents", hint: "Tasks, budget and briefing", href: "/admin#ai" }] : []),
     ],
   },
 ];

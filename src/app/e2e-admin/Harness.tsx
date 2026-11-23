@@ -7,6 +7,7 @@ import { CustomersAdmin } from "@/components/admin/CustomersAdmin";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { ApprovalsTable, EnquiriesTable, OrdersTable, QuotesTable } from "@/components/admin/AdminView";
 import { OverviewAdmin } from "@/components/admin/OverviewAdmin";
+import { ProjectsAdmin } from "@/components/admin/ProjectsAdmin";
 import { SubscriptionsAdmin } from "@/components/admin/SubscriptionsAdmin";
 
 const iso = (days: number) => new Date(Date.now() + days * 24 * 3600 * 1000).toISOString();
@@ -55,6 +56,13 @@ const TABLES: Record<string, unknown[]> = {
     { id: "55555555-5555-4555-8555-555555555555", title: "Homepage design", kind: "design", status: "pending", created_at: iso(-2), decided_at: null, projects: { name: "Harbour Estate Agents" }, approval_responses: [] },
     { id: "66666666-6666-4666-8666-666666666666", title: "Booking flow", kind: "design", status: "approved", created_at: iso(-8), decided_at: iso(-6), projects: { name: "Green Gym" }, approval_responses: [{ decision: "approve", responder_email: "owner@green.test", comment: "Looks right.", created_at: iso(-6) }] },
   ],
+  projects: [
+    { id: "77777777-7777-4777-8777-777777777777", name: "Harbour Estate Agents", customer_status: "in_progress", target_date: iso(21).slice(0, 10), organization_id: "o1" },
+    { id: "88888888-8888-4888-8888-888888888888", name: "Green Gym booking system", customer_status: "planning", target_date: null, organization_id: "o1" },
+  ],
+  conversations: [],
+  messages: [],
+  revision_requests: [],
   website_subscription_payments: [{ subscription_id: "s1", amount_pence: 14900, paid_at: iso(-1) }],
   website_subscription_events: [],
   website_brief_events: [],
@@ -85,7 +93,7 @@ function stubClient(): SupabaseClient {
   return { from, auth } as unknown as SupabaseClient;
 }
 
-const TITLES: Record<string, string> = { customers: "Customers", builds: "Websites", enquiries: "Inbox", subscriptions: "Subscriptions", quotes: "Quotes", orders: "Orders", approvals: "Approvals" };
+const TITLES: Record<string, string> = { customers: "Customers", builds: "Websites", enquiries: "Inbox", subscriptions: "Subscriptions", quotes: "Quotes", orders: "Orders", approvals: "Approvals", projects: "Projects" };
 
 export function Harness({ view }: { view: string }) {
   const client = useMemo(() => stubClient(), []);
@@ -102,6 +110,7 @@ export function Harness({ view }: { view: string }) {
       {view === "quotes" && <QuotesTable client={client} />}
       {view === "orders" && <OrdersTable client={client} selectedId={null} onSelect={() => {}} />}
       {view === "approvals" && <ApprovalsTable client={client} />}
+      {view === "projects" && <ProjectsAdmin client={client} tenantId="t1" userId="u1" />}
       {!TITLES[view] && <OverviewAdmin client={client} />}
     </div>
   );

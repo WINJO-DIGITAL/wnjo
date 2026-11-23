@@ -50,7 +50,7 @@ test("the staff menu is four places and a More menu", async ({ page }) => {
   const items = page.locator(".dash-nav > *");
   await expect(items).toHaveText(["Today", "Websites", "Inbox", "Customers", "More"]);
   await page.locator(".dash-nav button", { hasText: "More" }).click();
-  await expect(page.locator(".dash-menu__label")).toHaveText(["Subscriptions", "Quotes", "Orders", "Projects", "Approvals", "AI agents"]);
+  await expect(page.locator(".dash-menu__label")).toHaveText(["Subscriptions", "Quotes", "Orders", "Projects", "Approvals"]);
 });
 
 test("nothing scrolls sideways on a phone", async ({ page }) => {
