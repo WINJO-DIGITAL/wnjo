@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { AccountMenu } from "@/components/account/AccountMenu";
 import { NotificationsBell } from "@/components/account/NotificationsBell";
@@ -172,19 +172,18 @@ export function DashboardHeader({ variant }: { variant: "customer" | "staff" }) 
           </button>
         </nav>
       )}
-      {variant === "staff" && <StaffTabs groups={groups} isHere={isHere} />}
+      <StaffTabs groups={groups} isHere={isHere} label={variant === "staff" ? "Staff dashboard" : "Your account"} />
     </header>
   );
 }
 
-/** Phone navigation for staff. Portalled to the page, because a fixed bar inside the header (which blurs the background) sticks to the header instead of the bottom of the screen. */
-function StaffTabs({ groups, isHere }: { groups: DashGroup[]; isHere: (href: string) => boolean }) {
+/** Phone navigation for both dashboards. Portalled to the page, because a fixed bar inside the header (which blurs the background) sticks to the header instead of the bottom of the screen. */
+function StaffTabs({ groups, isHere, label }: { groups: DashGroup[]; isHere: (href: string) => boolean; label: string }) {
   const [moreOpen, setMoreOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  // False on the server and true on the phone, without an effect that sets state.
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const more = groups.find((group) => !group.href);
   const moreCurrent = more?.items.some((item) => isHere(item.href)) ?? false;
-
-  useEffect(() => setMounted(true), []);
 
   // Sit just above Safari's toolbar. That bar covers the bottom of the page and is not the home-indicator inset.
   useEffect(() => {
@@ -222,7 +221,7 @@ function StaffTabs({ groups, isHere }: { groups: DashGroup[]; isHere: (href: str
           ))}
         </div>
       )}
-      <nav className="dash-tabs" aria-label="Staff dashboard">
+      <nav className="dash-tabs" aria-label={label} style={{ gridTemplateColumns: `repeat(${groups.length}, minmax(0, 1fr))` }}>
         {groups.map((group) =>
           group.href ? (
             <a key={group.label} href={group.href} className="dash-tabs__item" aria-current={isHere(group.href) ? "page" : undefined} onClick={() => setMoreOpen(false)}>
