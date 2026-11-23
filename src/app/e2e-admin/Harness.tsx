@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { BuildsAdmin } from "@/components/admin/BuildsAdmin";
 import { CustomersAdmin } from "@/components/admin/CustomersAdmin";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { EnquiriesTable } from "@/components/admin/AdminView";
+import { ApprovalsTable, EnquiriesTable, OrdersTable, QuotesTable } from "@/components/admin/AdminView";
 import { OverviewAdmin } from "@/components/admin/OverviewAdmin";
 import { SubscriptionsAdmin } from "@/components/admin/SubscriptionsAdmin";
 
@@ -41,6 +41,20 @@ const TABLES: Record<string, unknown[]> = {
     { id: "e2", reference: "WNJO-502", kind: "website", name: "Priya Shah", email: "priya@shah.test", topic: null, created_at: iso(-1), handled_at: null },
     { id: "e3", reference: "WNJO-503", kind: "contact", name: "Tom Hill", email: "tom@hill.test", topic: "other", created_at: iso(-2), handled_at: iso(-1) },
   ],
+  quotes: [
+    { id: "11111111-1111-4111-8111-111111111111", reference: "Q-1001", status: "sent", created_at: iso(-3), expires_at: iso(11), quote_versions: [{ version: 1, range_low_pence: 150000, range_high_pence: 250000 }] },
+    { id: "22222222-2222-4222-8222-222222222222", reference: "Q-1002", status: "accepted", created_at: iso(-9), expires_at: iso(5), quote_versions: [{ version: 2, range_low_pence: 90000, range_high_pence: 120000 }] },
+  ],
+  quote_acceptances: [],
+  deposits: [],
+  orders: [
+    { id: "33333333-3333-4333-8333-333333333333", business_name: "Harbour Estate Agents", project_type: "Website", stage: "building", created_at: iso(-6) },
+    { id: "44444444-4444-4444-8444-444444444444", business_name: "Green Gym", project_type: "Booking system", stage: "brief_received", created_at: iso(-12) },
+  ],
+  approval_requests: [
+    { id: "55555555-5555-4555-8555-555555555555", title: "Homepage design", kind: "design", status: "pending", created_at: iso(-2), decided_at: null, projects: { name: "Harbour Estate Agents" }, approval_responses: [] },
+    { id: "66666666-6666-4666-8666-666666666666", title: "Booking flow", kind: "design", status: "approved", created_at: iso(-8), decided_at: iso(-6), projects: { name: "Green Gym" }, approval_responses: [{ decision: "approve", responder_email: "owner@green.test", comment: "Looks right.", created_at: iso(-6) }] },
+  ],
   website_subscription_payments: [{ subscription_id: "s1", amount_pence: 14900, paid_at: iso(-1) }],
   website_subscription_events: [],
   website_brief_events: [],
@@ -71,7 +85,7 @@ function stubClient(): SupabaseClient {
   return { from, auth } as unknown as SupabaseClient;
 }
 
-const TITLES: Record<string, string> = { customers: "Customers", builds: "Websites", enquiries: "Inbox", subscriptions: "Subscriptions" };
+const TITLES: Record<string, string> = { customers: "Customers", builds: "Websites", enquiries: "Inbox", subscriptions: "Subscriptions", quotes: "Quotes", orders: "Orders", approvals: "Approvals" };
 
 export function Harness({ view }: { view: string }) {
   const client = useMemo(() => stubClient(), []);
@@ -85,6 +99,9 @@ export function Harness({ view }: { view: string }) {
       {view === "builds" && <BuildsAdmin client={client} />}
       {view === "enquiries" && <EnquiriesTable client={client} />}
       {view === "subscriptions" && <SubscriptionsAdmin client={client} />}
+      {view === "quotes" && <QuotesTable client={client} />}
+      {view === "orders" && <OrdersTable client={client} selectedId={null} onSelect={() => {}} />}
+      {view === "approvals" && <ApprovalsTable client={client} />}
       {!TITLES[view] && <OverviewAdmin client={client} />}
     </div>
   );

@@ -316,6 +316,8 @@ function Manage({ row, call, onDone }: { row: Row; call: Call; onDone: () => voi
   const [price, setPrice] = useState("");
   const [note, setNote] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  // The controls stay folded away until the row is opened, so a long list reads as a list.
+  const [open, setOpen] = useState(false);
   const change = async () => {
     const monthly = Number(price);
     if (!Number.isFinite(monthly) || monthly <= 0) return setNote("Enter the new monthly price in pounds.");
@@ -329,6 +331,14 @@ function Manage({ row, call, onDone }: { row: Row; call: Call; onDone: () => voi
     setConfirmCancel(false);
     if (ok) onDone();
   };
+  if (!open) {
+    return (
+      <div className="admin-sub-manage">
+        <button type="button" className="btn btn--secondary btn--sm" aria-expanded="false" onClick={() => setOpen(true)}>Manage</button>
+        {note && <p className="acct-meta" role="status">{note}</p>}
+      </div>
+    );
+  }
   return (
     <div className="admin-sub-manage">
       <input className="acct-input" inputMode="decimal" placeholder="New £/month" aria-label={`New monthly price for ${row.reference}`} value={price} onChange={(e) => setPrice(e.target.value)} />
@@ -339,6 +349,7 @@ function Manage({ row, call, onDone }: { row: Row; call: Call; onDone: () => voi
         ) : (
           <button type="button" className="btn btn--secondary btn--sm" onClick={() => setConfirmCancel(true)}>Cancel</button>
         ))}
+      <button type="button" className="btn btn--secondary btn--sm" onClick={() => { setOpen(false); setConfirmCancel(false); }}>Close</button>
       {note && <p className="acct-meta" role="status">{note}</p>}
     </div>
   );

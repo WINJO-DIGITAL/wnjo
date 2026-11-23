@@ -356,7 +356,7 @@ function QuoteFromBrief({ client, enquiryId }: { client: SupabaseClient; enquiry
 
 type PaymentState = { acceptanceId: string; depositPaid: boolean; balance: "none" | "requested" | "paid" };
 
-function QuotesTable({ client }: { client: SupabaseClient }) {
+export function QuotesTable({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<QuoteRow[] | null>(null);
   const [payments, setPayments] = useState<Record<string, PaymentState>>({});
   const [error, setError] = useState(false);
@@ -454,7 +454,7 @@ function QuotesTable({ client }: { client: SupabaseClient }) {
   );
 }
 
-function ApprovalsTable({ client }: { client: SupabaseClient }) {
+export function ApprovalsTable({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<ApprovalRow[] | null>(null);
   const [error, setError] = useState(false);
   useEffect(() => {
@@ -481,10 +481,10 @@ function ApprovalsTable({ client }: { client: SupabaseClient }) {
           const response = r.approval_responses[0];
           return (
             <tr key={r.id}>
-              <td>{when.format(new Date(r.created_at))}</td>
+              <td style={{ whiteSpace: "nowrap" }}>{when.format(new Date(r.created_at))}</td>
               <td>{r.projects?.name ?? "-"}</td>
               <td>{r.title} <span className="acct-meta">({r.kind})</span></td>
-              <td>{approvalStatus[r.status] ?? r.status}</td>
+              <td style={{ whiteSpace: "nowrap" }}>{approvalStatus[r.status] ?? r.status}</td>
               <td>
                 {response
                   ? `${response.decision === "approve" ? "Approved" : "Asked for changes"} by ${response.responder_email} on ${when.format(new Date(response.created_at))}${response.comment ? `: "${response.comment}"` : ""}`
@@ -590,7 +590,7 @@ function InvitesPanel({ client, tenantId }: { client: SupabaseClient; tenantId: 
   );
 }
 
-function OrdersTable({
+export function OrdersTable({
   client,
   selectedId,
   onSelect,
