@@ -133,13 +133,16 @@ export function SubscriptionsAdmin({ client }: { client: SupabaseClient }) {
       </dl>
       <CreateLink call={call} onCreated={load} />
       {rows.length > 0 && (
-        <div className="seg" role="group" aria-label="Show">
-          {FILTERS.filter((f) => f.id === "all" || count(f.id) > 0).map((f) => (
-            <button key={f.id} type="button" className="seg__item" aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>
-              {f.label} <span className="seg__count">{count(f.id)}</span>
-            </button>
-          ))}
-        </div>
+        <label className="website-filter">
+          <span className="website-filter__label">Show</span>
+          <select className="website-filter__select" value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}>
+            {FILTERS.filter((f) => f.id === "all" || count(f.id) > 0).map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.label} ({count(f.id)})
+              </option>
+            ))}
+          </select>
+        </label>
       )}
       {rows.length === 0 ? (
         <p className="lede">No website subscriptions yet.</p>

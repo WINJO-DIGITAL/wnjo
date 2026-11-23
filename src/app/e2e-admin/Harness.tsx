@@ -5,7 +5,9 @@ import { useMemo } from "react";
 import { BuildsAdmin } from "@/components/admin/BuildsAdmin";
 import { CustomersAdmin } from "@/components/admin/CustomersAdmin";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { EnquiriesTable } from "@/components/admin/AdminView";
 import { OverviewAdmin } from "@/components/admin/OverviewAdmin";
+import { SubscriptionsAdmin } from "@/components/admin/SubscriptionsAdmin";
 
 const iso = (days: number) => new Date(Date.now() + days * 24 * 3600 * 1000).toISOString();
 
@@ -69,17 +71,21 @@ function stubClient(): SupabaseClient {
   return { from, auth } as unknown as SupabaseClient;
 }
 
+const TITLES: Record<string, string> = { customers: "Customers", builds: "Websites", enquiries: "Inbox", subscriptions: "Subscriptions" };
+
 export function Harness({ view }: { view: string }) {
   const client = useMemo(() => stubClient(), []);
   return (
     <div className="admin">
       <DashboardHeader variant="staff" />
       <div className="dash-page__head">
-        <h1 className="dash-title">{view === "customers" ? "Customers" : view === "builds" ? "Websites" : "Today"}</h1>
+        <h1 className="dash-title">{TITLES[view] ?? "Today"}</h1>
       </div>
       {view === "customers" && <CustomersAdmin client={client} tenantId="t1" />}
       {view === "builds" && <BuildsAdmin client={client} />}
-      {view !== "customers" && view !== "builds" && <OverviewAdmin client={client} />}
+      {view === "enquiries" && <EnquiriesTable client={client} />}
+      {view === "subscriptions" && <SubscriptionsAdmin client={client} />}
+      {!TITLES[view] && <OverviewAdmin client={client} />}
     </div>
   );
 }

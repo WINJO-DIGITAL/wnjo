@@ -17246,3 +17246,24 @@ body:has(.dash-header) {
       "main";
   }
 }
+
+/* Inbox: search and a Show dropdown in one row, and two message cards across on a laptop. */
+.cust-tools--two {
+  grid-template-columns: minmax(0, 1fr) 220px;
+  align-items: center;
+}
+.cust-tools--two .website-filter__select {
+  width: 100%;
+  margin: 0;
+}
+@media (max-width: 719px) {
+  .cust-tools--two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (min-width: 1100px) {
+  .inbox-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}

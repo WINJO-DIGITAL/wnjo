@@ -178,7 +178,7 @@ function Empty({ text }: { text: string }) {
 
 const enquiryType = (r: Enquiry): string => ((r.answers as { type?: string } | null)?.type === "website" ? r.topic ?? "Website quote" : r.kind === "brief" ? "Brief" : "Contact");
 
-function EnquiriesTable({ client }: { client: SupabaseClient }) {
+export function EnquiriesTable({ client }: { client: SupabaseClient }) {
   const [rows, setRows] = useState<Enquiry[] | null>(null);
   const [error, setError] = useState(false);
   const [search, setSearch] = useState("");
@@ -223,16 +223,17 @@ function EnquiriesTable({ client }: { client: SupabaseClient }) {
   );
   return (
     <div className="cust">
-      <div className="cust-tools cust-tools--one">
+      <div className="cust-tools cust-tools--two">
         <label className="visually-hidden" htmlFor="enq-search">Search enquiries</label>
         <input id="enq-search" type="search" className="acct-input" placeholder="Search by name, email or reference" value={search} onChange={(e) => setSearch(e.target.value)} />
-      </div>
-      <div className="seg" role="group" aria-label="Show">
-        {([["open", "To answer", open], ["done", "Dealt with", rows.length - open], ["all", "All", rows.length]] as const).map(([id, label, count]) => (
-          <button key={id} type="button" className="seg__item" aria-pressed={show === id} onClick={() => setShow(id)}>
-            {label} <span className="seg__count">{count}</span>
-          </button>
-        ))}
+        <label className="visually-hidden" htmlFor="enq-show">Show</label>
+        <select id="enq-show" className="website-filter__select" value={show} onChange={(e) => setShow(e.target.value as typeof show)}>
+          {([["open", "To answer", open], ["done", "Dealt with", rows.length - open], ["all", "All", rows.length]] as const).map(([id, label, count]) => (
+            <option key={id} value={id}>
+              {label} ({count})
+            </option>
+          ))}
+        </select>
       </div>
       {failed && <p role="alert">That couldn&apos;t be saved. Please try again.</p>}
       {shown.length === 0 ? (
