@@ -113,20 +113,21 @@ export function CustomersAdmin({ client, tenantId }: { client: SupabaseClient; t
       <div className="cust-tools">
         <label className="visually-hidden" htmlFor="cust-search">Search customers</label>
         <input id="cust-search" type="search" className="acct-input cust-search" placeholder="Search by name, business, email or reference" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <label className="visually-hidden" htmlFor="cust-show">Show</label>
+        <select id="cust-show" className="website-filter__select cust-show" value={filter} onChange={(e) => setFilter(e.target.value as CustomerFilter)}>
+          {FILTERS.filter((f) => f.id === "all" || (counts[f.id] ?? 0) > 0).map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.label} ({counts[f.id] ?? 0})
+            </option>
+          ))}
+        </select>
         <label className="visually-hidden" htmlFor="cust-sort">Sort by</label>
-        <select id="cust-sort" className="acct-input cust-sort" value={sort} onChange={(e) => setSort(e.target.value as CustomerSort)}>
+        <select id="cust-sort" className="website-filter__select cust-sort" value={sort} onChange={(e) => setSort(e.target.value as CustomerSort)}>
           <option value="recent">Latest activity</option>
           <option value="name">Name</option>
           <option value="monthly">Monthly payment</option>
           <option value="renewal">Renewal date</option>
         </select>
-      </div>
-      <div className="seg" role="group" aria-label="Show">
-        {FILTERS.filter((f) => f.id === "all" || (counts[f.id] ?? 0) > 0).map((f) => (
-          <button key={f.id} type="button" className="seg__item" aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>
-            {f.label} <span className="seg__count">{counts[f.id] ?? 0}</span>
-          </button>
-        ))}
       </div>
 
       {data.customers.length === 0 ? (

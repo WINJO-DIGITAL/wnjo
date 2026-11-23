@@ -202,16 +202,17 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
       <div className="builds__browse stack" style={{ "--stack": "var(--space-6)" } as React.CSSProperties}>
       <BuildModeSwitch client={client} />
       {stages.length > 1 && (
-        <div className="seg seg--scroll" role="group" aria-label="Stage">
-          <button type="button" className="seg__item" aria-pressed={stageFilter === "all"} onClick={() => setStageFilter("all")}>
-            All <span className="seg__count">{rows.length}</span>
-          </button>
-          {stages.map((stage) => (
-            <button key={stage} type="button" className="seg__item" aria-pressed={stageFilter === stage} onClick={() => setStageFilter(stage)}>
-              {staffStageLabel(stage)} <span className="seg__count">{rows.filter((row) => row.stage === stage).length}</span>
-            </button>
-          ))}
-        </div>
+        <label className="website-filter">
+          <span className="website-filter__label">Stage</span>
+          <select className="website-filter__select" value={stageFilter} onChange={(e) => setStageFilter(e.target.value as Stage | "all")}>
+            <option value="all">All websites ({rows.length})</option>
+            {stages.map((stage) => (
+              <option key={stage} value={stage}>
+                {staffStageLabel(stage)} ({rows.filter((row) => row.stage === stage).length})
+              </option>
+            ))}
+          </select>
+        </label>
       )}
       <ul className="website-cards" aria-label="Website briefs">
         {listed.map((r) => (
