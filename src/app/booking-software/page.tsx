@@ -99,6 +99,22 @@ export default function BookingSoftwarePage() {
         </div>
       </section>
 
+      {/* Winjo Dispatch has its own page: the booking product for transfer and private hire firms. */}
+      <section className="tile" aria-labelledby="dispatch-link-title">
+        <div className="container container--wide" data-reveal>
+          <p className="tile__name">Winjo Dispatch</p>
+          <h2 id="dispatch-link-title" className="tile__title">
+            Built for transfer and private hire firms.
+          </h2>
+          <p className="tile__line">Your website, a booking system and an operator app. £999 upfront for the first five operators.</p>
+          <p>
+            <Link href="/booking-software/dispatch" className="arrow-link">
+              See Winjo Dispatch <ArrowRight />
+            </Link>
+          </p>
+        </div>
+      </section>
+
       <CtaBand
         title={
           <>

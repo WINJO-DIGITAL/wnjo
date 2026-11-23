@@ -17267,3 +17267,107 @@ body:has(.dash-header) {
     align-items: start;
   }
 }
+
+/* Winjo Dispatch: a dark opener, the price stated plainly, and the launch offer as a panel. */
+.dispatch-hero {
+  padding-block: 72px 80px;
+}
+.dispatch-hero__layout {
+  display: grid;
+  gap: 24px;
+}
+.dispatch-hero__copy {
+  display: grid;
+  gap: 16px;
+  max-width: 640px;
+}
+.dispatch-offer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 16px;
+  margin: 8px 0 0;
+}
+.dispatch-offer__price {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 600;
+  line-height: 1;
+  color: #f0a04b;
+  font-variant-numeric: tabular-nums;
+}
+.dispatch-offer__note {
+  font-size: 15px;
+  color: rgb(255 255 255 / 0.75);
+}
+.dispatch-included {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dispatch-included li {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  font-size: 15px;
+}
+.dispatch-offer-panel {
+  display: grid;
+  gap: 24px;
+  padding: 36px;
+  border-radius: 24px;
+  background: #f5f0e8;
+  color: var(--color-ink);
+  justify-items: start;
+}
+.dispatch-offer-panel .tile__name {
+  margin: 0;
+}
+.dispatch-offer-panel__title {
+  margin: 0;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 600;
+  line-height: 1.15;
+}
+.dispatch-terms {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 32px;
+  margin: 0;
+  width: 100%;
+}
+.dispatch-terms div {
+  display: grid;
+  gap: 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-line);
+}
+.dispatch-terms dt {
+  font-size: 14px;
+  color: var(--color-ink-3);
+}
+.dispatch-terms dd {
+  margin: 0;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 24px;
+  font-weight: 600;
+}
+@media (min-width: 900px) {
+  .dispatch-hero__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+    align-items: center;
+    gap: 64px;
+  }
+}
+@media (max-width: 719px) {
+  .dispatch-terms {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dispatch-offer-panel {
+    padding: 24px;
+  }
+}

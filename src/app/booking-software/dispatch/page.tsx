@@ -1,0 +1,102 @@
+import type { Viewport } from "next";
+import Link from "next/link";
+import { CtaBand } from "@/components/Blocks";
+import { ArrowRight } from "@/components/Icons";
+import { PhoneFan } from "@/components/interactive/PhoneFan";
+import { pageMetadata } from "@/lib/metadata";
+
+export const viewport: Viewport = { themeColor: "#241a10" };
+
+export const metadata = pageMetadata(
+  "/booking-software/dispatch",
+  "Winjo Dispatch: booking software for transfer and private hire firms",
+  "Your own website, a booking system and an operator app for transfer and private hire firms. £999 upfront for the first five operators, with a free first month of hosting and free Stripe set-up.",
+);
+
+/**
+ * Winjo Dispatch: the booking product for transfer and private hire firms. It sits under booking systems, with its
+ * own offer. Only what the product does today is shown.
+ */
+export default function WinjoDispatchPage() {
+  return (
+    <>
+      <section className="tile inverse dispatch-hero" aria-labelledby="dispatch-title">
+        <div className="container container--wide dispatch-hero__layout">
+          <div className="dispatch-hero__copy">
+            <p className="tile__name">Winjo Dispatch · Part of WINJO DIGITAL</p>
+            <h1 id="dispatch-title" className="tile__title">
+              Your bookings, your website, your operator app.
+            </h1>
+            <p className="tile__line">Built for transfer and private hire firms.</p>
+            <p className="dispatch-offer" aria-label="Launch offer">
+              <span className="dispatch-offer__price">£999 upfront</span>
+              <span className="dispatch-offer__note">Launch offer for the first five operators</span>
+            </p>
+            <ul className="dispatch-included" aria-label="Included in the launch offer">
+              <li>Free first month of hosting</li>
+              <li>Free Stripe set-up</li>
+            </ul>
+            <div className="tile__ctas">
+              <Link href="/contact?topic=booking-software" className="btn btn--primary">
+                Request a demo
+                <ArrowRight />
+              </Link>
+              <Link href="#apps" className="btn btn--secondary">
+                See the apps
+              </Link>
+            </div>
+          </div>
+          <aside className="dispatch-offer-panel" aria-labelledby="offer-title">
+            <p className="tile__name">Launch offer</p>
+            <h2 id="offer-title" className="dispatch-offer-panel__title">
+              Hosting and Stripe set-up are on us.
+            </h2>
+            <dl className="dispatch-terms">
+              <div>
+                <dt>Upfront</dt>
+                <dd>£999</dd>
+              </div>
+              <div>
+                <dt>First month hosting</dt>
+                <dd>Free</dd>
+              </div>
+              <div>
+                <dt>Stripe integration set-up</dt>
+                <dd>Free</dd>
+              </div>
+              <div>
+                <dt>Places</dt>
+                <dd>First five operators</dd>
+              </div>
+            </dl>
+            <Link href="/contact?topic=booking-software" className="btn btn--primary">
+              Request a demo
+            </Link>
+          </aside>
+        </div>
+      </section>
+
+      <section id="apps" className="tile" aria-labelledby="apps-title">
+        <div className="container container--wide" data-reveal>
+          <p className="tile__name">The system</p>
+          <h2 id="apps-title" className="tile__title">
+            Your customers book online. Your office allocates the job.
+          </h2>
+          <p className="tile__line">Real screens from EV Exec, with example details.</p>
+        </div>
+        <div className="container container--wide tile__visual" data-reveal style={{ "--d": 1 } as React.CSSProperties}>
+          <PhoneFan />
+        </div>
+      </section>
+
+      <CtaBand
+        title={<>See it working for your firm.</>}
+        body="Live demo. No obligation."
+      >
+        <Link href="/contact?topic=booking-software" className="btn btn--primary">
+          Request a demo
+        </Link>
+      </CtaBand>
+    </>
+  );
+}

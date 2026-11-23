@@ -12,6 +12,7 @@ export const publicRoutes = [
   "/contact",
   "/faq",
   "/booking-software",
+  "/booking-software/dispatch",
   "/app-development",
   "/privacy",
   "/terms",
