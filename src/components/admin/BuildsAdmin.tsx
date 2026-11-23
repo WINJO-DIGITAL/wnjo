@@ -235,6 +235,11 @@ export function BuildsAdmin({ client }: { client: SupabaseClient }) {
       </ul>
       {listed.length === 0 && <p className="lede">No websites at that stage.</p>}
       </div>
+      {!current && (
+        <div className="builds__empty">
+          <p className="lede">Choose a website to see its steps.</p>
+        </div>
+      )}
       {current && (
         <div id="brief-detail" ref={detailRef}>
           <button type="button" className="arrow-link builds__back" onClick={() => { window.location.hash = "builds"; }}>

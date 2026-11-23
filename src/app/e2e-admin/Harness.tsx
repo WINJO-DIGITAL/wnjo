@@ -2,6 +2,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { useMemo } from "react";
+import { BuildsAdmin } from "@/components/admin/BuildsAdmin";
 import { CustomersAdmin } from "@/components/admin/CustomersAdmin";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { OverviewAdmin } from "@/components/admin/OverviewAdmin";
@@ -14,7 +15,7 @@ const sub = (n: number, o: Record<string, unknown>) => ({
   setup_pence: 0, monthly_pence: 14900, one_off_pence: 0, payments_count: 3, cancel_at_period_end: false, livemode: true, current_period_end: iso(20), first_payment_at: iso(-40), last_payment_at: iso(-10), created_at: iso(-60), ...o,
 });
 const brief = (n: number, o: Record<string, unknown>) => ({
-  id: `00000000-0000-4000-8000-00000000000${n}`, reference: `WNJO-00000${n}`, name: "Owner", business_name: null, email: `b${n}@x.test`, route: "package", stage: "specification", expected_by: null, created_at: iso(-n), updated_at: iso(-n), brief: { goals: ["enquiries"] }, ...o,
+  id: `00000000-0000-4000-8000-00000000000${n}`, reference: `WNJO-00000${n}`, name: "Owner", business_name: null, email: `b${n}@x.test`, route: "package", stage: "specification", expected_by: null, created_at: iso(-n), updated_at: iso(-n), brief: { goals: ["enquiries"] }, figures: { package: "Core", mode: "monthly", monthly: 9900, oneOffTotal: 0 }, version: 1, ...o,
 });
 
 const TABLES: Record<string, unknown[]> = {
@@ -63,7 +64,9 @@ function stubClient(): SupabaseClient {
       resolve(head ? { count: COUNTS[`${table}:${eq}`] ?? COUNTS[table] ?? 0, data: null, error: null } : { data: TABLES[table] ?? [], error: null });
     return builder;
   };
-  return { from } as unknown as SupabaseClient;
+  // Enough of the sign-in client for a screen that asks who is signed in. Nothing is sent anywhere.
+  const auth = { getSession: async () => ({ data: { session: null }, error: null }) };
+  return { from, auth } as unknown as SupabaseClient;
 }
 
 export function Harness({ view }: { view: string }) {
@@ -72,9 +75,11 @@ export function Harness({ view }: { view: string }) {
     <div className="admin">
       <DashboardHeader variant="staff" />
       <div className="dash-page__head">
-        <h1 className="dash-title">{view === "customers" ? "Customers" : "Today"}</h1>
+        <h1 className="dash-title">{view === "customers" ? "Customers" : view === "builds" ? "Websites" : "Today"}</h1>
       </div>
-      {view === "customers" ? <CustomersAdmin client={client} tenantId="t1" /> : <OverviewAdmin client={client} />}
+      {view === "customers" && <CustomersAdmin client={client} tenantId="t1" />}
+      {view === "builds" && <BuildsAdmin client={client} />}
+      {view !== "customers" && view !== "builds" && <OverviewAdmin client={client} />}
     </div>
   );
 }
