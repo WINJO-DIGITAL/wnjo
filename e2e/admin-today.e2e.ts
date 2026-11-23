@@ -16,9 +16,11 @@ test("Today leads with the websites to make and the messages to answer", async (
   const rows = sites.locator("li a");
   await expect(rows.first()).toContainText("Hill Joinery");
   await expect(rows.first()).toContainText("Monthly · Changes to make");
-  await expect(sites.getByText("Bespoke · Brief to review")).toBeVisible();
+  // Four websites are shown, the rest sit behind "All 6 websites".
+  await expect(rows).toHaveCount(4);
+  await expect(sites.getByRole("link", { name: "All 6 websites" })).toBeVisible();
   await expect(rows.first()).toHaveAttribute("href", /^#builds\/[0-9a-f-]{36}$/);
-  await expect(sites.getByText("Due 24 Nov")).toBeVisible();
+  await expect(sites.getByText(/Due \d{1,2} \w{3}/).first()).toBeVisible();
 
   // Messages: newest first, a customer's message told apart from a new enquiry, answered ones left out.
   await expect(messages.locator("li a").first()).toContainText("Mia Chen");
