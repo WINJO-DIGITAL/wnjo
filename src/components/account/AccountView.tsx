@@ -243,12 +243,17 @@ export function AccountView() {
   }
 
   return (
-    <div className="acct">
+    <div className="acct acct--split">
       <div className="dash-page__head">
         <h1 className="dash-title">Your websites</h1>
       </div>
 
-      <PlanSummary client={client} />
+      {/* The plan sits beside the website on a laptop and above it on a phone. */}
+      <aside className="acct__side" aria-label="Your plan">
+        <PlanSummary client={client} />
+      </aside>
+
+      <div className="acct__main">
       {loadError && <p role="alert">We couldn&apos;t load your orders. Please refresh the page.</p>}
       {depositNotice && <Confirmation title={depositNotice} />}
 
@@ -287,6 +292,7 @@ export function AccountView() {
           )}
         </article>
       ))}
+      </div>
     </div>
   );
 }

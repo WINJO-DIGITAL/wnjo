@@ -15,7 +15,7 @@ type DashGroup = { label: string; href?: string; items: DashItem[] };
 
 /** Client dashboard sections: four plain links, one per place a customer goes. */
 const CUSTOMER: DashGroup[] = [
-  { label: "Your websites", href: "/account", items: [] },
+  { label: "Websites", href: "/account", items: [] },
   { label: "Plan & billing", href: "/account/billing", items: [] },
   { label: "Settings", href: "/account/settings", items: [] },
   { label: "Help", href: "/account/help", items: [] },
