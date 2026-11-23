@@ -26,7 +26,6 @@ export default function WinjoDispatchPage() {
         <div className="container container--wide">
           <div className="dispatch-hero__layout">
             <div className="dispatch-hero__copy">
-              <p className="tile__name">Winjo Dispatch · by WINJO DIGITAL</p>
               <h1 id="dispatch-title" className="tile__title">
                 Customers book on your website. You assign the job in the app.
               </h1>
@@ -69,7 +68,6 @@ export default function WinjoDispatchPage() {
 
       <section id="apps" className="tile" aria-labelledby="apps-title">
         <div className="container container--wide" data-reveal>
-          <p className="tile__name">The apps</p>
           <h2 id="apps-title" className="tile__title">
             What the office sees.
           </h2>
