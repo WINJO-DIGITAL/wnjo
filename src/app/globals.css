@@ -17268,93 +17268,57 @@ body:has(.dash-header) {
   }
 }
 
-/* Winjo Dispatch: a dark opener, the price stated plainly, and the launch offer as a panel. */
+/* Winjo Dispatch: a dark opener with the booking demo beside the headline, and the offer as one ruled row. */
 .dispatch-hero {
-  padding-block: 72px 80px;
+  padding-block: 64px 48px;
 }
 .dispatch-hero__layout {
   display: grid;
-  gap: 24px;
+  gap: 32px;
 }
 .dispatch-hero__copy {
   display: grid;
   gap: 16px;
+  align-content: center;
   max-width: 640px;
 }
-.dispatch-offer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 12px 16px;
-  margin: 8px 0 0;
-}
-.dispatch-offer__price {
-  font-family: var(--font-serif, Georgia, serif);
-  font-size: clamp(36px, 5vw, 56px);
-  font-weight: 600;
-  line-height: 1;
-  color: #f0a04b;
-  font-variant-numeric: tabular-nums;
-}
-.dispatch-offer__note {
-  font-size: 15px;
-  color: rgb(255 255 255 / 0.75);
-}
-.dispatch-included {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.dispatch-included li {
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  font-size: 15px;
-}
-.dispatch-offer-panel {
+.dispatch-hero__visual {
   display: grid;
-  gap: 24px;
-  padding: 36px;
-  border-radius: 24px;
-  background: #f5f0e8;
-  color: var(--color-ink);
-  justify-items: start;
+  gap: 12px;
+  min-width: 0;
 }
-.dispatch-offer-panel .tile__name {
-  margin: 0;
-}
-.dispatch-offer-panel__title {
-  margin: 0;
-  font-family: var(--font-serif, Georgia, serif);
-  font-size: clamp(24px, 2.6vw, 32px);
-  font-weight: 600;
-  line-height: 1.15;
-}
-.dispatch-terms {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px 32px;
-  margin: 0;
+.dispatch-hero__visual .bd {
   width: 100%;
 }
-.dispatch-terms div {
-  display: grid;
-  gap: 4px;
-  padding-top: 14px;
-  border-top: 1px solid var(--color-line);
+.dispatch-hero__visual .bd__steps,
+.dispatch-hero__visual .bd__note {
+  display: none;
 }
-.dispatch-terms dt {
-  font-size: 14px;
-  color: var(--color-ink-3);
-}
-.dispatch-terms dd {
+.dispatch-hero__caption {
   margin: 0;
+  font-size: 13px;
+  text-align: center;
+  color: rgb(255 255 255 / 0.6);
+}
+.dispatch-rule {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 32px;
+  margin: 40px 0 0;
+  padding-top: 24px;
+  border-top: 1px solid rgb(255 255 255 / 0.18);
+}
+.dispatch-rule dt {
+  font-size: 13px;
+  color: rgb(255 255 255 / 0.6);
+}
+.dispatch-rule dd {
+  margin: 4px 0 0;
   font-family: var(--font-serif, Georgia, serif);
   font-size: 24px;
   font-weight: 600;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
 }
 @media (min-width: 900px) {
   .dispatch-hero__layout {
@@ -17364,82 +17328,11 @@ body:has(.dash-header) {
   }
 }
 @media (max-width: 719px) {
-  .dispatch-terms {
-    grid-template-columns: minmax(0, 1fr);
+  .dispatch-hero {
+    padding-block: 40px 32px;
   }
-  .dispatch-offer-panel {
-    padding: 24px;
-  }
-}
-
-/* Winjo Dispatch: the booking demo beside the headline, and the offer as one slim strip below the opener. */
-.dispatch-hero__visual {
-  display: grid;
-  gap: 12px;
-  justify-items: center;
-  min-width: 0;
-}
-.dispatch-hero__caption {
-  margin: 0;
-  font-size: 13px;
-  color: rgb(255 255 255 / 0.6);
-}
-.dispatch-strip-wrap {
-  position: relative;
-  z-index: 1;
-  margin-top: -36px;
-}
-.dispatch-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0;
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 18px 40px -24px rgb(36 25 15 / 0.5);
-}
-.dispatch-strip > div {
-  display: grid;
-  gap: 4px;
-  padding: 22px 24px;
-}
-.dispatch-strip > div + div {
-  border-left: 1px solid var(--color-line);
-}
-.dispatch-strip dt {
-  font-size: 13px;
-  color: var(--color-ink-3);
-}
-.dispatch-strip dd {
-  margin: 0;
-  font-family: var(--font-serif, Georgia, serif);
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1.15;
-}
-@media (max-width: 719px) {
-  .dispatch-strip {
+  .dispatch-rule {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 24px;
   }
-  .dispatch-strip > div:nth-child(3) {
-    border-left: 0;
-  }
-  .dispatch-strip > div:nth-child(n + 3) {
-    border-top: 1px solid var(--color-line);
-  }
-  .dispatch-strip > div {
-    padding: 16px 18px;
-  }
-}
-.dispatch-hero__visual .bd__steps,
-.dispatch-hero__visual .bd__note {
-  display: none;
-}
-.dispatch-hero__visual {
-  justify-items: stretch;
-}
-.dispatch-hero__visual .bd {
-  width: 100%;
-}
-.dispatch-hero__caption {
-  text-align: center;
 }

@@ -23,43 +23,36 @@ export default function WinjoDispatchPage() {
   return (
     <>
       <section className={`tile inverse dispatch-hero ${jost.variable}`} aria-labelledby="dispatch-title">
-        <div className="container container--wide dispatch-hero__layout">
-          <div className="dispatch-hero__copy">
-            <p className="tile__name">Winjo Dispatch · Part of WINJO DIGITAL</p>
-            <h1 id="dispatch-title" className="tile__title">
-              Your bookings, your website, your operator app.
-            </h1>
-            <p className="tile__line">Built for transfer and private hire firms.</p>
-            <p className="dispatch-offer" aria-label="Launch offer">
-              <span className="dispatch-offer__price">£999 upfront</span>
-              <span className="dispatch-offer__note">Launch offer for the first five operators</span>
-            </p>
-            <div className="tile__ctas">
-              <Link href="/contact?topic=booking-software" className="btn btn--primary">
-                Request a demo
-                <ArrowRight />
-              </Link>
-              <Link href="#apps" className="btn btn--secondary">
-                See the apps
-              </Link>
+        <div className="container container--wide">
+          <div className="dispatch-hero__layout">
+            <div className="dispatch-hero__copy">
+              <p className="tile__name">Winjo Dispatch · by WINJO DIGITAL</p>
+              <h1 id="dispatch-title" className="tile__title">
+                Customers book on your website. You assign the job in the app.
+              </h1>
+              <p className="tile__line">Website, booking system and operator app for transfer and private hire firms.</p>
+              <div className="tile__ctas">
+                <Link href="/contact?topic=booking-software" className="btn btn--primary">
+                  Request a demo
+                  <ArrowRight />
+                </Link>
+                <Link href="#apps" className="btn btn--secondary">
+                  See the apps
+                </Link>
+              </div>
+            </div>
+            <div className="dispatch-hero__visual">
+              <BookingDemo />
+              <p className="dispatch-hero__caption">EV Exec&apos;s booking flow · Example details</p>
             </div>
           </div>
-          <div className="dispatch-hero__visual">
-            <BookingDemo />
-            <p className="dispatch-hero__caption">Built for EV Exec · Example details</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="dispatch-strip-wrap" aria-label="Launch offer">
-        <div className="container container--wide">
-          <dl className="dispatch-strip">
+          <dl className="dispatch-rule" aria-label="Launch offer">
             <div>
               <dt>Upfront</dt>
               <dd>£999</dd>
             </div>
             <div>
-              <dt>First month hosting</dt>
+              <dt>First month of hosting</dt>
               <dd>Free</dd>
             </div>
             <div>
@@ -76,21 +69,18 @@ export default function WinjoDispatchPage() {
 
       <section id="apps" className="tile" aria-labelledby="apps-title">
         <div className="container container--wide" data-reveal>
-          <p className="tile__name">The system</p>
+          <p className="tile__name">The apps</p>
           <h2 id="apps-title" className="tile__title">
-            Your customers book online. Your office allocates the job.
+            What the office sees.
           </h2>
-          <p className="tile__line">Real screens from EV Exec, with example details.</p>
+          <p className="tile__line">Screens from EV Exec&apos;s system, with example details.</p>
         </div>
         <div className="container container--wide tile__visual" data-reveal style={{ "--d": 1 } as React.CSSProperties}>
           <PhoneFan />
         </div>
       </section>
 
-      <CtaBand
-        title={<>See it working for your firm.</>}
-        body="Live demo. No obligation."
-      >
+      <CtaBand title={<>See it working.</>} body="Live demo. No obligation.">
         <Link href="/contact?topic=booking-software" className="btn btn--primary">
           Request a demo
         </Link>
