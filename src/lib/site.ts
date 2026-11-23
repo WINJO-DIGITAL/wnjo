@@ -52,7 +52,7 @@ export type NavItem = NavLink & {
 export const primaryNav: NavItem[] = [
   {
     href: "/managed-websites",
-    label: "Managed websites",
+    label: "Websites",
     also: ["/build", "/winjo-refresh"],
     not: ["/build/project", "/build/hosting"],
     menu: {
