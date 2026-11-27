@@ -33,7 +33,7 @@ import {
 import { routeFor } from "@/lib/build-journey";
 import { payNowFor } from "@/lib/pay-now";
 import { isShortCheckout } from "@/lib/short-checkout";
-import { BLACK_FRIDAY, CANCEL_FREE, OFFER_COOLING_OFF, FIRST_BILL_DAY, MOTTO, OFFER_HEADLINE, afterTrialLine, blackFridayEligible } from "@/lib/black-friday";
+import { BLACK_FRIDAY, CANCEL_FREE, OFFER_COOLING_OFF, FIRST_BILL_DAY, MOTTO, OFFER_HEADLINE_PLAN, afterTrialLine, blackFridayEligible } from "@/lib/black-friday";
 import { useBlackFriday } from "../offers/useBlackFriday";
 import { draftHasProgress } from "@/lib/brief-draft";
 import { loadBriefDraft, saveBriefDraft } from "@/lib/brief-draft-client";
@@ -318,7 +318,7 @@ function Inner({
 
   // The short plan checkout: name, business and email, then straight to payment. The brief follows after payment.
   const shortCheckout = isShortCheckout(params) && Boolean(payNow) && monthly;
-  const freeTrial = shortCheckout && blackFridayOn && blackFridayEligible(quote);
+  const freeTrial = shortCheckout && blackFridayOn && blackFridayEligible(quote, answers.plan);
   const onShortPay = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!agree) return;
@@ -1146,7 +1146,7 @@ function PlanCheckout({
       <form onSubmit={onSubmit} noValidate className="card card--raised stack form" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
         <div>
           <p className="eyebrow">{planName}</p>
-          <h2 className="h2">{freeTrial ? OFFER_HEADLINE : `${formatGBP(quote.monthly)} a month`}</h2>
+          <h2 className="h2">{freeTrial ? OFFER_HEADLINE_PLAN : `${formatGBP(quote.monthly)} a month`}</h2>
           <p className="muted">
             {freeTrial
               ? `${afterTrialLine(quote.monthly).replace(/^t/, "T")}. Rolling monthly, no minimum term.`

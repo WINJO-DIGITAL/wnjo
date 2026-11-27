@@ -89,7 +89,7 @@ export default async function SubscribePage({
 
 function Offer({ row, token, cancelled }: { row: Row; token: string; cancelled: boolean }) {
   const sub = row.kind === "subscription";
-  const blackFriday = sub ? blackFridayOf(row.quote_snapshot) : null;
+  const blackFriday = sub ? blackFridayOf(row.quote_snapshot, row.package_code) : null;
   if (blackFriday) return <BlackFridayOffer row={row} token={token} cancelled={cancelled} />;
   const first = firstPaymentPence({ kind: row.kind, setupPence: row.setup_pence, monthlyPence: row.monthly_pence, oneOffPence: row.one_off_pence });
   return (

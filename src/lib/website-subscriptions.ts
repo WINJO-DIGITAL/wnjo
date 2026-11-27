@@ -1,3 +1,4 @@
+import { BLACK_FRIDAY } from "./black-friday";
 import { createHash, randomBytes } from "node:crypto";
 import { isHostingCode, type HostingCode } from "./hosting-request";
 import { OWNERSHIP } from "./pricing";
@@ -149,6 +150,8 @@ export function checkoutParams(
     p.set("subscription_data[description]", hosting ? `${offer.packageName} plan (${offer.reference})` : `${offer.packageName} website package (${offer.reference})`);
     if (trial) {
       if (!(Number.isInteger(trial.days) && trial.days > 0) || upfront > 0) throw new Error("A free trial needs a plan with nothing upfront");
+      // The Black Friday trial is for the Core plan only; Plus and Pro never get one, whatever asked for it.
+      if (offer.packageCode !== BLACK_FRIDAY.plan) throw new Error("The free trial is for the Core plan only");
       p.set("subscription_data[trial_period_days]", String(trial.days));
       // The card is taken at sign-up even though nothing is charged today, and a trial without one ends the plan.
       p.set("payment_method_collection", "always");

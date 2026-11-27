@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BLACK_FRIDAY, FIRST_BILL_DAY, MOTTO, OFFER_HEADLINE, afterTrialLine } from "@/lib/black-friday";
+import { BLACK_FRIDAY, FIRST_BILL_DAY, MOTTO, OFFER_HEADLINE, OFFER_HEADLINE_PLAN, OFFER_PLAN, afterTrialLine, blackFridayPlan } from "@/lib/black-friday";
 import { WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { useBlackFriday } from "./useBlackFriday";
 
@@ -20,7 +20,7 @@ export function BlackFridayStrip() {
       <div className="container container--wide bf-strip__inner">
         <p className="bf-strip__label">Black Friday</p>
         <p className="bf-strip__text">
-          <strong>{OFFER_HEADLINE}</strong> <span className="bf-strip__then">{afterTrialLine(null)}.</span>{" "}
+          <strong>{OFFER_HEADLINE_PLAN}</strong> <span className="bf-strip__then">{afterTrialLine()}.</span>{" "}
           <span className="bf-strip__ends">Sign up by {BLACK_FRIDAY.endsLabel}.</span>
         </p>
         <Link href="/pricing#black-friday" className="bf-strip__link">
@@ -31,10 +31,10 @@ export function BlackFridayStrip() {
   );
 }
 
-/** The offer on each plan card while it is on: the headline, then the plan's price after the trial and the cancel-free line. */
-export function PlanOfferBadge({ monthly }: { monthly: number }) {
+/** The offer on the Core card only, while it is on: the headline, then the price after the trial and the cancel-free line. */
+export function PlanOfferBadge({ plan, monthly }: { plan: string; monthly: number }) {
   const active = useBlackFriday();
-  if (!active) return null;
+  if (!active || !blackFridayPlan(plan)) return null;
   return (
     <div className="pkg-card__offer">
       <span className="tag tag--accent">{OFFER_HEADLINE}</span>
@@ -43,7 +43,7 @@ export function PlanOfferBadge({ monthly }: { monthly: number }) {
   );
 }
 
-const core = WEBSITE_PLANS.bronze;
+const core = OFFER_PLAN;
 const plus = WEBSITE_PLANS.silver;
 const pro = WEBSITE_PLANS.gold;
 
@@ -51,7 +51,11 @@ const pro = WEBSITE_PLANS.gold;
 export const BLACK_FRIDAY_FAQ: { q: string; a: string }[] = [
   {
     q: "What do I get?",
-    a: `A bespoke website, free for ${BLACK_FRIDAY.trialDays} days, on any WINJO plan: ${core.name} at ${formatGBP(core.monthly)}, ${plus.name} at ${formatGBP(plus.monthly)} or ${pro.name} at ${formatGBP(pro.monthly)} a month, with hosting and updates included. No large upfront cost.`,
+    a: `A bespoke website, free for ${BLACK_FRIDAY.trialDays} days, on our ${core.name} plan. After the trial it's ${formatGBP(core.monthly)} a month, with hosting and updates included. No large upfront cost.`,
+  },
+  {
+    q: `Does it apply to ${plus.name} or ${pro.name}?`,
+    a: `No. The free trial is for the ${core.name} plan only. ${plus.name} at ${formatGBP(plus.monthly)} and ${pro.name} at ${formatGBP(pro.monthly)} a month are on their standard terms, with no trial.`,
   },
   {
     q: "When am I charged?",
@@ -89,9 +93,9 @@ export function BlackFridayTerms() {
         <div className="bf-terms__head">
           <p className="eyebrow">Black Friday</p>
           <h2 id="bf-terms-title" className="h2">
-            FREE bespoke website <span className="serif-em">for {BLACK_FRIDAY.trialDays} days.</span>
+            FREE bespoke website <span className="serif-em">for {BLACK_FRIDAY.trialDays} days</span> on our {core.name} plan.
           </h2>
-          <p className="bf-terms__then">{afterTrialLine(core.monthly)}</p>
+          <p className="bf-terms__then">{afterTrialLine()}</p>
           <p className="lede">{MOTTO}</p>
         </div>
         <div className="faq bf-terms__list">
@@ -109,7 +113,7 @@ export function BlackFridayTerms() {
         </div>
         <div className="btn-row mt-5">
           <Link href="#plans" className="btn btn--primary">
-            Choose a plan
+            See the {core.name} plan
           </Link>
         </div>
       </div>

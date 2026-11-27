@@ -479,7 +479,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
     return NextResponse.json({ error: "That plan needs a written proposal first. Please use the full steps." }, { status: 422 });
   }
   // The Black Friday free trial. The browser only says the customer chose it; the server's clock decides
-  // whether it is still on, and a plan with anything upfront never qualifies. After the deadline it is refused
+  // whether it is still on, and only the Core plan with nothing upfront qualifies. After the deadline it is refused
   // outright, so nobody is charged a price they didn't agree to.
   const wantsBlackFriday = body.offer === BLACK_FRIDAY.code;
   if (wantsBlackFriday) {
@@ -492,8 +492,12 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
         { status: 410 },
       );
     }
-    if (!blackFridayEligible(quote)) {
-      return NextResponse.json({ error: "The free trial applies to a plan on its own. Please review your plan." }, { status: 422 });
+    // Core only: a Plus or Pro sign-up asking for the trial (a tampered request) is refused, never given one.
+    if (!blackFridayEligible(quote, answers.plan)) {
+      return NextResponse.json(
+        { error: "The free trial is for the Core plan on its own. Please review your plan.", code: "offer_not_eligible" },
+        { status: 422 },
+      );
     }
   }
   const reference = newReference();

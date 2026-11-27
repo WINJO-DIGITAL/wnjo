@@ -5,7 +5,7 @@ import { stripeConfig } from "./stripe";
 import { createOffer, type CreatedOffer } from "./website-offers";
 import type { WebsiteAnswers, WebsiteQuote } from "./website-quote";
 import { checkoutParams, createOfferCheckout, payNowFor } from "./website-subscriptions";
-import { BLACK_FRIDAY } from "./black-friday";
+import { BLACK_FRIDAY, blackFridayPlan } from "./black-friday";
 
 /**
  * Starts a payment straight from a customer's quote: the offer row holds the amounts (worked out here from the
@@ -35,6 +35,8 @@ export async function startQuotePayment(
   },
 ): Promise<{ url: string | null; offer: CreatedOffer } | null> {
   if (!payNowFor(args.route, args.quote)) return null;
+  // Core only, checked again here: a Plus or Pro sign-up never gets the trial, whatever the caller passed.
+  const trial = args.blackFriday === true && blackFridayPlan(args.answers.plan);
   const offer = await createOffer(db, {
     tenantId: args.tenantId,
     enquiryReference: args.reference,
@@ -46,7 +48,7 @@ export async function startQuotePayment(
     overrides: {},
     createdBy: null,
     consent: { agreedAt: new Date().toISOString(), startNow: args.startNow === true },
-    ...(args.blackFriday
+    ...(trial
       ? {
           blackFriday: {
             code: BLACK_FRIDAY.code,
@@ -70,7 +72,7 @@ export async function startQuotePayment(
           cancel: `${args.origin}/subscribe/${offer.token}?cancelled=1`,
         },
         {},
-        args.blackFriday ? { days: BLACK_FRIDAY.trialDays, offerCode: BLACK_FRIDAY.code } : undefined,
+        trial ? { days: BLACK_FRIDAY.trialDays, offerCode: BLACK_FRIDAY.code } : undefined,
       ),
     );
     await markAwaitingPayment(db, args.tenantId, args.reference);

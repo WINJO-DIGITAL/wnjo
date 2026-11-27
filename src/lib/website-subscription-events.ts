@@ -216,7 +216,8 @@ export async function handleWebsiteSubscriptionEvent(
     const amount = num(obj.amount_total);
     const currency = (str(obj.currency) ?? "").toLowerCase();
     // The Black Friday free trial: nothing is charged at checkout, so the expected first payment is 0.
-    const freeTrial = row.kind === "subscription" && blackFridayOf(row.quote_snapshot) !== null;
+    // Core only: a Plus or Pro row is never a trial, so a £0 checkout on one is refused and flagged like any other.
+    const freeTrial = row.kind === "subscription" && blackFridayOf(row.quote_snapshot, row.package_code) !== null;
     const expected = firstPaymentPence({ ...row, setupPence: row.setup_pence, monthlyPence: row.monthly_pence, oneOffPence: row.one_off_pence }, { freeTrial });
     if (amount !== expected || currency !== "gbp") {
       await deps.alertStaff(
@@ -400,7 +401,7 @@ export async function handleWebsiteSubscriptionEvent(
     const subscriptionId = str(obj.id);
     const row = await findRow(db, { id: str(meta(obj).website_subscription_id), subscriptionId });
     if (row === "error") return "retry";
-    if (!row || !blackFridayOf(row.quote_snapshot)) return row ? "handled" : "ignored";
+    if (!row || !blackFridayOf(row.quote_snapshot, row.package_code)) return row ? "handled" : "ignored";
     if (obj.cancel_at_period_end === true || row.status === "cancelled" || str(obj.status) !== "trialing") return "handled";
     const trialEnd = num(obj.trial_end);
     if (!trialEnd) return "handled";
