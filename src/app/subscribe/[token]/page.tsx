@@ -6,7 +6,7 @@ import { isHostingCode } from "@/lib/hosting-request";
 import { formatPence } from "@/lib/pricing";
 import { serviceClient } from "@/lib/quote-store";
 import { OFFER_TOKEN_RE, firstPaymentPence, hashOfferToken } from "@/lib/website-subscriptions";
-import { BLACK_FRIDAY, blackFridayOf } from "@/lib/black-friday";
+import { BLACK_FRIDAY, CANCEL_FREE, FIRST_BILL_DAY, OFFER_HEADLINE, blackFridayOf } from "@/lib/black-friday";
 import { blackFridayActiveNow } from "@/lib/black-friday-clock";
 
 export const dynamic = "force-dynamic";
@@ -189,15 +189,15 @@ function Account({ row, token }: { row: Row; token: string }) {
 }
 
 /**
- * An offer made on the Black Friday free first month: the cancel page when the customer leaves Stripe, and the way back
- * in. Once the offer has ended, by the server's clock, the link stops rather than charging the first month.
+ * An offer made on the Black Friday free trial: the cancel page when the customer leaves Stripe, and the way back in.
+ * Once the offer has ended, by the server's clock, the link stops rather than charging without the trial.
  */
 function BlackFridayOffer({ row, token, cancelled }: { row: Row; token: string; cancelled: boolean }) {
   const on = blackFridayActiveNow();
   return (
     <div className="stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
       <p className="eyebrow">{row.reference}</p>
-      <h1 className="h1">{cancelled ? "No card added yet." : `Your ${row.package_name} plan, first month free.`}</h1>
+      <h1 className="h1">{cancelled ? "No card added yet." : `${OFFER_HEADLINE}: your ${row.package_name} plan.`}</h1>
       <p className="lede">
         {cancelled
           ? `Hi ${row.name.split(/\s+/)[0]}. You left the secure payment page, so no card was added and nothing has been charged.`
@@ -212,23 +212,23 @@ function BlackFridayOffer({ row, token, cancelled }: { row: Row; token: string; 
               <small>your card is added; nothing is charged for {BLACK_FRIDAY.trialDays} days</small>
             </div>
             <div className="cfg-total">
-              <span>From day {BLACK_FRIDAY.trialDays + 1}</span>
+              <span>From day {FIRST_BILL_DAY}</span>
               <strong>{gbp(row.monthly_pence)}</strong>
-              <small>a month, {row.minimum_term_months}-month minimum term</small>
+              <small>a month, rolling monthly, no minimum term</small>
             </div>
           </div>
           <ul className="sub-facts" role="list">
-            <li>Your first monthly payment is taken on day {BLACK_FRIDAY.trialDays + 1}, then each month.</li>
-            <li>After your free month there is a {row.minimum_term_months}-month minimum term.</li>
-            <li>During your free month, your website is shown on a private WINJO preview link. It goes on your own domain, and files are handed over, once billing has started.</li>
+            <li>Your first monthly payment is taken on day {FIRST_BILL_DAY}, then each month. We email you a reminder 3 days before.</li>
+            <li>Changed your mind? {CANCEL_FREE.charAt(0).toUpperCase() + CANCEL_FREE.slice(1)}: sign in to your account and choose Request cancellation, or reply to any of our emails.</li>
+            <li>During your trial, your website is shown on a private WINJO preview link. It goes on your own domain, and files are handed over, once billing has started.</li>
             <li>Your design is licensed to you while your plan is active.</li>
           </ul>
           <LegalDraftNotice />
           <SubscribeActions
             token={token}
             mode="pay"
-            freeFirstMonth
-            commitment={`the Black Friday offer terms, including the ${row.minimum_term_months}-month minimum term after the free month`}
+            freeTrial
+            commitment="the Black Friday offer terms"
           />
           <p className="fine">The offer is open to sign-ups until {BLACK_FRIDAY.endsLabel}.</p>
         </>

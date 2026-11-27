@@ -219,7 +219,7 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
   });
 });
 
-describe("POST /api/enquiry: the Black Friday free first month", () => {
+describe("POST /api/enquiry: the Black Friday free trial", () => {
   const fetchMock = vi.fn();
   beforeEach(() => {
     vi.stubGlobal("fetch", fetchMock);
@@ -239,14 +239,14 @@ describe("POST /api/enquiry: the Black Friday free first month", () => {
   const short = (over: Record<string, unknown> = {}) =>
     body({ short: true, brief: undefined, draftId: null, details: { ...body().details, industry: "", description: "" }, offer: "black-friday-2026", ...over });
 
-  it("starts the free month while the offer is on, by the server's clock", async () => {
+  it("starts the free trial while the offer is on, by the server's clock", async () => {
     vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-11-28T12:00:00Z");
     const res = await post(short());
     expect(res.status).toBe(200);
     expect(vi.mocked(startQuotePayment).mock.calls[0][1]).toMatchObject({ blackFriday: true });
   });
 
-  it("refuses the free month after Monday 30 November 23:59 UK time, and saves nothing", async () => {
+  it("refuses the free trial after Monday 30 November 23:59 UK time, and saves nothing", async () => {
     vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-12-01T00:00:00Z");
     const res = await post(short());
     expect(res.status).toBe(410);

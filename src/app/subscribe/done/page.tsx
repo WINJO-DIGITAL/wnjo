@@ -42,9 +42,9 @@ export default async function SubscribeDone({ searchParams }: { searchParams: Pr
           : { data: null };
         const row = data as (ConfirmedOrder & { quote_snapshot?: unknown }) | null;
         if (row) {
-          // The Black Friday free first month: nothing was charged today; billing starts on day 31.
+          // The Black Friday free trial: nothing was charged today; billing starts on day 15.
           const { quote_snapshot: snapshot, ...rest } = row;
-          order = { ...rest, free_first_month: rest.kind === "subscription" && blackFridayOf(snapshot) !== null };
+          order = { ...rest, free_trial: rest.kind === "subscription" && blackFridayOf(snapshot) !== null };
         }
         if (order) {
           // A bought-outright website: the deposit (at the start) or the final balance (after approval). Anything else is a plan.

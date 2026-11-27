@@ -53,8 +53,8 @@ export async function POST(request: NextRequest) {
   if (row.status !== "offered") return NextResponse.json({ error: "already_paid" }, { status: 409 });
   if (new Date(row.offer_expires_at).getTime() < Date.now()) return NextResponse.json({ error: "expired" }, { status: 410 });
 
-  // An offer made on the Black Friday free first month keeps it only while the offer is on, by the server's clock.
-  // After the deadline the link stops rather than charging a first month the customer was told would be free.
+  // An offer made on the Black Friday free trial keeps it only while the offer is on, by the server's clock.
+  // After the deadline the link stops rather than charging the customer during a trial they were told was free.
   const blackFriday = row.kind === "subscription" ? blackFridayOf(row.quote_snapshot) : null;
   if (blackFriday && !blackFridayActiveNow()) return NextResponse.json({ error: "offer_ended" }, { status: 410 });
 

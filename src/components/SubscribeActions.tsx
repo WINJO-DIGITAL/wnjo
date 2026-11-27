@@ -9,14 +9,14 @@ export function SubscribeActions({
   mode,
   firstPayment,
   commitment,
-  freeFirstMonth = false,
+  freeTrial = false,
 }: {
   token: string;
   mode: "pay" | "manage";
   firstPayment?: string;
   commitment?: string;
-  /** The Black Friday free first month: the card is taken now and nothing is charged today. */
-  freeFirstMonth?: boolean;
+  /** The Black Friday free trial: the card is taken now and nothing is charged today. */
+  freeTrial?: boolean;
 }) {
   const [agree, setAgree] = useState(false);
   const [startNow, setStartNow] = useState(false);
@@ -79,7 +79,7 @@ export function SubscribeActions({
         </span>
       </label>
       <button type="button" className="btn btn--primary" onClick={go} disabled={!agree || busy}>
-        {busy ? "Opening secure payment…" : freeFirstMonth ? "Add your card and start your free month" : `Pay ${firstPayment ?? ""} securely`}
+        {busy ? "Opening secure payment…" : freeTrial ? "Add your card and start your free trial" : `Pay ${firstPayment ?? ""} securely`}
       </button>
       <p className="fine">Payment is handled by Stripe. Your card details never reach our servers.</p>
       {error && <p className="field-error" role="alert">{error}</p>}

@@ -17390,11 +17390,11 @@ body:has(.dash-header) {
 
 .pkg-card__offer {
   margin: var(--space-2) 0 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  display: grid;
+  justify-items: start;
   gap: var(--space-2);
   font-size: var(--text-sm);
+  line-height: var(--leading-snug);
 }
 .pkg-card__offer-then {
   color: var(--color-ink-2);
@@ -17411,6 +17411,13 @@ body:has(.dash-header) {
 }
 .bf-terms__head > * {
   margin: 0;
+}
+.bf-terms__then {
+  font-weight: 500;
+  color: var(--color-ink-2);
+}
+.bf-strip__then {
+  color: var(--color-inverse-ink-2);
 }
 .bf-terms .faq__short {
   font-size: var(--text-lg);

@@ -478,7 +478,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
   if (short && !payNowFor(routeFor(quote), quote)) {
     return NextResponse.json({ error: "That plan needs a written proposal first. Please use the full steps." }, { status: 422 });
   }
-  // The Black Friday free first month. The browser only says the customer chose it; the server's clock decides
+  // The Black Friday free trial. The browser only says the customer chose it; the server's clock decides
   // whether it is still on, and a plan with anything upfront never qualifies. After the deadline it is refused
   // outright, so nobody is charged a price they didn't agree to.
   const wantsBlackFriday = body.offer === BLACK_FRIDAY.code;
@@ -493,7 +493,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
       );
     }
     if (!blackFridayEligible(quote)) {
-      return NextResponse.json({ error: "The free first month applies to a plan on its own. Please review your plan." }, { status: 422 });
+      return NextResponse.json({ error: "The free trial applies to a plan on its own. Please review your plan." }, { status: 422 });
     }
   }
   const reference = newReference();

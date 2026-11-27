@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BLACK_FRIDAY, MOTTO } from "@/lib/black-friday";
+import { BLACK_FRIDAY, FIRST_BILL_DAY, MOTTO, OFFER_HEADLINE, afterTrialLine } from "@/lib/black-friday";
 import { WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 import { useBlackFriday } from "./useBlackFriday";
 
@@ -20,7 +20,8 @@ export function BlackFridayStrip() {
       <div className="container container--wide bf-strip__inner">
         <p className="bf-strip__label">Black Friday</p>
         <p className="bf-strip__text">
-          <strong>Your first month free</strong> on any WINJO website plan. Sign up by {BLACK_FRIDAY.endsLabel}.
+          <strong>{OFFER_HEADLINE}</strong> <span className="bf-strip__then">{afterTrialLine(null)}</span>{" "}
+          <span className="bf-strip__ends">Sign up by {BLACK_FRIDAY.endsLabel}.</span>
         </p>
         <Link href="/pricing#black-friday" className="bf-strip__link">
           How it works
@@ -30,15 +31,15 @@ export function BlackFridayStrip() {
   );
 }
 
-/** The line on each plan card while the offer is on. */
-export function PlanOfferBadge() {
+/** The offer on each plan card while it is on: the headline, then the plan's price after the trial and the cancel-free line. */
+export function PlanOfferBadge({ monthly }: { monthly: number }) {
   const active = useBlackFriday();
   if (!active) return null;
   return (
-    <p className="pkg-card__offer">
-      <span className="tag tag--accent">First month free</span>
-      <span className="pkg-card__offer-then">Billing starts on day {BLACK_FRIDAY.trialDays + 1}</span>
-    </p>
+    <div className="pkg-card__offer">
+      <span className="tag tag--accent">{OFFER_HEADLINE}</span>
+      <span className="pkg-card__offer-then">{afterTrialLine(monthly)}</span>
+    </div>
   );
 }
 
@@ -50,18 +51,22 @@ const pro = WEBSITE_PLANS.gold;
 export const BLACK_FRIDAY_FAQ: { q: string; a: string }[] = [
   {
     q: "What do I get?",
-    a: `Your first month free on any WINJO website plan: ${core.name} at ${formatGBP(core.monthly)}, ${plus.name} at ${formatGBP(plus.monthly)} or ${pro.name} at ${formatGBP(pro.monthly)} a month. No large upfront cost.`,
+    a: `A bespoke website, free for ${BLACK_FRIDAY.trialDays} days, on any WINJO plan: ${core.name} at ${formatGBP(core.monthly)}, ${plus.name} at ${formatGBP(plus.monthly)} or ${pro.name} at ${formatGBP(pro.monthly)} a month, with hosting and updates included. No large upfront cost.`,
   },
   {
     q: "When am I charged?",
-    a: `We take your card when you sign up, through Stripe, and nothing is charged for your first ${BLACK_FRIDAY.trialDays} days. Your first monthly payment is taken on day ${BLACK_FRIDAY.trialDays + 1}, then each month after that.`,
+    a: `We take your card when you sign up, through Stripe, and nothing is charged for ${BLACK_FRIDAY.trialDays} days. Your first monthly payment is taken on day ${FIRST_BILL_DAY}, then each month after that. We email you a reminder 3 days before.`,
+  },
+  {
+    q: "Can I cancel during the trial?",
+    a: `Yes. Cancel before day ${FIRST_BILL_DAY} and you pay nothing. Sign in to your account, open Plan and billing and choose Request cancellation, or reply to any of our emails. Your plan then ends when the trial does and your card is never charged.`,
   },
   {
     q: "Is there a minimum term?",
-    a: `Yes. After your free month there is a ${BLACK_FRIDAY.minimumTermMonths}-month minimum term. It applies only to sign-ups on this offer; our standard plans stay rolling monthly.`,
+    a: "No. Once billing starts, your plan is rolling monthly, like all our plans. Cancel any time.",
   },
   {
-    q: "Where will I see my website during the free month?",
+    q: "Where will I see my website during the trial?",
     a: "On a private preview link hosted by WINJO. Your website goes on your own domain, and files are handed over, only once your billing has started.",
   },
   {
@@ -84,8 +89,9 @@ export function BlackFridayTerms() {
         <div className="bf-terms__head">
           <p className="eyebrow">Black Friday</p>
           <h2 id="bf-terms-title" className="h2">
-            Your first month <span className="serif-em">on us.</span>
+            FREE bespoke website <span className="serif-em">for {BLACK_FRIDAY.trialDays} days.</span>
           </h2>
+          <p className="bf-terms__then">{afterTrialLine(core.monthly)}</p>
           <p className="lede">{MOTTO}</p>
         </div>
         <div className="faq bf-terms__list">

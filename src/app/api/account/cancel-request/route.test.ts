@@ -138,6 +138,17 @@ describe("a rolling plan ends at the end of the period already paid for", () => 
     expect(state.sent.find((m) => m.to === "staff@winjo.test")?.text).toContain("could not be set in Stripe automatically");
   });
 
+  it("in a Black Friday free trial, ends at the trial end and tells the customer nothing will be charged", async () => {
+    state.sub = { ...rolling };
+    const trialEnd = Math.floor(Date.UTC(2026, 11, 11, 10) / 1000);
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ status: "trialing", current_period_end: trialEnd }), { status: 200 })));
+    const res = await call({ reference: "WS-ABC123", action: "request" });
+    expect(await res.json()).toMatchObject({ ok: true, processed: true, inTrial: true });
+    const customer = state.sent.find((m) => m.to === "Owner@Shop.co.uk")?.text ?? "";
+    expect(customer).toContain("Your free trial ends on 11 December 2026 and nothing will be charged");
+    expect(state.sent.find((m) => m.to === "staff@winjo.test")?.text).toContain("during the free trial");
+  });
+
   it("leaves a plan with a minimum term for staff, as before", async () => {
     state.sub = { ...sub };
     const fetchMock = vi.fn();

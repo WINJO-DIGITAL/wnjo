@@ -35,7 +35,7 @@ export type NewOffer = {
   packageName?: string;
   /** Recorded in the snapshot when the customer agreed to the terms before paying. */
   consent?: { agreedAt: string; startNow?: boolean };
-  /** The Black Friday free first month, when the customer agreed to it and the server confirmed the offer was on. */
+  /** The Black Friday free trial, when the customer agreed to it and the server confirmed the offer was on. */
   blackFriday?: BlackFridaySnapshot;
 };
 
@@ -68,7 +68,7 @@ export async function createOffer(db: SupabaseClient, input: NewOffer): Promise<
         ...(input.blackFriday ? { offer: input.blackFriday } : {}),
       },
       terms_version: QUOTE_TERMS_VERSION,
-      minimum_term_months: input.blackFriday ? input.blackFriday.minimumTermMonths : OWNERSHIP.minimumTermMonths,
+      minimum_term_months: OWNERSHIP.minimumTermMonths,
       ownership_after_payments: OWNERSHIP.ownershipAfterPayments,
       offer_token_hash: hash,
       offer_expires_at: new Date(Date.now() + OFFER_TTL_DAYS * 86_400_000).toISOString(),

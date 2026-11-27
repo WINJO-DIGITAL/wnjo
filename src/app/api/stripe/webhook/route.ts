@@ -15,6 +15,8 @@ const WEBSITE_EVENTS = new Set([
   "invoice.payment_failed",
   "customer.subscription.updated",
   "customer.subscription.deleted",
+  // The Black Friday free-trial reminder, 3 days before the first charge.
+  "customer.subscription.trial_will_end",
 ]);
 
 async function emailCustomer(to: string, message: { subject: string; text: string }): Promise<void> {

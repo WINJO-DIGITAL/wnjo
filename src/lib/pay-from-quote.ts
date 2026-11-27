@@ -28,8 +28,8 @@ export async function startQuotePayment(
     /** The customer asked us to start work within the 14-day cancellation period. */
     startNow?: boolean;
     /**
-     * The Black Friday free first month. The caller has already checked, on the server's clock, that the offer is on
-     * and the plan qualifies; here it is recorded with the offer and passed to Stripe as a 30-day trial.
+     * The Black Friday free trial. The caller has already checked, on the server's clock, that the offer is on and the
+     * plan qualifies; here it is recorded with the offer and passed to Stripe as a 14-day trial.
      */
     blackFriday?: boolean;
   },
@@ -51,7 +51,6 @@ export async function startQuotePayment(
           blackFriday: {
             code: BLACK_FRIDAY.code,
             trialDays: BLACK_FRIDAY.trialDays,
-            minimumTermMonths: BLACK_FRIDAY.minimumTermMonths,
             agreedAt: new Date().toISOString(),
           },
         }

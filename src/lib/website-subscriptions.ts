@@ -89,15 +89,15 @@ export function proposalOverrides(
 }
 
 /**
- * What the customer pays first: setup + one-off extras + the first month, or the one-off amount. With a free first month
- * (the Black Friday offer) the first month is not charged at checkout, so only anything upfront is (which is nothing).
+ * What the customer pays first: setup + one-off extras + the first month, or the one-off amount. With a free trial
+ * (the Black Friday offer) nothing is charged at checkout, so only anything upfront is (which is nothing).
  */
 export function firstPaymentPence(
   offer: Pick<OfferAmounts, "kind" | "setupPence" | "monthlyPence" | "oneOffPence">,
-  opts: { freeFirstMonth?: boolean } = {},
+  opts: { freeTrial?: boolean } = {},
 ): number {
   if (offer.kind !== "subscription") return offer.oneOffPence;
-  return offer.setupPence + offer.oneOffPence + (opts.freeFirstMonth ? 0 : offer.monthlyPence);
+  return offer.setupPence + offer.oneOffPence + (opts.freeTrial ? 0 : offer.monthlyPence);
 }
 
 /** The Stripe Checkout request for an offer. Amounts come only from the offer row, never from the browser. */
@@ -148,7 +148,7 @@ export function checkoutParams(
     p.set("subscription_data[metadata][reference]", offer.reference);
     p.set("subscription_data[description]", hosting ? `${offer.packageName} plan (${offer.reference})` : `${offer.packageName} website package (${offer.reference})`);
     if (trial) {
-      if (!(Number.isInteger(trial.days) && trial.days > 0) || upfront > 0) throw new Error("A free first month needs a plan with nothing upfront");
+      if (!(Number.isInteger(trial.days) && trial.days > 0) || upfront > 0) throw new Error("A free trial needs a plan with nothing upfront");
       p.set("subscription_data[trial_period_days]", String(trial.days));
       // The card is taken at sign-up even though nothing is charged today, and a trial without one ends the plan.
       p.set("payment_method_collection", "always");

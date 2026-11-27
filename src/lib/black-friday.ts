@@ -1,12 +1,16 @@
+import { formatGBP } from "./pricing";
+
 /**
- * The WINJO Black Friday offer (owner's brief, 27 November 2026): the first month free on any managed website plan.
- * Browser-safe, so the banner, the plan cards, the checkout and the server all read the same dates and rules.
+ * The WINJO Black Friday offer (owner's brief, updated 27 November 2026): a 14-day free trial on any managed website
+ * plan. Browser-safe, so the banner, the plan cards, the checkout and the server all read the same dates and rules.
  *
  * - Sign-ups from Friday 27 November 2026 until Monday 30 November 2026, 23:59 UK time. The UK is on GMT then, so the
  *   last moment is 23:59:59 UTC. After that the offer switches itself off: the banner and badges disappear and the
- *   sign-up endpoint refuses the free month, whatever the browser says.
- * - A card is taken at sign-up through Stripe Checkout and billing starts on day 31 (a 30-day trial).
- * - A 12-month minimum term follows the free month.
+ *   sign-up endpoint refuses the trial, whatever the browser says.
+ * - A card is taken at sign-up through Stripe Checkout (a 14-day trial) and billing starts on day 15. Cancelling
+ *   before day 15 costs nothing: the plan ends when the trial does and Stripe never charges.
+ * - No minimum term (owner, 27 November 2026): offer sign-ups are rolling monthly, like every other plan.
+ * - Stripe sends customer.subscription.trial_will_end 3 days before the first charge; we email a reminder then.
  */
 export const BLACK_FRIDAY = {
   /** Sent by the checkout and stored with the offer, so the server knows which offer the customer agreed to. */
@@ -15,9 +19,20 @@ export const BLACK_FRIDAY = {
   endsAt: "2026-11-30T23:59:59Z",
   /** The last moment, as people read it. */
   endsLabel: "Monday 30 November, 23:59 UK time",
-  trialDays: 30,
-  minimumTermMonths: 12,
+  trialDays: 14,
 } as const;
+
+/** The day billing starts: the day after the trial. */
+export const FIRST_BILL_DAY = BLACK_FRIDAY.trialDays + 1;
+
+/** The headline, in the owner's words. */
+export const OFFER_HEADLINE = `FREE bespoke website for ${BLACK_FRIDAY.trialDays} days`;
+
+/** The line that sits next to the headline everywhere: the price after the trial, and that cancelling is free. */
+export const CANCEL_FREE = `cancel before day ${FIRST_BILL_DAY} and pay nothing`;
+export function afterTrialLine(monthlyPounds: number | null): string {
+  return monthlyPounds === null ? `then from ${formatGBP(99)}/mo · ${CANCEL_FREE}` : `then ${formatGBP(monthlyPounds)}/mo · ${CANCEL_FREE}`;
+}
 
 export const MOTTO = "Your goal is to do your business. Our goal is to grow it.";
 
@@ -25,7 +40,7 @@ const START_MS = Date.parse(BLACK_FRIDAY.startsAt);
 // Inclusive of the whole final second.
 const END_MS = Date.parse(BLACK_FRIDAY.endsAt) + 999;
 
-/** Whether a sign-up at this moment gets the free month. */
+/** Whether a sign-up at this moment gets the free trial. */
 export function blackFridayActiveAt(nowMs: number): boolean {
   return Number.isFinite(nowMs) && nowMs >= START_MS && nowMs <= END_MS;
 }
@@ -36,14 +51,14 @@ export function msUntilBlackFridayEnds(nowMs: number): number {
 }
 
 /**
- * Only a plain monthly plan qualifies: no setup fee and no one-off extras, so nothing at all is charged until day 31.
+ * Only a plain monthly plan qualifies: no setup fee and no one-off extras, so nothing at all is charged during the trial.
  * Anything with an upfront amount goes through the standard checkout.
  */
 export function blackFridayEligible(quote: { mode: "monthly" | "oneOff"; setup: number; oneOffTotal: number; monthly: number }): boolean {
   return quote.mode === "monthly" && quote.setup === 0 && quote.oneOffTotal === 0 && quote.monthly > 0;
 }
 
-/** The day billing starts for a sign-up on this date: day 31, i.e. 30 days after sign-up. */
+/** The day billing starts for a sign-up at this moment: day 15, i.e. 14 days after sign-up (when Stripe's trial ends). */
 export function blackFridayFirstBillDate(signUp: Date): Date {
   return new Date(signUp.getTime() + BLACK_FRIDAY.trialDays * 86_400_000);
 }
@@ -52,7 +67,6 @@ export function blackFridayFirstBillDate(signUp: Date): Date {
 export type BlackFridaySnapshot = {
   code: typeof BLACK_FRIDAY.code;
   trialDays: number;
-  minimumTermMonths: number;
   agreedAt: string;
 };
 
@@ -65,7 +79,6 @@ export function blackFridayOf(snapshot: unknown): BlackFridaySnapshot | null {
   return {
     code: BLACK_FRIDAY.code,
     trialDays: typeof offer.trialDays === "number" ? offer.trialDays : BLACK_FRIDAY.trialDays,
-    minimumTermMonths: typeof offer.minimumTermMonths === "number" ? offer.minimumTermMonths : BLACK_FRIDAY.minimumTermMonths,
     agreedAt: typeof offer.agreedAt === "string" ? offer.agreedAt : "",
   };
 }
