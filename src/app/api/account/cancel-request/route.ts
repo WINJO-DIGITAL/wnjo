@@ -30,10 +30,11 @@ type Sub = {
 };
 
 /**
- * Ends a rolling plan at the end of the billing period the customer has already paid for. Stripe is told, and our record
+ * Ends a rolling plan at the end of the billing period the customer has already paid for (or, in a free trial, at the
+ * end of the trial, before the first charge). Stripe is told, and our record
  * follows Stripe's answer. Returns the end date, or null when Stripe could not be reached (staff are then alerted).
  */
-async function endAtPeriodEnd(stripeSubscriptionId: string): Promise<string | null> {
+async function endAtPeriodEnd(stripeSubscriptionId: string): Promise<{ endsOn: string; inTrial: boolean } | null> {
   const key = stripeConfig().secretKey;
   if (!key) return null;
   const res = await fetch(`${STRIPE_API}/subscriptions/${encodeURIComponent(stripeSubscriptionId)}`, {
@@ -43,9 +44,12 @@ async function endAtPeriodEnd(stripeSubscriptionId: string): Promise<string | nu
     signal: AbortSignal.timeout(15_000),
   }).catch(() => null);
   if (!res?.ok) return null;
-  const json = (await res.json().catch(() => null)) as { current_period_end?: number; items?: { data?: { current_period_end?: number }[] } } | null;
+  const json = (await res.json().catch(() => null)) as
+    | { status?: string; current_period_end?: number; items?: { data?: { current_period_end?: number }[] } }
+    | null;
   const end = json?.current_period_end ?? json?.items?.data?.[0]?.current_period_end;
-  return typeof end === "number" ? new Date(end * 1000).toISOString() : null;
+  // In a free trial (Black Friday), the period end is the trial end, so cancelling now means nothing is ever charged.
+  return typeof end === "number" ? { endsOn: new Date(end * 1000).toISOString(), inTrial: json?.status === "trialing" } : null;
 }
 
 /**
@@ -93,9 +97,12 @@ export async function POST(request: NextRequest) {
   // A rolling plan (no minimum term) ends at the end of the period already paid for, automatically. A plan with a term
   // is left for staff, as before.
   let endsOn: string | null = null;
+  let inTrial = false;
   let processed = false;
   if (sub.minimum_term_months === 0 && sub.stripe_subscription_id) {
-    endsOn = await endAtPeriodEnd(sub.stripe_subscription_id);
+    const ended = await endAtPeriodEnd(sub.stripe_subscription_id);
+    endsOn = ended?.endsOn ?? null;
+    inTrial = ended?.inTrial ?? false;
     if (endsOn) {
       await db.from("website_subscriptions").update({ cancel_at_period_end: true, current_period_end: endsOn, updated_at: new Date().toISOString() }).eq("id", sub.id);
       await db.from("website_cancellation_requests").update({ status: "processed", processed_at: new Date().toISOString() }).eq("subscription_id", sub.id).eq("status", "open");
@@ -117,6 +124,7 @@ export async function POST(request: NextRequest) {
       ownershipAfterPayments: sub.ownership_after_payments,
       minimumTermMonths: sub.minimum_term_months,
       endsOn: endsOn ?? undefined,
+      inTrial,
     });
     await sendEmail(config, { to: sub.email, subject: message.subject, text: message.text }, "Cancellation request").catch(() => false);
     const staff = enquiryTo();
@@ -127,12 +135,12 @@ export async function POST(request: NextRequest) {
           to: staff,
           subject: `[WINJO DIGITAL payments] Cancellation requested ${sub.reference}`,
           text: processed
-            ? `${sub.reference}: ${sub.name} asked to cancel their ${sub.package_name} plan. It ends on ${endsOn}, and Stripe has been told.${reason ? `\nWhy: ${reason}` : ""}`
+            ? `${sub.reference}: ${sub.name} asked to cancel their ${sub.package_name} plan${inTrial ? " during the free trial" : ""}. It ends on ${endsOn}${inTrial ? " with nothing charged" : ""}, and Stripe has been told.${reason ? `\nWhy: ${reason}` : ""}`
             : `${sub.reference}: ${sub.name} asked to cancel their ${sub.package_name} plan from their account, but it could not be set in Stripe automatically.${reason ? `\nWhy: ${reason}` : ""}\n\nPlease process it in the admin.`,
         },
         "Cancellation alert",
       ).catch(() => false);
     }
   }
-  return NextResponse.json({ ok: true, endsOn, processed });
+  return NextResponse.json({ ok: true, endsOn, processed, inTrial });
 }

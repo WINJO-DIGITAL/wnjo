@@ -7,6 +7,7 @@ import { BALANCE_PACKAGE_NAME } from "@/lib/pay-now";
 import { isHostingCode } from "@/lib/hosting-request";
 import { PaymentConfirmed, type ConfirmedOrder, type PaymentJourney } from "@/components/PaymentConfirmed";
 import { RefreshWhilePending } from "@/components/RefreshWhilePending";
+import { blackFridayOf } from "@/lib/black-friday";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Payment", robots: { index: false, follow: false } };
@@ -35,11 +36,16 @@ export default async function SubscribeDone({ searchParams }: { searchParams: Pr
         const { data } = db
           ? await db
               .from("website_subscriptions")
-              .select("reference, kind, package_code, package_name, email, setup_pence, monthly_pence, one_off_pence, minimum_term_months, enquiry_reference")
+              .select("reference, kind, package_code, package_name, email, setup_pence, monthly_pence, one_off_pence, minimum_term_months, enquiry_reference, quote_snapshot")
               .eq("id", s.clientReferenceId)
               .maybeSingle()
           : { data: null };
-        order = (data as ConfirmedOrder | null) ?? null;
+        const row = data as (ConfirmedOrder & { quote_snapshot?: unknown }) | null;
+        if (row) {
+          // The Black Friday free trial: nothing was charged today; billing starts on day 15.
+          const { quote_snapshot: snapshot, ...rest } = row;
+          order = { ...rest, free_trial: rest.kind === "subscription" && blackFridayOf(snapshot) !== null };
+        }
         if (order) {
           // A bought-outright website: the deposit (at the start) or the final balance (after approval). Anything else is a plan.
           const { data: brief } = db

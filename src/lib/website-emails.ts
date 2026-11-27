@@ -178,6 +178,8 @@ export type SubscriptionEmailFacts = {
   needsDetails?: boolean;
   /** Set for a hosting-only plan, which has no website build behind it. */
   hosting?: { siteUrl: string; websiteStatus: WebsiteStatus };
+  /** The Black Friday free trial: the day the first monthly payment is taken (day 15), as people read it. */
+  trialEndsOn?: string;
 };
 
 const gbpPence = (p: number) => formatPence(p);
@@ -320,11 +322,21 @@ export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text
     text: [
       `Hi ${first(f.name)},`,
       "",
-      `Thank you. Your first payment for the ${f.packageName} package has been received.`,
+      f.trialEndsOn
+        ? `Thank you. Your 14-day free trial of the ${f.packageName} package has started. Nothing has been charged today.`
+        : `Thank you. Your first payment for the ${f.packageName} package has been received.`,
       "",
       ...detailsStep(f),
       "",
-      `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month.`,
+      f.trialEndsOn
+        ? `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically from ${f.trialEndsOn} and each month after that.`
+        : `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month.`,
+      ...(f.trialEndsOn
+        ? [
+            `Changed your mind? Cancel before ${f.trialEndsOn} and you pay nothing. Sign in to your account, open Plan and billing and choose Request cancellation, or simply reply to this email. We'll also remind you 3 days before your first payment.`,
+            "During your trial, your website is shown on a private WINJO preview link. It goes on your own domain once billing has started.",
+          ]
+        : []),
       termLine(f.minimumTermMonths),
       "",
       "Stripe emails a receipt for every payment.",
@@ -443,18 +455,40 @@ export function balanceReceivedEmail(f: SubscriptionEmailFacts): { subject: stri
 }
 
 /** Sent the moment a customer asks to cancel on their account, so they have a clear record of when they asked. */
-export function cancelRequestEmail(f: SubscriptionEmailFacts & { endsOn?: string }): { subject: string; text: string } {
+export function cancelRequestEmail(f: SubscriptionEmailFacts & { endsOn?: string; inTrial?: boolean }): { subject: string; text: string } {
   const endsOn = f.endsOn ? new Date(f.endsOn).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" }) : null;
   return {
     subject: endsOn ? `Your cancellation is confirmed [${f.reference}]` : `We've received your cancellation request [${f.reference}]`,
     text: [
       `Hi ${first(f.name)},`,
       "",
-      endsOn
+      endsOn && f.inTrial
+        ? `Your ${f.packageName} plan (${f.reference}) is cancelled. Your free trial ends on ${endsOn} and nothing will be charged.`
+        : endsOn
         ? `Your ${f.packageName} plan (${f.reference}) is cancelled. It ends on ${endsOn}, the end of the billing period you've already paid for. No further payments will be taken after that, and your website stays live until then.`
         : `We've received your request to cancel your ${f.packageName} plan (${f.reference}). We'll confirm by email when it will end. Your website stays live until then.`,
       "",
       "If you didn't ask to cancel, or you've changed your mind, reply to this email and we'll leave things as they are.",
+      ...sign,
+    ].join("\n"),
+  };
+}
+
+/**
+ * The Black Friday trial reminder, sent when Stripe says the trial ends in 3 days (customer.subscription.trial_will_end).
+ * It says when the first payment is taken, how much, and how to cancel for free before then.
+ */
+export function trialEndingEmail(f: SubscriptionEmailFacts & { trialEndsOn: string }, siteUrl: string): { subject: string; text: string } {
+  const account = `${siteUrl.replace(/\/+$/, "")}/account/billing`;
+  return {
+    subject: `Your free trial ends on ${f.trialEndsOn} [${f.reference}]`,
+    text: [
+      `Hi ${first(f.name)},`,
+      "",
+      `A quick reminder: your free trial of the ${f.packageName} plan (${f.reference}) ends on ${f.trialEndsOn}.`,
+      `If you carry on, your first payment of ${gbpPence(f.monthlyPence)} is taken automatically on ${f.trialEndsOn}, then each month. It's rolling monthly, with no minimum term.`,
+      "",
+      `Don't want to continue? Cancel before ${f.trialEndsOn} and you pay nothing. Sign in at ${account} and choose Request cancellation, or simply reply to this email.`,
       ...sign,
     ].join("\n"),
   };

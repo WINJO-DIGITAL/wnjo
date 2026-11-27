@@ -18,6 +18,8 @@ import { customerAcknowledgement, hostingAcknowledgement, hostingPayLinkEmail, o
 import { startQuotePayment } from "@/lib/pay-from-quote";
 import { routeFor } from "@/lib/build-journey";
 import { payNowFor } from "@/lib/pay-now";
+import { BLACK_FRIDAY, blackFridayEligible } from "@/lib/black-friday";
+import { blackFridayActiveNow } from "@/lib/black-friday-clock";
 import { CARE_PLANS, OWNERSHIP } from "@/lib/pricing";
 import { ROUTED_WANTS, formatWebsiteQuote, parseWebsiteAnswers, websiteQuote } from "@/lib/website-quote";
 import { formatGBP } from "@/lib/pricing";
@@ -476,6 +478,24 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
   if (short && !payNowFor(routeFor(quote), quote)) {
     return NextResponse.json({ error: "That plan needs a written proposal first. Please use the full steps." }, { status: 422 });
   }
+  // The Black Friday free trial. The browser only says the customer chose it; the server's clock decides
+  // whether it is still on, and a plan with anything upfront never qualifies. After the deadline it is refused
+  // outright, so nobody is charged a price they didn't agree to.
+  const wantsBlackFriday = body.offer === BLACK_FRIDAY.code;
+  if (wantsBlackFriday) {
+    if (!short || !blackFridayActiveNow()) {
+      return NextResponse.json(
+        {
+          error: `The Black Friday offer ended on ${BLACK_FRIDAY.endsLabel}. Please refresh the page to see the standard plan.`,
+          code: "offer_ended",
+        },
+        { status: 410 },
+      );
+    }
+    if (!blackFridayEligible(quote)) {
+      return NextResponse.json({ error: "The free trial applies to a plan on its own. Please review your plan." }, { status: 422 });
+    }
+  }
   const reference = newReference();
   const subject = ownerSubject(details, quote, intent, reference);
   const text = [
@@ -561,6 +581,7 @@ async function handleWebsiteQuote(body: Json, request: NextRequest) {
           answers,
           quote,
           startNow: body.startNow === true,
+          blackFriday: wantsBlackFriday,
         })
       : null;
   // No payment started (it failed, or the brief couldn't be tracked): tell staff now so the request isn't missed.

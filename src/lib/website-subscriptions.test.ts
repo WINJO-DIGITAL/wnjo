@@ -545,3 +545,88 @@ describe("tracking a cancellation from Stripe", () => {
     expect(tables.website_subscription_events).toEqual([expect.objectContaining({ kind: "payment_failed", reason: "Payment failed" })]);
   });
 });
+
+describe("Black Friday free trial webhooks", () => {
+  const bf = { setup_pence: 0, monthly_pence: 14900, minimum_term_months: 0, ownership_after_payments: 0, quote_snapshot: { offer: { code: "black-friday-2026", trialDays: 14, agreedAt: "2026-11-27T10:00:00Z" } } };
+  const trialCompleted = () => {
+    const e = completed(0);
+    (e.data.object as Record<string, unknown>).payment_status = "no_payment_required";
+    return e;
+  };
+
+  it("activates on a £0 checkout with the card on file, and tells the customer nothing was charged", async () => {
+    const { db, deps, row } = setup(bf);
+    expect(await handleWebsiteSubscriptionEvent(db, trialCompleted(), deps)).toBe("handled");
+    expect(row).toMatchObject({ status: "active", stripe_subscription_id: "stripe_sub_1" });
+    const [, message] = deps.emailCustomer.mock.calls[0] as unknown as [string, { subject: string; text: string }];
+    expect(message.text).toContain("14-day free trial");
+    expect(message.text).toContain("Nothing has been charged today");
+    expect(message.text).toMatch(/Cancel before .+ and you pay nothing/);
+    expect(message.text).toContain("no minimum term");
+    expect(message.text).not.toMatch(/Minimum term:|\d+-month minimum/);
+    const [, detail] = deps.alertStaff.mock.calls[0] as unknown as [string, string];
+    expect(detail).toContain("Black Friday");
+    expect(detail).toContain("no minimum term");
+    expect(detail).not.toMatch(/\d+-month minimum/);
+  });
+
+  it("still refuses a £0 checkout for an offer that wasn't made on the free trial", async () => {
+    const { db, deps, row } = setup({ ...bf, quote_snapshot: {} });
+    await handleWebsiteSubscriptionEvent(db, trialCompleted(), deps);
+    expect(row.status).toBe("offered");
+    expect(deps.alertStaff).toHaveBeenCalledWith("Website payment does not match the offer", expect.any(String));
+  });
+
+  it("refuses a free-trial offer if Stripe charged the first month anyway", async () => {
+    const { db, deps, row } = setup(bf);
+    await handleWebsiteSubscriptionEvent(db, completed(14900), deps);
+    expect(row.status).toBe("offered");
+  });
+
+  it("ignores the £0 trial invoice and records the first real payment on day 15", async () => {
+    const { db, deps, row } = setup({ ...bf, status: "active", stripe_subscription_id: "stripe_sub_1" });
+    await handleWebsiteSubscriptionEvent(db, invoice("in_trial", "subscription_create", 0), deps);
+    expect(row.payments_count ?? 0).toBe(0);
+    await handleWebsiteSubscriptionEvent(db, invoice("in_day15", "subscription_cycle", 14900), deps);
+    expect(row.payments_count).toBe(1);
+  });
+
+  // 27 Nov 2026 10:00 UTC + 14 days = 11 Dec 2026, the first charge. Stripe sends trial_will_end 3 days before.
+  const trialEnd = Math.floor(Date.parse("2026-12-11T10:00:00Z") / 1000);
+  const willEnd = (over: Record<string, unknown> = {}, id = "evt_twe_1") => ({
+    id,
+    type: "customer.subscription.trial_will_end",
+    livemode: false,
+    data: { object: { id: "stripe_sub_1", status: "trialing", trial_end: trialEnd, cancel_at_period_end: false, metadata: { website_subscription_id: "sub-1" }, ...over } },
+  });
+
+  it("emails the trial reminder 3 days before the first charge: the date, the amount and how to cancel free", async () => {
+    const { db, deps, tables } = setup({ ...bf, status: "active", stripe_subscription_id: "stripe_sub_1" });
+    expect(await handleWebsiteSubscriptionEvent(db, willEnd(), deps)).toBe("handled");
+    expect(deps.emailCustomer).toHaveBeenCalledTimes(1);
+    const [to, message] = deps.emailCustomer.mock.calls[0] as unknown as [string, { subject: string; text: string }];
+    expect(to).toBe("ada@example.com");
+    expect(message.subject).toContain("11 December 2026");
+    expect(message.text).toContain("£149");
+    expect(message.text).toContain("Cancel before 11 December 2026 and you pay nothing");
+    expect(message.text).toContain("/account/billing");
+    expect(message.text).toContain("no minimum term");
+    expect(tables.website_subscription_events).toHaveLength(1);
+  });
+
+  it("sends the reminder once, even when Stripe retries the event", async () => {
+    const { db, deps } = setup({ ...bf, status: "active", stripe_subscription_id: "stripe_sub_1" });
+    await handleWebsiteSubscriptionEvent(db, willEnd(), deps);
+    await handleWebsiteSubscriptionEvent(db, willEnd(), deps);
+    expect(deps.emailCustomer).toHaveBeenCalledTimes(1);
+  });
+
+  it("sends no reminder once the customer has cancelled in the trial, or for a subscription not on the offer", async () => {
+    const cancelled = setup({ ...bf, status: "active", stripe_subscription_id: "stripe_sub_1" });
+    await handleWebsiteSubscriptionEvent(cancelled.db, willEnd({ cancel_at_period_end: true }), cancelled.deps);
+    expect(cancelled.deps.emailCustomer).not.toHaveBeenCalled();
+    const ordinary = setup({ status: "active", stripe_subscription_id: "stripe_sub_1" });
+    await handleWebsiteSubscriptionEvent(ordinary.db, willEnd(), ordinary.deps);
+    expect(ordinary.deps.emailCustomer).not.toHaveBeenCalled();
+  });
+});

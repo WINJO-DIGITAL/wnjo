@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatPence } from "@/lib/pricing";
+import { BLACK_FRIDAY, FIRST_BILL_DAY } from "@/lib/black-friday";
 
 /** Which payment this is: a standard plan, the 50% deposit on a website bought outright, its final balance, or hosting on its own. */
 export type PaymentJourney = "plan" | "deposit" | "balance" | "hosting";
@@ -17,6 +18,8 @@ export type ConfirmedOrder = {
   monthly_pence: number;
   one_off_pence: number;
   minimum_term_months: number;
+  /** The Black Friday free trial: a card was added and nothing was charged today. */
+  free_trial?: boolean;
 };
 
 /**
@@ -24,7 +27,12 @@ export type ConfirmedOrder = {
  * firstPaymentPence, written here because that module uses Node's crypto and this page runs in the browser.
  */
 const paidToday = (order: ConfirmedOrder) =>
-  order.kind === "subscription" ? order.setup_pence + order.one_off_pence + order.monthly_pence : order.one_off_pence;
+  order.kind === "subscription"
+    ? order.setup_pence + order.one_off_pence + (order.free_trial ? 0 : order.monthly_pence)
+    : order.one_off_pence;
+
+/** Billing starts on day 15 of the Black Friday free trial (a 14-day trial from today). */
+const TRIAL_DAYS = BLACK_FRIDAY.trialDays;
 
 const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
@@ -97,9 +105,11 @@ export function PaymentConfirmed({ order, paidOn = new Date(), journey = "plan" 
           <path className="pc__tick" d="M30 49.5 42.5 62 67 36" />
         </svg>
         <p className="pc__status" role="status" aria-live="polite">
-          {done ? "Payment received" : "Confirming your payment…"}
+          {done ? (order?.free_trial ? "Card added" : "Payment received") : "Confirming your payment…"}
         </p>
-        <h1 className="pc__title pc__reveal">Thank you, your payment is in.</h1>
+        <h1 className="pc__title pc__reveal">
+          {order?.free_trial ? "Thank you, your free trial has started." : "Thank you, your payment is in."}
+        </h1>
       </div>
 
       {order && (
@@ -122,10 +132,23 @@ export function PaymentConfirmed({ order, paidOn = new Date(), journey = "plan" 
               <dt>Paid today</dt>
               <dd>{formatPence(paidToday(order))}</dd>
             </div>
+            {order.free_trial && (
+              <div>
+                <dt>Free trial</dt>
+                <dd>
+                  {BLACK_FRIDAY.trialDays} days. Cancel before day {FIRST_BILL_DAY} (
+                  {day.format(new Date(paidOn.getTime() + TRIAL_DAYS * 86_400_000))}) and you pay nothing.
+                </dd>
+              </div>
+            )}
             {order.kind === "subscription" && (
               <div>
                 <dt>Then</dt>
-                <dd>{formatPence(order.monthly_pence)} a month, {order.minimum_term_months > 0 ? `${order.minimum_term_months}-month minimum term` : "rolling monthly"}</dd>
+                <dd>
+                  {formatPence(order.monthly_pence)} a month
+                  {order.free_trial ? ` from ${day.format(new Date(paidOn.getTime() + TRIAL_DAYS * 86_400_000))}` : ""},{" "}
+                  {order.minimum_term_months > 0 ? `${order.minimum_term_months}-month minimum term` : "rolling monthly"}
+                </dd>
               </div>
             )}
             <div>
@@ -143,7 +166,17 @@ export function PaymentConfirmed({ order, paidOn = new Date(), journey = "plan" 
       <section className="pc__next pc__reveal" aria-labelledby="pc-next-title">
         <h2 id="pc-next-title" className="pc__next-title">What happens next</h2>
         <ol className="pc__steps">
-          {(NEXT_STEPS[journey] ?? NEXT_STEPS.plan).map((step) => (
+          {[
+            ...(NEXT_STEPS[journey] ?? NEXT_STEPS.plan),
+            ...(order?.free_trial
+              ? [
+                  {
+                    title: "Cancel free, any time in your trial",
+                    body: `We email you 3 days before your first payment. To cancel before day ${FIRST_BILL_DAY}, sign in to your account, open Plan and billing and choose Request cancellation, or reply to any of our emails. Your card is never charged.`,
+                  },
+                ]
+              : []),
+          ].map((step) => (
             <li key={step.title}>
               <strong>{step.title}</strong>
               <p>{step.body}</p>

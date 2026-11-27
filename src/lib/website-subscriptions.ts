@@ -88,9 +88,16 @@ export function proposalOverrides(
   return { oneOff: Math.round(agreed.one_off_pence * ONE_OFF_DEPOSIT_SHARE) / 100 };
 }
 
-/** What the customer pays first: setup + one-off extras + the first month, or the one-off amount. */
-export function firstPaymentPence(offer: Pick<OfferAmounts, "kind" | "setupPence" | "monthlyPence" | "oneOffPence">): number {
-  return offer.kind === "subscription" ? offer.setupPence + offer.oneOffPence + offer.monthlyPence : offer.oneOffPence;
+/**
+ * What the customer pays first: setup + one-off extras + the first month, or the one-off amount. With a free trial
+ * (the Black Friday offer) nothing is charged at checkout, so only anything upfront is (which is nothing).
+ */
+export function firstPaymentPence(
+  offer: Pick<OfferAmounts, "kind" | "setupPence" | "monthlyPence" | "oneOffPence">,
+  opts: { freeTrial?: boolean } = {},
+): number {
+  if (offer.kind !== "subscription") return offer.oneOffPence;
+  return offer.setupPence + offer.oneOffPence + (opts.freeTrial ? 0 : offer.monthlyPence);
 }
 
 /** The Stripe Checkout request for an offer. Amounts come only from the offer row, never from the browser. */
@@ -98,6 +105,11 @@ export function checkoutParams(
   offer: OfferAmounts & { id: string; reference: string; email: string },
   urls: { success: string; cancel: string },
   extraMetadata: Record<string, string> = {},
+  /**
+   * A free first period (the Black Friday offer): the card is collected now and billing starts when it ends. Only for a
+   * subscription with nothing upfront, so nothing at all is charged today. Set by our server, never by the browser.
+   */
+  trial?: { days: number; offerCode: string },
 ): URLSearchParams {
   const p = new URLSearchParams({
     customer_email: offer.email,
@@ -135,6 +147,15 @@ export function checkoutParams(
     p.set("subscription_data[metadata][website_subscription_id]", offer.id);
     p.set("subscription_data[metadata][reference]", offer.reference);
     p.set("subscription_data[description]", hosting ? `${offer.packageName} plan (${offer.reference})` : `${offer.packageName} website package (${offer.reference})`);
+    if (trial) {
+      if (!(Number.isInteger(trial.days) && trial.days > 0) || upfront > 0) throw new Error("A free trial needs a plan with nothing upfront");
+      p.set("subscription_data[trial_period_days]", String(trial.days));
+      // The card is taken at sign-up even though nothing is charged today, and a trial without one ends the plan.
+      p.set("payment_method_collection", "always");
+      p.set("subscription_data[trial_settings][end_behavior][missing_payment_method]", "cancel");
+      p.set("metadata[offer]", trial.offerCode);
+      p.set("subscription_data[metadata][offer]", trial.offerCode);
+    }
   } else {
     p.set("mode", "payment");
     p.set("line_items[0][quantity]", "1");

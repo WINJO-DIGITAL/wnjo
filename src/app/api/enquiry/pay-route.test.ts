@@ -218,3 +218,60 @@ describe("POST /api/enquiry: pay straight from the quote", () => {
     expect(res.status).toBe(422);
   });
 });
+
+describe("POST /api/enquiry: the Black Friday free trial", () => {
+  const fetchMock = vi.fn();
+  beforeEach(() => {
+    vi.stubGlobal("fetch", fetchMock);
+    fetchMock.mockReset().mockResolvedValue(new Response("{}", { status: 200 }));
+    vi.stubEnv("RESEND_API_KEY", "test-key");
+    vi.stubEnv("ENQUIRY_TO_EMAIL", "inbox@example.com");
+    vi.stubEnv("ENQUIRY_FROM_EMAIL", "site@example.com");
+    vi.mocked(startQuotePayment).mockClear();
+    state.route = "package";
+    state.payment = { url: "https://checkout.stripe.com/c/pay/cs_test_1", offer };
+    state.saved = 0;
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+  const short = (over: Record<string, unknown> = {}) =>
+    body({ short: true, brief: undefined, draftId: null, details: { ...body().details, industry: "", description: "" }, offer: "black-friday-2026", ...over });
+
+  it("starts the free trial while the offer is on, by the server's clock", async () => {
+    vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-11-28T12:00:00Z");
+    const res = await post(short());
+    expect(res.status).toBe(200);
+    expect(vi.mocked(startQuotePayment).mock.calls[0][1]).toMatchObject({ blackFriday: true });
+  });
+
+  it("refuses the free trial after Monday 30 November 23:59 UK time, and saves nothing", async () => {
+    vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-12-01T00:00:00Z");
+    const res = await post(short());
+    expect(res.status).toBe(410);
+    expect(await res.json()).toMatchObject({ code: "offer_ended" });
+    expect(state.saved).toBe(0);
+    expect(startQuotePayment).not.toHaveBeenCalled();
+  });
+
+  it("refuses it at the last second boundary too", async () => {
+    vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-11-30T23:59:59.999Z");
+    expect((await post(short())).status).toBe(200);
+    vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-12-01T00:00:00.000Z");
+    expect((await post(short())).status).toBe(410);
+  });
+
+  it("only on the short plan checkout", async () => {
+    vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-11-28T12:00:00Z");
+    const res = await post(body({ offer: "black-friday-2026" }));
+    expect(res.status).toBe(410);
+  });
+
+  it("leaves the standard checkout alone when the offer isn't asked for", async () => {
+    vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-11-28T12:00:00Z");
+    const res = await post(short({ offer: undefined }));
+    expect(res.status).toBe(200);
+    expect(vi.mocked(startQuotePayment).mock.calls[0][1]).toMatchObject({ blackFriday: false });
+  });
+});

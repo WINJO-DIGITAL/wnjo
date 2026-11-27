@@ -7,12 +7,16 @@ import {
   ownershipEmail,
   paymentFailedEmail,
   paymentReceivedEmail,
+  trialEndingEmail,
   welcomeEmail,
   type SubscriptionEmailFacts,
 } from "./website-emails";
 import { advanceAfterPayment } from "./brief-payment";
 import { isHostingCode, type WebsiteStatus } from "./hosting-request";
 import { firstPaymentPence, ownershipDue, statusFromStripe } from "./website-subscriptions";
+import { blackFridayFirstBillDate, blackFridayOf } from "./black-friday";
+
+const longDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" });
 
 /**
  * Stripe webhook events for website subscriptions and one-off website payments. The caller has already checked the
@@ -51,7 +55,7 @@ type Row = {
   ownership_eligible_at: string | null;
   enquiry_reference?: string | null;
   package_code?: string | null;
-  quote_snapshot?: { hosting?: { siteUrl?: unknown; websiteStatus?: unknown } } | null;
+  quote_snapshot?: { hosting?: { siteUrl?: unknown; websiteStatus?: unknown }; offer?: unknown } | null;
 };
 
 const COLUMNS =
@@ -211,7 +215,10 @@ export async function handleWebsiteSubscriptionEvent(
     if (!paid) return "handled";
     const amount = num(obj.amount_total);
     const currency = (str(obj.currency) ?? "").toLowerCase();
-    if (amount !== firstPaymentPence({ ...row, setupPence: row.setup_pence, monthlyPence: row.monthly_pence, oneOffPence: row.one_off_pence }) || currency !== "gbp") {
+    // The Black Friday free trial: nothing is charged at checkout, so the expected first payment is 0.
+    const freeTrial = row.kind === "subscription" && blackFridayOf(row.quote_snapshot) !== null;
+    const expected = firstPaymentPence({ ...row, setupPence: row.setup_pence, monthlyPence: row.monthly_pence, oneOffPence: row.one_off_pence }, { freeTrial });
+    if (amount !== expected || currency !== "gbp") {
       await deps.alertStaff(
         "Website payment does not match the offer",
         `Offer ${row.reference}, checkout ${str(obj.id)}: Stripe charged ${amount} ${currency}, but the offer expects a different amount. It has NOT been activated. Check it in Stripe before acting.`,
@@ -245,11 +252,14 @@ export async function handleWebsiteSubscriptionEvent(
           return "handled";
         }
         const needsDetails = await briefNeedsDetails(db, row.tenant_id, row.enquiry_reference);
-        await deps.emailCustomer(row.email, welcomeEmail({ ...facts(row), needsDetails }));
+        const firstBill = freeTrial ? longDate.format(blackFridayFirstBillDate(new Date())) : undefined;
+        await deps.emailCustomer(row.email, welcomeEmail({ ...facts(row), needsDetails, trialEndsOn: firstBill }));
         await advanceAfterPayment(db, row.tenant_id, row.enquiry_reference);
         await deps.alertStaff(
           `New ${row.package_name} subscription`,
-          `${row.reference}: ${row.name} subscribed. First payment ${amount / 100} GBP, then ${row.monthly_pence / 100} GBP a month.`,
+          freeTrial
+            ? `${row.reference}: ${row.name} subscribed on the Black Friday offer. 14-day free trial, card on file; billing of ${row.monthly_pence / 100} GBP a month starts on ${firstBill}, rolling monthly with no minimum term. If they cancel before then, nothing is charged. Show the build on a WINJO preview link only: no live domain and no files until billing has started.`
+            : `${row.reference}: ${row.name} subscribed. First payment ${amount / 100} GBP, then ${row.monthly_pence / 100} GBP a month.`,
         );
       }
       return "handled";
@@ -384,5 +394,29 @@ export async function handleWebsiteSubscriptionEvent(
     return "handled";
   }
 
+  if (type === "customer.subscription.trial_will_end") {
+    // Stripe sends this 3 days before a trial ends. Only Black Friday trials get our reminder, once per event, and not
+    // when the customer has already cancelled (then nothing will be charged).
+    const subscriptionId = str(obj.id);
+    const row = await findRow(db, { id: str(meta(obj).website_subscription_id), subscriptionId });
+    if (row === "error") return "retry";
+    if (!row || !blackFridayOf(row.quote_snapshot)) return row ? "handled" : "ignored";
+    if (obj.cancel_at_period_end === true || row.status === "cancelled" || str(obj.status) !== "trialing") return "handled";
+    const trialEnd = num(obj.trial_end);
+    if (!trialEnd) return "handled";
+    const eventId = str(event.id);
+    if (eventId) {
+      const logged = await logSubscriptionEvent(db, row, "renewal_reminder", "Free trial ending reminder", eventId);
+      if (logged === false) return "handled"; // already sent for this event
+      if (logged === "error") console.error("Subscription history not recorded");
+    }
+    await deps.emailCustomer(row.email, trialEndingEmail({ ...facts(row), trialEndsOn: longDate.format(new Date(trialEnd * 1000)) }, siteUrl()));
+    return "handled";
+  }
+
   return "ignored";
+}
+
+function siteUrl(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://winjodigital.co.uk";
 }
