@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { briefPassKey, briefPassValid } from "@/lib/brief-pass";
 import { createBrief } from "@/lib/brief-store";
-import { DEFAULT_WEBSITE_ANSWERS } from "@/lib/website-quote";
+import { bandForPlan, DEFAULT_WEBSITE_ANSWERS } from "@/lib/website-quote";
 
 const state = vi.hoisted(() => ({
   route: "package" as "package" | "proposal",
@@ -236,8 +236,9 @@ describe("POST /api/enquiry: the Black Friday free trial", () => {
     vi.unstubAllGlobals();
     vi.unstubAllEnvs();
   });
+  const core = { ...DEFAULT_WEBSITE_ANSWERS, plan: "bronze", mode: "monthly", pages: bandForPlan("bronze") };
   const short = (over: Record<string, unknown> = {}) =>
-    body({ short: true, brief: undefined, draftId: null, details: { ...body().details, industry: "", description: "" }, offer: "black-friday-2026", ...over });
+    body({ short: true, brief: undefined, draftId: null, answers: core, details: { ...body().details, industry: "", description: "" }, offer: "black-friday-2026", ...over });
 
   it("starts the free trial while the offer is on, by the server's clock", async () => {
     vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-11-28T12:00:00Z");
@@ -266,6 +267,29 @@ describe("POST /api/enquiry: the Black Friday free trial", () => {
     vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-11-28T12:00:00Z");
     const res = await post(body({ offer: "black-friday-2026" }));
     expect(res.status).toBe(410);
+  });
+
+  it("never gives Plus or Pro the trial, even when the request asks for it", async () => {
+    vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-11-28T12:00:00Z");
+    for (const plan of ["silver", "gold"]) {
+      vi.mocked(startQuotePayment).mockClear();
+      state.saved = 0;
+      const res = await post(short({ answers: { ...core, plan, pages: bandForPlan(plan as "silver" | "gold") } }));
+      expect(res.status).toBe(422);
+      expect(await res.json()).toMatchObject({ code: "offer_not_eligible" });
+      expect(startQuotePayment).not.toHaveBeenCalled();
+      expect(state.saved).toBe(0);
+    }
+  });
+
+  it("lets Plus and Pro sign up on the standard checkout during the offer, with no trial", async () => {
+    vi.stubEnv("OFFER_CLOCK_OVERRIDE", "2026-11-28T12:00:00Z");
+    for (const plan of ["silver", "gold"]) {
+      vi.mocked(startQuotePayment).mockClear();
+      const res = await post(short({ offer: undefined, answers: { ...core, plan, pages: bandForPlan(plan as "silver" | "gold") } }));
+      expect(res.status).toBe(200);
+      expect(vi.mocked(startQuotePayment).mock.calls[0][1]).toMatchObject({ blackFriday: false });
+    }
   });
 
   it("leaves the standard checkout alone when the offer isn't asked for", async () => {

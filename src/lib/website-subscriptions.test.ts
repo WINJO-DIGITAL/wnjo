@@ -547,7 +547,7 @@ describe("tracking a cancellation from Stripe", () => {
 });
 
 describe("Black Friday free trial webhooks", () => {
-  const bf = { setup_pence: 0, monthly_pence: 14900, minimum_term_months: 0, ownership_after_payments: 0, quote_snapshot: { offer: { code: "black-friday-2026", trialDays: 14, agreedAt: "2026-11-27T10:00:00Z" } } };
+  const bf = { package_code: "bronze", package_name: "Core", setup_pence: 0, monthly_pence: 9900, minimum_term_months: 0, ownership_after_payments: 0, quote_snapshot: { offer: { code: "black-friday-2026", trialDays: 14, agreedAt: "2026-11-27T10:00:00Z" } } };
   const trialCompleted = () => {
     const e = completed(0);
     (e.data.object as Record<string, unknown>).payment_status = "no_payment_required";
@@ -570,6 +570,19 @@ describe("Black Friday free trial webhooks", () => {
     expect(detail).not.toMatch(/\d+-month minimum/);
   });
 
+  it("refuses a £0 checkout on Plus or Pro, even with the offer in its snapshot", async () => {
+    for (const plan of [
+      { package_code: "silver", package_name: "Plus", monthly_pence: 14900 },
+      { package_code: "gold", package_name: "Pro", monthly_pence: 19900 },
+    ]) {
+      const { db, deps, row } = setup({ ...bf, ...plan });
+      expect(await handleWebsiteSubscriptionEvent(db, trialCompleted(), deps)).toBe("handled");
+      expect(row.status).toBe("offered");
+      expect(deps.alertStaff).toHaveBeenCalledWith("Website payment does not match the offer", expect.any(String));
+      expect(deps.emailCustomer).not.toHaveBeenCalled();
+    }
+  });
+
   it("still refuses a £0 checkout for an offer that wasn't made on the free trial", async () => {
     const { db, deps, row } = setup({ ...bf, quote_snapshot: {} });
     await handleWebsiteSubscriptionEvent(db, trialCompleted(), deps);
@@ -579,7 +592,7 @@ describe("Black Friday free trial webhooks", () => {
 
   it("refuses a free-trial offer if Stripe charged the first month anyway", async () => {
     const { db, deps, row } = setup(bf);
-    await handleWebsiteSubscriptionEvent(db, completed(14900), deps);
+    await handleWebsiteSubscriptionEvent(db, completed(9900), deps);
     expect(row.status).toBe("offered");
   });
 
@@ -587,7 +600,7 @@ describe("Black Friday free trial webhooks", () => {
     const { db, deps, row } = setup({ ...bf, status: "active", stripe_subscription_id: "stripe_sub_1" });
     await handleWebsiteSubscriptionEvent(db, invoice("in_trial", "subscription_create", 0), deps);
     expect(row.payments_count ?? 0).toBe(0);
-    await handleWebsiteSubscriptionEvent(db, invoice("in_day15", "subscription_cycle", 14900), deps);
+    await handleWebsiteSubscriptionEvent(db, invoice("in_day15", "subscription_cycle", 9900), deps);
     expect(row.payments_count).toBe(1);
   });
 
@@ -607,7 +620,7 @@ describe("Black Friday free trial webhooks", () => {
     const [to, message] = deps.emailCustomer.mock.calls[0] as unknown as [string, { subject: string; text: string }];
     expect(to).toBe("ada@example.com");
     expect(message.subject).toContain("11 December 2026");
-    expect(message.text).toContain("£149");
+    expect(message.text).toContain("£99");
     expect(message.text).toContain("Cancel before 11 December 2026 and you pay nothing");
     expect(message.text).toContain("/account/billing");
     expect(message.text).toContain("no minimum term");
@@ -625,6 +638,9 @@ describe("Black Friday free trial webhooks", () => {
     const cancelled = setup({ ...bf, status: "active", stripe_subscription_id: "stripe_sub_1" });
     await handleWebsiteSubscriptionEvent(cancelled.db, willEnd({ cancel_at_period_end: true }), cancelled.deps);
     expect(cancelled.deps.emailCustomer).not.toHaveBeenCalled();
+    const plus = setup({ ...bf, package_code: "silver", package_name: "Plus", status: "active", stripe_subscription_id: "stripe_sub_1" });
+    await handleWebsiteSubscriptionEvent(plus.db, willEnd(), plus.deps);
+    expect(plus.deps.emailCustomer).not.toHaveBeenCalled();
     const ordinary = setup({ status: "active", stripe_subscription_id: "stripe_sub_1" });
     await handleWebsiteSubscriptionEvent(ordinary.db, willEnd(), ordinary.deps);
     expect(ordinary.deps.emailCustomer).not.toHaveBeenCalled();

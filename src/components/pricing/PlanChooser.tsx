@@ -39,7 +39,7 @@ export function PlanChooser() {
                 <span className="pkg-card__amount">{formatGBP(plan.monthly)}</span>
                 <span className="pkg-card__unit">a month</span>
               </p>
-              <PlanOfferBadge monthly={plan.monthly} />
+              <PlanOfferBadge plan={id} monthly={plan.monthly} />
               <p className="pkg-card__tagline">{plan.tagline}</p>
               <ul className="pkg-card__points" role="list">
                 {CARD_POINTS[id].slice(0, 4).map((p) => (

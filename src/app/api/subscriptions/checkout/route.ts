@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
   // An offer made on the Black Friday free trial keeps it only while the offer is on, by the server's clock.
   // After the deadline the link stops rather than charging the customer during a trial they were told was free.
-  const blackFriday = row.kind === "subscription" ? blackFridayOf(row.quote_snapshot) : null;
+  const blackFriday = row.kind === "subscription" ? blackFridayOf(row.quote_snapshot, row.package_code) : null;
   if (blackFriday && !blackFridayActiveNow()) return NextResponse.json({ error: "offer_ended" }, { status: 410 });
 
   // Record the early-start choice with the consent the offer was made under.
