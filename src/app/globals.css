@@ -17346,3 +17346,95 @@ body:has(.dash-header) {
     display: none;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Black Friday offer (27 to 30 November 2026). Shows only while the   */
+/* offer is on; see lib/black-friday.ts.                               */
+/* ------------------------------------------------------------------ */
+
+.bf-strip {
+  background: var(--color-inverse-bg);
+  color: var(--color-inverse-ink);
+}
+.bf-strip__inner {
+  display: grid;
+  gap: var(--space-1);
+  padding-block: var(--space-3);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+}
+.bf-strip__label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-inverse-ink-2);
+}
+.bf-strip__text {
+  margin: 0;
+}
+.bf-strip__link {
+  justify-self: start;
+  color: var(--color-inverse-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+@media (min-width: 48rem) {
+  .bf-strip__inner {
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: var(--space-5);
+  }
+}
+
+.pkg-card__offer {
+  margin: var(--space-2) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+.pkg-card__offer-then {
+  color: var(--color-ink-2);
+}
+.pkg-card--selected .pkg-card__offer-then {
+  color: var(--color-inverse-ink-2);
+}
+
+.bf-terms__head {
+  display: grid;
+  gap: var(--space-3);
+  max-width: var(--width-prose);
+  margin-bottom: var(--space-6);
+}
+.bf-terms__head > * {
+  margin: 0;
+}
+.bf-terms .faq__short {
+  font-size: var(--text-lg);
+}
+.bf-terms .faq__item p {
+  margin: 0;
+  padding: 0 var(--space-5) var(--space-5);
+  color: var(--color-ink-2);
+}
+
+.bf-checkout {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+}
+.bf-checkout > * {
+  margin: 0;
+}
+.bf-checkout__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-accent) 85%, black);
+}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatPence } from "@/lib/pricing";
+import { BLACK_FRIDAY } from "@/lib/black-friday";
 
 /** Which payment this is: a standard plan, the 50% deposit on a website bought outright, its final balance, or hosting on its own. */
 export type PaymentJourney = "plan" | "deposit" | "balance" | "hosting";
@@ -17,6 +18,8 @@ export type ConfirmedOrder = {
   monthly_pence: number;
   one_off_pence: number;
   minimum_term_months: number;
+  /** The Black Friday free first month: a card was added and nothing was charged today. */
+  free_first_month?: boolean;
 };
 
 /**
@@ -24,7 +27,12 @@ export type ConfirmedOrder = {
  * firstPaymentPence, written here because that module uses Node's crypto and this page runs in the browser.
  */
 const paidToday = (order: ConfirmedOrder) =>
-  order.kind === "subscription" ? order.setup_pence + order.one_off_pence + order.monthly_pence : order.one_off_pence;
+  order.kind === "subscription"
+    ? order.setup_pence + order.one_off_pence + (order.free_first_month ? 0 : order.monthly_pence)
+    : order.one_off_pence;
+
+/** Billing starts on day 31 of the Black Friday free first month (a 30-day trial from today). */
+const TRIAL_DAYS = BLACK_FRIDAY.trialDays;
 
 const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
@@ -97,9 +105,11 @@ export function PaymentConfirmed({ order, paidOn = new Date(), journey = "plan" 
           <path className="pc__tick" d="M30 49.5 42.5 62 67 36" />
         </svg>
         <p className="pc__status" role="status" aria-live="polite">
-          {done ? "Payment received" : "Confirming your payment…"}
+          {done ? (order?.free_first_month ? "Card added" : "Payment received") : "Confirming your payment…"}
         </p>
-        <h1 className="pc__title pc__reveal">Thank you, your payment is in.</h1>
+        <h1 className="pc__title pc__reveal">
+          {order?.free_first_month ? "Thank you, your free month has started." : "Thank you, your payment is in."}
+        </h1>
       </div>
 
       {order && (
@@ -125,7 +135,11 @@ export function PaymentConfirmed({ order, paidOn = new Date(), journey = "plan" 
             {order.kind === "subscription" && (
               <div>
                 <dt>Then</dt>
-                <dd>{formatPence(order.monthly_pence)} a month, {order.minimum_term_months > 0 ? `${order.minimum_term_months}-month minimum term` : "rolling monthly"}</dd>
+                <dd>
+                  {formatPence(order.monthly_pence)} a month
+                  {order.free_first_month ? ` from ${day.format(new Date(paidOn.getTime() + TRIAL_DAYS * 86_400_000))}` : ""},{" "}
+                  {order.minimum_term_months > 0 ? `${order.minimum_term_months}-month minimum term` : "rolling monthly"}
+                </dd>
               </div>
             )}
             <div>

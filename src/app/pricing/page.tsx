@@ -5,6 +5,7 @@ import { RefreshCompare, SearchServices, SubscriptionTerms } from "@/components/
 import { AddOnsTable, CareComparison, PackageComparison } from "@/components/pricing/WebsitePackages";
 import { PlanChooser } from "@/components/pricing/PlanChooser";
 import { TrustCues } from "@/components/TrustCues";
+import { BlackFridayTerms } from "@/components/offers/BlackFriday";
 import { pageMetadata } from "@/lib/metadata";
 import { DAY_RATE, ONE_OFF_WEBSITE, REFRESH, WEBSITE_PLANS, formatGBP } from "@/lib/pricing";
 
@@ -60,6 +61,9 @@ export default function PricingPage() {
           </p>
         </div>
       </section>
+
+      {/* 1b. The Black Friday offer's terms. Shows only while the offer is on. */}
+      <BlackFridayTerms />
 
       {/* 2. Side by side. */}
       <section id="compare" className="section section--ruled" aria-labelledby="compare-title">

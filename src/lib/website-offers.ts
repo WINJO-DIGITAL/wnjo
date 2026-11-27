@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { HOSTING_CODE, HOSTING_NAME, type HostingPlan, type WebsiteStatus } from "./hosting-request";
 import { CARE_PLANS, OWNERSHIP } from "./pricing";
 import { QUOTE_TERMS_VERSION } from "./terms";
+import type { BlackFridaySnapshot } from "./black-friday";
 import type { WebsiteAnswers, WebsiteQuote } from "./website-quote";
 import {
   OFFER_TTL_DAYS,
@@ -34,6 +35,8 @@ export type NewOffer = {
   packageName?: string;
   /** Recorded in the snapshot when the customer agreed to the terms before paying. */
   consent?: { agreedAt: string; startNow?: boolean };
+  /** The Black Friday free first month, when the customer agreed to it and the server confirmed the offer was on. */
+  blackFriday?: BlackFridaySnapshot;
 };
 
 export type CreatedOffer = { id: string; reference: string; token: string; amounts: OfferAmounts };
@@ -62,9 +65,10 @@ export async function createOffer(db: SupabaseClient, input: NewOffer): Promise<
         lines: input.quote.lines,
         overrides: input.overrides,
         ...(input.consent ? { consent: { ...input.consent, termsVersion: QUOTE_TERMS_VERSION } } : {}),
+        ...(input.blackFriday ? { offer: input.blackFriday } : {}),
       },
       terms_version: QUOTE_TERMS_VERSION,
-      minimum_term_months: OWNERSHIP.minimumTermMonths,
+      minimum_term_months: input.blackFriday ? input.blackFriday.minimumTermMonths : OWNERSHIP.minimumTermMonths,
       ownership_after_payments: OWNERSHIP.ownershipAfterPayments,
       offer_token_hash: hash,
       offer_expires_at: new Date(Date.now() + OFFER_TTL_DAYS * 86_400_000).toISOString(),

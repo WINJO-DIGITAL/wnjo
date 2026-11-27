@@ -545,3 +545,45 @@ describe("tracking a cancellation from Stripe", () => {
     expect(tables.website_subscription_events).toEqual([expect.objectContaining({ kind: "payment_failed", reason: "Payment failed" })]);
   });
 });
+
+describe("Black Friday free first month webhooks", () => {
+  const bf = { setup_pence: 0, monthly_pence: 14900, minimum_term_months: 12, ownership_after_payments: 0, quote_snapshot: { offer: { code: "black-friday-2026", trialDays: 30, minimumTermMonths: 12, agreedAt: "2026-11-27T10:00:00Z" } } };
+  const trialCompleted = () => {
+    const e = completed(0);
+    (e.data.object as Record<string, unknown>).payment_status = "no_payment_required";
+    return e;
+  };
+
+  it("activates on a £0 checkout with the card on file, and tells the customer nothing was charged", async () => {
+    const { db, deps, row } = setup(bf);
+    expect(await handleWebsiteSubscriptionEvent(db, trialCompleted(), deps)).toBe("handled");
+    expect(row).toMatchObject({ status: "active", stripe_subscription_id: "stripe_sub_1" });
+    const [, message] = deps.emailCustomer.mock.calls[0] as unknown as [string, { subject: string; text: string }];
+    expect(message.text).toContain("free first month");
+    expect(message.text).toContain("Nothing has been charged today");
+    const [, detail] = deps.alertStaff.mock.calls[0] as unknown as [string, string];
+    expect(detail).toContain("Black Friday");
+    expect(detail).toContain("12-month minimum term");
+  });
+
+  it("still refuses a £0 checkout for an offer that wasn't made on the free month", async () => {
+    const { db, deps, row } = setup({ ...bf, quote_snapshot: {} });
+    await handleWebsiteSubscriptionEvent(db, trialCompleted(), deps);
+    expect(row.status).toBe("offered");
+    expect(deps.alertStaff).toHaveBeenCalledWith("Website payment does not match the offer", expect.any(String));
+  });
+
+  it("refuses a free-month offer if Stripe charged the first month anyway", async () => {
+    const { db, deps, row } = setup(bf);
+    await handleWebsiteSubscriptionEvent(db, completed(14900), deps);
+    expect(row.status).toBe("offered");
+  });
+
+  it("ignores the £0 trial invoice and records the first real payment on day 31", async () => {
+    const { db, deps, row } = setup({ ...bf, status: "active", stripe_subscription_id: "stripe_sub_1" });
+    await handleWebsiteSubscriptionEvent(db, invoice("in_trial", "subscription_create", 0), deps);
+    expect(row.payments_count ?? 0).toBe(0);
+    await handleWebsiteSubscriptionEvent(db, invoice("in_day31", "subscription_cycle", 14900), deps);
+    expect(row.payments_count).toBe(1);
+  });
+});

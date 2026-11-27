@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { serviceClient } from "@/lib/quote-store";
 import { LIMITS_PER_ROUTE, sharedRateLimited } from "@/lib/rate-limit-shared";
 import { stripeConfig } from "@/lib/stripe";
+import { blackFridayOf } from "@/lib/black-friday";
+import { blackFridayActiveNow } from "@/lib/black-friday-clock";
 import { OFFER_TOKEN_RE, checkoutParams, createOfferCheckout, hashOfferToken, type OfferAmounts } from "@/lib/website-subscriptions";
 
 export const runtime = "nodejs";
@@ -51,6 +53,11 @@ export async function POST(request: NextRequest) {
   if (row.status !== "offered") return NextResponse.json({ error: "already_paid" }, { status: 409 });
   if (new Date(row.offer_expires_at).getTime() < Date.now()) return NextResponse.json({ error: "expired" }, { status: 410 });
 
+  // An offer made on the Black Friday free first month keeps it only while the offer is on, by the server's clock.
+  // After the deadline the link stops rather than charging a first month the customer was told would be free.
+  const blackFriday = row.kind === "subscription" ? blackFridayOf(row.quote_snapshot) : null;
+  if (blackFriday && !blackFridayActiveNow()) return NextResponse.json({ error: "offer_ended" }, { status: 410 });
+
   // Record the early-start choice with the consent the offer was made under.
   const snapshot = row.quote_snapshot ?? {};
   const consent = (snapshot.consent as Record<string, unknown> | undefined) ?? {};
@@ -77,8 +84,10 @@ export async function POST(request: NextRequest) {
         },
         {
           success: `${origin}/subscribe/done?session_id={CHECKOUT_SESSION_ID}`,
-          cancel: `${origin}/subscribe/${token}`,
+          cancel: `${origin}/subscribe/${token}?cancelled=1`,
         },
+        {},
+        blackFriday ? { days: blackFriday.trialDays, offerCode: blackFriday.code } : undefined,
       ),
     );
     return NextResponse.json({ url: session.url });

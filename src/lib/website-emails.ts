@@ -178,6 +178,8 @@ export type SubscriptionEmailFacts = {
   needsDetails?: boolean;
   /** Set for a hosting-only plan, which has no website build behind it. */
   hosting?: { siteUrl: string; websiteStatus: WebsiteStatus };
+  /** The Black Friday free first month: the day the first monthly payment is taken, as people read it. */
+  freeFirstMonthUntil?: string;
 };
 
 const gbpPence = (p: number) => formatPence(p);
@@ -320,11 +322,18 @@ export function welcomeEmail(f: SubscriptionEmailFacts): { subject: string; text
     text: [
       `Hi ${first(f.name)},`,
       "",
-      `Thank you. Your first payment for the ${f.packageName} package has been received.`,
+      f.freeFirstMonthUntil
+        ? `Thank you. Your free first month on the ${f.packageName} package has started. Nothing has been charged today.`
+        : `Thank you. Your first payment for the ${f.packageName} package has been received.`,
       "",
       ...detailsStep(f),
       "",
-      `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month.`,
+      f.freeFirstMonthUntil
+        ? `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically from ${f.freeFirstMonthUntil} and each month after that.`
+        : `Monthly payment: ${gbpPence(f.monthlyPence)}, taken automatically each month.`,
+      ...(f.freeFirstMonthUntil
+        ? ["During your free month, your website is shown on a private WINJO preview link. It goes on your own domain once billing has started."]
+        : []),
       termLine(f.minimumTermMonths),
       "",
       "Stripe emails a receipt for every payment.",

@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LegalDraftNotice } from "@/components/pricing/WebsitePackages";
 import { SubscribeActions } from "@/components/SubscribeActions";
 import { isHostingCode } from "@/lib/hosting-request";
 import { formatPence } from "@/lib/pricing";
 import { serviceClient } from "@/lib/quote-store";
 import { OFFER_TOKEN_RE, firstPaymentPence, hashOfferToken } from "@/lib/website-subscriptions";
+import { BLACK_FRIDAY, blackFridayOf } from "@/lib/black-friday";
+import { blackFridayActiveNow } from "@/lib/black-friday-clock";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Your payment link", robots: { index: false, follow: false } };
@@ -26,6 +29,7 @@ type Row = {
   ownership_eligible_at: string | null;
   offer_expires_at: string;
   cancel_at_period_end: boolean;
+  quote_snapshot?: Record<string, unknown> | null;
 };
 
 const gbp = (p: number) => formatPence(p);
@@ -37,7 +41,7 @@ async function load(token: string): Promise<{ row: Row | null; expired: boolean 
   if (!OFFER_TOKEN_RE.test(token) || !db) return { row: null, expired: false };
   const { data } = await db
     .from("website_subscriptions")
-    .select("reference, kind, package_code, status, name, business_name, package_name, setup_pence, monthly_pence, one_off_pence, minimum_term_months, ownership_after_payments, payments_count, ownership_eligible_at, offer_expires_at, cancel_at_period_end")
+    .select("reference, kind, package_code, status, name, business_name, package_name, setup_pence, monthly_pence, one_off_pence, minimum_term_months, ownership_after_payments, payments_count, ownership_eligible_at, offer_expires_at, cancel_at_period_end, quote_snapshot")
     .eq("offer_token_hash", hashOfferToken(token))
     .maybeSingle();
   const row = data as Row | null;
@@ -46,8 +50,16 @@ async function load(token: string): Promise<{ row: Row | null; expired: boolean 
 }
 
 /** A customer's private link: the offer before payment, then their subscription and billing afterwards. */
-export default async function SubscribePage({ params }: { params: Promise<{ token: string }> }) {
+export default async function SubscribePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ token: string }>;
+  searchParams: Promise<{ cancelled?: string }>;
+}) {
   const { token } = await params;
+  // Stripe's cancel link brings the customer back here: say plainly that nothing was taken.
+  const cancelled = (await searchParams).cancelled === "1";
   const { row, expired } = await load(token);
 
   return (
@@ -66,7 +78,7 @@ export default async function SubscribePage({ params }: { params: Promise<{ toke
             <p className="lede">Reply to our email and we&apos;ll send you a new one.</p>
           </>
         ) : row.status === "offered" ? (
-          <Offer row={row} token={token} />
+          <Offer row={row} token={token} cancelled={cancelled} />
         ) : (
           <Account row={row} token={token} />
         )}
@@ -75,11 +87,18 @@ export default async function SubscribePage({ params }: { params: Promise<{ toke
   );
 }
 
-function Offer({ row, token }: { row: Row; token: string }) {
+function Offer({ row, token, cancelled }: { row: Row; token: string; cancelled: boolean }) {
   const sub = row.kind === "subscription";
+  const blackFriday = sub ? blackFridayOf(row.quote_snapshot) : null;
+  if (blackFriday) return <BlackFridayOffer row={row} token={token} cancelled={cancelled} />;
   const first = firstPaymentPence({ kind: row.kind, setupPence: row.setup_pence, monthlyPence: row.monthly_pence, oneOffPence: row.one_off_pence });
   return (
     <div className="stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
+      {cancelled && (
+        <p className="notice" role="status">
+          You left the payment page, so nothing has been taken. You can pick up where you left off below.
+        </p>
+      )}
       <p className="eyebrow">{row.reference}</p>
       <h1 className="h1">
         {sub ? (isHostingCode(row.package_code ?? "") ? `Your ${row.package_name} plan.` : `Your ${row.package_name} website package.`) : `Your ${row.package_name}.`}
@@ -165,6 +184,62 @@ function Account({ row, token }: { row: Row; token: string }) {
       </dl>
       {sub && row.status !== "cancelled" && <SubscribeActions token={token} mode="manage" />}
       <p className="fine">Questions about your package? Reply to any of our emails.</p>
+    </div>
+  );
+}
+
+/**
+ * An offer made on the Black Friday free first month: the cancel page when the customer leaves Stripe, and the way back
+ * in. Once the offer has ended, by the server's clock, the link stops rather than charging the first month.
+ */
+function BlackFridayOffer({ row, token, cancelled }: { row: Row; token: string; cancelled: boolean }) {
+  const on = blackFridayActiveNow();
+  return (
+    <div className="stack" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
+      <p className="eyebrow">{row.reference}</p>
+      <h1 className="h1">{cancelled ? "No card added yet." : `Your ${row.package_name} plan, first month free.`}</h1>
+      <p className="lede">
+        {cancelled
+          ? `Hi ${row.name.split(/\s+/)[0]}. You left the secure payment page, so no card was added and nothing has been charged.`
+          : `Hi ${row.name.split(/\s+/)[0]}. Here\u2019s what you\u2019re agreeing to.`}
+      </p>
+      {on ? (
+        <>
+          <div className="cfg-totals">
+            <div className="cfg-total cfg-total--main">
+              <span>Today</span>
+              <strong>{gbp(0)}</strong>
+              <small>your card is added; nothing is charged for {BLACK_FRIDAY.trialDays} days</small>
+            </div>
+            <div className="cfg-total">
+              <span>From day {BLACK_FRIDAY.trialDays + 1}</span>
+              <strong>{gbp(row.monthly_pence)}</strong>
+              <small>a month, {row.minimum_term_months}-month minimum term</small>
+            </div>
+          </div>
+          <ul className="sub-facts" role="list">
+            <li>Your first monthly payment is taken on day {BLACK_FRIDAY.trialDays + 1}, then each month.</li>
+            <li>After your free month there is a {row.minimum_term_months}-month minimum term.</li>
+            <li>During your free month, your website is shown on a private WINJO preview link. It goes on your own domain, and files are handed over, once billing has started.</li>
+            <li>Your design is licensed to you while your plan is active.</li>
+          </ul>
+          <LegalDraftNotice />
+          <SubscribeActions
+            token={token}
+            mode="pay"
+            freeFirstMonth
+            commitment={`the Black Friday offer terms, including the ${row.minimum_term_months}-month minimum term after the free month`}
+          />
+          <p className="fine">The offer is open to sign-ups until {BLACK_FRIDAY.endsLabel}.</p>
+        </>
+      ) : (
+        <>
+          <p>The Black Friday offer ended on {BLACK_FRIDAY.endsLabel}, so this link no longer works.</p>
+          <p>
+            <Link href="/pricing" className="btn btn--primary">See the plans</Link>
+          </p>
+        </>
+      )}
     </div>
   );
 }

@@ -33,6 +33,8 @@ import {
 import { routeFor } from "@/lib/build-journey";
 import { payNowFor } from "@/lib/pay-now";
 import { isShortCheckout } from "@/lib/short-checkout";
+import { BLACK_FRIDAY, MOTTO, blackFridayEligible } from "@/lib/black-friday";
+import { useBlackFriday } from "../offers/useBlackFriday";
 import { draftHasProgress } from "@/lib/brief-draft";
 import { loadBriefDraft, saveBriefDraft } from "@/lib/brief-draft-client";
 import { cleanBrief, validateBrief, EMPTY_BRIEF, DRAFT_ID_RE, type BriefErrors, type WebsiteBrief } from "@/lib/website-brief";
@@ -203,6 +205,8 @@ function Inner({
   const monthly = answers.mode === "monthly";
   const plan = WEBSITE_PLANS[answers.plan];
   const includedHere = new Set<AddOnId>(monthly ? plan.includedAddOns : ONE_OFF_WEBSITE.includedAddOns);
+  // The Black Friday free first month, while the server says the offer is on. The server checks again at sign-up.
+  const blackFridayOn = useBlackFriday();
 
   useEffect(() => {
     if (!inBrowser) return;
@@ -314,6 +318,7 @@ function Inner({
 
   // The short plan checkout: name, business and email, then straight to payment. The brief follows after payment.
   const shortCheckout = isShortCheckout(params) && Boolean(payNow) && monthly;
+  const freeFirstMonth = shortCheckout && blackFridayOn && blackFridayEligible(quote);
   const onShortPay = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!agree) return;
@@ -329,6 +334,7 @@ function Inner({
       short: true,
       agree,
       startNow,
+      ...(freeFirstMonth ? { offer: BLACK_FRIDAY.code } : {}),
       answers,
       details: cleaned,
       website: honeypot,
@@ -444,6 +450,7 @@ function Inner({
         planName={plan.name}
         includes={plan.includes}
         payNow={payNow}
+        freeFirstMonth={freeFirstMonth}
         details={details}
         errors={detailErrors}
         onDetail={setDetail}
@@ -1102,6 +1109,7 @@ function PlanCheckout({
   planName,
   includes,
   payNow,
+  freeFirstMonth,
   details,
   errors,
   onDetail,
@@ -1118,6 +1126,8 @@ function PlanCheckout({
   planName: string;
   includes: readonly string[];
   payNow: { kind: "first_payment" | "deposit"; pence: number };
+  /** The Black Friday free first month: the card is taken now and billing starts on day 31. */
+  freeFirstMonth: boolean;
   details: WebsiteDetails;
   errors: DetailErrors;
   onDetail: (key: keyof WebsiteDetails, value: string) => void;
@@ -1136,10 +1146,12 @@ function PlanCheckout({
       <form onSubmit={onSubmit} noValidate className="card card--raised stack form" style={{ "--stack": "var(--space-5)" } as React.CSSProperties}>
         <div>
           <p className="eyebrow">{planName}</p>
-          <h2 className="h2">
-            {formatGBP(quote.monthly)} a month
-          </h2>
-          <p className="muted">{TERM.charAt(0).toUpperCase() + TERM.slice(1)}.</p>
+          <h2 className="h2">{freeFirstMonth ? "First month free" : `${formatGBP(quote.monthly)} a month`}</h2>
+          <p className="muted">
+            {freeFirstMonth
+              ? `Then ${formatGBP(quote.monthly)} a month from day ${BLACK_FRIDAY.trialDays + 1}, with a ${BLACK_FRIDAY.minimumTermMonths}-month minimum term.`
+              : `${TERM.charAt(0).toUpperCase() + TERM.slice(1)}.`}
+          </p>
         </div>
         <ul className="checks" role="list">
           {includes.slice(0, 6).map((item) => (
@@ -1150,16 +1162,33 @@ function PlanCheckout({
         <Field id="businessName" label="Business name" value={details.businessName} error={errors.businessName} onChange={(v) => onDetail("businessName", v)} autoComplete="organization" />
         <Field id="email" label="Email" type="email" value={details.email} error={errors.email} onChange={(v) => onDetail("email", v)} autoComplete="email" inputMode="email" />
         <Field id="phone" label="Phone" type="tel" optional value={details.phone} error={errors.phone} onChange={(v) => onDetail("phone", v)} autoComplete="tel" />
-        <PayPanel quote={quote} payNow={payNow} agree={agree} onAgree={onAgree} startNow={startNow} onStartNow={onStartNow} />
+        {freeFirstMonth ? (
+          <FreeMonthPanel quote={quote} agree={agree} onAgree={onAgree} startNow={startNow} onStartNow={onStartNow} />
+        ) : (
+          <PayPanel quote={quote} payNow={payNow} agree={agree} onAgree={onAgree} startNow={startNow} onStartNow={onStartNow} />
+        )}
         <div className="pay-info">
           <p className="eyebrow">What happens next</p>
           <ul role="list" className="checks">
+            {freeFirstMonth ? (
+              <>
+                <li>
+                  <span>We reply within one working day and start on your website once we have your goals. During your free month, you see it on a private WINJO preview link.</span>
+                </li>
+                <li>
+                  <span>Your website goes on your own domain, and files are handed over, once billing has started. Your design is licensed to you while your plan is active.</span>
+                </li>
+              </>
+            ) : (
+              <>
             <li>
               <span>We reply within one working day, and your website is live within {DELIVERY.liveWithinDays} days of us having your goals.</span>
             </li>
             <li>
               <span>Cancel any time, with no notice and no cancellation fee. Your plan ends at the end of the month you have paid for. Your design files follow once you have paid for {SUBSCRIPTION_TERMS.designFilesAfterMonths} months, and your site stays live for {SUBSCRIPTION_TERMS.liveAfterEndDays} days after you cancel.</span>
             </li>
+              </>
+            )}
             <li>
               <span>
                 Questions first? {contactPhoneHref && <a href={contactPhoneHref}>Call us</a>}
@@ -1185,17 +1214,71 @@ function PlanCheckout({
         )}
         <div className="btn-row">
           <button type="submit" className="btn btn--primary" disabled={submitting || !agree}>
-            {submitting ? "Opening secure payment…" : `Pay ${formatPence(payNow.pence)} and start`}
+            {submitting ? "Opening secure payment…" : freeFirstMonth ? "Add card and start free month" : `Pay ${formatPence(payNow.pence)} and start`}
           </button>
           <Link href="/contact?topic=website" className="btn btn--secondary">
             Talk to us first
           </Link>
         </div>
         <p className="fine">
-          Payment is handled by Stripe. After you&apos;ve paid, we&apos;ll ask for your goals, pages and style.{" "}
+          {freeFirstMonth
+            ? "Your card is added securely through Stripe and nothing is charged today. Next, we\u2019ll ask for your goals, pages and style. "
+            : <>Payment is handled by Stripe. After you&apos;ve paid, we&apos;ll ask for your goals, pages and style.{" "}</>}
           <Link href="/pricing">Change plan</Link>
         </p>
       </form>
+    </div>
+  );
+}
+
+/** The Black Friday free first month: nothing to pay today, what is charged later, and the agreement to tick first. */
+function FreeMonthPanel({
+  quote,
+  agree,
+  onAgree,
+  startNow,
+  onStartNow,
+}: {
+  quote: WebsiteQuote;
+  agree: boolean;
+  onAgree: (value: boolean) => void;
+  startNow: boolean;
+  onStartNow: (value: boolean) => void;
+}) {
+  return (
+    <div className={styles.pay}>
+      <div className="bf-checkout">
+        <p className="bf-checkout__label">Black Friday</p>
+        <p>{MOTTO}</p>
+      </div>
+      <p className="eyebrow">Today</p>
+      <p className={styles.payAmount}>{formatPence(0)}</p>
+      <p className="muted">
+        We take your card now and nothing is charged for {BLACK_FRIDAY.trialDays} days. Your first payment of {formatGBP(quote.monthly)} is taken on day {BLACK_FRIDAY.trialDays + 1}, then each month. Offer open to sign-ups until {BLACK_FRIDAY.endsLabel}.
+      </p>
+      <fieldset className="pay-agree">
+        <legend className="eyebrow">Before you add your card</legend>
+        <label className="sub-agree">
+          <input type="checkbox" checked={agree} onChange={(e) => onAgree(e.target.checked)} />
+          <span>
+            I agree to the{" "}
+            <Link href="/terms" target="_blank">
+              terms
+            </Link>{" "}
+            and the{" "}
+            <Link href="/pricing#black-friday" target="_blank">
+              Black Friday offer terms
+            </Link>
+            , including the {BLACK_FRIDAY.minimumTermMonths}-month minimum term after my free month.
+          </span>
+        </label>
+        <label className="sub-agree">
+          <input type="checkbox" checked={startNow} onChange={(e) => onStartNow(e.target.checked)} />
+          <span>
+            Start my website straight away. If I cancel within 14 days, I pay only for the work already done.
+          </span>
+        </label>
+      </fieldset>
     </div>
   );
 }

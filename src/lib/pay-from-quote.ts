@@ -5,6 +5,7 @@ import { stripeConfig } from "./stripe";
 import { createOffer, type CreatedOffer } from "./website-offers";
 import type { WebsiteAnswers, WebsiteQuote } from "./website-quote";
 import { checkoutParams, createOfferCheckout, payNowFor } from "./website-subscriptions";
+import { BLACK_FRIDAY } from "./black-friday";
 
 /**
  * Starts a payment straight from a customer's quote: the offer row holds the amounts (worked out here from the
@@ -26,6 +27,11 @@ export async function startQuotePayment(
     quote: WebsiteQuote;
     /** The customer asked us to start work within the 14-day cancellation period. */
     startNow?: boolean;
+    /**
+     * The Black Friday free first month. The caller has already checked, on the server's clock, that the offer is on
+     * and the plan qualifies; here it is recorded with the offer and passed to Stripe as a 30-day trial.
+     */
+    blackFriday?: boolean;
   },
 ): Promise<{ url: string | null; offer: CreatedOffer } | null> {
   if (!payNowFor(args.route, args.quote)) return null;
@@ -40,6 +46,16 @@ export async function startQuotePayment(
     overrides: {},
     createdBy: null,
     consent: { agreedAt: new Date().toISOString(), startNow: args.startNow === true },
+    ...(args.blackFriday
+      ? {
+          blackFriday: {
+            code: BLACK_FRIDAY.code,
+            trialDays: BLACK_FRIDAY.trialDays,
+            minimumTermMonths: BLACK_FRIDAY.minimumTermMonths,
+            agreedAt: new Date().toISOString(),
+          },
+        }
+      : {}),
   });
   if (!offer) return null;
 
@@ -52,8 +68,10 @@ export async function startQuotePayment(
         { id: offer.id, reference: offer.reference, email: args.email, ...offer.amounts },
         {
           success: `${args.origin}/subscribe/done?session_id={CHECKOUT_SESSION_ID}`,
-          cancel: `${args.origin}/subscribe/${offer.token}`,
+          cancel: `${args.origin}/subscribe/${offer.token}?cancelled=1`,
         },
+        {},
+        args.blackFriday ? { days: BLACK_FRIDAY.trialDays, offerCode: BLACK_FRIDAY.code } : undefined,
       ),
     );
     await markAwaitingPayment(db, args.tenantId, args.reference);

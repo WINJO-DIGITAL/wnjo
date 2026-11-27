@@ -9,11 +9,14 @@ export function SubscribeActions({
   mode,
   firstPayment,
   commitment,
+  freeFirstMonth = false,
 }: {
   token: string;
   mode: "pay" | "manage";
   firstPayment?: string;
   commitment?: string;
+  /** The Black Friday free first month: the card is taken now and nothing is charged today. */
+  freeFirstMonth?: boolean;
 }) {
   const [agree, setAgree] = useState(false);
   const [startNow, setStartNow] = useState(false);
@@ -35,7 +38,9 @@ export function SubscribeActions({
         return;
       }
       setError(
-        data.error === "expired"
+        data.error === "offer_ended"
+          ? "The Black Friday offer has ended, so this link no longer works. Reply to our email and we'll help you choose a plan."
+          : data.error === "expired"
           ? "This link has expired. Reply to our email and we'll send a new one."
           : data.error === "already_paid"
             ? "This has already been paid. Thank you."
@@ -74,7 +79,7 @@ export function SubscribeActions({
         </span>
       </label>
       <button type="button" className="btn btn--primary" onClick={go} disabled={!agree || busy}>
-        {busy ? "Opening secure payment…" : `Pay ${firstPayment ?? ""} securely`}
+        {busy ? "Opening secure payment…" : freeFirstMonth ? "Add your card and start your free month" : `Pay ${firstPayment ?? ""} securely`}
       </button>
       <p className="fine">Payment is handled by Stripe. Your card details never reach our servers.</p>
       {error && <p className="field-error" role="alert">{error}</p>}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CARD_POINTS, PLAN_ORDER } from "./WebsitePackages";
 import { REFRESH, WEBSITE_PLANS, formatGBP, type WebsitePlanId } from "@/lib/pricing";
 import { PLAN_EVENT } from "@/lib/plan-selection";
+import { PlanOfferBadge } from "@/components/offers/BlackFriday";
 
 /** The label on the recommended plan (the one marked `popular` in lib/pricing). One place, so the wording is easy to change. */
 const RECOMMENDED_LABEL = "Most popular";
@@ -38,6 +39,7 @@ export function PlanChooser() {
                 <span className="pkg-card__amount">{formatGBP(plan.monthly)}</span>
                 <span className="pkg-card__unit">a month</span>
               </p>
+              <PlanOfferBadge />
               <p className="pkg-card__tagline">{plan.tagline}</p>
               <ul className="pkg-card__points" role="list">
                 {CARD_POINTS[id].slice(0, 4).map((p) => (
