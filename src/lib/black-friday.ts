@@ -29,6 +29,9 @@ export const FIRST_BILL_DAY = BLACK_FRIDAY.trialDays + 1;
 export const OFFER_HEADLINE = `FREE bespoke website for ${BLACK_FRIDAY.trialDays} days`;
 
 /** The line that sits next to the headline everywhere: the price after the trial, and that cancelling is free. */
+/** The cooling-off box on the offer checkout only (owner's wording, 27 November 2026). The standard checkout keeps its own. */
+export const OFFER_COOLING_OFF = "I understand I can cancel at any time before day 15 and pay nothing. After that, my plan is rolling monthly and I can cancel any time.";
+
 export const CANCEL_FREE = `cancel before day ${FIRST_BILL_DAY} and pay nothing`;
 export function afterTrialLine(monthlyPounds: number | null): string {
   return monthlyPounds === null ? `then from ${formatGBP(99)}/mo · ${CANCEL_FREE}` : `then ${formatGBP(monthlyPounds)}/mo · ${CANCEL_FREE}`;

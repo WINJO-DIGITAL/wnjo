@@ -33,7 +33,7 @@ import {
 import { routeFor } from "@/lib/build-journey";
 import { payNowFor } from "@/lib/pay-now";
 import { isShortCheckout } from "@/lib/short-checkout";
-import { BLACK_FRIDAY, CANCEL_FREE, FIRST_BILL_DAY, MOTTO, OFFER_HEADLINE, afterTrialLine, blackFridayEligible } from "@/lib/black-friday";
+import { BLACK_FRIDAY, CANCEL_FREE, OFFER_COOLING_OFF, FIRST_BILL_DAY, MOTTO, OFFER_HEADLINE, afterTrialLine, blackFridayEligible } from "@/lib/black-friday";
 import { useBlackFriday } from "../offers/useBlackFriday";
 import { draftHasProgress } from "@/lib/brief-draft";
 import { loadBriefDraft, saveBriefDraft } from "@/lib/brief-draft-client";
@@ -1277,9 +1277,7 @@ function FreeTrialPanel({
         </label>
         <label className="sub-agree">
           <input type="checkbox" checked={startNow} onChange={(e) => onStartNow(e.target.checked)} />
-          <span>
-            Start my website straight away. If I cancel within 14 days, I pay only for the work already done.
-          </span>
+          <span>{OFFER_COOLING_OFF}</span>
         </label>
       </fieldset>
     </div>

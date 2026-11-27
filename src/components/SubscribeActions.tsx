@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { OFFER_COOLING_OFF } from "@/lib/black-friday";
 
 /** The agree-and-pay step, and the billing link for a subscriber. Errors are shown in plain words; nothing is faked. */
 export function SubscribeActions({
@@ -69,7 +70,7 @@ export function SubscribeActions({
     <div className="stack" style={{ "--stack": "var(--space-4)" } as React.CSSProperties}>
       <label className="sub-agree">
         <input type="checkbox" checked={startNow} onChange={(e) => setStartNow(e.target.checked)} />
-        <span>Please start work straight away. I understand that if I cancel within 14 days, I pay for the work already done.</span>
+        <span>{freeTrial ? OFFER_COOLING_OFF : "Please start work straight away. I understand that if I cancel within 14 days, I pay for the work already done."}</span>
       </label>
       <label className="sub-agree">
         <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
