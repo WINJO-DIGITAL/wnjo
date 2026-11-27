@@ -20,7 +20,7 @@ export function BlackFridayStrip() {
       <div className="container container--wide bf-strip__inner">
         <p className="bf-strip__label">Black Friday</p>
         <p className="bf-strip__text">
-          <strong>{OFFER_HEADLINE}</strong> <span className="bf-strip__then">{afterTrialLine(null)}</span>{" "}
+          <strong>{OFFER_HEADLINE}</strong> <span className="bf-strip__then">{afterTrialLine(null)}.</span>{" "}
           <span className="bf-strip__ends">Sign up by {BLACK_FRIDAY.endsLabel}.</span>
         </p>
         <Link href="/pricing#black-friday" className="bf-strip__link">
